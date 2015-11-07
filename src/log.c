@@ -132,7 +132,7 @@ dx_internal_log_context(dc_t *context, const char* fmt_message, va_list args)
     // Allocate sufficiently large buffer, write message
     if (context->cx_error_message_size < message_size + 1)
     {
-        context->cx_error_message = malloc(message_size + 1);
+        context->cx_error_message = realloc(context->cx_error_message, message_size + 1);
         if (context->cx_error_message == NULL)
         {
             // What should we do!? Throw a tantrum!?
