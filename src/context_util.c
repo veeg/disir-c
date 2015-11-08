@@ -146,6 +146,8 @@ dx_context_create(enum disir_context_type type)
         return NULL;
     }
     
+    log_debug("Allocating disir_context for %s", dx_context_type_string(type));
+
     context = calloc(1, sizeof(struct disir_context));
     if (context == NULL)
         return NULL;

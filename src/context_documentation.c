@@ -68,7 +68,9 @@ dx_documentation_add(dc_t *parent, struct disir_documentation *doc)
     
     if (parent == NULL || doc == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
-    
+
+    log_info_context(parent, "Adding documentation entry to context,");
+
     switch(dc_type(parent))
     {
     case DISIR_CONTEXT_CONFIG:
@@ -101,17 +103,20 @@ dx_documentation_add(dc_t *parent, struct disir_documentation *doc)
     if (parent_doc == NULL)
     {
         // LOGWARN
+        log_debug_context(parent, "parent_doc is NULL - we cannot add doc entry");
         status = DISIR_STATUS_WRONG_CONTEXT;
     }
     // Add to parent storage if no entry exists
     else if (*parent_doc == NULL)
     {
+        log_debug_context(parent, "doesn't contain any doc entries. Adding as only element.");
         *parent_doc = doc;
         status = DISIR_STATUS_OK;
     }
     // There exists multiple entries - insert into storage
     else
     {
+        log_debug_context(parent, "contains documentation entires. Adding in-place");
         // Assume everything is okay
         status = DISIR_STATUS_OK;
         
@@ -203,7 +208,7 @@ dc_add_documentation(dc_t *parent, char *doc, int32_t doc_size)
     // Construct a simple document context with default values.
     // The SemVer version will be default.
     // Any invalid state building operation is reported to parent context
-    
+    log_debug("Arguments ok - begining doc");
     
     status = dx_documentation_begin(parent, &context);
     if (status != DISIR_STATUS_OK)
