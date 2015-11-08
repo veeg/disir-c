@@ -288,7 +288,59 @@ dc_add_value_string(dc_t *context, const char *value, int32_t value_size)
 enum disir_status
 dc_add_introduced(dc_t *context, struct semantic_version semver)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    struct semantic_version *introduced;
+    enum disir_status status;
+
+    introduced = NULL;
+    status = DISIR_STATUS_OK;
+
+    // check arguments
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK(context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    if (context->CONTEXT_CAPABILITY_INTRODUCED == 0)
+    {
+        dx_log_context(context, "no capability to add introduced semver to context");
+        return DISIR_STATUS_NO_CAN_DO;
+    }
+
+    switch(dc_type(context))
+    {
+    case DISIR_CONTEXT_DOCUMENTATION:
+    {
+        introduced = &context->cx_documentation->dd_introduced;
+        break;
+    }
+    case DISIR_CONTEXT_GROUP:
+    case DISIR_CONTEXT_KEYVAL:
+    case DISIR_CONTEXT_TYPE:
+    case DISIR_CONTEXT_DEFAULT:
+    case DISIR_CONTEXT_RESTRICTION:
+        dx_crash_and_burn("%s - UNHANDLED CONTEXT TYPE: %s", __FUNCTION__, dc_type_string(context));
+    case DISIR_CONTEXT_CONFIG:
+    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_TEMPLATE:
+        dx_log_context(context, "invoked %s() with capability it should not have.", __FUNCTION__);
+        status = DISIR_STATUS_INTERNAL_ERROR;
+        break;
+    case DISIR_CONTEXT_UNKNOWN:
+        status = DISIR_STATUS_BAD_CONTEXT_OBJECT;
+        break;
+    // No default handler - let compiler warn us of  unhandled context
+    }
+
+    if (introduced)
+    {
+        introduced->sv_major = semver.sv_major;
+        introduced->sv_minor = semver.sv_minor;
+        introduced->sv_patch = semver.sv_patch;
+    }
+
+    return status;
 }
 
 //! PUBLIC API
@@ -317,7 +369,13 @@ dc_get_introduced(dc_t *context, struct semantic_version *semver)
         log_debug("invoked with semver NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    
+
+    if (context->CONTEXT_CAPABILITY_INTRODUCED == 0)
+    {
+        dx_log_context(context, "no capability to get introduced semver from context");
+        return DISIR_STATUS_NO_CAN_DO;
+    }
+
     introduced = NULL;
     status = DISIR_STATUS_OK;
     
@@ -328,15 +386,18 @@ dc_get_introduced(dc_t *context, struct semantic_version *semver)
         introduced = &context->cx_documentation->dd_introduced;
         break;
     }
-    case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_GROUP:
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn("%s - UNHANDLED CONTEXT TYPE: %s", __FUNCTION__, dc_type_string(context));
+    case DISIR_CONTEXT_CONFIG:
+    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_TEMPLATE:
+        dx_log_context(context, "invoked %s() with capability it should not have.", __FUNCTION__);
+        status = DISIR_STATUS_INTERNAL_ERROR;
+        break;
     case DISIR_CONTEXT_UNKNOWN:
         status = DISIR_STATUS_BAD_CONTEXT_OBJECT;
         break;
