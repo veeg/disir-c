@@ -16,8 +16,8 @@ enum disir_context_capabilities
     CC_ADD_MULTIPLE_DOCUMENTATION       = 1ull << 3,
     CC_ADD_NAME                         = 1ull << 4,
     CC_ADD_VALUE_STRING                 = 1ull << 5,
-    CC_ADD_INTRODUCED                   = 1ull << 6,
-    CC_ADD_DEPRECRATED                  = 1ull << 7,
+    CC_INTRODUCED                       = 1ull << 6,
+    CC_DEPRECRATED                      = 1ull << 7,
 };
 
 //! The almighty disir_context
@@ -38,8 +38,8 @@ struct disir_context
                         CONTEXT_CAPABILITY_ADD_MULTIPLE_DOCUMENTATION : 1,
                         CONTEXT_CAPABILITY_ADD_NAME                 : 1,
                         CONTEXT_CAPABILITY_ADD_VALUE_STRING         : 1,
-                        CONTEXT_CAPABILITY_ADD_INTRODUCED           : 1,
-                        CONTEXT_CAPABILITY_ADD_DEPRECRATED          : 1,
+                        CONTEXT_CAPABILITY_INTRODUCED               : 1,
+                        CONTEXT_CAPABILITY_DEPRECRATED              : 1,
                                                                     : 0;
         };
     };
