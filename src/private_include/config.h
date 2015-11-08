@@ -16,7 +16,7 @@ struct disir_config
     struct disir_schema     *cf_schema;
 
     // TODO: Hashmap of entries, either keyval or group.
-    
+
     //! Documentation associated with the disir_config.
     //! Only one entry is allowed.
     struct disir_documentation      *cf_documentation;

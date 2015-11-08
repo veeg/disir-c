@@ -53,7 +53,7 @@ struct disir_context
                         CONTEXT_STATE_INVALID           : 1;
         };
     };
-    
+
     //! The actual object pointed to by this context.
     union
     {
@@ -64,15 +64,15 @@ struct disir_context
         struct disir_keyval         *cx_keyval;
         struct disir_documentation  *cx_documentation;
     };
-    
+
     //! Parent context of this context.
     dc_t                        *cx_parent_context;
-    
-    
+
+
     //! Reference count on how many context pointers the user
     //! is in possession of.
     int64_t                     cx_refcount;
-     
+
     //! Allocated and populated if an error message occurs.
     //! Should probably be a stack of messages, with a counter.
     //! and a state counter!

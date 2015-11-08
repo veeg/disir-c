@@ -5,24 +5,23 @@ struct disir_documentation
 {
     //! Context element this documentation element belongs to.
     dc_t                        *dd_context;
-    
+
     //! Version this documentation entry was introduced.
     struct semantic_version     dd_introduced;
-    
+
     //! Allocated if dd_string_size is greater than zero.
     char                        *dd_string;
-    
+
     //! Number of bytes that make up the documentation string.
     //! Excluding NULL terminator
     int32_t                     dd_string_size;
-    
+
     //! Number of bytes allocated for dd_string
     int32_t                     dd_string_allocated;
-    
+
     // Simple double linked list
     struct disir_documentation *dd_next;
     struct disir_documentation *dd_prev;
-
 };
 
 //! Construct a DISIR_CONTEXT_DOCUMENTATION as a child of parent.

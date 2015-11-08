@@ -49,30 +49,30 @@ dx_log_format(enum disir_log_level dll, const char *prefix, const char* fmt_mess
     FILE *stream;
     time_t now;
     struct tm *utctime;
-    
+
     buffer_size = 100;
-    
+
     // Dont log anything if loglevel doesnt match
     if (dll > runtime_loglevel)
     {
         return;
     }
-    
+
     if (dll <= DISIR_LOG_LEVEL_NONE || dll > DISIR_LOG_LEVEL_DEBUG)
     {
         dx_crash_and_burn("Passed log level is of the charts!: %d", dll);
     }
-    
+
     // Get UTC time
     time(&now);
     utctime = gmtime(&now);
-    
+
     time_written = strftime(buffer, buffer_size, "[%Y-%m-%d %H:%M:%S]", utctime);
     if (time_written >= buffer_size || time_written <= 0)
     {
         dx_crash_and_burn("strftime returned: %d - not within buffer size: %d", time_written, buffer_size);
     }
-    
+
     res = snprintf(buffer + time_written, buffer_size - time_written, 
             "-[%s] %s%s", 
             disir_log_level_string[dll], 
@@ -83,19 +83,19 @@ dx_log_format(enum disir_log_level dll, const char *prefix, const char* fmt_mess
         // Buffer not large enough, or encoding error..
         dx_crash_and_burn("snprintf() returned res: %d - size: %d", res, buffer_size - time_written);
     }
-    
+
     // Prepare outgoing stream
     stream = fopen("/var/log/disir.log", "a");
-    
+
     // Output buffer with time, loglevel and context
     fwrite(buffer, 1, time_written + res, stream);
-    
+
     // Write incomming log message
     vfprintf(stream, fmt_message, args);
-    
+
     // Append newline to log message
     fprintf(stream, "\n");
-    
+
     // close output stream. We dont want to keep it open forever, atleast not yet.
     fclose(stream);
 }
@@ -112,7 +112,7 @@ dx_internal_log_context(dc_t *context, const char* fmt_message, va_list args)
     int res;
     char dummy[4];
     va_list args_copy;
-    
+
     // Make two instances of variadic arguments list
     // one to count buffer size, and one to populate
     va_copy(args_copy, args);
@@ -123,13 +123,13 @@ dx_internal_log_context(dc_t *context, const char* fmt_message, va_list args)
     // This will only count the size, not write any bytes
     message_size = vsnprintf(dummy, 1, fmt_message, args_copy);
     va_end(args_copy);
-    
+
     if (message_size <= 0)
     {
         // Nothing to log!
         return;
     }
-    
+
     // Allocate sufficiently large buffer, write message
     if (context->cx_error_message_size < message_size + 1)
     {
@@ -141,12 +141,12 @@ dx_internal_log_context(dc_t *context, const char* fmt_message, va_list args)
         }
         context->cx_error_message_size = message_size + 1;
     }
-    
+
     res = vsnprintf(context->cx_error_message, message_size + 1, fmt_message, args);
-    
+
     // Put a null terminator to it.
     context->cx_error_message[message_size] = '\0';
-    
+
     if (res < 0 || res > message_size)
     {
         // Another error case to report.. If only i had memory..
@@ -169,16 +169,16 @@ dx_log_disir(enum disir_log_level dll,
     int prefix_size = 60;
     int res;
     va_list args;
-    
+
     prefix = NULL;
-    
+
     if (log_context)
     {
         va_start(args, fmt_message);
         dx_internal_log_context(context, fmt_message, args);
         va_end(args);
     }
-    
+
     if (context)
     {
         //! Prepare the log prefix message.

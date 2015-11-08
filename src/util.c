@@ -36,14 +36,14 @@ int
 dx_semantic_version_compare(struct semantic_version *s1, struct semantic_version *s2)
 {
     int res;
-    
+
     res = 0;
-    
+
     res = s1->sv_major - s2->sv_major;
     if (res == 0)
         res = s1->sv_minor - s2->sv_minor;
     if (res == 0)
         res = s1->sv_patch - s2->sv_patch;
-    
+
     return res;
 }

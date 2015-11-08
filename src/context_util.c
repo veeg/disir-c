@@ -83,7 +83,7 @@ dx_context_type_sanify(enum disir_context_type type)
     {
         return DISIR_CONTEXT_UNKNOWN;
     }
-    
+
     return type;
 }
 
@@ -109,7 +109,7 @@ dx_context_attach(dc_t *parent, dc_t *context)
 {
     if (parent == NULL || context == NULL)
         return;
-    
+
     context->cx_parent_context = parent;
 }
 
@@ -125,7 +125,7 @@ void
 dx_context_decref(dc_t *context)
 {
     context->cx_refcount--;
-    
+
     if (context->cx_refcount == 0)
     {
         dx_context_destroy(&context);
@@ -145,18 +145,18 @@ dx_context_create(enum disir_context_type type)
         log_debug("invoked with unknown context type( %d )", type);
         return NULL;
     }
-    
+
     log_debug("Allocating disir_context for %s", dx_context_type_string(type));
 
     context = calloc(1, sizeof(struct disir_context));
     if (context == NULL)
         return NULL;
-    
+
     context->cx_type = type;
-    
+
     // Set default context state to CONSTRUCTING
     context->CONTEXT_STATE_CONSTRUCTING = 1;
-    
+
     // Set capabilities on context
     switch (type)
     {
@@ -187,7 +187,7 @@ dx_context_create(enum disir_context_type type)
         break;
     // No default handler - let compiler warn us of unhandled context
     }
-    
+
     return context;
 }
 
@@ -197,13 +197,13 @@ dx_context_destroy(dc_t **context)
 {
     if (context == NULL || *context == NULL)
         return;
-    
+
     // Free the error message, if it exists
     if ((*context)->cx_error_message)
     {
         free((*context)->cx_error_message);
     }
-    
+
     free(*context);
     *context = NULL;
 }
@@ -213,15 +213,15 @@ void
 dx_context_transfer_logwarn(dc_t *destination, dc_t *source)
 {
     // Simply inherhit the memory allocated by source to destination
-    
+
     // Check arguments
     if (destination == NULL || source == NULL)
         return;
-    
+
     // No error message to transfer
     if (source->cx_error_message == NULL)
         return;
-    
+
     // No size on source error message - uhmm..
     if (source->cx_error_message_size <= 0)
         return;
@@ -232,10 +232,10 @@ dx_context_transfer_logwarn(dc_t *destination, dc_t *source)
         free(destination->cx_error_message);
         destination->cx_error_message_size = 0;
     }
-    
+
     destination->cx_error_message = source->cx_error_message;
     destination->cx_error_message_size = source->cx_error_message_size;
-    
+
     source->cx_error_message = NULL;
     source->cx_error_message_size = 0;
 }
@@ -250,25 +250,25 @@ dx_context_full_check_log_error(dc_t **context, const char *function_name)
         log_debug("%s() invoked with context NULL pointer", function_name);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    
+
     if (*context == NULL)
     {
         log_debug("%s() invoked with context NULL pointer value.", function_name);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    
+
     if ((*context)->CONTEXT_STATE_INVALID)
     {
         dx_log_context(*context, "%s() invoked on invalid context %s", function_name, dc_type_string(*context));
         return DISIR_STATUS_INVALID_CONTEXT;
     }
-    
+
     if (dx_context_type_sanify((*context)->cx_type) == DISIR_CONTEXT_UNKNOWN)
     {
         dx_log_context(*context, "%s() invoked on unknown context( %d )", (*context)->cx_type);
         return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;
     }
-    
+
     return DISIR_STATUS_OK;
 }
 
@@ -293,7 +293,7 @@ dx_context_type_check_log_error(dc_t *context, ...)
     status = DISIR_STATUS_OK;
     variadic_type = DISIR_CONTEXT_UNKNOWN;
     context_type = dx_context_type_sanify(context->cx_type);
-    
+
     // Check if the passed context matches any of the context types
     // passed in the variadic list.
     // If the passed context is unknown, skip straight to fail.
@@ -305,7 +305,7 @@ dx_context_type_check_log_error(dc_t *context, ...)
              variadic_type = va_arg(ap, enum disir_context_type))
         {
             variadic_list_length += 1;
-            
+
             if (context_type == dx_context_type_sanify(variadic_type))
             {
                 correct_context = 1;
@@ -320,7 +320,7 @@ dx_context_type_check_log_error(dc_t *context, ...)
     {
         buffer_space = 512;
         buf = buffer;
-        
+
         if (context_type == DISIR_CONTEXT_UNKNOWN)
         {
             written = snprintf(buf, buffer_space,
@@ -342,7 +342,7 @@ dx_context_type_check_log_error(dc_t *context, ...)
                         dx_context_type_string(context_type));
             status = DISIR_STATUS_WRONG_CONTEXT;
         }
-        
+
         // Error check buffer.
         if (written < 0 || written >= buffer_space)
         {
@@ -363,7 +363,7 @@ dx_context_type_check_log_error(dc_t *context, ...)
             buf += written;
             buffer_space -= written;
         }
-        
+
         // Write out comma separated list of strings for the passed variadic contexts
         if (context_type != DISIR_CONTEXT_UNKNOWN && variadic_list_length != 0)
         {
@@ -384,7 +384,7 @@ dx_context_type_check_log_error(dc_t *context, ...)
                     written = snprintf(buf, buffer_space, " %s(%d),", 
                                 dx_context_type_string(variadic_type), variadic_type);    
                 }
-                
+
                 if (written < 0 || written >= buffer_space)
                 {
                     // Abort appending, just printout what we have..
@@ -397,7 +397,7 @@ dx_context_type_check_log_error(dc_t *context, ...)
                 }
             }
             va_end(ap);
-            
+
             // Remove the last comma
             *(buf - 1) = '\0';
         }
