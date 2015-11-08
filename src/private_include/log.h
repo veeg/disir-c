@@ -42,7 +42,7 @@ void dx_log_disir( enum disir_log_level dll,
 #define log_fatal_context(context, message, ...) _log_disir_level_context(DISIR_LOG_LEVEL_FATAL, context, message, ##__VA_ARGS__)
 #define log_error_context(context, message, ...) _log_disir_level_context(DISIR_LOG_LEVEL_WARNING, context, message, ##__VA_ARGS__)
 #define log_warn_context(context, message, ...) _log_disir_level_context(DISIR_LOG_LEVEL_ERROR, context, message, ##__VA_ARGS__)
-#define log_info_context(context, info, ...) _log_disir_level_context(DISIR_LOG_LEVEL_INFO, context, message, ##__VA_ARGS__)
+#define log_info_context(context, message, ...) _log_disir_level_context(DISIR_LOG_LEVEL_INFO, context, message, ##__VA_ARGS__)
 #define log_debug_context(context, message, ...) _log_disir_level_context(DISIR_LOG_LEVEL_DEBUG, context, message, ##__VA_ARGS__)
 
 //! Log at different log levels
