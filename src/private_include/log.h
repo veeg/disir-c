@@ -13,6 +13,8 @@ enum disir_log_level {
     DISIR_LOG_LEVEL_ERROR,
     //! Warning, erroneous and Fatal conditions are logged.
     DISIR_LOG_LEVEL_WARNING,
+    //! Test level - Used within the testsuite.
+    DISIR_LOG_LEVEL_TEST,
     //! Informational entries prints will be logged.
     DISIR_LOG_LEVEL_INFO,
     //! Everything will be logged, i mean, really.
@@ -47,6 +49,7 @@ void dx_log_disir( enum disir_log_level dll,
 #define log_fatal(message, ...) _log_disir_level(DISIR_LOG_LEVEL_FATAL, message, ##__VA_ARGS__)
 #define log_error(message, ...) _log_disir_level(DISIR_LOG_LEVEL_ERROR, message, ##__VA_ARGS__)
 #define log_warn(message, ...) _log_disir_level(DISIR_LOG_LEVEL_WARNING, message, ##__VA_ARGS__)
+#define log_test(message, ...) _log_disir_level(DISIR_LOG_LEVEL_TEST, message, ##__VA_ARGS__)
 #define log_info(message, ...) _log_disir_level(DISIR_LOG_LEVEL_INFO, message, ##__VA_ARGS__)
 #define log_debug(message, ...) _log_disir_level(DISIR_LOG_LEVEL_DEBUG, message, ##__VA_ARGS__)
 
