@@ -89,7 +89,7 @@ dx_context_type_sanify(enum disir_context_type type)
 
 //! INTERNAL API
 uint32_t
-dx_context_type_if_toplevel(enum disir_context_type context_type)
+dx_context_type_is_toplevel(enum disir_context_type context_type)
 {
     if (
         context_type == DISIR_CONTEXT_CONFIG    ||
