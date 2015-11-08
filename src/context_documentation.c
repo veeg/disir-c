@@ -62,7 +62,7 @@ dx_documentation_add(dc_t *parent, struct disir_documentation *doc)
     enum disir_status status;
     int res;
     char buffer[32];
-    
+
     status = DISIR_STATUS_INTERNAL_ERROR;
     parent_doc = NULL;
     
@@ -136,7 +136,7 @@ dx_documentation_add(dc_t *parent, struct disir_documentation *doc)
                     status = DISIR_STATUS_CONFLICTING_SEMVER;
                     break;
                 }
-                
+
                 // Insert inplace of tmp
                 if (res > 0)
                 {
@@ -149,7 +149,7 @@ dx_documentation_add(dc_t *parent, struct disir_documentation *doc)
                     tmp->dd_prev = doc;
                     break;
                 }
-                
+
                 // Doc is greatest entry, append to list
                 if (tmp->dd_next == NULL)
                 {
@@ -157,13 +157,13 @@ dx_documentation_add(dc_t *parent, struct disir_documentation *doc)
                     tmp->dd_next = doc;
                     break;
                 }
-                
+
                 tmp = tmp->dd_next;
                 res = dx_semantic_version_compare(&tmp->dd_introduced, &doc->dd_introduced);
             }
         }
     }
-    
+
     return status;
 }
 
