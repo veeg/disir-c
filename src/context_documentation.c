@@ -366,7 +366,7 @@ dx_documentation_add_value_string(struct disir_documentation *doc, const char *v
 
 //! INTERNAL API
 struct disir_documentation *
-dx_documentation_create(dc_t *parent)
+dx_documentation_create(dc_t *context)
 {
     struct disir_documentation *doc;
     
@@ -374,7 +374,7 @@ dx_documentation_create(dc_t *parent)
     if (doc == NULL)
         return NULL;
     
-    doc->dd_context = parent;
+    doc->dd_context = context;
     
     return doc;
 }
