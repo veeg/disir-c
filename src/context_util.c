@@ -242,7 +242,7 @@ dx_context_transfer_logwarn(dc_t *destination, dc_t *source)
 
 //! INTERNAL API
 enum disir_status
-dx_context_full_check_log_error(dc_t **context, const char *function_name)
+dx_context_sp_full_check_log_error(dc_t *context, const char *function_name)
 {
     // Check argument
     if (context == NULL)
@@ -251,26 +251,36 @@ dx_context_full_check_log_error(dc_t **context, const char *function_name)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    if (*context == NULL)
+    if (context->CONTEXT_STATE_INVALID)
     {
-        log_debug("%s() invoked with context NULL pointer value.", function_name);
-        return DISIR_STATUS_INVALID_ARGUMENT;
-    }
-
-    if ((*context)->CONTEXT_STATE_INVALID)
-    {
-        dx_log_context(*context, "%s() invoked on invalid context %s", function_name, dc_type_string(*context));
+        dx_log_context(context, "%s() invoked on invalid context %s", function_name, dc_type_string(context));
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
-    if (dx_context_type_sanify((*context)->cx_type) == DISIR_CONTEXT_UNKNOWN)
+    if (dx_context_type_sanify(context->cx_type) == DISIR_CONTEXT_UNKNOWN)
     {
-        dx_log_context(*context, "%s() invoked on unknown context( %d )", (*context)->cx_type);
+        dx_log_context(context, "%s() invoked on unknown context( %d )", context->cx_type);
         return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;
     }
 
     return DISIR_STATUS_OK;
 }
+
+//! INTERNAL API
+enum disir_status
+dx_context_dp_full_check_log_error(dc_t **context, const char *function_name)
+{
+    // Check argument
+    if (context == NULL)
+    {
+        log_debug("%s() invoked with context NULL pointer", function_name);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    return dx_context_sp_full_check_log_error(*context, function_name);
+}
+
+
 
 //! INTERNAL API
 enum disir_status
@@ -354,6 +364,7 @@ dx_context_type_check_log_error(dc_t *context, ...)
             else
             {
                 // Insufficient buffer
+                dx_crash_and_burn("TODO: Re-allocate log buffer - too small");
                 status = DISIR_STATUS_INSUFFICIENT_RESOURCES;
             }
         }

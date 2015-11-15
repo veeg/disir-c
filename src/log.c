@@ -87,8 +87,15 @@ dx_log_format(enum disir_log_level dll, const char *prefix, const char* fmt_mess
     // Prepare outgoing stream
     stream = fopen("/var/log/disir.log", "a");
 
+    // Cant open file output stream! Bleh!
+    if (stream == NULL)
+    {
+      // Throw a tantrum?
+      return;
+    }
+
     // Output buffer with time, loglevel and context
-    fwrite(buffer, 1, time_written + res, stream);
+    fwrite(buffer, time_written + res, sizeof(char), stream);
 
     // Write incomming log message
     vfprintf(stream, fmt_message, args);

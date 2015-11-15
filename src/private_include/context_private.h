@@ -92,10 +92,10 @@ struct disir_context
 
 //! Check if the passed disir_context pointer is non-NULL, 
 //! is not of type DISIR_CONTEXT_UNKNOWN and its state is not INVALID.
-#define CONTEXT_NULL_INVALID_TYPE_CHECK(context) dx_context_full_check_log_error(&context, __FUNCTION__)
+#define CONTEXT_NULL_INVALID_TYPE_CHECK(context) dx_context_sp_full_check_log_error(context, __FUNCTION__)
 //! \see CONTEXT_NULL_INVALID_TYPE_CHECK
 //! Input a disir_context double pointers instead.
-#define CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK(context) dx_context_full_check_log_error(context, __FUNCTION__)
+#define CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK(context) dx_context_dp_full_check_log_error(context, __FUNCTION__)
 
 
 //
@@ -163,11 +163,18 @@ void dx_context_destroy(dc_t **context);
 //!     of variadic arguments of DISIR_CONTEXT_*
 enum disir_status dx_context_type_check_log_error(dc_t *context, ...);
 
-//! Check if the passed context is INVALID.
+//! Check if the passed context single pointer is INVALID.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if null pointer is supplied.
 //! \return DISIR_STATUS_INVALID_CONTEXT if the passed context is INVALID.
 //! \return DISIR_STATUS_OK if everything is great!
-enum disir_status dx_context_full_check_log_error(dc_t **context, const char *function_name);
+enum disir_status dx_context_sp_full_check_log_error(dc_t *context, const char *function_name);
+
+//! Check if the passed context double pointer is INVALID.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if null pointer is supplied.
+//! \return DISIR_STATUS_INVALID_CONTEXT if the passed context is INVALID.
+//! \return DISIR_STATUS_OK if everything is great!
+enum disir_status dx_context_dp_full_check_log_error(dc_t **context, const char *function_name);
+
 
 
 // Transfer the logwarn entry from source to destination
