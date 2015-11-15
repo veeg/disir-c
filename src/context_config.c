@@ -149,6 +149,7 @@ dx_config_create(dc_t *context)
 enum disir_status
 dx_config_destroy(struct disir_config **config)
 {
+    dc_t *context;
     if (config == NULL || *config == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
@@ -156,7 +157,10 @@ dx_config_destroy(struct disir_config **config)
 
     // Destroy single documentation, if it exists
     if ((*config)->cf_documentation)
-        dc_destroy(&((*config)->cf_documentation->dd_context));
+    {
+        context = (*config)->cf_documentation->dd_context;
+        dc_destroy(&context);
+    }
 
     free(*config);
     *config = NULL;

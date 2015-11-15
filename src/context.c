@@ -49,6 +49,8 @@ dc_printerror(dc_t *context, char *buffer, int32_t buffer_size, int32_t *bytes_w
 }
 
 //! PUBLIC API
+//! INTERNAL USAGE: Be careful not to enter a context pointer address that originate
+//! from within the structure to be deleted.
 enum disir_status
 dc_destroy(dc_t **context)
 {
@@ -70,6 +72,8 @@ dc_destroy(dc_t **context)
         *context = NULL;
         return DISIR_STATUS_OK;
     }
+
+    log_context_debug(context, "destroying (context: %p - *context: %p", context, *context)
 
     // Call destroy on the object pointed to by context.
     // This shall destroy the element, and every single child.
