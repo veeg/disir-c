@@ -1,6 +1,6 @@
 
 
-find_library (CMocka NAMES cmocka.a cmocka)
+find_library (cmocka NAMES cmocka.a cmocka)
 
 # Include all the inclulde directories in the disir source
 include_directories(
@@ -24,4 +24,4 @@ add_definitions ("-Wall")
 add_definitions ("-Werror")
 
 target_link_libraries(${LIBDISIR_TESTSUITE_TARGET} ${PROJECT_NAME})
-target_link_libraries(${LIBDISIR_TESTSUITE_TARGET} CMocka)
+target_link_libraries(${LIBDISIR_TESTSUITE_TARGET} cmocka)

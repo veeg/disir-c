@@ -8,7 +8,7 @@
 #define LOG_TEST _log_disir_level(DISIR_LOG_LEVEL_TEST, "TESTING %s()", __FUNCTION__);
 #define LOG_TEST_CONTEXT(context) _log_disir_level(DISIR_LOG_LEVEL_TEST, "TESTING (context: %s) %s()", dc_type_string(context), __FUNCTION__)
 
-! Include the individual test group source files.
+//! Include the individual test group source files.
 #include "test_context.c"
 #include "test_context_documentation.c"
 #include "test_introduced.c"
