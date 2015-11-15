@@ -342,7 +342,8 @@ dx_documentation_add_value_string(struct disir_documentation *doc, const char *v
         // Allocate doc string, if need be
         if (doc->dd_string == NULL)
         {
-            doc->dd_string = calloc(1, value_size);
+            // Size of requested string + 1 for NULL terminator
+            doc->dd_string = calloc(1, value_size + 1);
             if (doc->dd_string == NULL)
             {
                 // LOGWARN
