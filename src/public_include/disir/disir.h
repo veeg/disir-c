@@ -48,8 +48,6 @@ enum disir_restriction
     DISIR_RESTRICTION_RANGE,
 };
 
-//! The IO interface can be implemented by external parties.
-#include "io_interface.h"
 #include <disir/util.h>
 
 
