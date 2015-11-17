@@ -36,48 +36,6 @@ int teardown_context_documentation(void **state)
     return 0;
 }
 
-//
-void
-test_context_documentation_dx_documentation_add_can_add(void **state)
-{
-    dc_t *parent = *state;
-    enum disir_status status;
-    struct disir_documentation *doc;
-
-    LOG_TEST_CONTEXT(parent);
-
-    doc = dx_documentation_create(NULL);
-    assert_non_null(doc);
-
-    // Add single entry - shall succeed
-    status = dx_documentation_add(parent, doc);
-    assert_int_equal(status, DISIR_STATUS_OK);
-
-    status = dx_documentation_destroy(&doc);
-    assert_int_equal(status, DISIR_STATUS_OK);
-}
-
-//
-void
-test_context_documentation_dx_documentation_add_cannot_add(void **state)
-{
-    dc_t *parent = *state;
-    enum disir_status status;
-    struct disir_documentation *doc;
-
-    LOG_TEST_CONTEXT(parent);
-
-    doc = dx_documentation_create(NULL);
-    assert_non_null(doc);
-
-    // Add first entry
-    status = dx_documentation_add(parent, doc);
-    assert_int_equal(status, DISIR_STATUS_WRONG_CONTEXT);
-    
-    status = dx_documentation_destroy(&doc);
-    assert_int_equal(status, DISIR_STATUS_OK);
-}
-
 //! Test basic API functions for dx_documentation_add()
 void
 test_context_documentation_dx_documentation_add_basic(void **state)
@@ -366,14 +324,6 @@ const struct CMUnitTest disir_context_documentation_tests[] = {
   cmocka_unit_test(test_context_documentation_dc_add_documentation_basic),
   cmocka_unit_test(test_context_documentation_dx_documentation_begin_basic),
   cmocka_unit_test(test_context_documentation_dx_documentation_add_basic),
-    // dx_documentation_add can add
-    cmocka_unit_test_setup_teardown(
-        test_context_documentation_dx_documentation_add_can_add,
-        setup_context_config, teardown_context_config),
-    // dx_documentation_add cannot add
-    cmocka_unit_test_setup_teardown(
-        test_context_documentation_dx_documentation_add_cannot_add,
-        setup_context_documentation, teardown_context_documentation),
     // dc_add_documentation can add single
     cmocka_unit_test_setup_teardown(
         test_context_documentation_dc_add_documentation_can_add_single,
