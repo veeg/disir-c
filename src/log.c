@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <time.h>
+#include <string.h>
 
 #include "log.h"
 #include "context_private.h"
@@ -40,9 +41,9 @@ dx_crash_and_burn(const char* message, ...)
 //! prefix is injected between the fmt message and the timestamp/loglevel
 //! Ignored if null
 static void
-dx_log_format(enum disir_log_level dll, const char *prefix, const char* fmt_message, va_list args)
+dx_log_format(enum disir_log_level dll, const char *prefix, const char *suffix, const char* fmt_message, va_list args)
 {
-    char buffer[100];
+    char buffer[512];
     size_t  time_written;
     int res;
     int buffer_size;
@@ -50,7 +51,7 @@ dx_log_format(enum disir_log_level dll, const char *prefix, const char* fmt_mess
     time_t now;
     struct tm *utctime;
 
-    buffer_size = 100;
+    buffer_size = 512;
 
     // Dont log anything if loglevel doesnt match
     if (dll > runtime_loglevel)
@@ -77,7 +78,8 @@ dx_log_format(enum disir_log_level dll, const char *prefix, const char* fmt_mess
             "-[%s] %s%s", 
             disir_log_level_string[dll], 
             (prefix != NULL ? prefix : ""),
-            (prefix != NULL ? " " : ""));
+            (prefix != NULL ? " " : "")
+            );
     if (res >= buffer_size - time_written || res < 0)
     {
         // Buffer not large enough, or encoding error..
@@ -99,6 +101,10 @@ dx_log_format(enum disir_log_level dll, const char *prefix, const char* fmt_mess
 
     // Write incomming log message
     vfprintf(stream, fmt_message, args);
+
+    // Write suffix
+    if (suffix != NULL)
+        fwrite(suffix, strlen(suffix), sizeof(char), stream); // XXX
 
     // Append newline to log message
     fprintf(stream, "\n");
@@ -172,12 +178,15 @@ dx_log_disir(enum disir_log_level dll,
             ...)
 {
     char *prefix;
+    char *suffix;
     char buffer[60];
+    char suffix_buffer[255];
     int prefix_size = 60;
     int res;
     va_list args;
 
     prefix = NULL;
+    suffix = NULL;
 
     if (log_context)
     {
@@ -197,7 +206,25 @@ dx_log_disir(enum disir_log_level dll,
         }
     }
 
+    if (dll == DISIR_LOG_LEVEL_DEBUG)
+    {
+        res = snprintf(suffix_buffer, 255, " (%s%s%s:%d)",
+                // file, "/",
+                "", "",
+                function,
+                line);
+        if (res > 0 || res < 255)
+        {
+            suffix_buffer[res] = '\0';
+            suffix = suffix_buffer;
+        }
+    }
+
     va_start(args, fmt_message);
-    dx_log_format(dll, (prefix != NULL ? prefix : message_prefix), fmt_message, args);
+    dx_log_format(dll,
+            (prefix != NULL ? prefix : message_prefix),
+            (suffix != NULL ? suffix : ""),
+            fmt_message,
+            args);
     va_end(args);
 }
