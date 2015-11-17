@@ -73,7 +73,7 @@ dc_destroy(dc_t **context)
         return DISIR_STATUS_OK;
     }
 
-    log_context_debug(context, "destroying (context: %p - *context: %p", context, *context)
+    log_debug_context(*context, "destroying (context: %p - *context: %p", context, *context);
 
     // Call destroy on the object pointed to by context.
     // This shall destroy the element, and every single child.

@@ -273,7 +273,7 @@ dx_context_dp_full_check_log_error(dc_t **context, const char *function_name)
     // Check argument
     if (context == NULL)
     {
-        log_debug("%s() invoked with context NULL pointer", function_name);
+        log_debug("%s() invoked with context double NULL pointer", function_name);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
