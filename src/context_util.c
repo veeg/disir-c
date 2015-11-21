@@ -157,6 +157,9 @@ dx_context_create(enum disir_context_type type)
     // Set default context state to CONSTRUCTING
     context->CONTEXT_STATE_CONSTRUCTING = 1;
 
+    // Set refcount to 1 - object is owned by creator.
+    context->cx_refcount = 1;
+
     // Set capabilities on context
     switch (type)
     {
