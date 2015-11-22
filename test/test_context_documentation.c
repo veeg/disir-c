@@ -47,7 +47,7 @@ test_context_documentation_dx_documentation_add_basic(void **state)
     struct disir_documentation *doc3;    
     struct disir_documentation *tmp;
 
-    LOG_TEST
+    LOG_TEST_START
 
     //
     // Use DISIR_CONTEXT_CONFIG as the testbed
@@ -125,6 +125,8 @@ test_context_documentation_dx_documentation_add_basic(void **state)
     // XXX: Will it tho, since its DISIR_CONTEXT_CONFIG 
     // and all doc entries  has no context. Hmm
     dc_destroy(&parent);
+
+    LOG_TEST_END
 }
 
 void
@@ -136,11 +138,13 @@ test_context_documentation_dc_add_documentation_can_add_single(void **state)
     char doc_string[] = "A doc string that tells something";
     int32_t doc_string_size = strlen(doc_string);
 
-    LOG_TEST_CONTEXT(parent);
+    LOG_TEST_CONTEXT_START(parent);
 
     // Add single entry - shall succeed
     status = dc_add_documentation(parent, doc_string, doc_string_size);
     assert_int_equal(status, DISIR_STATUS_OK);
+
+    LOG_TEST_CONTEXT_END(parent);
 }
 
 void
@@ -152,11 +156,13 @@ test_context_documentation_dc_add_documentation_cannot_add_single(void **state)
     char doc_string[] = "A doc string that tells something";
     int32_t doc_string_size = strlen(doc_string);
 
-    LOG_TEST_CONTEXT(parent);
+    LOG_TEST_CONTEXT_START(parent);
 
     // Add single entry - shall fail
     status = dc_add_documentation(parent, doc_string, doc_string_size);
     assert_int_equal(status, DISIR_STATUS_NO_CAN_DO);
+
+    LOG_TEST_CONTEXT_END(parent);
 }
 
 void
@@ -168,7 +174,7 @@ test_context_documentation_dc_add_documentation_can_add_multiple(void **state)
     char doc_string[] = "A doc string that tells something";
     int32_t doc_string_size = strlen(doc_string);
 
-    LOG_TEST_CONTEXT(parent);
+    LOG_TEST_CONTEXT_START(parent);
 
     // Add single entry - shall succeed
     status = dc_add_documentation(parent, doc_string, doc_string_size);
@@ -177,6 +183,8 @@ test_context_documentation_dc_add_documentation_can_add_multiple(void **state)
     // Add another entry - shall succeed
     status = dc_add_documentation(parent, doc_string, doc_string_size);
     assert_int_equal(status, DISIR_STATUS_OK);
+
+    LOG_TEST_CONTEXT_END(parent);
 }
 
 void
@@ -188,7 +196,7 @@ test_context_documentation_dc_add_documentation_cannot_add_multiple(void **state
     char doc_string[] = "A doc string that tells something";
     int32_t doc_string_size = strlen(doc_string);
 
-    LOG_TEST_CONTEXT(parent);
+    LOG_TEST_CONTEXT_START(parent);
 
     // Add single entry - shall succeed
     status = dc_add_documentation(parent, doc_string, doc_string_size);
@@ -197,6 +205,8 @@ test_context_documentation_dc_add_documentation_cannot_add_multiple(void **state
     // Add another entry - shall fail
     status = dc_add_documentation(parent, doc_string, doc_string_size);
     assert_int_equal(status, DISIR_STATUS_EXISTS);
+
+    LOG_TEST_CONTEXT_END(parent);
 }
 
 void test_context_documentation_dc_add_documentation_basic(void **state)
@@ -206,7 +216,7 @@ void test_context_documentation_dc_add_documentation_basic(void **state)
     int32_t doc_one_size;
     char doc_string_one[] = "A doc string that tells something";
 
-    LOG_TEST
+    LOG_TEST_START
 
     parent = NULL;
     doc_one_size = strlen(doc_string_one);
@@ -249,6 +259,8 @@ void test_context_documentation_dc_add_documentation_basic(void **state)
 
     status = dc_destroy(&parent);
     assert_int_equal(status, DISIR_STATUS_OK);
+
+    LOG_TEST_END
 }
 
 void test_context_documentation_dx_documentation_begin_basic(void **state)
@@ -260,7 +272,7 @@ void test_context_documentation_dx_documentation_begin_basic(void **state)
     char doc_string_one[] = "A doc string that tells something";
     struct semantic_version semver;
 
-    LOG_TEST
+    LOG_TEST_START
 
     parent = NULL;
     doc = NULL;
@@ -318,6 +330,8 @@ void test_context_documentation_dx_documentation_begin_basic(void **state)
 
     // Cleanup
     dc_destroy(&parent);
+
+    LOG_TEST_END 
 }
 
 const struct CMUnitTest disir_context_documentation_tests[] = {

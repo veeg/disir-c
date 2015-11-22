@@ -41,6 +41,8 @@ test_context_type(void **state)
 {
     dc_t c;
     dc_t *context = &c;
+
+    LOG_TEST_START
     
     enum disir_context_type type;
     
@@ -107,12 +109,16 @@ test_context_type(void **state)
     c.cx_type = 87634;
     assert_true(dc_type(context) == DISIR_CONTEXT_UNKNOWN);
     assert_string_equal(dc_type_string(context), "UNKNOWN");
+
+    LOG_TEST_END
 }
 
 void test_context_type_check(void **state)
 {
     dc_t context;
     enum disir_status status;
+
+    LOG_TEST_START
     
     // input invalid context less than zero.
     context.cx_type = -5;
@@ -157,6 +163,8 @@ void test_context_type_check(void **state)
     context.cx_type = DISIR_CONTEXT_GROUP;
     status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_DEFAULT, DISIR_CONTEXT_GROUP);
     assert_int_equal(status, DISIR_STATUS_OK);
+
+    LOG_TEST_END
 }
 
 
