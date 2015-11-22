@@ -32,6 +32,38 @@ int teardown_context_config(void **state)
     return 0;
 }
 
+static void
+test_context_create(void **state)
+{
+    dc_t *context;
+
+    LOG_TEST_START
+
+    context = dx_context_create(DISIR_CONTEXT_CONFIG);
+    assert_non_null(context);
+
+    assert_int_equal(context->cx_refcount, 1);
+
+    LOG_TEST_END
+}
+
+static void
+test_context_destroy(void **state)
+{
+    dc_t *context;
+
+    LOG_TEST_START
+
+    // prep
+    context = dx_context_create(DISIR_CONTEXT_CONFIG);
+    assert_non_null(context);
+
+    dc_destroy(&context);
+    assert_null(context);
+
+    LOG_TEST_END
+}
+
 
 // Test the allocator for each context type, and
 // query that dc_type returns the correct type.
@@ -171,4 +203,6 @@ void test_context_type_check(void **state)
 const struct CMUnitTest disir_context_tests[] = {
   cmocka_unit_test(test_context_type),
   cmocka_unit_test(test_context_type_check),
+  cmocka_unit_test(test_context_create),
+  cmocka_unit_test(test_context_destroy),
 };
