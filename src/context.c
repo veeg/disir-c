@@ -106,6 +106,9 @@ dc_destroy(dc_t **context)
     // Simply decref the context - When it reaches zero, it will be dealloced
     dx_context_decref(*context);
 
+    // Take care of the users pointer. As an added service!
+    *context = NULL;
+
     return status;
 }
 
