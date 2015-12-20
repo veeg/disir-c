@@ -58,16 +58,16 @@ dc_destroy(dc_t **context)
 
     // Check arguments
     status = CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK(context);
-    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_DESTROYED_CONTEXT)
     {
         // Already logged.
         return status;
     }
 
-    // If context is invalid, decrement and get-out-of-town
-    if ((*context)->CONTEXT_STATE_INVALID)
+    // If context is destroyed, decrement and get-out-of-town
+    if ((*context)->cx_state == CONTEXT_STATE_DESTROYED)
     {
-        log_debug("destroying invalid context( %p )", *context);
+        log_debug("destroying destroyed-context( %p )", *context);
         dx_context_decref(*context);
         *context = NULL;
         return DISIR_STATUS_OK;
@@ -99,9 +99,8 @@ dc_destroy(dc_t **context)
     // No default switch handle - Let compiler warn us for unhandled case
     }
 
-    // Set the context to invalid
-    (*context)->cx_state = 0;
-    (*context)->CONTEXT_STATE_INVALID = 1;
+    // Set the context to destroyed
+    (*context)->cx_state = CONTEXT_STATE_DESTROYED;
 
     // Simply decref the context - When it reaches zero, it will be dealloced
     dx_context_decref(*context);
@@ -223,13 +222,13 @@ dc_putcontext(dc_t **context)
     // Check arguments
     // Let invalid contexts into this safe heaven!
     status = CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK(context);
-    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_DESTROYED_CONTEXT)
     {
         // Already logged.
         return status;
     }
 
-    if ((*context)->CONTEXT_STATE_CONSTRUCTING)
+    if ((*context)->cx_state == CONTEXT_STATE_CONSTRUCTING)
     {
         dx_log_context(*context, "You cannot put back a context in contructing mode. You can either destroy it or finalize it.");
         return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;

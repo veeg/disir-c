@@ -155,7 +155,7 @@ dx_context_create(enum disir_context_type type)
     context->cx_type = type;
 
     // Set default context state to CONSTRUCTING
-    context->CONTEXT_STATE_CONSTRUCTING = 1;
+    context->cx_state = CONTEXT_STATE_CONSTRUCTING;
 
     // Set refcount to 1 - object is owned by creator.
     context->cx_refcount = 1;
@@ -254,10 +254,10 @@ dx_context_sp_full_check_log_error(dc_t *context, const char *function_name)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    if (context->CONTEXT_STATE_INVALID)
+    if (context->cx_state == CONTEXT_STATE_DESTROYED)
     {
-        dx_log_context(context, "%s() invoked on invalid context %s", function_name, dc_type_string(context));
-        return DISIR_STATUS_INVALID_CONTEXT;
+        dx_log_context(context, "%s() invoked on destroyed context %s", function_name, dc_type_string(context));
+        return DISIR_STATUS_DESTROYED_CONTEXT;
     }
 
     if (dx_context_type_sanify(context->cx_type) == DISIR_CONTEXT_UNKNOWN)
