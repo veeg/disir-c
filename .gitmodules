@@ -1,0 +1,3 @@
+[submodule "lib/void-multimap"]
+	path = lib/void-multimap
+	url = git@github.com:veeg/void-multimap.git
