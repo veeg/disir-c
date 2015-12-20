@@ -22,16 +22,17 @@ set (LIBDISIR_PRIVATE_INCLUDE_DIR
     CACHE INTERNAL "${PROJECT_NAME}: Private include directory" FORCE
 )
 
+# Define a static libdisir library
+add_library(${PROJECT_NAME} STATIC ${_LIBDISIR_SOURCES})
+
 include_directories (
     ${LIBDISIR_PUBLIC_INCLUDE_DIR}
     ${LIBDISIR_PRIVATE_INCLUDE_DIR}
+    ${VOID-MULTIMAP_PUBLIC_INCLUDE_DIR}
 )
-
-# Define a static libdisir library
-add_library(${PROJECT_NAME} STATIC ${_LIBDISIR_SOURCES})
 
 add_definitions ("-Wall")
 add_definitions ("-Werror")
 
-target_link_libraries(${PROJECT_NAME})
+target_link_libraries (${PROJECT_NAME} void-multimap)
 
