@@ -137,7 +137,9 @@ dx_documentation_add(dc_t *parent, struct disir_documentation *doc)
                 if (res == 0)
                 {
                     // LOGWARN
-                    dx_log_context(parent, "already contains a documentation entry with semantic version: %s", dx_semver_string(buffer, 40, &doc->dd_introduced));
+                    dx_log_context (parent,
+                            "already contains a documentation entry with semantic version: %s",
+                            dx_semver_string (buffer, 40, &doc->dd_introduced));
                     status = DISIR_STATUS_CONFLICTING_SEMVER;
                     break;
                 }
