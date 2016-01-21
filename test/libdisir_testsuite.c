@@ -16,6 +16,7 @@
 #include "test_context_documentation.c"
 #include "test_introduced.c"
 #include "test_collection.c"
+#include "test_util.c"
 
 int
 main(int argc, char *argv[])
@@ -27,5 +28,6 @@ main(int argc, char *argv[])
     returnval += cmocka_run_group_tests_name("Context-documentation", disir_context_documentation_tests, NULL, NULL);
     returnval += cmocka_run_group_tests_name("Introduced", disir_introduced_tests, NULL, NULL);
     returnval += cmocka_run_group_tests_name("Collection", disir_collection_tests, NULL, NULL);
+    returnval += cmocka_run_group_tests_name("Utility", disir_util_tests, NULL, NULL);
     return returnval;
 }
