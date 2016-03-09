@@ -1,0 +1,6 @@
+= Developer Documentation
+
+Methods that interface with the overall *Disir* operations are prefixed with `disir_`.
+
+To query and interact with configuration objects returned by *Disir* operations, 
+the namespace to employ is `dx_`

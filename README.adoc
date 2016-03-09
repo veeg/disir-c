@@ -1,0 +1,17 @@
+= Disir - Text-based configuration files management
+
+_Disir_ is a text-based configuration file management system. Why? Because configuration files are made to be configured. _They change_. When the provider of a configuration file changes the semantics of a configurable variable, this change is not propagated to deployed configuration files through an upgrade. Heck, even the changes made by the user is not saved through an update.
+
+== But we have RPM, which readily stores modified configuration files as *.rpmnew. Why not just use that?
+
+Because its **manual**. It does not aid you in resolving conflict between the saved backup and the new version. It provides no documentation **alongside** the configuration definition. It does not automatically provide type safety and restriction checks. This is all left up to be manually handled by the application deploying a configuration file. 
+
+== Contributing Guidelines
+
+* Coding style shall be consistent with the entire codebase.
+
+== TODO List
+
+[horizontal]
+Templates:: The schemas should be able to inherrit shared definitions from a template.
+
