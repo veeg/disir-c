@@ -1,6 +1,0 @@
-[submodule "lib/void-multimap"]
-	path = lib/void-multimap
-	url = git@github.com:veeg/void-multimap.git
-[submodule "lib/list"]
-	path = lib/list
-	url = git@github.com:veeg/list.git
