@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+#
+# Run all commit-msg hooks found in the git hooks directory
+#
+require_relative '../local/githook.rb'
+
+VERBOSE = false
+DEBUG = false
+
+GitHook.invoke_hooks "commit-msg", ARGV

@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+require_relative '../local/githook.rb'
+
+class CommitMessageFormat < GitHook
+
+  TYPES = ["feat", "fix", "docs", "style", "refactor", "test", "chore"]
+
+  def run
+    message_file = ARGV[0]
+    commit_msg_filepath = "#{self.class.git_root}/#{message_file}"
+
+    @rln = 0
+    File.open(commit_msg_filepath, 'r').each_with_index do |line, line_number|
+      next if line[0] == '#'
+      check_format_rules @rln, line.strip
+      @rln += 1
+    end
+  end
+
+  def check_format_rules(line_number, line)
+    if line_number == 0 && line.length > 50
+      error "First line should be less than 50 characters in length."
+    end
+    if line_number == 0
+      checks_out = false
+      TYPES.each do |type|
+        if line.start_with? "#{type}: "
+          checks_out = true
+        end
+      end
+      if not checks_out
+        error "First line must include type: #{TYPES.join ', '}" +
+        "\n\tExample \"docs: updated end user manual\""
+      end
+    end
+    if line_number == 1 && line.length > 0
+      error "Second line should be empty."
+    end
+    if line.length > 72 && line[0] != '#'
+      error "No line shall be over 72 characters long."
+    end
+  end
+end
+
+CommitMessageFormat.hook ARGV

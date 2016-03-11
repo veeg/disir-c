@@ -1,0 +1,50 @@
+#!/usr/bin/env ruby
+require_relative '../local/githook.rb'
+
+class LineWidth < GitHook
+  def run
+    @line_length = 100
+    @offending_lines = {}
+    @git_files = `git diff --cached --name-only`.lines.map(&:chomp)
+    get_offending_lines
+    assert_no_offending_lines
+  end
+
+  def get_offending_lines
+    @git_files.each do |file|
+      verbose "Testing file elidibility: #{file}"
+      next unless File.file?(file)
+      next if File.binary?(file)
+
+      verbose "Checking file: #{file}"
+      File.open(file) do |f|
+        ln = 1
+        lna = Array.new
+
+        f.each_line do |line|
+          debug "#{line.size.to_s.rjust(3, '0')} #{line}"
+          lna.push(Hash[:line => line, :num => ln]) if line.size > @line_length
+          ln += 1
+        end
+        @offending_lines[file] = lna unless lna.empty?
+      end
+    end
+  end
+
+  def assert_no_offending_lines
+    unless @offending_lines.empty?
+      puts "[POLICY]: Source code lines should not be above #{@line_length} characters."
+      puts "Offenting line(s):"
+      @offending_lines.each do |file, arr|
+        arr.each do |hsh|
+          puts "#{file}:#{hsh[:num].to_s}"
+          puts "\t#{hsh[:line]}"
+        end
+      end
+
+      exit 1
+    end
+  end
+end
+
+LineWidth.hook ARGV
