@@ -8,32 +8,32 @@
 
 //! PUBLIC API
 int32_t
-dc_collection_size(dcc_t *collection)
+dc_collection_size (dcc_t *collection)
 {
     // QUESTION: Should this return -1 instead?
     if (collection == NULL)
         return 0;
 
     // Collesce to get an accurate count
-    dx_collection_coalesce(collection);
+    dx_collection_coalesce (collection);
 
     return collection->cc_numentries;
 }
 
 //! PUBLIC API
 enum disir_status
-dc_collection_next(dcc_t *collection, dc_t **context)
+dc_collection_next (dcc_t *collection, dc_t **context)
 {
     enum disir_status status;
 
     if (collection == NULL)
     {
-        log_debug("Invoked with NULL collection pointer.");
+        log_debug ("Invoked with NULL collection pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (context == NULL)
     {
-        log_debug("invoked with NULL context pointer.");
+        log_debug ("invoked with NULL context pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -41,7 +41,7 @@ dc_collection_next(dcc_t *collection, dc_t **context)
     *context = NULL;
 
     // Coalesce array to get it in sync with reality
-    status = dx_collection_coalesce(collection);
+    status = dx_collection_coalesce (collection);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -50,7 +50,7 @@ dc_collection_next(dcc_t *collection, dc_t **context)
     // Exausted?
     if (collection->cc_iterator_index > collection->cc_numentries - 1)
     {
-        log_debug("Collection iterator( %d ) exhausted (numentires: %d)", 
+        log_debug ("Collection iterator( %d ) exhausted (numentires: %d)",
                 collection->cc_iterator_index, collection->cc_numentries - 1);
         return DISIR_STATUS_EXHAUSTED;
     }
@@ -58,7 +58,7 @@ dc_collection_next(dcc_t *collection, dc_t **context)
     // Grab the iterator index item, increment index.
     *context = collection->cc_collection[collection->cc_iterator_index];
 
-    log_debug("Next context( %p ) at index( %d )", *context, collection->cc_iterator_index);
+    log_debug ("Next context( %p ) at index( %d )", *context, collection->cc_iterator_index);
 
     collection->cc_iterator_index++;
 
@@ -67,11 +67,11 @@ dc_collection_next(dcc_t *collection, dc_t **context)
 
 //! PUBLIC API
 enum disir_status
-dc_collection_reset(dcc_t *collection)
+dc_collection_reset (dcc_t *collection)
 {
     if (collection == NULL)
     {
-        log_debug("invoked with collection NULL pointer.");
+        log_debug ("invoked with collection NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -93,7 +93,7 @@ dx_collection_coalesce(dcc_t *collection)
 
     if (collection == NULL)
     {
-        log_debug("invoked with collection NULL pointer.");
+        log_debug ("invoked with collection NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -109,10 +109,9 @@ dx_collection_coalesce(dcc_t *collection)
 
         if (context == NULL || context->cx_state == CONTEXT_STATE_DESTROYED)
         {
-            // 
             if (context != NULL)
             {
-                dx_context_decref(context);
+                dx_context_decref (context);
                 invalid_entries_count += 1;
                 context = collection->cc_collection[index - 1] = NULL;
             }
@@ -157,17 +156,17 @@ dx_collection_coalesce(dcc_t *collection)
 
 //! INTERNAL API
 dcc_t *
-dx_collection_create(void)
+dx_collection_create (void)
 {
     dcc_t *collection;
 
-    collection = calloc(1, sizeof(dcc_t));
+    collection = calloc (1, sizeof (dcc_t));
     if (collection == NULL)
         return NULL;
 
     collection->cc_capacity = 10;
 
-    collection->cc_collection = calloc(collection->cc_capacity, sizeof(dc_t *));
+    collection->cc_collection = calloc (collection->cc_capacity, sizeof (dc_t *));
     if (collection->cc_collection == NULL)
     {
         free(collection);
@@ -179,7 +178,7 @@ dx_collection_create(void)
 
 //! PUBLIC API
 enum disir_status
-dc_collection_finished(dcc_t **collection)
+dc_collection_finished (dcc_t **collection)
 {
     uint32_t index;
     dc_t *context;
@@ -197,7 +196,7 @@ dc_collection_finished(dcc_t **collection)
         context = (*collection)->cc_collection[index];
         if (context != NULL)
         {
-            dx_context_decref(context);
+            dx_context_decref (context);
         }
         index++;
     }
@@ -211,7 +210,7 @@ dc_collection_finished(dcc_t **collection)
 
 //! INTERNAL API
 enum disir_status
-dx_collection_push_context(dcc_t *collection, dc_t *context)
+dx_collection_push_context (dcc_t *collection, dc_t *context)
 {
     enum disir_status status;
     void *reallocated_collection;
@@ -220,17 +219,17 @@ dx_collection_push_context(dcc_t *collection, dc_t *context)
 
     if (collection == NULL)
     {
-        log_debug("Invoked with NULL collection pointer.");
+        log_debug ("Invoked with NULL collection pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (context == NULL)
     {
-        log_debug("invoked with NULL context pointer.");
+        log_debug ("invoked with NULL context pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
     // Coalesce array to get it in sync with reality
-    status = dx_collection_coalesce(collection);
+    status = dx_collection_coalesce (collection);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -240,22 +239,21 @@ dx_collection_push_context(dcc_t *collection, dc_t *context)
     if (collection->cc_numentries == collection->cc_capacity)
     {
         reallocated_capacity = collection->cc_capacity + 10;
-        reallocated_size = reallocated_capacity * sizeof(dc_t*);
-        log_debug("Reallocating collection to new size( %d )", reallocated_size);
-        reallocated_collection = realloc(collection->cc_collection, reallocated_size);
+        reallocated_size = reallocated_capacity * sizeof (dc_t*);
+        log_debug ("Reallocating collection to new size( %d )", reallocated_size);
+        reallocated_collection = realloc (collection->cc_collection, reallocated_size);
         if (reallocated_collection == NULL)
         {
-            log_warn("context collection reallocation of size( %d ) failed.", reallocated_size);
+            log_warn ("context collection reallocation of size( %d ) failed.", reallocated_size);
             return DISIR_STATUS_NO_MEMORY;
         }
         collection->cc_collection = reallocated_collection;
         collection->cc_capacity = reallocated_capacity;
     }
 
-    dx_context_incref(context);
+    dx_context_incref (context);
     collection->cc_collection[collection->cc_numentries] = context;
     collection->cc_numentries++;
 
     return DISIR_STATUS_OK;
 }
-
