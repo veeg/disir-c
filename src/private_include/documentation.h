@@ -25,27 +25,29 @@ struct disir_documentation
 };
 
 //! Construct a DISIR_CONTEXT_DOCUMENTATION as a child of parent.
-enum disir_status dx_documentation_begin(dc_t *parent, dc_t **doc);
+enum disir_status dx_documentation_begin (dc_t *parent, dc_t **doc);
 
 //! Finalize the construction of a DISIR_CONTEXT_DOCUMENTATION
-enum disir_status dx_documentation_finalize(dc_t **doc);
+enum disir_status dx_documentation_finalize (dc_t **doc);
 
 //! Allocate a disir_documentation structure
-struct disir_documentation *dx_documentation_create(dc_t *parent);
+struct disir_documentation *dx_documentation_create (dc_t *parent);
 
 //! Destroy a disir_documentation structure, freeing all associated
 //! memory and unhooking from linked list storage.
-enum disir_status dx_documentation_destroy(struct disir_documentation **documentation);
+enum disir_status dx_documentation_destroy (struct disir_documentation **documentation);
 
 //! Allocate and populate the documentation string entry
-enum disir_status dx_documentation_add_value_string(struct disir_documentation *doc, const char *value, int32_t value_size);
+enum disir_status dx_documentation_add_value_string (struct disir_documentation *doc,
+                                                     const char *value,
+                                                     int32_t value_size);
 
 //! Fetch the associated documentation structure from the passed context.
 //! NULL is returned if no such documentation exists
 //! Function asserts if it receives an unhandled context type
-struct disir_documentation *dx_documentation_fetch(dc_t *context);
+struct disir_documentation *dx_documentation_fetch (dc_t *context);
 
 //! Add a disir_documentation to the parent context
-enum disir_status dx_documentation_add(dc_t *parent, struct disir_documentation *doc);
+enum disir_status dx_documentation_add (dc_t *parent, struct disir_documentation *doc);
 
 #endif // _LIBDISIR_DOCUMENTATION_H

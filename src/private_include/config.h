@@ -24,10 +24,10 @@ struct disir_config
 
 //! INTERNAL API
 //! Allocate a struct disir_config
-struct disir_config *dx_config_create(dc_t *context);
+struct disir_config *dx_config_create (dc_t *context);
 
 //! INTERNAL API
 //! Destroy the passed struct disir_config
-enum disir_status dx_config_destroy(struct disir_config **config);
+enum disir_status dx_config_destroy (struct disir_config **config);
 
 #endif // _LIBDISIR_CONFIG_H

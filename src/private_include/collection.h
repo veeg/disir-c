@@ -28,19 +28,18 @@ struct disir_context_collection
 };
 
 //! INTERNAL API
-dcc_t * dx_collection_create(void);
+dcc_t * dx_collection_create (void);
 
 //! INTERNAL API
 //! Make sure every entry in collection is valid and stored sequentially.
 //! Modify iterator index and numentries if context(s) are found to be invalid.
 //! Decref and lose invalid context pointers.
-enum disir_status dx_collection_coalesce(dcc_t *collection);
+enum disir_status dx_collection_coalesce (dcc_t *collection);
 
 //! INTERNAL API
 //! Append the context to the end of the collection.
-//! Will increment the context reference count. 
-enum disir_status dx_collection_push_context(dcc_t *collection, dc_t *context);
+//! Will increment the context reference count.
+enum disir_status dx_collection_push_context (dcc_t *collection, dc_t *context);
 
 
 #endif // _LIBDISIR_PRIVATE_CONTEXT_COLLECTION_H
-

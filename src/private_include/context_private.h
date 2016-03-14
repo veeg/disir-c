@@ -36,7 +36,7 @@ struct disir_context
 {
     //! Type of object this context describes.
     enum disir_context_type     cx_type;
-    
+
     //! Capabilities determine what operation
     //! is allowed on this context.
     union {
@@ -80,7 +80,7 @@ struct disir_context
     //! Should probably be a stack of messages, with a counter.
     //! and a state counter!
     char                        *cx_error_message;
-    int32_t                     cx_error_message_size;    
+    int32_t                     cx_error_message_size;
 };
 
 //
@@ -90,15 +90,19 @@ struct disir_context
 //! Check if the passed context is of the same type
 //! as any of the passed DISIR_CONTEXT_* in the variadic list.
 //! Logs an error to the context and returns DISIR_STATUS_WRONG_CONTEXT
-//! upon mismatching types. 
-#define CONTEXT_TYPE_CHECK(context, ...) dx_context_type_check_log_error(context, __VA_ARGS__, 0)
+//! upon mismatching types.
+#define CONTEXT_TYPE_CHECK(context, ...) \
+    dx_context_type_check_log_error (context, __VA_ARGS__, 0)
 
-//! Check if the passed disir_context pointer is non-NULL, 
+//! Check if the passed disir_context pointer is non-NULL,
 //! is not of type DISIR_CONTEXT_UNKNOWN and its state is not INVALID.
-#define CONTEXT_NULL_INVALID_TYPE_CHECK(context) dx_context_sp_full_check_log_error(context, __FUNCTION__)
+#define CONTEXT_NULL_INVALID_TYPE_CHECK(context) \
+    dx_context_sp_full_check_log_error (context, __FUNCTION__)
+
 //! \see CONTEXT_NULL_INVALID_TYPE_CHECK
 //! Input a disir_context double pointers instead.
-#define CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK(context) dx_context_dp_full_check_log_error(context, __FUNCTION__)
+#define CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK(context) \
+    dx_context_dp_full_check_log_error (context, __FUNCTION__)
 
 
 //
@@ -106,42 +110,42 @@ struct disir_context
 //
 
 //! Increment the reference count for the passed context.
-void dx_context_incref(dc_t *context);
+void dx_context_incref (dc_t *context);
 
 //! Decrement the reference count for the passed context.
 //! If the reference count reaches zero, the context is de-allocated.
 //! Nothing is done for object which is pointed to by this context.
 //! It is the callers responsibility to make sure it is properly free'd
-void dx_context_decref(dc_t *context);
+void dx_context_decref (dc_t *context);
 
 //! Attach 'parent' as parent context to 'context'
-void dx_context_attach(dc_t *parent, dc_t *context);
+void dx_context_attach (dc_t *parent, dc_t *context);
 
 //! Return the string representation of the disir_context_type enumeration
-const char * dx_context_type_string(enum disir_context_type type);
+const char * dx_context_type_string (enum disir_context_type type);
 
 //! Return a string description of the passed capability.
 //! \return string description of passed capability
 //!     if 'capability' is unknown, a standard 'unknown capability' string
-//!     is returned.    
-const char *dx_context_capability_string(uint64_t capability);
+//!     is returned.
+const char *dx_context_capability_string (uint64_t capability);
 
 //! Return 1 if the passed disir_context type is a Top-Level context type
 //! \return 1 if 'type' is an enum value representing a top-level context.
 //! \return 0 if 'type' is not an enum value representing a top-level context.
-uint32_t dx_context_type_is_toplevel(enum disir_context_type type);
+uint32_t dx_context_type_is_toplevel (enum disir_context_type type);
 
 //! Sanify the passed enum value, making sure its within DISIR_CONTEXT_TYPE
 //! bounds. If its out of bounds, DISIR_CONTEXT_UNKNOWN is returned.
 //! \return DISIR_CONTEXT_UNKNOWN is returned if input type is out-of-bounds
 //! \return 'type' if within bounds.
-enum disir_context_type dx_context_type_sanify(enum disir_context_type type);
+enum disir_context_type dx_context_type_sanify (enum disir_context_type type);
 
 //! Allocate a disir_context
-dc_t * dx_context_create(enum disir_context_type type);
+dc_t * dx_context_create (enum disir_context_type type);
 
 //! Free an allocated disir_context
-void dx_context_destroy(dc_t **context);
+void dx_context_destroy (dc_t **context);
 
 
 //! Check that the passed context is either of the passed
@@ -164,24 +168,24 @@ void dx_context_destroy(dc_t **context);
 //! \return DISIR_STATUS_INTERNAL_ERROR is returned upon encoding error.
 //! \return DISIR_STATUS_OK is returned when passed context exists in set
 //!     of variadic arguments of DISIR_CONTEXT_*
-enum disir_status dx_context_type_check_log_error(dc_t *context, ...);
+enum disir_status dx_context_type_check_log_error (dc_t *context, ...);
 
 //! Check if the passed context single pointer is INVALID.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if null pointer is supplied.
 //! \return DISIR_STATUS_INVALID_CONTEXT if the passed context is INVALID.
 //! \return DISIR_STATUS_OK if everything is great!
-enum disir_status dx_context_sp_full_check_log_error(dc_t *context, const char *function_name);
+enum disir_status dx_context_sp_full_check_log_error (dc_t *context, const char *function_name);
 
 //! Check if the passed context double pointer is INVALID.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if null pointer is supplied.
 //! \return DISIR_STATUS_INVALID_CONTEXT if the passed context is INVALID.
 //! \return DISIR_STATUS_OK if everything is great!
-enum disir_status dx_context_dp_full_check_log_error(dc_t **context, const char *function_name);
+enum disir_status dx_context_dp_full_check_log_error (dc_t **context, const char *function_name);
 
 
 
 // Transfer the logwarn entry from source to destination
-void dx_context_transfer_logwarn(dc_t *destination, dc_t *source);
+void dx_context_transfer_logwarn (dc_t *destination, dc_t *source);
 
 
 #endif // _LIBDISIR_CONTEXT_PRIVATE_H
