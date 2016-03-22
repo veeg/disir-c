@@ -19,5 +19,6 @@ int32_t dc_collection_size (dcc_t *collection);
 //! Finished using the context collection.
 enum disir_status dc_collection_finished (dcc_t **collection);
 
+
 #endif // _LIBDISIR_COLLECTION_H
 

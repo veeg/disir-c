@@ -231,3 +231,4 @@ dx_log_disir (enum disir_log_level dll,
             args);
     va_end (args);
 }
+

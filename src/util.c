@@ -48,3 +48,4 @@ dx_semantic_version_compare (struct semantic_version *s1, struct semantic_versio
 
     return res;
 }
+

@@ -167,3 +167,4 @@ dx_config_destroy (struct disir_config **config)
 
     return DISIR_STATUS_OK;
 }
+

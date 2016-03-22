@@ -80,4 +80,6 @@ void dx_log_disir( enum disir_log_level dll,
 //! USE WITH EXTREME CARE
 void dx_crash_and_burn(const char* message, ...);
 
+
 #endif // _LIBDISIR_LOG_H
+

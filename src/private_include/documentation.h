@@ -51,3 +51,4 @@ struct disir_documentation *dx_documentation_fetch (dc_t *context);
 enum disir_status dx_documentation_add (dc_t *parent, struct disir_documentation *doc);
 
 #endif // _LIBDISIR_DOCUMENTATION_H
+

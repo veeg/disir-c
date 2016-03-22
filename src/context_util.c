@@ -428,3 +428,4 @@ dx_context_type_check_log_error (dc_t *context, ...)
 
     return status;
 }
+

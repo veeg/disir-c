@@ -189,3 +189,4 @@ void dx_context_transfer_logwarn (dc_t *destination, dc_t *source);
 
 
 #endif // _LIBDISIR_CONTEXT_PRIVATE_H
+

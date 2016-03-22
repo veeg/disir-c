@@ -436,3 +436,4 @@ dc_get_deprecrated (dc_t *context, struct semantic_version *semver)
 {
     return DISIR_STATUS_INTERNAL_ERROR;
 }
+

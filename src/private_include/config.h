@@ -31,3 +31,4 @@ struct disir_config *dx_config_create (dc_t *context);
 enum disir_status dx_config_destroy (struct disir_config **config);
 
 #endif // _LIBDISIR_CONFIG_H
+

@@ -257,3 +257,4 @@ dx_collection_push_context (dcc_t *collection, dc_t *context)
 
     return DISIR_STATUS_OK;
 }
+

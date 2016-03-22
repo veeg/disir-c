@@ -410,3 +410,4 @@ dx_documentation_destroy (struct disir_documentation **documentation)
     *documentation = NULL;
     return DISIR_STATUS_OK;
 }
+
