@@ -42,7 +42,7 @@ enum disir_status
     DISIR_STATUS_CONFLICTING_SEMVER,
     //! The requested resource is exhausted.
     DISIR_STATUS_EXHAUSTED,
-    
+
 };
 
 //! Forward declaration of the top-level context disir_config
@@ -71,6 +71,5 @@ enum disir_restriction
 #include <disir/util.h>
 
 
-
-
 #endif // _LIBDISIR_H
+

@@ -3,7 +3,7 @@
 
 #include <disir/disir.h>
 
-//! \struct semantic_version provides a dedicated data type 
+//! \struct semantic_version provides a dedicated data type
 //! to represent semantically versioned objects.
 struct semantic_version
 {
@@ -25,3 +25,4 @@ char * dx_semver_string(char *buffer, int32_t buffer_size, struct semantic_versi
 
 
 #endif // _LIBDISIR_UTIL_H
+
