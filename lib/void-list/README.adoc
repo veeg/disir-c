@@ -1,0 +1,15 @@
+= void-list
+
+A simple double linked list in C
+
+== Build
+
+.Build with CMake
+----
+mkdir build
+cd build
+cmake ..
+make
+ctest -V
+----
+
