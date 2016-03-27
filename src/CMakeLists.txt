@@ -39,3 +39,15 @@ add_definitions ("-Werror")
 target_link_libraries (${PROJECT_NAME} void-multimap)
 target_link_libraries (${PROJECT_NAME} void-list)
 
+install (TARGETS ${PROJECT_NAME}
+    EXPORT ${EXPORT_TARGET}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    INCLUDES DESTINATION include
+)
+
+install (
+  DIRECTORY ${LIBDISIR_PUBLIC_INCLUDE_DIR}/
+  DESTINATION include
+  COMPONENT Devel
+)
