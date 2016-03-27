@@ -1,0 +1,7 @@
+<config disir="1.1.0" group="default">
+  <unchanged>COOL</unchanged>
+  <fep_file>/etc/fep/general.cfg"</fep_file>
+  <output>
+    <rolling_archive>ISP</rolling_archive>
+  </output>
+</config>

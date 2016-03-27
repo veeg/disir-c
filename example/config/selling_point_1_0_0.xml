@@ -1,0 +1,4 @@
+<config disir="1.0.0" group="default">
+  <country>Norway</country>
+  <timeout>10</timeout>
+</config>
