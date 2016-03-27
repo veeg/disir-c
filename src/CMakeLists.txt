@@ -29,10 +29,12 @@ include_directories (
     ${LIBDISIR_PUBLIC_INCLUDE_DIR}
     ${LIBDISIR_PRIVATE_INCLUDE_DIR}
     ${VOID-MULTIMAP_PUBLIC_INCLUDE_DIR}
+    ${VOID-LIST_PUBLIC_INCLUDE_DIR}
 )
 
 add_definitions ("-Wall")
 add_definitions ("-Werror")
 
 target_link_libraries (${PROJECT_NAME} void-multimap)
+target_link_libraries (${PROJECT_NAME} void-list)
 
