@@ -1,5 +1,5 @@
 
-find_library (cmocka NAMES multimap.a multimap)
+find_library (cmocka NAMES cmocka.a cmocka)
 
 include_directories (${VOID-MULTIMAP_PUBLIC_INCLUDE_DIR})
 
