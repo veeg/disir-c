@@ -25,4 +25,10 @@ include_directories (${VOID-LIST_PUBLIC_INCLUDE_DIR})
 add_definitions ("-Wall")
 add_definitions ("-Werror")
 
+install (
+    TARGETS ${PROJECT_NAME}
+    EXPORT ${EXPORT_TARGET}
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+)
 
