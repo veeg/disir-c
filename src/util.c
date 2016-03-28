@@ -20,7 +20,7 @@ dx_semver_string (char *buffer, int32_t buffer_size, struct semantic_version *se
     }
 
     res = snprintf (buffer, buffer_size,
-            "%d.%d.%d.", semver->sv_major, semver->sv_minor, semver->sv_patch);
+            "%d.%d.%d", semver->sv_major, semver->sv_minor, semver->sv_patch);
     if (res < 0 || res >= buffer_size)
     {
         log_warn ("Insufficient buffer( %p ) size( %d ) to copy semver (%d.%d.%d) - Res: %d",
