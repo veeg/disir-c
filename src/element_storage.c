@@ -226,7 +226,64 @@ enum disir_status
 dx_element_storage_get_all (struct disir_element_storage *storage,
                             struct disir_context_collection **collection)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    dc_t *context;
+    struct disir_context_collection *coll;
+    struct list_iterator *iter;
+
+    coll = NULL;
+    iter = NULL;
+
+    if (storage == NULL)
+    {
+        log_debug ("invoked with storage NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (collection == NULL)
+    {
+        log_debug ("invoked with collection NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    iter = list_iterator_create (storage->es_list, LIST_HEAD);
+    if (iter == NULL)
+    {
+        log_warn ("in element_storage (%p) - list_iterator_create failed", storage);
+        status = DISIR_STATUS_NO_MEMORY;
+        goto error;
+    }
+
+    coll = dx_collection_create ();
+    if (coll == NULL)
+    {
+        log_warn (
+            "in element_storage (%p) - dx_collection_create failed to allocate sufficient memory",
+            storage);
+        status = DISIR_STATUS_NO_MEMORY;
+        goto error;
+    }
+
+    while ((context = list_iterator_next (iter)))
+    {
+        status = dx_collection_push_context (coll, context);
+        if (status != DISIR_STATUS_OK)
+            goto error;
+    }
+
+    list_iterator_destroy (&iter);
+
+    *collection = coll;
+
+    return DISIR_STATUS_OK;
+error:
+    if (iter)
+        list_iterator_destroy (&iter);
+    if (coll)
+    {
+        dc_collection_finished (&coll);
+    }
+
+    return status;
 }
 
 enum disir_status
