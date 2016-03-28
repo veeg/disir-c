@@ -76,6 +76,10 @@ dx_element_storage_create (void)
     }
 
     storage->es_list = list_create ();
+    if (storage->es_list == NULL)
+    {
+        goto error;
+    }
 
     return storage;
 error:
