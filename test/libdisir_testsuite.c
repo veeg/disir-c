@@ -3,6 +3,8 @@
 #include <setjmp.h>
 #include <cmocka.h>
 
+#include <stdlib.h>
+
 #include "log.h"
 
 #define LOG_TEST_START \
