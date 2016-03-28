@@ -180,7 +180,7 @@ dx_element_storage_add (struct disir_element_storage *storage,
     }
 
     // Add to list for chronological ordering.
-    if (list_lpush (storage->es_list, context))
+    if (list_rpush (storage->es_list, context))
     {
         status = DISIR_STATUS_INTERNAL_ERROR;
         goto list_error;
