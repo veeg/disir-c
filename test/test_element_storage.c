@@ -16,8 +16,9 @@ const char *keyval_names[] = {
     "milk",
     "porridge",
     "flowers",
-    NULL
 };
+
+#define KEYVAL_NUMENTRIES (sizeof (keyval_names) / sizeof (const char *))
 
 int
 setup_element_storage (void **state)
@@ -84,8 +85,10 @@ test_element_storage_add (void **state)
     LOG_TEST_START
 
     // Add X number of dc_t *context to storage, by name.
-    for (i = 0, key = keyval_names[i]; key != NULL; i++, key = keyval_names[i])
+    for (i = 0; i < KEYVAL_NUMENTRIES; i++)
     {
+        key = keyval_names[i];
+
         context = dx_context_create (DISIR_CONTEXT_CONFIG); // XXX: Should be DISIR_CONTEXT_KEYVAL
         assert_non_null (context);
         status = dx_element_storage_add (storage, key, context);
