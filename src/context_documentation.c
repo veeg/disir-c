@@ -13,6 +13,7 @@
 // Private
 #include "context_private.h"
 #include "config.h"
+#include "documentation.h"
 #include "log.h"
 
 //! INTERNAL API
@@ -334,39 +335,9 @@ dx_documentation_add_value_string (struct disir_documentation *doc,
                                    const char *value,
                                    int32_t value_size)
 {
-    // At this point, simply allocate /reallocate and override exiting shizzle
-
-    if (doc->dd_string == NULL || doc->dd_string_allocated - 1 < value_size)
-    {
-        // Just free the existing memory. We allocate a larger one below
-        if (doc->dd_string_allocated - 1 < value_size )
-        {
-            free(doc->dd_string);
-            doc->dd_string = NULL;
-        }
-        // Allocate doc string, if need be
-        if (doc->dd_string == NULL)
-        {
-            // Size of requested string + 1 for NULL terminator
-            doc->dd_string = calloc (1, value_size + 1);
-            if (doc->dd_string == NULL)
-            {
-                // LOGWARN
-                fprintf (stderr, "Failed to allocate memory for doc string");
-                return DISIR_STATUS_NO_MEMORY;
-            }
-            doc->dd_string_allocated = value_size;
-        }
-    }
-
-    // Copy the incoming docstring to freely available space
-    memcpy (doc->dd_string, value, value_size);
-    doc->dd_string_size = value_size;
-
-    // Terminate it with a zero terminator. Just to be safe.
-    doc->dd_string[value_size] = '\0';
-
-    return DISIR_STATUS_OK;
+    log_debug ("setting documentation (%p) with value (%p) of size (%d)",
+               doc, value, value_size);
+    return dx_value_set_string (&doc->dd_value, value, value_size);
 }
 
 //! INTERNAL API
@@ -380,6 +351,7 @@ dx_documentation_create (dc_t *context)
         return NULL;
 
     doc->dd_context = context;
+    doc->dd_value.dv_type = DISIR_VALUE_TYPE_STRING;
 
     return doc;
 }
@@ -395,8 +367,8 @@ dx_documentation_destroy (struct disir_documentation **documentation)
 
     tmp = *documentation;
 
-    if (tmp->dd_string != NULL)
-        free(tmp->dd_string);
+    if (tmp->dd_value.dv_size > 0)
+        free(tmp->dd_value.dv_string);
 
     // Unhook from double linked list.
     if (tmp->dd_prev)
