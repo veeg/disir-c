@@ -89,7 +89,6 @@ dc_destroy (dc_t **context)
     case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_GROUP:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
@@ -152,7 +151,6 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
     case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_GROUP:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
@@ -203,7 +201,6 @@ dc_finalize (dc_t **context)
     case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_GROUP:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
@@ -285,7 +282,6 @@ dc_add_value_string (dc_t *context, const char *value, int32_t value_size)
     case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_GROUP:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
@@ -331,7 +327,6 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
     }
     case DISIR_CONTEXT_GROUP:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
@@ -403,7 +398,6 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
     }
     case DISIR_CONTEXT_GROUP:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",

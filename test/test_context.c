@@ -107,10 +107,6 @@ test_context_type(void **state)
             assert_true(dc_type(context) == DISIR_CONTEXT_KEYVAL);
             assert_string_equal(dc_type_string(context), "KEYVAL");
             break;
-        case DISIR_CONTEXT_TYPE:
-            assert_true(dc_type(context) == DISIR_CONTEXT_TYPE);
-            assert_string_equal(dc_type_string(context), "TYPE");
-            break;
         case DISIR_CONTEXT_DEFAULT:
             assert_true(dc_type(context) == DISIR_CONTEXT_DEFAULT);
             assert_string_equal(dc_type_string(context), "DEFAULT");

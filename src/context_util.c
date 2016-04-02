@@ -21,7 +21,6 @@ const char *disir_context_type_string[] = {
     "GROUP",
     "KEYVAL",
     "DOCUMENTATION",
-    "TYPE",
     "DEFAULT",
     "RESTRICTION",
     "UNKNOWN",
@@ -180,7 +179,6 @@ dx_context_create (enum disir_context_type type)
     case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_GROUP:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s UNHANDLED CONTEXT TYPE: %s",

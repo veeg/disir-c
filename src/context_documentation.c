@@ -38,7 +38,6 @@ dx_documentation_fetch (dc_t *context)
         dx_crash_and_burn ("unhandled not implemented");
         break;
     }
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
     case DISIR_CONTEXT_DOCUMENTATION:
@@ -86,7 +85,6 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
         dx_crash_and_burn ("unhandled not implemented");
         break;
     }
-    case DISIR_CONTEXT_TYPE:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
     case DISIR_CONTEXT_DOCUMENTATION:
