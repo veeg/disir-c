@@ -1,4 +1,5 @@
 #include <disir/util.h>
+#include "value.h"
 
 void
 test_semantic_version_compare(void **state)
@@ -58,8 +59,72 @@ test_semantic_version_compare(void **state)
     LOG_TEST_END
 }
 
+static void
+test_value_string (void **state)
+{
+    enum disir_status status;
+    struct disir_value value;
+    const char *test_string = "A explaination of everything good about this product.";
+    int32_t string_length;
+    int32_t output_size;
+    const char *output_string;
+
+    LOG_TEST_START
+
+    string_length = strlen (test_string);
+
+    // Invalid argument check
+    status = dx_value_set_string (NULL, NULL, 0);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+    status = dx_value_set_string (NULL, test_string, 0);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+
+    // Invalid type
+    value.dv_type = DISIR_VALUE_TYPE_UNKNOWN;
+    status = dx_value_set_string (&value, test_string, string_length);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+
+    // Valid type
+    value.dv_type = DISIR_VALUE_TYPE_STRING;
+    status = dx_value_set_string (&value, test_string, string_length);
+    assert_int_equal (status, DISIR_STATUS_OK);
+
+    assert_int_equal (value.dv_size, string_length);
+    assert_memory_equal (test_string, value.dv_string, string_length);
+
+    // Test getter
+    status = dx_value_get_string (NULL, NULL, NULL);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+    status = dx_value_get_string (&value, NULL, NULL);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+    status = dx_value_get_string (NULL, &output_string, NULL);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+
+    status = dx_value_get_string (&value, &output_string, NULL);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    status = dx_value_get_string (&value, &output_string, &output_size);
+    assert_int_equal (status, DISIR_STATUS_OK);
+
+    assert_int_equal (string_length, output_size);
+    assert_memory_equal (output_string, test_string, string_length);
+
+    // Set NULL
+    status = dx_value_set_string (&value, NULL, 0);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_int_equal (value.dv_size, 0);
+    assert_null (value.dv_string);
+
+    status = dx_value_get_string (&value, &output_string, &output_size);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_int_equal (output_size, 0);
+    assert_null (output_string);
+
+    LOG_TEST_END
+}
+
 const struct CMUnitTest disir_util_tests[] = {
     // introduced can add
-    cmocka_unit_test (test_semantic_version_compare)
+    cmocka_unit_test (test_semantic_version_compare),
+    cmocka_unit_test (test_value_string),
 };
 

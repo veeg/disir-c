@@ -52,13 +52,16 @@ struct disir_schema;
 //! Forward declaration of the top-level context disir_template
 struct disir_template;
 
-//! The different types that can be held by a DISIR_CONTEXT_TYPE
+//! The different value types that may be held by differrent contexts.
+//! This enumeration also defines the explicit type of a DISIR_CONTEXT_KEYVAL.
 enum disir_type
 {
-    DISIR_TYPE_STRING = 1,
-    DISIR_TYPE_INTEGER,
-    DISIR_TYPE_FLOAT,
-    DISIR_TYPE_BOOLEAN,
+    DISIR_VALUE_TYPE_UNKNOWN = 0,
+    DISIR_VALUE_TYPE_STRING,
+    DISIR_VALUE_TYPE_INTEGER,
+    DISIR_VALUE_TYPE_FLOAT,
+    DISIR_VALUE_TYPE_BOOLEAN,
+    DISIR_VALUE_TYPE_ENUM,
 };
 
 //! The different restrictions that can be held by a DISIR_CONTEXT_RESTRICTION
