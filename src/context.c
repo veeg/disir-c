@@ -243,6 +243,27 @@ dc_putcontext (dc_t **context)
 }
 
 //! PUBLIC API
+//! alias for dc_add_value_string with additional type checks
+enum disir_status
+dc_add_name (dc_t *context, const char *name, int32_t name_size)
+{
+    enum disir_status status;
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_SECTION);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    return dc_add_value_string (context, name, name_size);
+}
+
+//! PUBLIC API
 enum disir_status
 dc_add_value_string (dc_t *context, const char *value, int32_t value_size)
 {

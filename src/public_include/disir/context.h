@@ -114,15 +114,22 @@ enum disir_status dc_add_documentation (dc_t *context, char *doc, int32_t doc_si
 // Add related context API
 //
 
-//! Add a name to an entry.
+//! \brief Add a name to a context entry.
+//!
 //! One can only add a name to a context who is in construction mode.
-//! This is required on supported contexts DISIR_CONTEXT_KEYVAL and
-//! DISIR_CONTEXT_GROUP.
-//! If an unsupported context is provided DISIR_STATUS_WRONG_CONTEXT
-//! is returned. If the entry already has a name, then DISIR_STATUS_EXISTS
-//! will be returned.
-//! On success, DISIR_STATUS_OK is returned.
-enum disir_status dc_add_name (dc_t *context, char *name, int32_t name_size);
+//! This is required on supported contexts:
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!
+//! \param context Context to set the name attribute on.
+//! \param name The input name to associate with the context.
+//! \param name_size Size in bytes of the input name. Does not include null terminator.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if name or name_size are zero
+//! \return DISIR_STATUS_NO_CAN_DO if an unsupported context type
+//! \return DISIR_STATUS_OK on successful insertion of name to context.
+//!
+enum disir_status dc_add_name (dc_t *context, const char *name, int32_t name_size);
 
 //! Add an introduced semantic version number to an entry.
 //! One can only add an introduced semver to a context who is in construction mode.
