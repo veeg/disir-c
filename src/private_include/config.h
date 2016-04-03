@@ -18,8 +18,9 @@ struct disir_config
     // TODO: Hashmap of entries, either keyval or group.
 
     //! Documentation associated with the disir_config.
-    //! Only one entry is allowed.
-    struct disir_documentation      *cf_documentation;
+    //! Only one entry is allowed. - REMOVE THIS SUPPRT - ONLY APPLICABLE TO SCHEMA
+    //! FOR TOPLEVEL CONTEXT
+    struct disir_documentation      *cf_documentation_queue;
 };
 
 //! INTERNAL API

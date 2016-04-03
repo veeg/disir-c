@@ -9,6 +9,7 @@
 // Private
 #include "context_private.h"
 #include "config.h"
+#include "mqueue.h"
 #include "log.h"
 
 //! PUBLIC API
@@ -150,15 +151,16 @@ enum disir_status
 dx_config_destroy (struct disir_config **config)
 {
     dc_t *context;
+    struct disir_documentation *doc;
     if (config == NULL || *config == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
     // TODO: Iterate and abort all child elements of disir_config
 
     // Destroy single documentation, if it exists
-    if ((*config)->cf_documentation)
+    while ((doc = MQ_POP ((*config)->cf_documentation_queue)))
     {
-        context = (*config)->cf_documentation->dd_context;
+        context = doc->dd_context;
         dc_destroy (&context);
     }
 

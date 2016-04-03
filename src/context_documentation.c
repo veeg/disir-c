@@ -14,6 +14,7 @@
 #include "context_private.h"
 #include "config.h"
 #include "documentation.h"
+#include "mqueue.h"
 #include "log.h"
 
 //! INTERNAL API
@@ -57,14 +58,12 @@ dx_documentation_fetch (dc_t *context)
 enum disir_status
 dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
 {
-    struct disir_documentation **parent_doc;
-    struct disir_documentation *tmp;
+    struct disir_documentation **doc_queue;
     enum disir_status status;
-    int res;
+    int exists;
     char buffer[32];
 
     status = DISIR_STATUS_INTERNAL_ERROR;
-    parent_doc = NULL;
 
     if (parent == NULL || doc == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
@@ -75,7 +74,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
     {
     case DISIR_CONTEXT_CONFIG:
     {
-        parent_doc = &(parent->cx_config->cf_documentation);
+        doc_queue = &(parent->cx_config->cf_documentation_queue);
         break;
     }
     case DISIR_CONTEXT_SCHEMA:
@@ -99,75 +98,27 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
 
     // Function invoked on wrong context.
     // Programming error
-    if (parent_doc == NULL)
+    if (doc_queue == NULL)
     {
         // LOGWARN
         log_debug_context (parent, "parent_doc is NULL - we cannot add doc entry");
         status = DISIR_STATUS_WRONG_CONTEXT;
     }
-    // Add to parent storage if no entry exists
-    else if (*parent_doc == NULL)
+
+    exists = MQ_SIZE_COND (*doc_queue,
+                (dx_semantic_version_compare(&entry->dd_introduced, &doc->dd_introduced) == 0));
+    if (exists)
     {
-        log_debug_context (parent, "doesn't contain any doc entries. Adding as only element.");
-        *parent_doc = doc;
-        status = DISIR_STATUS_OK;
+        dx_log_context (parent,
+            "already contains a documentation entry with semantic version: %s",
+            dx_semver_string (buffer, 40, &doc->dd_introduced));
+        status = DISIR_STATUS_CONFLICTING_SEMVER;
     }
-    // There exists multiple entries - insert into storage
     else
     {
-        log_debug_context (parent, "contains documentation entires. Adding in-place");
-        // Assume everything is okay
+        MQ_ENQUEUE_CONDITIONAL (*doc_queue, doc,
+            (dx_semantic_version_compare (&entry->dd_introduced, &doc->dd_introduced) > 0));
         status = DISIR_STATUS_OK;
-
-        // Special first case - need to change the parent_doc pointer.
-        res = dx_semantic_version_compare (&((*parent_doc)->dd_introduced), &(doc->dd_introduced));
-        if (res > 0)
-        {
-            doc->dd_next = *parent_doc;
-            (*parent_doc)->dd_prev = doc;
-            *parent_doc = doc;
-        }
-        else
-        {
-            tmp = *parent_doc;
-            while (1)
-            {
-                // Entry exists - deny this operation
-                if (res == 0)
-                {
-                    // LOGWARN
-                    dx_log_context (parent,
-                            "already contains a documentation entry with semantic version: %s",
-                            dx_semver_string (buffer, 40, &doc->dd_introduced));
-                    status = DISIR_STATUS_CONFLICTING_SEMVER;
-                    break;
-                }
-
-                // Insert inplace of tmp
-                if (res > 0)
-                {
-                    doc->dd_next = tmp;
-                    doc->dd_prev = tmp->dd_prev;
-                    if (tmp->dd_prev)
-                    {
-                        tmp->dd_prev->dd_next = doc;
-                    }
-                    tmp->dd_prev = doc;
-                    break;
-                }
-
-                // Doc is greatest entry, append to list
-                if (tmp->dd_next == NULL)
-                {
-                    doc->dd_prev = tmp;
-                    tmp->dd_next = doc;
-                    break;
-                }
-
-                tmp = tmp->dd_next;
-                res = dx_semantic_version_compare (&tmp->dd_introduced, &doc->dd_introduced);
-            }
-        }
     }
 
     return status;
@@ -361,6 +312,8 @@ enum disir_status
 dx_documentation_destroy (struct disir_documentation **documentation)
 {
     struct disir_documentation *tmp;
+    struct disir_documentation **queue;
+    dc_t *context;
 
     if (documentation == NULL || *documentation == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
@@ -370,11 +323,41 @@ dx_documentation_destroy (struct disir_documentation **documentation)
     if (tmp->dd_value.dv_size > 0)
         free(tmp->dd_value.dv_string);
 
-    // Unhook from double linked list.
-    if (tmp->dd_prev)
-        tmp->dd_prev->dd_next = tmp->dd_next;
-    if (tmp->dd_next)
-        tmp->dd_next->dd_prev = tmp->dd_prev;
+    context = (*documentation)->dd_context;
+    if (context && context->cx_parent_context)
+    {
+        context = context->cx_parent_context;
+
+        switch (dc_type (context))
+        {
+        case DISIR_CONTEXT_CONFIG:
+        {
+            queue = &(context->cx_config->cf_documentation_queue);
+            break;
+        }
+        case DISIR_CONTEXT_SCHEMA:
+        case DISIR_CONTEXT_TEMPLATE:
+        case DISIR_CONTEXT_GROUP:
+        case DISIR_CONTEXT_KEYVAL:
+        {
+            dx_crash_and_burn ("unhandled not implemented");
+            break;
+        }
+        case DISIR_CONTEXT_DEFAULT:
+        case DISIR_CONTEXT_RESTRICTION:
+        case DISIR_CONTEXT_DOCUMENTATION:
+        case DISIR_CONTEXT_UNKNOWN:
+        {
+            // These types do not accept a documentation entry
+            // No default - let compiler handle unreferenced context type
+            dx_crash_and_burn ("invoked on invalid context type (%s)", dc_type_string (context));
+        }
+        }
+
+        // Must remove safely - cannot guarantee that the instance we are destroying
+        // is in its parents queue
+        MQ_REMOVE_SAFE (*queue, tmp);
+    }
 
     free(tmp);
     *documentation = NULL;

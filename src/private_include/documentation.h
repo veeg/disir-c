@@ -15,8 +15,8 @@ struct disir_documentation
     struct disir_value          dd_value;
 
     // Simple double linked list
-    struct disir_documentation *dd_next;
-    struct disir_documentation *dd_prev;
+    struct disir_documentation *next;
+    struct disir_documentation *prev;
 };
 
 //! Construct a DISIR_CONTEXT_DOCUMENTATION as a child of parent.

@@ -107,20 +107,20 @@ test_context_documentation_dx_documentation_add_basic (void **state)
     // Add version with lower version number
     status = dx_documentation_add (parent, doc2);
     assert_int_equal (status, DISIR_STATUS_OK);
-    assert_ptr_equal (parent->cx_config->cf_documentation, doc2);
+    assert_ptr_equal (parent->cx_config->cf_documentation_queue, doc2);
 
     // Add last entry
     status = dx_documentation_add (parent, doc3);
     assert_int_equal (status, DISIR_STATUS_OK);
 
     // Verify order in storage
-    tmp = parent->cx_config->cf_documentation;
+    tmp = parent->cx_config->cf_documentation_queue;
     assert_ptr_equal (tmp, doc2);
-    assert_non_null (tmp->dd_next);
-    tmp = tmp->dd_next;
+    assert_non_null (tmp->next);
+    tmp = tmp->next;
     assert_ptr_equal (tmp, doc1);
-    assert_non_null (tmp->dd_next);
-    tmp = tmp->dd_next;
+    assert_non_null (tmp->next);
+    tmp = tmp->next;
     assert_ptr_equal (tmp, doc3);
 
     // This should free up all documentation entries
@@ -337,10 +337,97 @@ test_context_documentation_dx_documentation_begin_basic (void **state)
     LOG_TEST_END
 }
 
+void
+test_context_documentation_verify_queue (void **state)
+{
+    enum disir_status status;
+    dc_t *parent;
+    dc_t *context;
+    dc_t *cx_doc1, *cx_doc2, *cx_doc3;
+    struct disir_documentation *doc1;
+    struct disir_documentation *doc2;
+    struct disir_documentation *doc3;
+    struct disir_documentation *tmp;
+
+    parent = *state;
+
+    LOG_TEST_START
+
+    status = dx_documentation_begin (parent, &cx_doc1);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    status = dx_documentation_begin (parent, &cx_doc2);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    status = dx_documentation_begin (parent, &cx_doc3);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_non_null (cx_doc1);
+    assert_non_null (cx_doc2);
+    assert_non_null (cx_doc3);
+    doc1 = cx_doc1->cx_documentation;
+    doc2 = cx_doc2->cx_documentation;
+    doc3 = cx_doc3->cx_documentation;
+
+    // Set semver numbers
+    // doc1 is middle (2.15.1)
+    // doc2 is first 1.29.15
+    // doc3 is last inbetween at 3.6.2
+    doc1->dd_introduced.sv_major = 2;
+    doc1->dd_introduced.sv_minor = 15;
+    doc1->dd_introduced.sv_patch = 1;
+
+    doc2->dd_introduced.sv_major = 1;
+    doc2->dd_introduced.sv_minor = 29;
+    doc2->dd_introduced.sv_patch = 15;
+
+    doc3->dd_introduced.sv_major = 3;
+    doc3->dd_introduced.sv_minor = 6;
+    doc3->dd_introduced.sv_patch = 2;
+
+    // Assert that parent queue is empty when no docs are in it.
+    assert_null (parent->cx_config->cf_documentation_queue);
+
+    // Add first entry
+    status = dx_documentation_add (parent, doc1);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_ptr_equal (parent->cx_config->cf_documentation_queue, doc1);
+
+    // Add second entry that goes first in queue
+    status = dx_documentation_add (parent, doc2);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_ptr_equal (parent->cx_config->cf_documentation_queue, doc2);
+
+    // Add last entry
+    status = dx_documentation_add (parent, doc3);
+    assert_int_equal (status, DISIR_STATUS_OK);
+
+    // Verify order in storage
+    tmp = parent->cx_config->cf_documentation_queue;
+    assert_ptr_equal (tmp, doc2);
+    assert_non_null (tmp->next);
+    tmp = tmp->next;
+    assert_ptr_equal (tmp, doc1);
+    assert_non_null (tmp->next);
+    tmp = tmp->next;
+    assert_ptr_equal (tmp, doc3);
+
+    // Destroy the lowest docu entry (head of queue)
+    // assert that the parent queue pointer is modified to point to the next in line
+    context = doc2->dd_context;
+    dc_destroy (&context);
+    assert_ptr_not_equal(parent->cx_config->cf_documentation_queue, doc2);
+    assert_ptr_equal (parent->cx_config->cf_documentation_queue, doc1);
+
+    LOG_TEST_END
+}
+
 const struct CMUnitTest disir_context_documentation_tests[] = {
   cmocka_unit_test (test_context_documentation_dc_add_documentation_basic),
   cmocka_unit_test (test_context_documentation_dx_documentation_begin_basic),
   cmocka_unit_test (test_context_documentation_dx_documentation_add_basic),
+    // verify queue
+  cmocka_unit_test_setup_teardown (
+      test_context_documentation_verify_queue,
+      setup_context_config, teardown_context_config),
+
     // dc_add_documentation can add single
     cmocka_unit_test_setup_teardown (
         test_context_documentation_dc_add_documentation_can_add_single,
