@@ -28,6 +28,7 @@
 #include "test_collection.c"
 #include "test_util.c"
 #include "test_element_storage.c"
+#include "test_mqueue.c"
 
 int
 main(int argc, char *argv[])
@@ -64,6 +65,12 @@ main(int argc, char *argv[])
         disir_element_storage_tests,
         NULL,
         NULL);
+
+    returnval += cmocka_run_group_tests_name("MQueue",
+        disir_mqueue_tests,
+        NULL,
+        NULL);
+
 
     return returnval;
 }
