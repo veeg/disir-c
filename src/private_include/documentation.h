@@ -37,10 +37,9 @@ enum disir_status dx_documentation_add_value_string (struct disir_documentation 
                                                      const char *value,
                                                      int32_t value_size);
 
-//! Fetch the associated documentation structure from the passed context.
-//! NULL is returned if no such documentation exists
-//! Function asserts if it receives an unhandled context type
-struct disir_documentation *dx_documentation_fetch (dc_t *context);
+//! Return the number of documentation contexts associated with the passed context.
+//! \return -1 if invalid context
+int32_t dx_documentation_numentries (dc_t *context);
 
 //! Add a disir_documentation to the parent context
 enum disir_status dx_documentation_add (dc_t *parent, struct disir_documentation *doc);

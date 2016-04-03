@@ -18,43 +18,6 @@
 #include "log.h"
 
 //! INTERNAL API
-struct disir_documentation *
-dx_documentation_fetch (dc_t *context)
-{
-    struct disir_documentation *doc;
-
-    doc = NULL;
-
-    switch(dc_type(context))
-    {
-    case DISIR_CONTEXT_CONFIG:
-    {
-        doc = context->cx_config->cf_documentation;
-        break;
-    }
-    case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_TEMPLATE:
-    case DISIR_CONTEXT_GROUP:
-    case DISIR_CONTEXT_KEYVAL:
-    {
-        dx_crash_and_burn ("unhandled not implemented");
-        break;
-    }
-    case DISIR_CONTEXT_DEFAULT:
-    case DISIR_CONTEXT_RESTRICTION:
-    case DISIR_CONTEXT_DOCUMENTATION:
-    case DISIR_CONTEXT_UNKNOWN:
-    {
-        // These types do not accept a documentation entry
-        break;
-    }
-    // No default - let compiler handle unreferenced context type
-    }
-
-    return doc;
-}
-
-//! INTERNAL API
 enum disir_status
 dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
 {
@@ -124,16 +87,40 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
     return status;
 }
 
-uint32_t
-dx_documentation_exists (dc_t *context)
+//! INTERNAL API
+int32_t
+dx_documentation_numentries (dc_t *context)
 {
-    struct disir_documentation *doc;
+    struct disir_documentation *queue;
 
-    doc = dx_documentation_fetch(context);
+    switch (dc_type (context))
+    {
+    case DISIR_CONTEXT_CONFIG:
+    {
+        queue = context->cx_config->cf_documentation_queue;
+        break;
+    }
+    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_TEMPLATE:
+    case DISIR_CONTEXT_GROUP:
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        dx_crash_and_burn ("unhandled not implemented");
+        break;
+    }
+    case DISIR_CONTEXT_DEFAULT:
+    case DISIR_CONTEXT_RESTRICTION:
+    case DISIR_CONTEXT_DOCUMENTATION:
+    case DISIR_CONTEXT_UNKNOWN:
+    {
+        // These types do not accept a documentation entry
+        return -1;
+    }
+    // No default - let compiler handle unreferenced context type
+    }
 
-    return (doc != NULL ? 1 : 0);
+    return MQ_SIZE (queue);
 }
-
 
 //! PUBLIC API
 enum disir_status
@@ -213,7 +200,7 @@ dx_documentation_begin (dc_t *parent, dc_t **doc)
     log_debug_context (parent, "capable of adding single documentataion.");
 
     // Check if we can add multiple documentation entries
-    if (dx_documentation_exists(parent))
+    if (dx_documentation_numentries(parent) > 0)
     {
         log_debug ("documentation exists");
         if ((parent->cx_capabilities & CC_ADD_MULTIPLE_DOCUMENTATION) == 0)
