@@ -18,7 +18,7 @@ const char *disir_context_type_string[] = {
     "FILE_CONFIG",
     "FILE_SCHEMA",
     "FILE_TEMPLATE",
-    "GROUP",
+    "SECTION",
     "KEYVAL",
     "DOCUMENTATION",
     "DEFAULT",
@@ -177,7 +177,7 @@ dx_context_create (enum disir_context_type type)
     }
     case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_TEMPLATE:
-    case DISIR_CONTEXT_GROUP:
+    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:

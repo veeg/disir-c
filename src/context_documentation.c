@@ -42,7 +42,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
     }
     case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_TEMPLATE:
-    case DISIR_CONTEXT_GROUP:
+    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     {
         dx_crash_and_burn ("unhandled not implemented");
@@ -102,7 +102,7 @@ dx_documentation_numentries (dc_t *context)
     }
     case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_TEMPLATE:
-    case DISIR_CONTEXT_GROUP:
+    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     {
         dx_crash_and_burn ("unhandled not implemented");
@@ -324,7 +324,7 @@ dx_documentation_destroy (struct disir_documentation **documentation)
         }
         case DISIR_CONTEXT_SCHEMA:
         case DISIR_CONTEXT_TEMPLATE:
-        case DISIR_CONTEXT_GROUP:
+        case DISIR_CONTEXT_SECTION:
         case DISIR_CONTEXT_KEYVAL:
         {
             dx_crash_and_burn ("unhandled not implemented");
