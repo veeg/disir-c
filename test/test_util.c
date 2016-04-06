@@ -71,6 +71,7 @@ test_value_string (void **state)
 
     LOG_TEST_START
 
+    memset (&value, 0, sizeof (struct disir_value));
     string_length = strlen (test_string);
 
     // Invalid argument check

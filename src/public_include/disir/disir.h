@@ -52,14 +52,15 @@ struct disir_schema;
 
 //! The different value types that may be held by differrent contexts.
 //! This enumeration also defines the explicit type of a DISIR_CONTEXT_KEYVAL.
-enum disir_type
+enum disir_value_type
 {
-    DISIR_VALUE_TYPE_UNKNOWN = 0,
-    DISIR_VALUE_TYPE_STRING,
+    DISIR_VALUE_TYPE_STRING = 1,
     DISIR_VALUE_TYPE_INTEGER,
     DISIR_VALUE_TYPE_FLOAT,
     DISIR_VALUE_TYPE_BOOLEAN,
     DISIR_VALUE_TYPE_ENUM,
+
+    DISIR_VALUE_TYPE_UNKNOWN, // Must be the last element
 };
 
 //! The different restrictions that can be held by a DISIR_CONTEXT_RESTRICTION

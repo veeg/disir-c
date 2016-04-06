@@ -51,6 +51,97 @@ dx_semantic_version_compare (struct semantic_version *s1, struct semantic_versio
     return res;
 }
 
+// INTERNAL API
+enum disir_status
+dx_value_set_integer (struct disir_value *value, int64_t integer)
+{
+    if (value == NULL)
+    {
+        log_debug ("invoked with NULL value pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (value->dv_type != DISIR_VALUE_TYPE_INTEGER)
+    {
+        log_debug ("invoked with non-integer value type %s (%d)",
+                   dx_value_type_string (value->dv_type), value->dv_type);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    value->dv_integer = integer;
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_value_get_integer (struct disir_value *value, int64_t *integer)
+{
+    if (value == NULL)
+    {
+        log_debug ("invoked with NULL value pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (integer == NULL)
+    {
+        log_debug ("invoked with NULL integer pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (value->dv_type != DISIR_VALUE_TYPE_INTEGER)
+    {
+        log_debug ("invoked with non-integer value type %s (%d)",
+                   dx_value_type_string (value->dv_type), value->dv_type);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    *integer = value->dv_integer;
+    return DISIR_STATUS_OK;
+}
+
+// INTERNAL API
+enum disir_status
+dx_value_set_float (struct disir_value *value, double input_double)
+{
+    if (value == NULL)
+    {
+        log_debug ("invoked with NULL value pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (value->dv_type != DISIR_VALUE_TYPE_FLOAT)
+    {
+        log_debug ("invoked with non-float value type %s (%d)",
+                   dx_value_type_string (value->dv_type), value->dv_type);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    value->dv_float = input_double;
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_value_get_float (struct disir_value *value, double *output_double)
+{
+    if (value == NULL)
+    {
+        log_debug ("invoked with NULL value pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (output_double == NULL)
+    {
+        log_debug ("invoked with NULL output_double pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (value->dv_type != DISIR_VALUE_TYPE_FLOAT)
+    {
+        log_debug ("invoked with non-float value type %s (%d)",
+                   dx_value_type_string (value->dv_type), value->dv_type);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    *output_double = value->dv_float;
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
 enum disir_status
 dx_value_set_string (struct disir_value *value, const char *string, int32_t string_size)
 {
@@ -61,7 +152,8 @@ dx_value_set_string (struct disir_value *value, const char *string, int32_t stri
     }
     if (value->dv_type != DISIR_VALUE_TYPE_STRING)
     {
-        log_debug ("invoked with non-string value type (%d)", value->dv_type);
+        log_debug ("invoked with non-string value type %s (%d)",
+                   dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (string == NULL)
@@ -104,6 +196,7 @@ dx_value_set_string (struct disir_value *value, const char *string, int32_t stri
     return DISIR_STATUS_OK;
 }
 
+//! INTERNAL API
 enum disir_status
 dx_value_get_string (struct disir_value *value, const char **string, int32_t *size)
 {

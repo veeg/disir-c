@@ -140,12 +140,34 @@ enum disir_status dc_add_introduced(dc_t *context, struct semantic_version semve
 enum disir_status dc_add_deprecrated(dc_t *context, struct semantic_version smever);
 
 
-//! One may only add types to a context in construction mode.
-//! Only applicable to the DISIR_CONTEXT_SCHEMA
-//! root contexts.
-//! Only applicable to the DISIR_CONTEXT_KEYVAL parent context.
-//! A keyval MUST have a valid type at all times.
-enum disir_status dc_add_type (dc_t *context, enum disir_type type);
+//! \brief Set the value type associated with input context
+//!
+//! Set the value type of the input context.
+//! The available input contexts are as follows:
+//!     * DISIR_CONTEXT_KEYVAL
+//!
+//! There are a number of restrictions on when you can set a value type on a context.
+//! DISIR_CONTEXT_KEYVAL: Cannot have any default entries on it.
+//!     Can only set type if the toplevel context is DISIR_CONTEXT_SCHEMA
+//!
+//! \return DISIR_STATUS_OK the input 'context' was succesfuly populated with value type 'type'
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context is NULL or type is out-of-bounds
+//!
+enum disir_status dc_set_value_type (dc_t *context, enum disir_value_type type);
+
+//! \brief Retrieve the value type stored in the input context
+//!
+//! Retrieve the value type of the input context, populated in the output argument 'type'
+//!
+//! \param[in] context The input context object to return the value type of.
+//! \param[out] type Output value populated with the type found in context.
+//!     DISIR_VALUE_TYPE_UNKNOWN is populated if any errors on the input context are found.
+//!
+//! \return DISIR_STATUS_OK if the context contatins a value type
+//! \return DISIR_STATUS_WRONG_CONTEXT if it does not contain a value type.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either context or type are NULL pointer.
+//!
+enum disir_status dc_get_value_type (dc_t *context, enum disir_value_type *type);
 
 //! Add a default value to an entry.
 // XXX: Should this be revised? Removed? Renamed?

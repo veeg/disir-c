@@ -191,10 +191,58 @@ void test_context_type_check(void **state)
     LOG_TEST_END
 }
 
+void
+test_context_value_type (void **state)
+{
+    enum disir_value_type type;
+
+    LOG_TEST_START
+
+    for (type = DISIR_VALUE_TYPE_STRING; type <= DISIR_VALUE_TYPE_UNKNOWN; type++)
+    {
+        switch (type)
+        {
+        case DISIR_VALUE_TYPE_STRING:
+            assert_true (dx_value_type_sanify (type) == DISIR_VALUE_TYPE_STRING);
+            assert_string_equal (dx_value_type_string (type), "STRING");
+            break;
+        case DISIR_VALUE_TYPE_INTEGER:
+            assert_true (dx_value_type_sanify (type) == DISIR_VALUE_TYPE_INTEGER);
+            assert_string_equal (dx_value_type_string (type), "INTEGER");
+            break;
+        case DISIR_VALUE_TYPE_FLOAT:
+            assert_true (dx_value_type_sanify (type) == DISIR_VALUE_TYPE_FLOAT);
+            assert_string_equal (dx_value_type_string (type), "FLOAT");
+            break;
+        case DISIR_VALUE_TYPE_BOOLEAN:
+            assert_true (dx_value_type_sanify (type) == DISIR_VALUE_TYPE_BOOLEAN);
+            assert_string_equal (dx_value_type_string (type), "BOOLEAN");
+            break;
+        case DISIR_VALUE_TYPE_ENUM:
+            assert_true (dx_value_type_sanify (type) == DISIR_VALUE_TYPE_ENUM);
+            assert_string_equal (dx_value_type_string (type), "ENUM");
+            break;
+        case DISIR_VALUE_TYPE_UNKNOWN:
+            assert_true (dx_value_type_sanify (type) == DISIR_VALUE_TYPE_UNKNOWN);
+            assert_string_equal (dx_value_type_string (type), "UNKNOWN");
+            break;
+         // No default entry - let compiler warn us if we have not handled a case.
+        }
+    }
+
+    //! out of bounds values
+    assert_true (dx_value_type_sanify (0) == DISIR_VALUE_TYPE_UNKNOWN);
+    assert_true (dx_value_type_sanify (-1) == DISIR_VALUE_TYPE_UNKNOWN);
+    assert_true (dx_value_type_sanify (659843) == DISIR_VALUE_TYPE_UNKNOWN);
+
+    LOG_TEST_END
+}
+
 
 const struct CMUnitTest disir_context_tests[] = {
   cmocka_unit_test(test_context_type),
   cmocka_unit_test(test_context_type_check),
   cmocka_unit_test(test_context_create),
   cmocka_unit_test(test_context_destroy),
+  cmocka_unit_test(test_context_value_type),
 };

@@ -25,6 +25,17 @@ const char *disir_context_type_string[] = {
     "UNKNOWN",
 };
 
+//! Array of string representations of enum disir_value_type
+const char *disir_value_type_string[] = {
+    "INVALID_VALUE_TYPE",
+    "STRING",
+    "INTEGER",
+    "FLOAT",
+    "BOOLEAN",
+    "ENUM",
+    "UNKNOWN",
+};
+
 //! Array of string representations of the context capabilities
 const char *disir_capability_string[] = {
     "add documentation",
@@ -83,6 +94,25 @@ dx_context_type_sanify (enum disir_context_type type)
     }
 
     return type;
+}
+
+//! INTERNAL API
+enum disir_value_type
+dx_value_type_sanify (enum disir_value_type type)
+{
+    if (type >= DISIR_VALUE_TYPE_UNKNOWN || type <= 0)
+    {
+        return DISIR_VALUE_TYPE_UNKNOWN;
+    }
+
+    return type;
+}
+
+//! INTERNAL API
+const char *
+dx_value_type_string (enum disir_value_type type)
+{
+    return disir_value_type_string[dx_value_type_sanify (type)];
 }
 
 //! INTERNAL API
@@ -419,6 +449,87 @@ dx_context_type_check_log_error (dc_t *context, ...)
         {
             log_error (buffer);
         }
+    }
+
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_set_value_type (dc_t *context, enum disir_value_type type)
+{
+    enum disir_status status;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    if (dx_value_type_sanify (type) == DISIR_VALUE_TYPE_UNKNOWN)
+    {
+        log_debug_context (context, "invoked with invalid/unknown value type (%d)", type);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = DISIR_STATUS_OK;
+    switch (dc_type (context))
+    {
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        //TODO XXX: Cannot set type if keyval has defaults
+        //TODO XXX: Cannot set type if toplevel context is not DISIR_SCHEMA
+        context->cx_keyval->kv_type = type;
+        break;
+    }
+    default:
+    {
+        dx_crash_and_burn ("%s: %s not handled", __FUNCTION__, dc_type_string (context));
+        return DISIR_STATUS_INTERNAL_ERROR; // not reached
+    }
+    }
+
+    if (status == DISIR_STATUS_OK)
+    {
+        log_debug_context (context, "sat value type to %s", dx_value_type_string (type));
+    }
+
+    return status;
+}
+
+
+//! PUBLIC API
+enum disir_status
+dc_get_value_type (dc_t *context, enum disir_value_type *type)
+{
+    enum disir_status status;
+
+    if (type == NULL)
+    {
+        log_debug ("invoked with type NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    *type = DISIR_VALUE_TYPE_UNKNOWN;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    status = DISIR_STATUS_OK;
+    switch (dc_type (context))
+    {
+    case DISIR_CONTEXT_DEFAULT:
+        *type = context->cx_default->de_value.dv_type;
+        break;
+    case DISIR_CONTEXT_KEYVAL:
+        *type = context->cx_keyval->kv_type;
+        break;
+    default:
+        log_debug_context (context, "invoked but does not contain/handle type");
+        status = DISIR_STATUS_WRONG_CONTEXT;
     }
 
     return status;
