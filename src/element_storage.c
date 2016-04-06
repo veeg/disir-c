@@ -39,9 +39,6 @@ struct disir_element_storage
     // The list lets us iterate all child context in order of insertion - important
     // for the sake of consistency when exposing the raw dump of all children.
     struct list     *es_list;
-
-    //! Number of entries in this element storage.
-    uint32_t        es_numentires;
 };
 
 // String hashing function for the multimap
@@ -135,6 +132,17 @@ dx_element_storage_destroy (struct disir_element_storage **storage)
     free (*storage);
     *storage = NULL;
     return DISIR_STATUS_OK;;
+}
+
+//! INTERNAL API
+int32_t
+dx_element_storage_numentries (struct disir_element_storage *storage)
+{
+    if (storage == NULL)
+        return (-1);
+
+    // Get the number of entries from the multimap
+    return multimap_size (storage->es_map);
 }
 
 //! PRIVATE API

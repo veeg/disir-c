@@ -1,4 +1,8 @@
 
+#include <disir/context.h>
+
+#include "collection.h"
+
 //! Forward declare Disir Element Storage structure.
 //! This is a private structure, even to the internals of Disir.
 struct disir_element_storage;
@@ -17,6 +21,16 @@ dx_element_storage_create (void);
 //!
 enum disir_status
 dx_element_storage_destroy (struct disir_element_storage **storage);
+
+//! \brief Return the number of elements stored in the Disir Element Storage
+//!
+//! \param[in] storage Pointer to the element storage to query entries from.
+//!
+//! \return number of entries stored in the Disir Element Storage. -1 is returned
+//!     if the input parameter is NULL.
+//!
+int32_t
+dx_element_storage_numentries (struct disir_element_storage *storage);
 
 enum disir_status
 dx_element_storage_add (struct disir_element_storage *storage,
