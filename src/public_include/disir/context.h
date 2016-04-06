@@ -12,7 +12,7 @@
 //! It offers a detailed level of abstraction.
 //! Each context is structured heirarchly, with the root
 //! context being either DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SCHEMA
-//! or DISIR_CONTEXT_TEMPLATE. The root context will determine the
+//! The root context will determine the
 //! effect and allowed operations on child contexts.
 struct disir_context;
 
@@ -25,7 +25,6 @@ enum disir_context_type
 {
     DISIR_CONTEXT_CONFIG = 1,
     DISIR_CONTEXT_SCHEMA,
-    DISIR_CONTEXT_TEMPLATE,
     DISIR_CONTEXT_SECTION,
     DISIR_CONTEXT_KEYVAL,
     DISIR_CONTEXT_DOCUMENTATION,
@@ -102,7 +101,6 @@ enum disir_status dc_putcontext (dc_t **context);
 //!     * GROUP
 //!     * CONFIG
 //!     * SCHEMA
-//!     * TEMPLATE
 //! If an unsupported context is provided, DISIR_STATUS_WRONG_CONTEXT
 //! is returned. If a documention entry already exists for this element,
 //! DISIR_STATUS_EXISTS will be returned.
@@ -143,7 +141,7 @@ enum disir_status dc_add_deprecrated(dc_t *context, struct semantic_version smev
 
 
 //! One may only add types to a context in construction mode.
-//! Only applicable to the DISIR_CONTEXT_SCHEMA or DISIR_CONTEXT_TEMPLATE
+//! Only applicable to the DISIR_CONTEXT_SCHEMA
 //! root contexts.
 //! Only applicable to the DISIR_CONTEXT_KEYVAL parent context.
 //! A keyval MUST have a valid type at all times.
@@ -261,34 +259,6 @@ enum disir_status dc_schema_begin (dc_t **schema);
 //! status DISIR_STATUS_WRONG_CONTEXT will be returned.
 //! On success, DISIR_STATUS_OK is returned.
 enum disir_status dc_schema_finalize (dc_t **context, struct disir_schema **schema);
-
-//! Associate a disir_template with a schema context.
-//! The template is attached to the inner disir_schema
-//! associated with the passed schema context.
-//! That is, when the context is finalized, the template
-//! is still associated with the underlying disir_schema.
-enum disir_status dc_schema_attach_template (dc_t *schema, struct disir_template *templ);
-
-//
-// Template related context API
-//
-
-//! Retrieve the context associated with an already constructed disir_template.
-//! This context may be used to manipulate or query the schema object.
-dc_t * dc_template_getcontext (struct disir_template *templ);
-
-//! Construct the DISIR_CONTEXT_TEMPLATE
-enum disir_status dc_template_begin (dc_t **templ);
-
-//! Finalize the construction of a DISIR_CONTEXT_TEMPLATE, returning
-//! an allocated disir_template object in the output parameter.
-//! If any unfinalized descendant contexts exists,
-//! DISIR_STATUS_CONTEXT_IN_WRONG_STATE will be returned.
-//! If the context supplied is not of type DISIR_CONTEXT_TEMPLATE,
-//! status DISIR_STATUS_WRONG_CONTEXT will be returned.
-//! On success, DISIR_STATUS_OK is returned.
-enum disir_status dc_template_finalize (dc_t **context, struct disir_template **templ);
-
 
 #endif // _LIBDISIR_CONTEXT_H
 

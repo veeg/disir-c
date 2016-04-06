@@ -49,8 +49,6 @@ enum disir_status
 struct disir_config;
 //! Forward declaration of the top-level context disir_schema
 struct disir_schema;
-//! Forward declaration of the top-level context disir_template
-struct disir_template;
 
 //! The different value types that may be held by differrent contexts.
 //! This enumeration also defines the explicit type of a DISIR_CONTEXT_KEYVAL.

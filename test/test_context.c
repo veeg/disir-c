@@ -91,10 +91,6 @@ test_context_type(void **state)
             assert_true(dc_type(context) == DISIR_CONTEXT_SCHEMA);
             assert_string_equal(dc_type_string(context), "FILE_SCHEMA");
             break;
-        case DISIR_CONTEXT_TEMPLATE:
-            assert_true(dc_type(context) == DISIR_CONTEXT_TEMPLATE);
-            assert_string_equal(dc_type_string(context), "FILE_TEMPLATE");
-            break;
         case DISIR_CONTEXT_SECTION:
             assert_true(dc_type(context) == DISIR_CONTEXT_SECTION);
             assert_string_equal(dc_type_string(context), "SECTION");

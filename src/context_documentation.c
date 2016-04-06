@@ -41,7 +41,6 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
         break;
     }
     case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     {
@@ -101,7 +100,6 @@ dx_documentation_numentries (dc_t *context)
         break;
     }
     case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     {
@@ -323,7 +321,6 @@ dx_documentation_destroy (struct disir_documentation **documentation)
             break;
         }
         case DISIR_CONTEXT_SCHEMA:
-        case DISIR_CONTEXT_TEMPLATE:
         case DISIR_CONTEXT_SECTION:
         case DISIR_CONTEXT_KEYVAL:
         {

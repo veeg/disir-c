@@ -62,7 +62,6 @@ struct disir_context
     {
         struct disir_config         *cx_config;
         struct disir_schema         *cx_schema;
-        struct disir_template       *cx_template;
         struct disir_group          *cx_group;
         struct disir_keyval         *cx_keyval;
         struct disir_documentation  *cx_documentation;

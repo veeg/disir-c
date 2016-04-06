@@ -17,7 +17,6 @@ const char *disir_context_type_string[] = {
     "INVALID_CONTEXT_VALUE",
     "FILE_CONFIG",
     "FILE_SCHEMA",
-    "FILE_TEMPLATE",
     "SECTION",
     "KEYVAL",
     "DOCUMENTATION",
@@ -92,8 +91,7 @@ dx_context_type_is_toplevel (enum disir_context_type context_type)
 {
     if (
         context_type == DISIR_CONTEXT_CONFIG    ||
-        context_type == DISIR_CONTEXT_SCHEMA    ||
-        context_type == DISIR_CONTEXT_TEMPLATE
+        context_type == DISIR_CONTEXT_SCHEMA
        )
     {
         return 1;
@@ -176,7 +174,6 @@ dx_context_create (enum disir_context_type type)
         break;
     }
     case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_TEMPLATE:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_DEFAULT:
