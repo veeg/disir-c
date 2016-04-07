@@ -90,13 +90,13 @@ dc_destroy (dc_t **context)
     case DISIR_CONTEXT_DOCUMENTATION:
         status = dx_documentation_destroy (&((*context)->cx_documentation));
         break;
-    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
         status = dx_keyval_destroy (&((*context)->cx_keyval));
         break;
     case DISIR_CONTEXT_DEFAULT:
         status = dx_default_destroy (&((*context)->cx_default));
         break;
+    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_type_string (*context));
@@ -208,13 +208,13 @@ dc_finalize (dc_t **context)
         dx_crash_and_burn ("Context %s made to to switch it should never reach",
                 dc_type_string (*context));
         break;
-    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
         status = dx_keyval_finalize (context);
         break;
     case DISIR_CONTEXT_DEFAULT:
         status = dx_default_finalize (context);
         break;
+    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_type_string (*context));
