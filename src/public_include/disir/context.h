@@ -243,6 +243,7 @@ dc_add_default_float (dc_t *parent, double value, struct semantic_version *semve
 
 //! Add a string as value to the context.
 //! Not applicable to every context.
+//! XXX: Make private?
 enum disir_status dc_add_value_string (dc_t *context, const char *value, int32_t value_size);
 
 //
@@ -270,8 +271,6 @@ enum disir_status dc_get_introduced (dc_t *context, struct semantic_version *sem
 enum disir_status dc_get_deprecrated (dc_t *context, struct semantic_version *semver);
 
 
-//! Query the context for the first child with the name child_name.
-dc_t *dc_get_child (dc_t *parent, const char *child_name, int32_t child_name_size);
 //
 // KEYVAL related context API
 //
