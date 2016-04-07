@@ -80,3 +80,10 @@ dio_schema_read(id)
 // Write the schema object identified by the passed id, in the appropriate group.
 dio_schema_write(id, group, schema)
 ----
+
+== Notes:
+
+*What are there calls to `dx_crash_and_burn` in library code that exits the program*?
+Simple answer is there shouldnt be, but they are put in place during initial development
+to crash early and crash hard. When the library is stabilized, all these calls will be replaced
+with a proper return statement.
