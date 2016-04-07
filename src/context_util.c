@@ -210,6 +210,11 @@ dx_context_create (enum disir_context_type type)
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_DEFAULT:
+    {
+        // XXX: What capabilities?
+        context->CONTEXT_CAPABILITY_INTRODUCED = 1;
+        break;
+    }
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__,

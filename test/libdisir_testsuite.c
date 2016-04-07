@@ -23,6 +23,7 @@
 
 //! Include the individual test group source files.
 #include "test_context.c"
+#include "test_context_default.c"
 #include "test_context_documentation.c"
 #include "test_introduced.c"
 #include "test_collection.c"
@@ -68,6 +69,11 @@ main(int argc, char *argv[])
 
     returnval += cmocka_run_group_tests_name("MQueue",
         disir_mqueue_tests,
+        NULL,
+        NULL);
+
+    returnval += cmocka_run_group_tests_name("Context-default",
+        disir_context_default_tests,
         NULL,
         NULL);
 

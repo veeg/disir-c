@@ -61,6 +61,7 @@ struct disir_context
     union
     {
         struct disir_config         *cx_config;
+        struct disir_default        *cx_default;
         struct disir_schema         *cx_schema;
         struct disir_group          *cx_group;
         struct disir_keyval         *cx_keyval;

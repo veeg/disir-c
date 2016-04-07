@@ -89,6 +89,8 @@ dc_destroy (dc_t **context)
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_DEFAULT:
+        status = dx_default_destroy (&((*context)->cx_default));
+        break;
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_type_string (*context));
@@ -150,6 +152,8 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_DEFAULT:
+        status = dx_default_begin (parent, child);
+        break;
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dx_context_type_string (context_type));
@@ -199,6 +203,8 @@ dc_finalize (dc_t **context)
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_DEFAULT:
+        status = dx_default_finalize (context);
+        break;
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_type_string (*context));
@@ -342,9 +348,13 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
         introduced = &context->cx_documentation->dd_introduced;
         break;
     }
+    case DISIR_CONTEXT_DEFAULT:
+    {
+        introduced = &context->cx_default->de_introduced;
+        break;
+    }
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_type_string(context));
@@ -412,9 +422,13 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
         introduced = &context->cx_documentation->dd_introduced;
         break;
     }
+    case DISIR_CONTEXT_DEFAULT:
+    {
+        introduced = &context->cx_default->de_introduced;
+        break;
+    }
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
-    case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_type_string(context));

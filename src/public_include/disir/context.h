@@ -169,9 +169,76 @@ enum disir_status dc_set_value_type (dc_t *context, enum disir_value_type type);
 //!
 enum disir_status dc_get_value_type (dc_t *context, enum disir_value_type *type);
 
-//! Add a default value to an entry.
-// XXX: Should this be revised? Removed? Renamed?
-enum disir_status dc_add_default (dc_t *context, void *value, int32_t value_size);
+//! \brief  Add a default value to an entry, type inferred from the parent context
+//!
+//! Parse the input string to retrieve the value whose type is inferred from the
+//! parent context. This function is merely a convenient wrapper around all
+//! other dc_add_default_* functions.
+//!
+//! \param context Parent context of which to add a new default entry
+//! \param value String to parse the relevant value information from
+//! \param value_size: Only applicable to string manipulating value types.
+//!     Size in bytes of the input string to copy.A
+//! \param semver Semantic version number to tag this default with. NULL indicates
+//!     a semantic version number of 1.0.0
+//!
+//! \return DISIR_STATUS_OK if a new default object was associated with the parent context.t
+enum disir_status dc_add_default (dc_t *context, const char *value,
+                                  int32_t value_size, struct semantic_version *semver);
+
+//! \brief Add a default string value to the parent context.
+//!
+//! Type of parent must be DISIR_VALUE_TYPE_STRING. There must not be a default context
+//! in parent with an equal semantic version number.
+//!
+//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_SCHEMA.
+//! \param value Default string value to add.
+//! \param value_size Size in bytes of the string to copy.
+//! \param semver Semantic version number this default entry is valid from. NULL indicates
+//!     the semantic verssion number 1.0.0
+//!
+//! \return DISIR_STATUS_OK if the default string 'value' entry succesfully added
+//!     to the parent context.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
+//!
+enum disir_status dc_add_default_string (dc_t *parent, const char *value,
+                                         int32_t value_size, struct semantic_version *semver);
+
+//! \brief Add a default integer value to the parent context.
+//!
+//! Type of parent must be DISIR_VALUE_TYPE_INTEGER. There must not be a default context
+//! in parent with an equal semantic version number.
+//!
+//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_SCHEMA.
+//! \param value Default integer value to add.
+//! \param semver Semantic version number this default entry is valid from. NULL indicates
+//!     the semantic verssion number 1.0.0
+//!
+//! \return DISIR_STATUS_OK if the default integer 'value' entry succesfully added
+//!     to the parent context.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
+//!
+enum disir_status
+dc_add_default_integer (dc_t *parent, int64_t value, struct semantic_version *semver);
+
+//! \brief Add a default float value to the parent context.
+//!
+//! Type of parent must be DISIR_VALUE_TYPE_FLOAT. There must not be a default context
+//! in parent with an equal semantic version number.
+//!
+//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_SCHEMA.
+//! \param value Default float value to add.
+//! \param semver Semantic version number this default entry is valid from. NULL indicates
+//!     the semantic verssion number 1.0.0
+//!
+//! \return DISIR_STATUS_OK if the default float 'value' entry succesfully added
+//!     to the parent context.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
+//!
+enum disir_status
+dc_add_default_float (dc_t *parent, double value, struct semantic_version *semver);
+
+
 
 
 //! Add a string as value to the context.
