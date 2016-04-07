@@ -8,10 +8,17 @@ Because its **manual**. It does not aid you in resolving conflict between the sa
 
 == Contributing Guidelines
 
-* Coding style shall be consistent with the entire codebase.
+* When first cloning the git repository, you must run the `dev/init_repo.sh` script
+    to align your local git repository with upstream codebase policy.
+
+* General codestyle guidelines include:
+** Opening paranthesis to function calls and definitions shall be separated with a whitespace.
+** Function return type skall be declared on a separate line above the function name.
+** Line length shall strive to be under 100 characters long.
+** Opening bracket shall be on a separate line.
 
 == TODO List
 
 [horizontal]
-Templates:: The schemas should be able to inherrit shared definitions from a template.
+Restrictions:: No restritions are implemented on neither section nor keyval.
 
