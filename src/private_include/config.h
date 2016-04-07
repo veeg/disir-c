@@ -15,7 +15,8 @@ struct disir_config
     //! with it before it can gain most capabilities.
     struct disir_schema     *cf_schema;
 
-    // TODO: Hashmap of entries, either keyval or group.
+    //! Storage of element entries, either DISIR_CONTEXT_KEYVAL or DISIR_CONTEXT_SECTION.
+    struct disir_element_storage    *cf_elements;
 
     //! Documentation associated with the disir_config.
     //! Only one entry is allowed. - REMOVE THIS SUPPRT - ONLY APPLICABLE TO SCHEMA
