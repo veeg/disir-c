@@ -10,6 +10,7 @@
 // Private
 #include "context_private.h"
 #include "log.h"
+#include "keyval.h"
 
 //! Array  of string representations corresponding to the
 //! disir_context_type enumeration value.
@@ -209,6 +210,12 @@ dx_context_create (enum disir_context_type type)
     case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
+    {
+        // XXX: What capabilitites?
+        context->CONTEXT_CAPABILITY_ADD_DOCUMENTATION = 1;
+        context->CONTEXT_CAPABILITY_ADD_VALUE_STRING = 1;
+        break;
+    }
     case DISIR_CONTEXT_DEFAULT:
     {
         // XXX: What capabilities?

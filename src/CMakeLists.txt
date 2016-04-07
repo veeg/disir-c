@@ -5,6 +5,7 @@ set (_LIBDISIR_SOURCES
     "util.c"
     "context.c"
     "context_default.c"
+    "context_keyval.c"
     "context_util.c"
     "context_config.c"
     "context_documentation.c"

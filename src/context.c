@@ -12,6 +12,7 @@
 // Private
 #include "context_private.h"
 #include "config.h"
+#include "keyval.h"
 #include "log.h"
 
 //! PUBLIC API
@@ -88,6 +89,8 @@ dc_destroy (dc_t **context)
     case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
+        status = dx_keyval_destroy (&((*context)->cx_keyval));
+        break;
     case DISIR_CONTEXT_DEFAULT:
         status = dx_default_destroy (&((*context)->cx_default));
         break;
@@ -151,6 +154,8 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
     case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
+        status = dx_keyval_begin (parent, child);
+        break;
     case DISIR_CONTEXT_DEFAULT:
         status = dx_default_begin (parent, child);
         break;
@@ -202,6 +207,8 @@ dc_finalize (dc_t **context)
     case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
+        status = dx_keyval_finalize (context);
+        break;
     case DISIR_CONTEXT_DEFAULT:
         status = dx_default_finalize (context);
         break;
@@ -305,6 +312,10 @@ dc_add_value_string (dc_t *context, const char *value, int32_t value_size)
     case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
+    {
+        status = dx_value_set_string (&context->cx_keyval->kv_name, value, value_size);
+        break;
+    }
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",

@@ -272,6 +272,70 @@ enum disir_status dc_get_deprecrated (dc_t *context, struct semantic_version *se
 
 //! Query the context for the first child with the name child_name.
 dc_t *dc_get_child (dc_t *parent, const char *child_name, int32_t child_name_size);
+//
+// KEYVAL related context API
+//
+
+//! \brief Shortcut to add a KEYVAL string entry to a parent context.
+//!
+//! Instead of beginning a context on a parent, setting the required name, type,
+//! default, documentation fields, this function wraps all that logic into one
+//! simple function call. If you require special restrictions and additional defaults,
+//! you will need to go the long route through beginning and finalizing a context.
+//!
+//! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
+//!     the input semver 'semver'.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
+//!
+enum disir_status dc_add_keyval_string (dc_t *parent, const char *name, const char *def,
+                                        const char *doc, struct semantic_version *semver);
+
+//! \brief Shortcut to add a KEYVAL integer entry to a parent context.
+//!
+//! Instead of beginning a context on a parent, setting the required name, type,
+//! default, documentation fields, this function wraps all that logic into one
+//! simple function call. If you require special restrictions and additional defaults,
+//! you will need to go the long route through beginning and finalizing a context.
+//!
+//! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
+//!     the input semver 'semver'.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
+//!
+enum disir_status dc_add_keyval_integer (dc_t *parent, const char *name, int64_t def,
+                                         const char *doc, struct semantic_version *semver);
+
+//! \brief Shortcut to add a KEYVAL float entry to a parent context.
+//!
+//! Instead of beginning a context on a parent, setting the required name, type,
+//! default, documentation fields, this function wraps all that logic into one
+//! simple function call. If you require special restrictions and additional defaults,
+//! you will need to go the long route through beginning and finalizing a context.
+//!
+//! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
+//!     the input semver 'semver'.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
+//!
+enum disir_status dc_add_keyval_float (dc_t *parent, const char *name, double def,
+                                       const char *doc, struct semantic_version *semver);
+
+//! \brief Shortcut to add a KEYVAL boolean entry to a parent context.
+//!
+//! Instead of beginning a context on a parent, setting the required name, type,
+//! default, documentation fields, this function wraps all that logic into one
+//! simple function call. If you require special restrictions and additional defaults,
+//! you will need to go the long route through beginning and finalizing a context.
+//!
+//! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
+//!     the input semver 'semver'.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
+//!
+enum disir_status dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t def,
+                                         const char *doc, struct semantic_version *semver);
+
 
 //
 // Restriction related context API
