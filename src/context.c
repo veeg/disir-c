@@ -14,6 +14,7 @@
 #include "config.h"
 #include "keyval.h"
 #include "log.h"
+#include "schema.h"
 
 //! PUBLIC API
 enum disir_status
@@ -83,10 +84,12 @@ dc_destroy (dc_t **context)
     case DISIR_CONTEXT_CONFIG:
         status = dx_config_destroy (&((*context)->cx_config));
         break;
+    case DISIR_CONTEXT_SCHEMA:
+        status = dx_schema_destroy (&((*context)->cx_schema));
+        break;
     case DISIR_CONTEXT_DOCUMENTATION:
         status = dx_documentation_destroy (&((*context)->cx_documentation));
         break;
-    case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
         status = dx_keyval_destroy (&((*context)->cx_keyval));
@@ -200,11 +203,11 @@ dc_finalize (dc_t **context)
     case DISIR_CONTEXT_DOCUMENTATION:
         status = dx_documentation_finalize (context);
         break;
+    case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_CONFIG:
         dx_crash_and_burn ("Context %s made to to switch it should never reach",
                 dc_type_string (*context));
         break;
-    case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
         status = dx_keyval_finalize (context);

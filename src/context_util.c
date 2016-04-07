@@ -208,6 +208,11 @@ dx_context_create (enum disir_context_type type)
         break;
     }
     case DISIR_CONTEXT_SCHEMA:
+    {
+        // XXX: What capabilitties?
+        context->CONTEXT_CAPABILITY_ADD_DOCUMENTATION = 1;
+        break;
+    }
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     {

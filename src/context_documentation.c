@@ -13,6 +13,7 @@
 // Private
 #include "context_private.h"
 #include "config.h"
+#include "schema.h"
 #include "keyval.h"
 #include "documentation.h"
 #include "mqueue.h"
@@ -42,12 +43,17 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
         break;
     }
     case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_SECTION:
+    {
+        doc_queue = &(parent->cx_schema->sc_documentation_queue);
+        break;
+    }
     case DISIR_CONTEXT_KEYVAL:
     {
         doc_queue = &(parent->cx_keyval->kv_documentation_queue);
         break;
     }
+    case DISIR_CONTEXT_SECTION:
+    {
         dx_crash_and_burn ("%s: %s unhandled not implemented",
                            __FUNCTION__, dc_type_string (parent));
         break;
@@ -105,12 +111,17 @@ dx_documentation_numentries (dc_t *context)
         break;
     }
     case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_SECTION:
+    {
+        queue = context->cx_schema->sc_documentation_queue;
+        break;
+    }
     case DISIR_CONTEXT_KEYVAL:
     {
         queue = context->cx_keyval->kv_documentation_queue;
         break;
     }
+    case DISIR_CONTEXT_SECTION:
+    {
         dx_crash_and_burn ("%s: %s unhandled not implemented",
                            __FUNCTION__, dc_type_string (context));
         break;
@@ -330,12 +341,17 @@ dx_documentation_destroy (struct disir_documentation **documentation)
             break;
         }
         case DISIR_CONTEXT_SCHEMA:
-        case DISIR_CONTEXT_SECTION:
+        {
+            queue = &(context->cx_schema->sc_documentation_queue);
+            break;
+        }
         case DISIR_CONTEXT_KEYVAL:
         {
             queue = &(context->cx_keyval->kv_documentation_queue);
             break;
         }
+        case DISIR_CONTEXT_SECTION:
+        {
             dx_crash_and_burn ("%s: %s unhandled not implemented",
                            __FUNCTION__, dc_type_string (context));
             break;
