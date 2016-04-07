@@ -149,13 +149,16 @@ dx_context_incref (dc_t *context)
 
 //! INTERNAL API
 void
-dx_context_decref (dc_t *context)
+dx_context_decref (dc_t **context)
 {
-    context->cx_refcount--;
+    if (context == NULL)
+        return;
 
-    if (context->cx_refcount == 0)
+    (*context)->cx_refcount--;
+
+    if ((*context)->cx_refcount == 0)
     {
-        dx_context_destroy (&context);
+        dx_context_destroy (context);
     }
 }
 

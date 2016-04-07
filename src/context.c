@@ -68,7 +68,7 @@ dc_destroy (dc_t **context)
     if ((*context)->cx_state == CONTEXT_STATE_DESTROYED)
     {
         log_debug ("destroying destroyed-context( %p )", *context);
-        dx_context_decref (*context);
+        dx_context_decref (context);
         *context = NULL;
         return DISIR_STATUS_OK;
     }
@@ -102,7 +102,7 @@ dc_destroy (dc_t **context)
     (*context)->cx_state = CONTEXT_STATE_DESTROYED;
 
     // Simply decref the context - When it reaches zero, it will be dealloced
-    dx_context_decref (*context);
+    dx_context_decref (context);
 
     // Take care of the users pointer. As an added service!
     *context = NULL;
@@ -234,7 +234,7 @@ dc_putcontext (dc_t **context)
         return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;
     }
 
-    dx_context_decref (*context);
+    dx_context_decref (context);
     *context = NULL;
     return DISIR_STATUS_OK;
 }

@@ -111,7 +111,7 @@ dx_collection_coalesce(dcc_t *collection)
         {
             if (context != NULL)
             {
-                dx_context_decref (context);
+                dx_context_decref (&context);
                 invalid_entries_count += 1;
                 context = collection->cc_collection[index - 1] = NULL;
             }
@@ -196,7 +196,7 @@ dc_collection_finished (dcc_t **collection)
         context = (*collection)->cc_collection[index];
         if (context != NULL)
         {
-            dx_context_decref (context);
+            dx_context_decref (&context);
         }
         index++;
     }

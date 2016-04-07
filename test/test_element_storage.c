@@ -96,8 +96,8 @@ test_element_storage_add (void **state)
         // Ref count should be 2 when inserted into element storage
         assert_int_equal (context->cx_refcount, 2);
 
-        // Decref the context, to free up the memoey again (when element storage is destroyed)
-        dx_context_decref (context);
+        // Put back the context - we are finished with it.
+        dx_context_decref (&context);
         assert_int_equal (context->cx_refcount, 1);
     }
 
@@ -179,7 +179,7 @@ test_element_storage_get_all (void **state)
     // cleanup
     for (i = 0; i < (3 * KEYVAL_NUMENTRIES); i++)
     {
-        dx_context_decref (allocated_contexts[i]);
+        dx_context_decref (&allocated_contexts[i]);
     }
     free (allocated_contexts);
 

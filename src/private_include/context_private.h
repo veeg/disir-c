@@ -108,14 +108,21 @@ struct disir_context
 // Utility context prototypes
 //
 
-//! Increment the reference count for the passed context.
+//! \brief Increment the reference count for the passed context.
+//!
+//!
 void dx_context_incref (dc_t *context);
 
-//! Decrement the reference count for the passed context.
+//! \brief Decrement the reference count for the passed context.
+//!
 //! If the reference count reaches zero, the context is de-allocated.
 //! Nothing is done for object which is pointed to by this context.
 //! It is the callers responsibility to make sure it is properly free'd
-void dx_context_decref (dc_t *context);
+//!
+//! If the context ends up destroyed, since its reference count reaches zero,
+//! the context pointer is sat to NULL.
+//!
+void dx_context_decref (dc_t **context);
 
 //! Attach 'parent' as parent context to 'context'
 void dx_context_attach (dc_t *parent, dc_t *context);

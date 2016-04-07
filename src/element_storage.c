@@ -119,8 +119,11 @@ dx_element_storage_destroy (struct disir_element_storage **storage)
     {
         // Ignore return code - we just want to destroy and get out of town.
         // Decref first, before destroying
-        dx_context_decref (context);
-        dc_destroy (&context);
+        dx_context_decref (&context);
+        if (context)
+        {
+            dc_destroy (&context);
+        }
     }
 
     // Destroy iterator and element_storage data structures
