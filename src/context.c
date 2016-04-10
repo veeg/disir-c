@@ -474,3 +474,52 @@ dc_get_deprecrated (dc_t *context, struct semantic_version *semver)
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_get_elements (dc_t *context, dcc_t **collection)
+{
+    enum disir_status status;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    if (collection == NULL)
+    {
+        log_debug ("invoked with NULL collection pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG,
+                                 DISIR_CONTEXT_SCHEMA, DISIR_CONTEXT_SECTION);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    status = DISIR_STATUS_OK;
+    switch (dc_type (context))
+    {
+    case DISIR_CONTEXT_SCHEMA:
+    {
+        status = dx_element_storage_get_all (context->cx_schema->sc_elements, collection);
+        break;
+    }
+    case DISIR_CONTEXT_CONFIG:
+    {
+        status = dx_element_storage_get_all (context->cx_config->cf_elements, collection);
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+    default:
+    {
+        dx_crash_and_burn ("%s: %s not handled/implemented/supported",
+                           __FUNCTION__, dc_type_string (context));
+    }
+    }
+
+    return status;
+}

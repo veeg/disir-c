@@ -20,6 +20,9 @@ struct disir_context;
 //! is a often used construct.
 typedef struct disir_context dc_t;
 
+
+#include <disir/collection.h>
+
 //! Different types of disir_contexts that are available.
 enum disir_context_type
 {
@@ -269,6 +272,22 @@ enum disir_status dc_get_introduced (dc_t *context, struct semantic_version *sem
 //! If no such member exists on the context,
 //! DISIR_STATUS_NO_CAN_DO is returned.
 enum disir_status dc_get_deprecrated (dc_t *context, struct semantic_version *semver);
+
+//!  \brief Collect all direct child elements of the passed context.
+//!
+//! \param[in] context Parent context to collect child elements from.
+//!     Must be of context ype:
+//!         * DISIR_CONTEXT_CONFIG
+//!         * DISIR_CONTEXT_SCHEMA
+//!         * DISIR_CONTEXT_SECTION
+//! \param[out] collection Output collection, if return status is DISIR_STATUS_OK
+//!
+//! \return DISIR_STATUS_OK if the output collection contains all
+//!     child elements of a valid input context.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input parameters are NULL
+//! \return DISRI_STATUS_WRONG_CONTEXT if the input context is not of correct type.
+//!
+enum disir_status dc_get_elements (dc_t *context, dcc_t **collection);
 
 
 //

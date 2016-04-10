@@ -31,6 +31,7 @@
 #include "test_util.c"
 #include "test_element_storage.c"
 #include "test_mqueue.c"
+#include "test_context_query.c"
 
 int
 main(int argc, char *argv[])
@@ -83,6 +84,10 @@ main(int argc, char *argv[])
         NULL,
         NULL);
 
+    returnval += cmocka_run_group_tests_name("Context-query",
+        disir_context_query_tests,
+        NULL,
+        NULL);
 
     return returnval;
 }
