@@ -133,6 +133,13 @@ test_context_get_name (void **state)
 
     // TODO: Test section
 
+    // cleanup
+    dx_context_destroy (&invalid);
+    dc_destroy (&schema);
+    dc_destroy (&keyval);
+
+    LOG_TEST_END
+}
 
 void
 test_context_get_documentation (void **state)
