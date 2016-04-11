@@ -142,7 +142,7 @@ dx_documentation_numentries (dc_t *context)
 
 //! PUBLIC API
 enum disir_status
-dc_add_documentation (dc_t *parent, char *doc, int32_t doc_size)
+dc_add_documentation (dc_t *parent, const char *doc, int32_t doc_size)
 {
     dc_t *context;
     enum disir_status status;

@@ -108,8 +108,10 @@ enum disir_status dc_putcontext (dc_t **context);
 //! is returned. If a documention entry already exists for this element,
 //! DISIR_STATUS_EXISTS will be returned.
 //! On success, DISIR_STATUS_OK is returned.
-enum disir_status dc_add_documentation (dc_t *context, char *doc, int32_t doc_size);
+enum disir_status dc_add_documentation (dc_t *context, const char *doc, int32_t doc_size);
 
+enum disir_status dc_get_documentation (dc_t *context, const char **doc, int32_t *doc_size,
+                                        struct semantic_version *semver);
 
 //
 // Add related context API
