@@ -78,7 +78,66 @@ test_context_get_elements (void **state)
     LOG_TEST_END
 }
 
+void
+test_context_get_name (void **state)
+{
+    enum disir_status status;
+    dc_t *invalid;
+    dc_t *schema;
+    dc_t *keyval;
+    const char *name;
+    int32_t size;
+
+    LOG_TEST_START
+
+    // setup
+    status = dc_schema_begin (&schema);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    status = dc_begin (schema, DISIR_CONTEXT_KEYVAL, &keyval);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    status = dc_add_name (keyval, "test_keyval", strlen ("test_keyval"));
+    assert_int_equal (status, DISIR_STATUS_OK);
+
+
+    // Invalid argument check
+    status = dc_get_name (NULL, NULL, NULL);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+    status = dc_get_name (keyval, NULL, NULL);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+    status = dc_get_name (NULL, &name, NULL);
+    assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
+
+    // enumerate all DISIR_CONTEST_* and attempt to get elements from invalid context type.
+    invalid = dx_context_create (DISIR_CONTEXT_CONFIG);
+    assert_non_null (invalid);
+    while (invalid->cx_type != DISIR_CONTEXT_UNKNOWN)
+    {
+        // valid types
+        if (invalid->cx_type == DISIR_CONTEXT_KEYVAL ||
+            invalid->cx_type == DISIR_CONTEXT_SECTION)
+        {
+            invalid->cx_type++;
+            continue;
+        }
+
+        status = dc_get_name (invalid, &name, &size);
+        assert_int_equal (status, DISIR_STATUS_WRONG_CONTEXT);
+
+        invalid->cx_type++;
+    }
+
+    // Test valid KEVVAL
+    status = dc_get_name (keyval, &name, NULL);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_string_equal (name, "test_keyval");
+
+    // TODO: Test section
+
+    LOG_TEST_END
+}
+
 const struct CMUnitTest disir_context_query_tests[] = {
     cmocka_unit_test (test_context_get_elements),
+    cmocka_unit_test (test_context_get_name),
 };
 

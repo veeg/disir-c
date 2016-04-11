@@ -132,6 +132,22 @@ enum disir_status dc_add_documentation (dc_t *context, char *doc, int32_t doc_si
 //!
 enum disir_status dc_add_name (dc_t *context, const char *name, int32_t name_size);
 
+//! \brief Get a name attribute associated with the context entry
+//!
+//! One can only retrieve a name from one of these supported contexts:
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!
+//! \param[in] context Context to get name attribute from
+//! \param[out] Pointer will be re-directed to the name constant
+//! \param[out] Address is populated wth the output name size in bytes. May be NULL.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or name are NULL pointers.
+//! \return DISIR_STATUS_WRONG_CONTEXT if input context is not of the supported types.
+//! \return DISIR_STATUS_OK if name is successfully populated with the name attribute of context.
+//!
+enum disir_status dc_get_name (dc_t *context, const char **name, int32_t *name_size);
+
 //! Add an introduced semantic version number to an entry.
 //! One can only add an introduced semver to a context who is in construction mode.
 //! Add a deprecrated semantic version number to an entry.

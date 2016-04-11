@@ -278,6 +278,56 @@ dc_add_name (dc_t *context, const char *name, int32_t name_size)
 
 //! PUBLIC API
 enum disir_status
+dc_get_name (dc_t *context, const char **name, int32_t *name_size)
+{
+    enum disir_status status;
+    struct disir_value *value;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_SECTION);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    if (name == NULL)
+    {
+        log_debug ("invoked with name NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    switch (dc_type (context))
+    {
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        value = &context->cx_keyval->kv_name;
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+    default:
+    {
+        dx_crash_and_burn ("%s: %s invoked unhandled", __FUNCTION__, dc_type_string (context));
+    }
+    }
+
+    *name = value->dv_string;
+    if (name_size)
+    {
+        *name_size = value->dv_size;
+    }
+
+    log_debug_context (context, "retrieved name: %s\n", *name);
+
+    return DISIR_STATUS_OK;
+}
+
+//! PUBLIC API
+enum disir_status
 dc_add_value_string (dc_t *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
