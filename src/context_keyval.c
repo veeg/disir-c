@@ -219,6 +219,13 @@ add_keyval_generic (dc_t *parent, const char *name, const char *doc,
         }
     }
 
+    status = dc_add_documentation (keyval, doc, strlen (doc));
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto error;
+    }
+
     status = dx_keyval_finalize (&keyval);
     if (status != DISIR_STATUS_OK)
     {
