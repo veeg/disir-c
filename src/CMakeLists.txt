@@ -12,6 +12,7 @@ set (_LIBDISIR_SOURCES
     "context_documentation.c"
     "collection.c"
     "element_storage.c"
+    "disir.c"
 )
 
 # Export public include directory as internal cache variable

@@ -45,6 +45,9 @@ enum disir_status
 
 };
 
+//! Forward declare the disir main object
+struct disir;
+
 //! Forward declaration of the top-level context disir_config
 struct disir_config;
 //! Forward declaration of the top-level context disir_schema
@@ -69,6 +72,30 @@ enum disir_restriction
     DISIR_RESTRICTION_VALUE = 1,
     DISIR_RESTRICTION_RANGE,
 };
+
+//! \brief Allocate a new libdisir instance
+//!
+//! \param[in,out] Pointer will be populated with the address of the allocated instance.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if the input address is NULL
+//! \return DISIR_STATUS_NO_MEMORY if memory allocation failed.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_instance_create (struct disir **disir);
+
+//! \brief Destroy a previously allocated libdisir instance
+//!
+//! Destroy a libdisir instance previously allocated with disir_instance_create()
+//!
+//! \param[in,out] disir Instance to destroy. Pointer is sat to NULL upon successful destroy
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input paramter address and its pointed to value
+//!     are NULL:
+//! \return DISIR_STATUS_OK on success.
+enum disir_status
+disir_instance_destroy (struct disir **disir);
+
 
 #include <disir/util.h>
 
