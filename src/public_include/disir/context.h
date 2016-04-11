@@ -110,8 +110,28 @@ enum disir_status dc_putcontext (dc_t **context);
 //! On success, DISIR_STATUS_OK is returned.
 enum disir_status dc_add_documentation (dc_t *context, const char *doc, int32_t doc_size);
 
-enum disir_status dc_get_documentation (dc_t *context, const char **doc, int32_t *doc_size,
-                                        struct semantic_version *semver);
+//! \brief Get the documentation entry for a given semver on the context.
+//!
+//! Retrieve a specific documentation entry valid for the input semantic version number
+//! given. If semver is NULL, the highest version is picked.
+//! Supported context types are:
+//!     * DISIR_CONTEXT_SECTION
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_CONFIG
+//!     * DISIR_CONTEXT_SCHEMA
+//!
+//! \param[in] context Input context to retrieve documentation for.
+//! \param[in] semver Matching documentation entry covered by this semantic verison number.
+//!     NULL indicates the greatest (semver) documentation entry.
+//! \param[out] doc Output pointer the documentation constant will be populated to.
+//! \param[out] doc_size Size of the documentation string, in bytes. Optional; May be NULL
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENTS if context or doc are NULL
+//! \return DISIR_STATUS_WRONG_CONTEXT if context is not of supported type.
+//! \return DISIR_STATUS_OK if doc is popualted with documentation string of context.
+//!
+enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *semver,
+                                        const char **doc, int32_t *doc_size);
 
 //
 // Add related context API

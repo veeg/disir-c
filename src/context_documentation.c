@@ -191,6 +191,82 @@ dc_add_documentation (dc_t *parent, const char *doc, int32_t doc_size)
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_get_documentation (dc_t *context, struct semantic_version *semver,
+                      const char **doc, int32_t *doc_size)
+{
+    enum disir_status status;
+    struct disir_documentation **doc_parent;
+    struct disir_documentation *doc_context;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
+                                          DISIR_CONTEXT_CONFIG,
+                                          DISIR_CONTEXT_SECTION,
+                                          DISIR_CONTEXT_SCHEMA);
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_log_context (context, "cannot fetch documentation for context.");
+        return status;
+    }
+    if (doc == NULL || doc_size == NULL)
+    {
+        // Already logged
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    switch (dc_type (context))
+    {
+    case DISIR_CONTEXT_KEYVAL:
+        doc_parent = &context->cx_keyval->kv_documentation_queue;
+        break;
+    case DISIR_CONTEXT_SCHEMA:
+        doc_parent = &context->cx_schema->sc_documentation_queue;
+        break;
+    default:
+    {
+        dx_crash_and_burn ("%s: %s unhandled", __FUNCTION__, dc_type_string (context));
+    }
+    }
+
+    if (semver == NULL)
+    {
+        // Get highest semver
+        doc_context = MQ_TAIL (*doc_parent);
+    }
+    else
+    {
+        // Get the prev entry from the found entry
+        //  NULL is returned if the tail is lower than our version compare input
+        doc_context = MQ_FIND (*doc_parent,
+                (dx_semantic_version_compare (&entry->dd_introduced, semver) > 0));
+        if (doc_context != NULL && doc_context->prev != MQ_TAIL (*doc_parent))
+        {
+            doc_context = doc_context->prev;
+        }
+        if (doc_context == NULL)
+        {
+            doc_context = MQ_TAIL (*doc_parent);
+        }
+    }
+
+
+    if (doc_context == NULL)
+    {
+        log_error_context (context, "No doc entry on context" );
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    status = dx_value_get_string (&doc_context->dd_value, doc, doc_size);
+    return status;
+}
+
 //! INTERNAL API
 enum disir_status
 dx_documentation_begin (dc_t *parent, dc_t **doc)
