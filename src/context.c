@@ -411,6 +411,12 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
         return DISIR_STATUS_NO_CAN_DO;
     }
 
+    // Update schema with highest version if root context is DISIR_CONTEXT_SCHEMA
+    if (dc_type (context->cx_root_context) == DISIR_CONTEXT_SCHEMA)
+    {
+        dx_schema_update_version (context->cx_root_context->cx_schema, &semver);
+    }
+
     switch (dc_type (context))
     {
     case DISIR_CONTEXT_DOCUMENTATION:
