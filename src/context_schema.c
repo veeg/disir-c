@@ -119,6 +119,11 @@ dx_schema_create (dc_t *context)
         goto error;
     }
 
+    // Initialize version to 1.0.0
+    schema->sc_version.sv_major = 1;
+    schema->sc_version.sv_minor = 0;
+    schema->sc_version.sv_patch = 0;
+
     return schema;
 error:
     if (schema && schema->sc_elements)
@@ -158,6 +163,63 @@ dx_schema_destroy (struct disir_schema **schema)
 
     free (*schema);
     *schema = NULL;
+
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_schema_update_version (struct disir_schema *schema, struct semantic_version *semver)
+{
+    struct semantic_version fact;
+
+    if (schema == NULL || semver == NULL)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    fact.sv_major = schema->sc_version.sv_major;
+    fact.sv_minor = schema->sc_version.sv_minor;
+    fact.sv_patch = schema->sc_version.sv_patch;
+
+    if (schema->sc_version.sv_major < semver->sv_major)
+    {
+        fact.sv_major = semver->sv_major;
+        fact.sv_minor = semver->sv_minor;
+        fact.sv_patch = semver->sv_patch;
+    }
+    else if (schema->sc_version.sv_major == semver->sv_major &&
+             schema->sc_version.sv_minor < semver->sv_minor)
+    {
+        fact.sv_minor = semver->sv_minor;
+        fact.sv_patch = semver->sv_patch;
+    }
+    else if (schema->sc_version.sv_minor == semver->sv_minor &&
+             schema->sc_version.sv_patch < semver->sv_patch)
+    {
+        fact.sv_patch = semver->sv_patch;
+    }
+
+    schema->sc_version.sv_major = fact.sv_major;
+    schema->sc_version.sv_minor = fact.sv_minor;
+    schema->sc_version.sv_patch = fact.sv_patch;
+
+    return DISIR_STATUS_OK;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_schema_get_version (struct disir_schema *schema, struct semantic_version *semver)
+{
+    if (schema == NULL || semver == NULL)
+    {
+        log_debug ("invoked with NULL pointer(s)");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    semver->sv_major = schema->sc_version.sv_major;
+    semver->sv_minor = schema->sc_version.sv_minor;
+    semver->sv_patch = schema->sc_version.sv_patch;
 
     return DISIR_STATUS_OK;
 }

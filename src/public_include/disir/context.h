@@ -457,6 +457,17 @@ enum disir_status dc_config_attach_schema (dc_t *config, struct disir_schema *sc
 //! This context may be used to manipulate or query the schema object.
 dc_t * dc_schema_getcontext (struct disir_schema *schema);
 
+//! \brief Get the version number of this schema.
+//!
+//! \param[in] schema Input schema to retrieve semver for
+//! \param[out] semver Output structure populated with the semver of schema.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if schema or semver are NULL
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_schema_get_version (struct disir_schema *schema, struct semantic_version *semver);
+
 //! Construct the DISIR_CONTEXT_SCHEMA
 enum disir_status dc_schema_begin (dc_t **schema);
 

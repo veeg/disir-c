@@ -161,9 +161,69 @@ test_context_schema_basic (void **state)
     LOG_TEST_END
 }
 
+void
+test_context_schema_version (void **state)
+{
+    enum disir_status status;
+    struct disir_schema *schema;
+    dc_t *context;
+    struct semantic_version input;
+    struct semantic_version output;
+
+    LOG_TEST_START
+
+    // setup
+    status = dc_schema_begin (&context);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    status = dc_schema_finalize (&context, &schema);
+    assert_int_equal (status, DISIR_STATUS_OK);
+
+    // Get initialized context at 1.0.0
+    input.sv_major = 1;
+    input.sv_minor = 0;
+    input.sv_patch = 0;
+    status = dc_schema_get_version (schema, &output);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_true (dx_semantic_version_compare (&input, &output) == 0);
+
+    // Update version (with internal function)
+    input.sv_minor = 4;
+    status = dx_schema_update_version (schema, &input);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    // Assert schema got updated to input
+    status = dc_schema_get_version (schema, &output);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_true (dx_semantic_version_compare (&input, &output) == 0);
+
+    // Update all three
+    input.sv_major = 3;
+    input.sv_minor = 1;
+    input.sv_patch = 10;
+    status = dx_schema_update_version (schema, &input);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    // Assert schema got updated to input
+    status = dc_schema_get_version (schema, &output);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_true (dx_semantic_version_compare (&input, &output) == 0);
+
+    // Update with lower semver
+    input.sv_major = 2;
+    input.sv_minor = 7;
+    input.sv_patch = 3;
+    status = dx_schema_update_version (schema, &input);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    // Assert schema did not update version
+    status = dc_schema_get_version (schema, &output);
+    assert_int_equal (status, DISIR_STATUS_OK);
+    assert_true (dx_semantic_version_compare (&input, &output) < 0);
+
+    LOG_TEST_END
+}
+
 const struct CMUnitTest disir_context_schema_tests[] = {
     cmocka_unit_test (test_context_schema_basic),
     cmocka_unit_test (test_context_schema_add_documentation),
     cmocka_unit_test (test_context_schema_add_keyval),
+    cmocka_unit_test (test_context_schema_version),
 };
 
