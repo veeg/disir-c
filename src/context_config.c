@@ -63,6 +63,9 @@ dc_config_begin (dc_t **config)
         return DISIR_STATUS_NO_MEMORY;
     }
 
+    // Set root context to self (such that children can inherit)
+    context->cx_root_context = context;
+
     *config = context;
     return DISIR_STATUS_OK;
 }

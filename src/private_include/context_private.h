@@ -72,6 +72,12 @@ struct disir_context
     //! Parent context of this context.
     dc_t                        *cx_parent_context;
 
+    //! Root context to this context.
+    //! A root context may only be one of:
+    //!     * DISIR_CONTEXT_CONFIG
+    //!     * DISIR_CONTEXT_SCHEMA
+    dc_t                        *cx_root_context;
+
 
     //! Reference count on how many context pointers the user
     //! is in possession of.

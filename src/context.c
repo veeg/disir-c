@@ -172,6 +172,12 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
     // No default case - Let compiler warn us on unhandled context type
     }
 
+    // Set root context
+    if (status == DISIR_STATUS_OK)
+    {
+        (*child)->cx_root_context = parent->cx_root_context;
+    }
+
     return status;
 }
 

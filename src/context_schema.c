@@ -56,6 +56,9 @@ dc_schema_begin (dc_t **schema)
         return DISIR_STATUS_NO_MEMORY;
     }
 
+    // Set root context to self (such that children can inherit)
+    context->cx_root_context = context;
+
     *schema = context;
     return DISIR_STATUS_OK;
 }
