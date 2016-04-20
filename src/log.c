@@ -19,7 +19,7 @@ static const char * disir_log_level_string[] = {
     "FATAL",
     "ERROR",
     "WARN ",
-    "TEST",
+    "TEST ",
     "INFO ",
     "DEBUG",
     "TRACE",
