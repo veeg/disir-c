@@ -31,7 +31,7 @@ test_context_schema_add_keyval (void **state)
     assert_int_equal (status, DISIR_STATUS_OK);
     assert_non_null (keyval);
     // Add name
-    status = dc_add_name (keyval, "test_string", strlen ("test_string")),
+    status = dc_set_name (keyval, "test_string", strlen ("test_string")),
     assert_int_equal (status, DISIR_STATUS_OK);
     // Add type
     status = dc_set_value_type (keyval, DISIR_VALUE_TYPE_STRING),

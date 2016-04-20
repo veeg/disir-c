@@ -95,7 +95,7 @@ test_context_get_name (void **state)
     assert_int_equal (status, DISIR_STATUS_OK);
     status = dc_begin (schema, DISIR_CONTEXT_KEYVAL, &keyval);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_add_name (keyval, "test_keyval", strlen ("test_keyval"));
+    status = dc_set_name (keyval, "test_keyval", strlen ("test_keyval"));
     assert_int_equal (status, DISIR_STATUS_OK);
 
 
