@@ -137,7 +137,7 @@ add_keyval_generic (dc_t *parent, const char *name, const char *doc,
 
     keyval = NULL;
 
-    status = dx_keyval_begin (parent, &keyval);
+    status = dc_begin (parent, DISIR_CONTEXT_KEYVAL, &keyval);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
