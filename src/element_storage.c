@@ -53,7 +53,7 @@ unsigned long djb2 (char *str)
     return hash;
 }
 
-//! PRIVATE API
+//! INTERNAL API
 struct disir_element_storage *
 dx_element_storage_create (void)
 {
@@ -92,7 +92,7 @@ error:
     return NULL;
 }
 
-//! PRIVATE API
+//! INTERNAL API
 //! Will dc_destroy all stored contexts
 //! Will make sure to decref the refcount added by insertion into element storage
 enum disir_status
@@ -148,7 +148,7 @@ dx_element_storage_numentries (struct disir_element_storage *storage)
     return multimap_size (storage->es_map);
 }
 
-//! PRIVATE API
+//! INTERNAL API
 //! Make a copy of the input name to use as key for multimap. Only allocate if no such
 //! key exist in the map.
 //! Will increment context refcount.
@@ -162,11 +162,18 @@ dx_element_storage_add (struct disir_element_storage *storage,
     int keys_in_map;
     char *key;
 
+    if (storage == NULL || name == NULL || context == NULL)
+    {
+        log_debug ("invoked with NULL pointer(s) (storage %p, name %p, context %p)",
+                   storage, name, context);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
     keys_in_map = multimap_contains_key (storage->es_map, (void *)name);
     if (keys_in_map == 0)
     {
         // Map does not contain a key with this name. Allocate space to store
-        // key in, so we can safely access the key memory every if the appointed context
+        // key in, so we can safely access the key memory even if the appointed context
         // is destroyed whilst in our storage.
         key = malloc (strlen (name) + 1); // XXX: Is there a more safe way to allocate this memory?
         memcpy(key, name, strlen (name) + 1);
@@ -229,10 +236,51 @@ dx_element_storage_get (struct disir_element_storage *storage,
                         const char * const name,
                         struct disir_context_collection **collection)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    dc_t *context;
+    dcc_t *col;
+    struct multimap_value_iterator *iter;
+
+    iter = multimap_fetch (storage->es_map, (void *) name);
+    if (iter == NULL)
+    {
+        return DISIR_STATUS_NO_MEMORY;
+    }
+    col = dx_collection_create ();
+    if (collection == NULL)
+    {
+        status = DISIR_STATUS_NO_MEMORY;
+        goto error;
+    }
+
+    while ((context = multimap_iterator_next (iter)))
+    {
+        status = dx_collection_push_context (col, context);
+        if (status != DISIR_STATUS_OK)
+        {
+            goto error;
+        }
+    }
+
+    multimap_iterator_destroy (iter);
+
+    *collection = col;
+    return DISIR_STATUS_OK;
+error:
+
+    if (col)
+    {
+        dc_collection_finished (&col);
+    }
+    if (iter)
+    {
+        multimap_iterator_destroy (iter);
+    }
+
+    return status;
 }
 
-// PRIVATE API
+// INTERNAL API
 enum disir_status
 dx_element_storage_get_all (struct disir_element_storage *storage,
                             struct disir_context_collection **collection)
@@ -297,19 +345,22 @@ error:
     return status;
 }
 
+//! INTERNAL API
 enum disir_status
-dx_element_storage_get_first_keyval (struct disir_element_storage *storage,
-                                     const char *name,
-                                     struct disir_context **context)
+dx_element_storage_get_first(struct disir_element_storage *storage,
+                             const char *name,
+                             struct disir_context **context)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    dc_t *keyval;
+
+    keyval = multimap_get_first (storage->es_map, (void *) name);
+    if (keyval == NULL)
+    {
+        return DISIR_STATUS_EXHAUSTED;
+    }
+
+    *context = keyval;
+    return DISIR_STATUS_OK;
 }
 
-enum disir_status
-dx_element_storage_get_first_section (struct disir_element_storage *storage,
-                                      const char *name,
-                                      struct disir_context **context)
-{
-    return DISIR_STATUS_INTERNAL_ERROR;
-}
 
