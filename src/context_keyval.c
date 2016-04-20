@@ -313,7 +313,9 @@ dx_keyval_create (dc_t *parent)
     if (keyval == NULL)
         return NULL;
 
+    keyval->kv_context = parent;
     keyval->kv_name.dv_type = DISIR_VALUE_TYPE_STRING;
+    keyval->kv_introduced.sv_major = 1;
 
     return keyval;
 }
