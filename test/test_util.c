@@ -123,9 +123,77 @@ test_value_string (void **state)
     LOG_TEST_END
 }
 
+static void
+test_disir_status_string (void **state)
+{
+    enum disir_status status;
+    const char *status_string;
+
+    LOG_TEST_START
+
+    for (status = DISIR_STATUS_OK; status <= DISIR_STATUS_UNKNOWN; status++)
+    {
+        status_string = disir_status_string (status);
+        switch (status)
+        {
+        case DISIR_STATUS_OK:
+            assert_string_equal (status_string, "OK");
+            break;
+        case DISIR_STATUS_NO_CAN_DO:
+            assert_string_equal (status_string, "NO CAN DO");
+            break;
+        case DISIR_STATUS_INVALID_ARGUMENT:
+            assert_string_equal (status_string, "INVALID ARGUMENT");
+            break;
+        case DISIR_STATUS_TOO_FEW_ARGUMENTS:
+            assert_string_equal (status_string, "TOO FEW ARGUMENTS");
+            break;
+        case DISIR_STATUS_CONTEXT_IN_WRONG_STATE:
+            assert_string_equal (status_string, "CONTEXT IN WRONG STATE");
+            break;
+        case DISIR_STATUS_WRONG_CONTEXT:
+            assert_string_equal (status_string, "WRONG CONTEXT");
+            break;
+        case DISIR_STATUS_CONTEXT_DESTROYED:
+            assert_string_equal (status_string, "DESTROYED CONTEXT");
+            break;
+        case DISIR_STATUS_BAD_CONTEXT_OBJECT:
+            assert_string_equal (status_string, "BAD CONTEXT OBJECT");
+            break;
+        case DISIR_STATUS_NO_MEMORY:
+            assert_string_equal (status_string, "NO MEMORY");
+            break;
+        case DISIR_STATUS_NO_ERROR:
+            assert_string_equal (status_string, "NO ERROR");
+            break;
+        case DISIR_STATUS_INTERNAL_ERROR:
+            assert_string_equal (status_string, "INTERNAL ERROR");
+            break;
+        case DISIR_STATUS_INSUFFICIENT_RESOURCES:
+            assert_string_equal (status_string, "INSUFFICIENT RESOURCES");
+            break;
+        case DISIR_STATUS_EXISTS:
+            assert_string_equal (status_string, "EXISTS");
+            break;
+        case DISIR_STATUS_CONFLICTING_SEMVER:
+            assert_string_equal (status_string, "CONFLICTING SEMVER");
+            break;
+        case DISIR_STATUS_EXHAUSTED:
+            assert_string_equal (status_string, "EXHAUSTED");
+            break;
+        case DISIR_STATUS_UNKNOWN:
+            assert_string_equal (status_string, "UNKNOWN");
+            break;
+        }
+    }
+
+    LOG_TEST_END
+}
+
 const struct CMUnitTest disir_util_tests[] = {
     // introduced can add
     cmocka_unit_test (test_semantic_version_compare),
     cmocka_unit_test (test_value_string),
+    cmocka_unit_test (test_disir_status_string),
 };
 

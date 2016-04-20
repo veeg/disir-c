@@ -97,6 +97,34 @@ dx_context_type_sanify (enum disir_context_type type)
     return type;
 }
 
+enum disir_value_type
+dc_value_type (dc_t *context)
+{
+    enum disir_value_type value_type;
+    enum disir_context_type context_type;
+
+    if (context == NULL)
+    {
+        return DISIR_VALUE_TYPE_UNKNOWN;
+    }
+
+    value_type = DISIR_VALUE_TYPE_UNKNOWN;
+    context_type = dc_type (context);
+
+    if (context_type == DISIR_CONTEXT_DEFAULT)
+        value_type = context->cx_default->de_value.dv_type;
+    else if (context_type == DISIR_CONTEXT_KEYVAL)
+        value_type = context->cx_keyval->kv_type;
+
+    return dx_value_type_sanify (value_type);
+}
+
+const char *
+dc_value_type_string (dc_t *context)
+{
+    return dx_value_type_string (dc_value_type (context));
+}
+
 //! INTERNAL API
 enum disir_value_type
 dx_value_type_sanify (enum disir_value_type type)
