@@ -10,7 +10,7 @@
 
 //! Variable to control the loglevel
 //! Hardcode default for now.
-enum disir_log_level runtime_loglevel = DISIR_LOG_LEVEL_DEBUG;
+enum disir_log_level runtime_loglevel = DISIR_LOG_LEVEL_TRACE_EXIT;
 
 //! String representation of the different disir_log_level
 static const char * disir_log_level_string[] = {
@@ -22,6 +22,8 @@ static const char * disir_log_level_string[] = {
     "TEST",
     "INFO ",
     "DEBUG",
+    "TRACE",
+    "TRACE",
 };
 
 //! INTERNAL API
@@ -60,7 +62,7 @@ dx_log_format (enum disir_log_level dll, const char *prefix,
         return;
     }
 
-    if (dll <= DISIR_LOG_LEVEL_NONE || dll > DISIR_LOG_LEVEL_DEBUG)
+    if (dll <= DISIR_LOG_LEVEL_NONE || dll > DISIR_LOG_LEVEL_TRACE_EXIT)
     {
         dx_crash_and_burn ("Passed log level is of the charts!: %d", dll);
     }
@@ -188,6 +190,9 @@ dx_log_disir (enum disir_log_level dll,
     int res;
     va_list args;
 
+    char enter_string[] = "ENTER";
+    char exit_string[] = "EXIT";
+
     prefix = NULL;
     suffix = NULL;
 
@@ -220,6 +225,19 @@ dx_log_disir (enum disir_log_level dll,
         {
             suffix_buffer[res] = '\0';
             suffix = suffix_buffer;
+        }
+    }
+
+    if (dll == DISIR_LOG_LEVEL_TRACE_ENTER ||
+        dll == DISIR_LOG_LEVEL_TRACE_EXIT)
+    {
+        res = snprintf (suffix_buffer, 255, "%s %s: ",
+                        (dll == DISIR_LOG_LEVEL_TRACE_ENTER ? enter_string : exit_string),
+                        function);
+        if (res > 0 || res < 255)
+        {
+            suffix_buffer[res] = '\0';
+            prefix = suffix_buffer;
         }
     }
 
