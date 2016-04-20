@@ -10,6 +10,8 @@ struct disir_config
     //! Context object for this config
     dc_t    *cf_context;
 
+    struct semantic_version         cf_version;
+
     //! The disir_schema associated with this config instance
     //! Every disir_config needs a valid schema associated
     //! with it before it can gain most capabilities.
