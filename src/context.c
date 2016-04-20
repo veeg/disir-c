@@ -262,9 +262,8 @@ dc_putcontext (dc_t **context)
 }
 
 //! PUBLIC API
-//! alias for dc_add_value_string with additional type checks
 enum disir_status
-dc_add_name (dc_t *context, const char *name, int32_t name_size)
+dc_set_name (dc_t *context, const char *name, int32_t name_size)
 {
     enum disir_status status;
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);

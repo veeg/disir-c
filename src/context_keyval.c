@@ -144,7 +144,7 @@ add_keyval_generic (dc_t *parent, const char *name, const char *doc,
         goto error;
     }
 
-    status = dc_add_name (keyval, name, strlen (name));
+    status = dc_set_name (keyval, name, strlen (name));
     if (status != DISIR_STATUS_OK)
     {
         // Already logged

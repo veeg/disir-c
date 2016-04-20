@@ -152,7 +152,7 @@ enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *
 //! \return DISIR_STATUS_NO_CAN_DO if an unsupported context type
 //! \return DISIR_STATUS_OK on successful insertion of name to context.
 //!
-enum disir_status dc_add_name (dc_t *context, const char *name, int32_t name_size);
+enum disir_status dc_set_name (dc_t *context, const char *name, int32_t name_size);
 
 //! \brief Get a name attribute associated with the context entry
 //!
