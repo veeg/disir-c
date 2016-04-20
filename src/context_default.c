@@ -448,3 +448,36 @@ error:
     return status;
 }
 
+
+//! INTERNAL API
+void
+dx_default_get_active (dc_t *keyval, struct semantic_version *semver, struct disir_default **def)
+{
+    struct disir_default *current;
+
+    if (keyval->cx_keyval->kv_default_queue == NULL)
+    {
+        // We cant really do anything - everything is empty.
+        current = NULL;
+    }
+    else if (semver)
+    {
+        current = MQ_FIND (keyval->cx_keyval->kv_default_queue,
+                (dx_semantic_version_compare (&entry->de_introduced, semver) > 0));
+        if (current != NULL && current->prev != MQ_TAIL (keyval->cx_keyval->kv_default_queue))
+        {
+            current = current->prev;
+        }
+        if (current == NULL)
+        {
+            current = MQ_TAIL (keyval->cx_keyval->kv_default_queue);
+        }
+    }
+    else
+    {
+        current = MQ_TAIL (keyval->cx_keyval->kv_default_queue);
+    }
+
+    *def = current;
+}
+
