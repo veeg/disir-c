@@ -247,6 +247,7 @@ dx_context_create (enum disir_context_type type)
         // XXX: What capabilitites?
         context->CONTEXT_CAPABILITY_ADD_DOCUMENTATION = 1;
         context->CONTEXT_CAPABILITY_ADD_VALUE_STRING = 1;
+        context->CONTEXT_CAPABILITY_INTRODUCED = 1;
         break;
     }
     case DISIR_CONTEXT_DEFAULT:
