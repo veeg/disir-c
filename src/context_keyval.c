@@ -252,7 +252,7 @@ dc_add_keyval_string (dc_t *parent, const char *name, const char *def,
 {
     return add_keyval_generic (parent, name, doc, semver,
                                DISIR_VALUE_TYPE_STRING,
-                               name,
+                               def,
                                0,
                                0,
                                0
