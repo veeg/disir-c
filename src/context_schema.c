@@ -172,6 +172,7 @@ enum disir_status
 dx_schema_update_version (struct disir_schema *schema, struct semantic_version *semver)
 {
     struct semantic_version fact;
+    char buffer[32];
 
     if (schema == NULL || semver == NULL)
     {
@@ -203,6 +204,9 @@ dx_schema_update_version (struct disir_schema *schema, struct semantic_version *
     schema->sc_version.sv_major = fact.sv_major;
     schema->sc_version.sv_minor = fact.sv_minor;
     schema->sc_version.sv_patch = fact.sv_patch;
+
+    log_debug ("schema (%p) version sat to: %s",
+               schema, dc_semantic_version_string (buffer, 32, &fact));
 
     return DISIR_STATUS_OK;
 }
