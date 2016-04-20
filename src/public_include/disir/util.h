@@ -12,16 +12,30 @@ struct semantic_version
     uint32_t    sv_patch;
 };
 
-//! \return return if < 0 if s1 is lesser than s2,
-//! \return return 0 if s1 == s2
-//! \return return > 0 if s2 is greater than s1.
-int dx_semantic_version_compare(struct semantic_version *s1, struct semantic_version *s2);
+//! \brief Populate the input buffer with a string representation of the semantic version structure
+//!
+//! If the input buffer is of unsufficient size, NULL is returned
+//!
+//! \return NULL if buffer or semver are NULL.
+//! \return NULL if buffer is of insufficient size.
+//! \return buffer when the full string represention was populated into the buffer.
+//!
+char * dc_semantic_version_string (char *buffer, int32_t buffer_size,
+                                   struct semantic_version *semver);
 
-//! Populate the buffer, up to buffer_size bytes, with a string representation
-//! of the semantic_version number passed.
-//! \return buffer upon successful copy.
-//! \return string indicating the error upon insufficient buffer or arguments.
-char * dx_semver_string(char *buffer, int32_t buffer_size, struct semantic_version *semver);
+//! \brief Extract a semantic version number from input string and populate the output semver.
+//!
+//! \param[in] input String where the semantic version number is located
+//! \param[out] semver Version structure that is populated with the semantic version
+//!     number found in the input string.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input or semver is NULL.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input string does not contain the expected
+//!     3 numeric numbers seperated by a period. semver structure is partially updated
+//!     with the values it has already detected and parsed.
+//! \return DISRI_STATUS_OK on success
+//!
+enum disir_status dc_semantic_version_convert (const char *input, struct semantic_version *semver);
 
 
 #endif // _LIBDISIR_UTIL_H

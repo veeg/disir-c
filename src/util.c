@@ -45,13 +45,14 @@ disir_status_string (enum disir_status status)
 
 //! PUBLIC API
 char *
-dx_semver_string (char *buffer, int32_t buffer_size, struct semantic_version *semver)
+dc_semantic_version_string (char *buffer, int32_t buffer_size, struct semantic_version *semver)
 {
     int res;
     if (buffer == NULL || semver == NULL)
     {
-        log_warn ("%s invoked with NULL buffer or semverpointer", __FUNCTION__);
-        return "<invalid_arguments>";
+        log_warn ("%s invoked with NULL pointer(s) (buffer %p, semver: %p)",
+                  __FUNCTION__, buffer, semver);
+        return NULL;
     }
 
     res = snprintf (buffer, buffer_size,
@@ -61,13 +62,13 @@ dx_semver_string (char *buffer, int32_t buffer_size, struct semantic_version *se
         log_warn ("Insufficient buffer( %p ) size( %d ) to copy semver (%d.%d.%d) - Res: %d",
                     buffer, buffer_size, semver->sv_major, semver->sv_minor,
                     semver->sv_patch, res);
-        return "<insufficient_buffer>";
+        return NULL;
     }
 
     return buffer;
 }
 
-//! PUBLIC API
+//! INTERNAL API
 int
 dx_semantic_version_compare (struct semantic_version *s1, struct semantic_version *s2)
 {
@@ -82,6 +83,81 @@ dx_semantic_version_compare (struct semantic_version *s1, struct semantic_versio
         res = s1->sv_patch - s2->sv_patch;
 
     return res;
+}
+
+//! INTERNAL API
+void
+dx_semantic_version_set (struct semantic_version *destination, struct semantic_version *source)
+{
+    log_debug ("setting semver (%p) to %d.%d.%d from source (%p)",
+               destination,
+               source->sv_major, source->sv_minor, source->sv_patch,
+               source);
+
+    destination->sv_major = source->sv_major;
+    destination->sv_minor = source->sv_minor;
+    destination->sv_patch = source->sv_patch;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_semantic_version_convert (const char *input, struct semantic_version *semver)
+{
+    long int parsed_integer;
+    char *endptr;
+    const char *start;
+
+    if (input == NULL || semver == NULL)
+    {
+        log_debug ("invoked with NULL pointer(s). input: %p, semver: %p", input, semver);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    log_debug ("Converting semver input: %s", input);
+
+    // Get Major version
+    start = input;
+    parsed_integer = strtol (start, &endptr, 10);
+    if (start == endptr)
+    {
+        log_debug ("no int parsed");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (*endptr != '.')
+    {
+        log_debug ("missing period seperator after major");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    semver->sv_major = parsed_integer;
+
+    // Get minor version
+    endptr++;
+    start = endptr;
+    parsed_integer = strtol (start, &endptr, 10);
+    if (start == endptr)
+    {
+        log_debug ("no int parsed");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (*endptr != '.')
+    {
+        log_debug ("missing period seperator after minor");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    semver->sv_minor = parsed_integer;
+
+    // Get minor version
+    endptr++;
+    start = endptr;
+    parsed_integer = strtol (start, &endptr, 10);
+    if (start == endptr)
+    {
+        log_debug ("no int parsed");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    semver->sv_patch = parsed_integer;
+
+    return DISIR_STATUS_OK;
 }
 
 // INTERNAL API
