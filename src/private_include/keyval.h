@@ -35,6 +35,9 @@ struct disir_keyval
     //! Name of this keyval.
     struct disir_value          kv_name;
 
+    //! Value held by this KEYVAL, given its root is CONFIG.
+    struct disir_value          kv_value;
+
     //! Whether or not this keyval entry is disabled.
     uint32_t                    kv_disabled;
 };
