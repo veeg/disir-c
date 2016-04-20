@@ -10,6 +10,39 @@
 #include "value.h"
 #include "log.h"
 
+//! Array of strings describing the various DISIR_STATUS_* enumerations
+const char *disir_status_strings[] = {
+    "OK",
+    "NO CAN DO",
+    "INVALID ARGUMENT",
+    "TOO FEW ARGUMENTS",
+    "CONTEXT IN WRONG STATE",
+    "WRONG CONTEXT",
+    "INVALID CONTEXT",
+    "DESTROYED CONTEXT",
+    "BAD CONTEXT OBJECT",
+    "NO MEMORY",
+    "NO ERROR",
+    "INTERNAL ERROR",
+    "INSUFFICIENT RESOURCES",
+    "EXISTS",
+    "CONFLICTING SEMVER",
+    "EXHAUSTED",
+    "UNKNOWN",
+};
+
+//! PUBLIC API
+const char *
+disir_status_string (enum disir_status status)
+{
+    if (status < 0 || status > DISIR_STATUS_UNKNOWN)
+    {
+        status = DISIR_STATUS_UNKNOWN;
+    }
+
+    return disir_status_strings[status];
+}
+
 //! PUBLIC API
 char *
 dx_semver_string (char *buffer, int32_t buffer_size, struct semantic_version *semver)

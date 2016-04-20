@@ -73,6 +73,10 @@ enum disir_restriction
     DISIR_RESTRICTION_RANGE,
 };
 
+
+//! \brief Return a string representation of the disir status
+const char * disir_status_string (enum disir_status status);
+
 //! \brief Allocate a new libdisir instance
 //!
 //! \param[in,out] Pointer will be populated with the address of the allocated instance.
