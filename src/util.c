@@ -381,6 +381,9 @@ dx_value_set_string (struct disir_value *value, const char *string, int32_t stri
     // Terminate it with a zero terminator. Just to be safe.
     value->dv_string[string_size] = '\0';
 
+    log_debug ("stored string in disir_value (%p) of size (%d): %s\n",
+               value, value->dv_size, value->dv_string);
+
     return DISIR_STATUS_OK;
 }
 
