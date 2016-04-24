@@ -328,14 +328,29 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
 enum disir_status dc_get_default_contexts (dc_t *context, dcc_t **collection);
 
 
-//! Add a string as value to the context.
-//! Not applicable to every context.
-//! XXX: Make private?
-enum disir_status dc_add_value_string (dc_t *context, const char *value, int32_t value_size);
+//! \brief Set a value to the context. Type is extracted from string where applicable
+//!
+//! TODO: implement me
+//!
+//! \return DISIR_STATUS_INTERNAL_ERROR - Not Implemeneted
+//!
+enum disir_status dc_set_value (dc_t *context, const char *value, int32_t value_size);
 
-//
-// Query related context API
-//
+//! \brief Set a string value to the context.
+//!
+//! Applicable contexts are:
+//!     * DISIR_CONTEXT_DOCUMENTATION
+//!     * DISIR_CONTEXT_KEYVAL whose root is CONFIG
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or value are NULL,
+//!     or if value_size is less or equal to zero.
+//! \return DISIR_STATUS_NO_CAN_DO if one cannot add a value string to this context.
+//! \return DISIR_STATUS_WRONG_CONTEXT if root context is not CONFIG.
+//! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a schema equivalent.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_set_value_string (dc_t *context, const char *value, int32_t value_size);
+
 
 //! Return the number of bytes stored at the context string value, if applicable
 enum disir_status dc_get_value_string_size (dc_t *context, int64_t *value_size);

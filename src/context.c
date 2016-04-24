@@ -358,9 +358,17 @@ dc_get_name (dc_t *context, const char **name, int32_t *name_size)
     return DISIR_STATUS_OK;
 }
 
+
+// PUBLIC API
+enum disir_status
+dc_set_value (dc_t *context, const char *value, int32_t value_size)
+{
+    return DISIR_STATUS_INTERNAL_ERROR;
+}
+
 //! PUBLIC API
 enum disir_status
-dc_add_value_string (dc_t *context, const char *value, int32_t value_size)
+dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
 
@@ -395,7 +403,18 @@ dc_add_value_string (dc_t *context, const char *value, int32_t value_size)
     }
     case DISIR_CONTEXT_KEYVAL:
     {
-        status = dx_value_set_string (&context->cx_keyval->kv_name, value, value_size);
+        if (dc_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+        {
+            dx_log_context (context, "cannot set value on KEYVAL whose root is not CONFIG.");
+            return DISIR_STATUS_WRONG_CONTEXT;
+        }
+        if (context->cx_keyval->kv_schema_equiv == NULL)
+        {
+            dx_log_context (context, "cannot set value on KEYVAL not associated with a schema.");
+            return DISIR_STATUS_INVALID_CONTEXT;
+        }
+        // TODO: Validate input against schema
+        status = dx_value_set_string (&context->cx_keyval->kv_value, value, value_size);
         break;
     }
     case DISIR_CONTEXT_CONFIG:
