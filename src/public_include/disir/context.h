@@ -139,10 +139,13 @@ enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *
 
 //! \brief Add a name to a context entry.
 //!
-//! One can only add a name to a context who is in construction mode.
 //! This is required on supported contexts:
 //!     * DISIR_CONTEXT_KEYVAL
 //!     * DISIR_CONTEXT_SECTION
+//!
+//! When adding a name to a context whose root context is CONFIG,
+//! the name must match a KEYVAL entry found in the associated SCHEMA to CONFIG.
+//! If no such association is found, DISIR_STATUS_WRONG_CONTEXT is returned.
 //!
 //! \param context Context to set the name attribute on.
 //! \param name The input name to associate with the context.
@@ -150,6 +153,8 @@ enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if name or name_size are zero
 //! \return DISIR_STATUS_NO_CAN_DO if an unsupported context type
+//! \return DISIR_STATUS_WRONG_CONTEXT if the name attempted to add on a context whose root
+//!     is CONFIG, is not found in the associated SCHEMA.
 //! \return DISIR_STATUS_OK on successful insertion of name to context.
 //!
 enum disir_status dc_set_name (dc_t *context, const char *name, int32_t name_size);

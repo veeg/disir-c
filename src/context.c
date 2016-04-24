@@ -277,7 +277,35 @@ dc_set_name (dc_t *context, const char *name, int32_t name_size)
         // Already logged
         return status;
     }
-    return dc_add_value_string (context, name, name_size);
+
+    if (dc_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+    {
+        // Find the name in the schema
+        // TODO: Should be sufficient to query the schema equiv of parent
+        // That will solve querying sections aswell
+        status = dx_set_schema_equiv (context, name, name_size);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+    }
+
+    if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
+    {
+        status = dx_value_set_string (&context->cx_keyval->kv_name, name, name_size);
+    }
+    else if (dc_type (context) == DISIR_CONTEXT_SECTION)
+    {
+        dx_crash_and_burn ("%s: Implement section", __FUNCTION__);
+        //status = dx_value_set_string (&context->cx_section->se_name, value, value_size);
+    }
+    else
+    {
+        log_fatal_context (context, "slipped through guard - unsupported.");
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    return status;
 }
 
 //! PUBLIC API
