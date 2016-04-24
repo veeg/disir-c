@@ -11,6 +11,7 @@
 #include "config.h"
 #include "mqueue.h"
 #include "log.h"
+#include "element_storage.h"
 
 //! PUBLIC API
 dc_t *
@@ -31,17 +32,17 @@ dc_config_getcontext (struct disir_config *config)
 
 //! PUBLIC API
 enum disir_status
-dc_config_begin (dc_t **config)
+dc_config_begin (struct disir_schema *schema, dc_t **config)
 {
     dc_t *context;
 
     context = NULL;
 
     // Disallow non-null content of passed pointer.
-    if (config == NULL)
+    if (config == NULL || schema == NULL)
     {
         // LOGWARN
-        log_debug ("invoked with NULL config pointer");
+        log_debug ("invoked with NULL pointer(s) (%p %p)", context, schema);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -63,6 +64,9 @@ dc_config_begin (dc_t **config)
         return DISIR_STATUS_NO_MEMORY;
     }
 
+    context->cx_config->cf_schema = schema;
+    context->CONTEXT_CAPABILITY_ADD_ENTRY = 1;
+
     // Set root context to self (such that children can inherit)
     context->cx_root_context = context;
 
@@ -70,66 +74,37 @@ dc_config_begin (dc_t **config)
     return DISIR_STATUS_OK;
 }
 
-//! PUBLIC API
+// PUBLIC API
 enum disir_status
-dc_config_begin_supplied_schema (struct disir_schema *schema, dc_t **config)
+dc_config_finalize (dc_t **context, struct disir_config **config)
 {
     enum disir_status status;
 
-    if (schema == NULL)
+    status = CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
     {
-        log_debug ("invoked with NULL schema pointer");
+        // Already looged
+        return status;
+    }
+    if (config == NULL)
+    {
+        log_debug ("invoked with NULL config pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    status = dc_config_begin (config);
-    if (status != DISIR_STATUS_OK)
+    if (dx_context_type_sanify ((*context)->cx_type) != DISIR_CONTEXT_CONFIG)
     {
-        // Log already produced
-        return status;
+        dx_log_context (*context, "Cannot call %s() on top-level context( %s )",
+                        __FUNCTION__, dc_type_string (*context));
+        return DISIR_STATUS_WRONG_CONTEXT;
     }
 
-    status = dc_config_attach_schema (*config, schema);
-    if (status != DISIR_STATUS_OK)
-    {
-        // Log already produced
-        dc_destroy(config);
-        return status;
-    }
+    // TODO: Perform some validation?
 
-    return DISIR_STATUS_OK;
-}
-
-//! PUBLIC API
-enum disir_status
-dc_config_attach_schema (dc_t *config, struct disir_schema *schema)
-{
-    enum disir_status status;
-
-    if (config == NULL || schema == NULL)
-    {
-        // LOGWARN
-        log_debug ("invoked with NULL pointer(s) (config: %p \t schema: %p)", config, schema);
-        return DISIR_STATUS_INVALID_ARGUMENT;
-    }
-
-    status = CONTEXT_TYPE_CHECK (config, DISIR_CONTEXT_CONFIG);
-    if (status != DISIR_STATUS_OK)
-    {
-        // log produced by CONTEXT_TYPE_CHECK
-        return status;
-    }
-
-    // Is there already a schema associated with this config?
-    if (config->cx_config->cf_schema != NULL)
-    {
-        dx_log_context (config, "schema already exists.");
-        return DISIR_STATUS_EXISTS;
-    }
-
-    config->cx_config->cf_schema = schema;
-    config->CONTEXT_CAPABILITY_ADD_ENTRY = 1;
-    // TODO: Add more capabilities
+    *config = (*context)->cx_config;
+    (*context)->cx_state = CONTEXT_STATE_ACTIVE;
+    *context = NULL;
+    // We do not decref context refcount on finalize
 
     return DISIR_STATUS_OK;
 }
@@ -142,30 +117,41 @@ dx_config_create (dc_t *context)
 
     config = calloc (1, sizeof (struct disir_config));
     if (config ==  NULL)
-        return config;
+    {
+        goto error;
+    }
+
+    config->cf_elements = dx_element_storage_create ();
+    if (config->cf_elements == NULL)
+    {
+        goto error;
+    }
 
     config->cf_context = context;
+    config->cf_version.sv_major = 1;
 
     return config;
+error:
+    if (config && config->cf_elements)
+    {
+        dx_element_storage_destroy (&config->cf_elements);
+    }
+    if (config)
+    {
+        free (config);
+    }
+
+    return NULL;
 }
 
 //! INTERNAL API
 enum disir_status
 dx_config_destroy (struct disir_config **config)
 {
-    dc_t *context;
-    struct disir_documentation *doc;
     if (config == NULL || *config == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
-    // TODO: Iterate and abort all child elements of disir_config
-
-    // Destroy single documentation, if it exists
-    while ((doc = MQ_POP ((*config)->cf_documentation_queue)))
-    {
-        context = doc->dd_context;
-        dc_destroy (&context);
-    }
+    dx_element_storage_destroy (&(*config)->cf_elements);
 
     free (*config);
     *config = NULL;
@@ -173,3 +159,19 @@ dx_config_destroy (struct disir_config **config)
     return DISIR_STATUS_OK;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_config_get_version (struct disir_config *config, struct semantic_version *semver)
+{
+    if (config == NULL || semver == NULL)
+    {
+        log_debug ("invoked with NULL pointer(s)");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    semver->sv_major = config->cf_version.sv_major;
+    semver->sv_minor = config->cf_version.sv_minor;
+    semver->sv_patch = config->cf_version.sv_patch;
+
+    return DISIR_STATUS_OK;
+}

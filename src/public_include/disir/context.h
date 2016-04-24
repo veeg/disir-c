@@ -408,46 +408,44 @@ enum disir_status dc_restriction_get_type (dc_t *restriction, enum disir_restric
 // Config related context API
 //
 
-//! Retrieve the context associated with an already constructed disir_config.
+//! \brief Retrieve the context associated with an already constructed disir_config.
+//!
 //! This context may be used to manipulate or query the config object.
+//!
+//! \return context of type DISIR_CONTEXT_CONFIG
+//!
 dc_t * dc_config_getcontext (struct disir_config *config);
 
-//! Create a DISIR_CONTEXT_CONFIG, which is a root context
-//! used to create a disir_config object.
-//! The returned context will reject any attempts to
-//! add entries to it until a schema is attached.
-enum disir_status dc_config_begin (dc_t **config);
+//! \brief Get the version number of this config.
+//!
+//! \param[in] config Input schema to retrieve semver for
+//! \param[out] semver Output structure populated with the semver of config.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if config or semver are NULL
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_config_get_version (struct disir_config *config, struct semantic_version *semver);
 
-//! Create a DISIR_CONTEXT_CONFIG, which is a root context
-//! used to create a disir_config object.
-//! It will locate the corresponding disir_schema in the default
-//! location. If no such schema can be located or constructed, NULL is returned.
-//! The schema is attempted located based on the config identifier
-//! supplied.
-enum disir_status dc_config_begin_default_schema (const char *config_identifier,
-                                                  int32_t config_identifier_size,
-                                                  dc_t **config);
 
-//! \see dc_config_begin
-//! Construct the DISIR_CONTEXT_CONFIG
-//! The disir_schema object is provided.
-//! The only scenarios where this may return NULL is in case of no
-//! more memory or the supplied schema is in invalid state.
-enum disir_status dc_config_begin_supplied_schema (struct disir_schema *schema, dc_t **config);
+//! \brief Begin construction of a CONFIG context based on the passed schema.
+//!
+//! \param[in] schema Input schema that this CONFIG object shall represent.
+//! \param[out] config Output CONFIG context object.
+//!
+//! \return DISIR_STATUS_OK on success
+//!
+enum disir_status dc_config_begin (struct disir_schema *schema, dc_t **config);
 
-//! Finalize the construction of a DISIR_CONTEXT_CONFIG, returning
-//! an allocated disir_config object instead.
-//! If any unfinalized descendant contexts exists, DISIR_STATUS_CONTEXT_IN_WRONG_STATE
-//! will be returned.
-//! If the context supplied is not of type DISIR_CONTEXT_CONFIG,
-//! status DISIR_STATUS_WRONG_CONTEXT will be returned.
-//! On success, DISIR_STATUS_OK is returned.
+//! \brief Finalize the construction of a DISIR_CONTEXT_CONFIG
+//!
+//! \param[in,out] context A CONFIG context to finalize. Will be sat to NULL on success.
+//! \param[out] config The CONFIG object to populated on success.
+//!
+//! \return DISIRSTATUS_WRONG_CONTEXT if input context is not of type CONFIG.
+//! \return DISIR_STATUS_OK on success
+//!
 enum disir_status dc_config_finalize (dc_t **context, struct disir_config **config);
-
-//! Associate a schema object with the supplied config.
-//! If the config context already has an attached schema,
-//! the call fails with DISIR_STATUS_CONTEXT_IN_WRONG_STATE
-enum disir_status dc_config_attach_schema (dc_t *config, struct disir_schema *schema);
 
 //
 // Schema related context API
