@@ -176,7 +176,6 @@ dc_add_documentation (dc_t *parent, const char *doc, int32_t doc_size)
     status = dc_set_value_string (context, doc, doc_size);
     if (status != DISIR_STATUS_OK)
     {
-        // dc_add_value_string performs LOGWARN
         dx_context_transfer_logwarn (parent, context);
         dc_destroy (&context);
         return status;
