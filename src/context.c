@@ -11,6 +11,7 @@
 
 // Private
 #include "context_private.h"
+#include "util_private.h"
 #include "config.h"
 #include "keyval.h"
 #include "log.h"
@@ -148,14 +149,9 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
     // Allocate a child context using the actual allocator
     switch (dx_context_type_sanify (context_type))
     {
-    case DISIR_CONTEXT_CONFIG:
-        status = dc_config_begin (child);
-        break;
     case DISIR_CONTEXT_DOCUMENTATION:
         status = dx_documentation_begin (parent, child);
         break;
-    case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
         status = dx_keyval_begin (parent, child);
         break;
@@ -163,8 +159,11 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
         status = dx_default_begin (parent, child);
         break;
     case DISIR_CONTEXT_RESTRICTION:
+    case DISIR_CONTEXT_SECTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dx_context_type_string (context_type));
+    case DISIR_CONTEXT_CONFIG:
+    case DISIR_CONTEXT_SCHEMA:
     case DISIR_CONTEXT_UNKNOWN:
         dx_log_context (parent, "attempted to add context of unknown type( %d )", context_type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
@@ -366,14 +365,14 @@ dc_add_value_string (dc_t *context, const char *value, int32_t value_size)
         status = dx_documentation_add_value_string (context->cx_documentation, value, value_size);
         break;
     }
-    case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_SCHEMA:
-    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
     {
         status = dx_value_set_string (&context->cx_keyval->kv_name, value, value_size);
         break;
     }
+    case DISIR_CONTEXT_CONFIG:
+    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
