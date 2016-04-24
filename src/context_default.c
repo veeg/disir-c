@@ -14,31 +14,6 @@
 #include "default.h"
 #include "context_private.h"
 
-//! INTERNAL API
-enum disir_value_type
-dx_infer_disir_value_type (dc_t *context)
-{
-    enum disir_status status;
-
-    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
-    if (status != DISIR_STATUS_OK)
-    {
-        // already logged
-        return DISIR_VALUE_TYPE_UNKNOWN;
-    }
-
-    switch (dc_type (context))
-    {
-    case DISIR_CONTEXT_KEYVAL:
-        return context->cx_keyval->kv_type;
-    case DISIR_CONTEXT_DEFAULT:
-        return context->cx_default->de_value.dv_type;
-    default:
-        dx_crash_and_burn ("%s: %s invoked with invalid/unhandleds",
-                           __FUNCTION__, dc_type_string (context));
-        return DISIR_VALUE_TYPE_UNKNOWN; // not reachable
-    }
-}
 
 //! INTERNAL API
 enum disir_status
@@ -233,7 +208,7 @@ dc_add_default (dc_t *parent, const char *value,
 
     status = DISIR_STATUS_INTERNAL_ERROR;
 
-    type = dx_infer_disir_value_type (parent);
+    type = dc_value_type (parent);
     if (type == DISIR_VALUE_TYPE_UNKNOWN)
     {
         return DISIR_STATUS_WRONG_CONTEXT;
