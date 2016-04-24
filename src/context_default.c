@@ -137,6 +137,7 @@ dx_default_create (dc_t *context)
     }
 
     def->de_context = context;
+    def->de_introduced.sv_major = 1;
 
     return def;
 }
