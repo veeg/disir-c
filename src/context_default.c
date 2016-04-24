@@ -41,8 +41,11 @@ dx_default_begin (dc_t *parent, dc_t **def)
         // Already logged
         return status;
     }
-    // TODO: Check that toplevel context is DISIR_CONTEXT_SCHEMA
-
+    if (dc_type (parent->cx_root_context) != DISIR_CONTEXT_SCHEMA)
+    {
+        dx_log_context (parent, "Cannot add default to a KEYVAL whose root is not a SCHEMA");
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
 
     if (dx_value_type_sanify (parent->cx_keyval->kv_type) == DISIR_VALUE_TYPE_UNKNOWN)
     {
