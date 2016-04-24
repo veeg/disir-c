@@ -111,7 +111,7 @@ dx_default_finalize (dc_t **default_context)
     {
         dx_log_context (*default_context,
                         "already contains a default entry with semantic version: %s",
-                        dx_semver_string (buffer, 32, &def->de_introduced));
+                        dc_semantic_version_string (buffer, 32, &def->de_introduced));
         status = DISIR_STATUS_CONFLICTING_SEMVER;
     }
     else
