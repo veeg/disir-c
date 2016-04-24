@@ -77,25 +77,25 @@ int dx_value_compare (struct disir_value *v1, struct disir_value *v2);
 enum disir_status dx_value_copy (struct disir_value *destination, struct disir_value *source);
 
 
-//! \brief Set the input 'value' with the contents of the input 'string'
+//! \brief Set the input 'value' with the contents of the input 'input'
 //!
-//! Allocate and copy the input 'string' into the 'value' structure.
-//! Only 'string_size' bytes are copied and then an additional \0 terminator
+//! Allocate and copy the input 'input' into the 'value' structure.
+//! Only 'size' bytes are copied and then an additional \0 terminator
 //! is appended to the stored string. Passing in a NULL string pointer results in
 //! the value to be emptied and set to zero length.
 //!
 //! \param value Value object to store a value type.
-//! \param string Input string which shall be stored in the 'value' object.
-//! \param string_size Length of the input string. Only 'string_size' number of bytes
+//! \param input Input string which shall be stored in the 'value' object.
+//! \param size Length of the input string. Only 'size' number of bytes
 //!     are copied into the 'value' object.
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer
 //!     or that the value type of 'value' is not DISIR_VALUE_TYPE_STRING.
 //! \return DISIR_STATUS_NO_MEMORY if an allocation failed for the value object.
-//! \return DISIR_STATUS_OK if 'value' is successfully populated with the contents of 'string'
+//! \return DISIR_STATUS_OK if 'value' is successfully populated with the contents of 'input'
 //!
 enum disir_status
-dx_value_set_string (struct disir_value *value, const char *string, int32_t string_size);
+dx_value_set_string (struct disir_value *value, const char *input, int32_t size);
 
 //! \brief Reterieve the string type stored in value
 //!

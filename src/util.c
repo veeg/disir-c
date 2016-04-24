@@ -331,7 +331,7 @@ dx_value_get_float (struct disir_value *value, double *output_double)
 
 //! INTERNAL API
 enum disir_status
-dx_value_set_string (struct disir_value *value, const char *string, int32_t string_size)
+dx_value_set_string (struct disir_value *value, const char *input, int32_t size)
 {
     if (value == NULL)
     {
@@ -344,7 +344,7 @@ dx_value_set_string (struct disir_value *value, const char *string, int32_t stri
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    if (string == NULL)
+    if (input == NULL)
     {
         if (value->dv_size > 0)
         {
@@ -355,31 +355,31 @@ dx_value_set_string (struct disir_value *value, const char *string, int32_t stri
         return DISIR_STATUS_OK;
     }
 
-    if (value->dv_string == NULL || value->dv_size - 1 < string_size)
+    if (value->dv_string == NULL || value->dv_size - 1 < size)
     {
         // Just free the existing memory. We allocate a larger one below
-        if (value->dv_size - 1 < string_size)
+        if (value->dv_size - 1 < size)
         {
             free (value->dv_string);
             value->dv_string = NULL;
         }
 
         // Size of requested string + 1 for NULL terminator
-        value->dv_string = calloc (1, string_size + 1);
+        value->dv_string = calloc (1, size + 1);
         if (value->dv_string == NULL)
         {
             log_error ("failed to allocate sufficient memory for value string (%d)",
-                       string_size + 1);
+                       size + 1);
             return DISIR_STATUS_NO_MEMORY;
         }
     }
 
     // Copy the incoming docstring to freely available space
-    memcpy (value->dv_string, string, string_size);
-    value->dv_size = string_size;
+    memcpy (value->dv_string, input, size);
+    value->dv_size = size;
 
     // Terminate it with a zero terminator. Just to be safe.
-    value->dv_string[string_size] = '\0';
+    value->dv_string[size] = '\0';
 
     log_debug ("stored string in disir_value (%p) of size (%d): %s\n",
                value, value->dv_size, value->dv_string);
