@@ -287,7 +287,7 @@ dc_add_default_string (dc_t *parent, const char *value,
 
     def = NULL;
 
-    status = dx_default_begin (parent, &def);
+    status = dc_begin (parent, DISIR_CONTEXT_DEFAULT, &def);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
