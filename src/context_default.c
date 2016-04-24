@@ -1,6 +1,7 @@
 // standard includes
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 // public disir interface
 #include <disir/disir.h>
@@ -13,6 +14,8 @@
 #include "keyval.h"
 #include "default.h"
 #include "context_private.h"
+#include "util_private.h"
+#include "collection.h"
 
 
 //! INTERNAL API
@@ -426,6 +429,111 @@ error:
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_buffer_size,
+                char *output, int32_t *output_string_size)
+{
+    enum disir_status status;
+    struct disir_value *value;
+    dc_t *keyval;
+    struct disir_default *def;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    if (output_buffer_size <= 0 || output == NULL)
+    {
+        log_debug ("invoked with insufficient buffer size or buffer NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_DEFAULT, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+    {
+        log_debug_context (context, "invoked with wrong context");
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    // Get the default entry associated with the input keyval
+    if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
+    {
+        if (dc_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+        {
+            // Get the schema
+            keyval = context->cx_keyval->kv_schema_equiv;
+        }
+        else if (dc_type (context->cx_root_context) == DISIR_CONTEXT_SCHEMA)
+        {
+            keyval = context;
+        }
+        else
+        {
+            log_warn ("root context type unhandled: %s",
+                      dc_type_string (context->cx_root_context));
+            return DISIR_STATUS_INTERNAL_ERROR;
+        }
+
+        dx_default_get_active (keyval, semver, &def);
+    }
+    else if (dc_type (context) == DISIR_CONTEXT_DEFAULT)
+    {
+        def = context->cx_default;
+    }
+
+    value = &def->de_value;
+    return dx_value_stringify (value, output_buffer_size, output, output_string_size);
+}
+
+//! PUBLIC API
+enum disir_status
+dc_get_default_contexts (dc_t *context, dcc_t **collection)
+{
+    enum disir_status status;
+    dcc_t *col;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+    if (dc_type (context->cx_root_context) != DISIR_CONTEXT_SCHEMA)
+    {
+        dx_log_context (context, "cannot get defaults for KEYVAL not associated with a schema.");
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    col = dx_collection_create ();
+    if (col == NULL)
+    {
+        log_debug ("failed to allocate sufficient meory for output collection");
+        return DISIR_STATUS_NO_MEMORY;
+    }
+
+    //! Populate collection with each default entry on keyval
+    status = DISIR_STATUS_OK;
+    MQ_FOREACH (context->cx_keyval->kv_default_queue,
+      {status = dx_collection_push_context (col, entry->de_context);
+       if (status != DISIR_STATUS_OK) break;});
+
+    if (status != DISIR_STATUS_OK)
+    {
+        log_error ("failed to populate default context collection");
+        dc_collection_finished (&col);
+        return status;
+    }
+
+    *collection = col;
+    return DISIR_STATUS_OK;
+}
 
 //! INTERNAL API
 void

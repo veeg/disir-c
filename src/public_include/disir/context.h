@@ -279,7 +279,48 @@ dc_add_default_integer (dc_t *parent, int64_t value, struct semantic_version *se
 enum disir_status
 dc_add_default_float (dc_t *parent, double value, struct semantic_version *semver);
 
+//! \brief Return the default value as a string representation from context.
+//!
+//! Retrieve the default value of input context as a string representation.
+//! The supported contexts are:
+//!     * DISIR_CONTEXT_DEFAULT: Plainly retrieve the appointed to default value
+//!     * DISIR_CONTEXT_KEYVAL: Search for the matching default entry in keyval.
+//! The matching default version when searching KEYVAL is picked. If semver is NULL,
+//! the highest version is chosen.
+//!
+//! The output buffer is populated with the string representation of the default value held
+//! by context. If the output_buffer_size is inssuficient in size, the output_string_size
+//! will be equal or greater than output_buffer_size, and the output buffer populated
+//! with a output_buffer_size - 1 bytes of data.
+//! The output buffer is always NULL terminated.
+//! On success, the output_string_size will always hold the exact number of bytes populated
+//! in the buffer, not counting the terminating NULL character.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUENT if context or output are NULL, or output_buffer_size
+//!     is less than or equal to zero.
+//! \return DISIR_STATUS_WRONG_CONTEXT if context is not of type DISIR_CONTEXT_DEFAULT or
+//!     DISIR_CONTEXT_KEYVAL
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_buffer_size,
+                char *output, int32_t *output_string_size);
 
+
+//! \brief Gather all default entries on the context into a collection.
+//!
+//! The supported context for this function is the DISIR_CONTEXT_KEYVAL,
+//! whose root context must be a DISIR_CONTEXT_SCHEMA.
+//!
+//! \param[in] context Input KEYVAL context to retrieve all default contexts from.
+//! \param[out] collection Output collection populated with default contexts of input context.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if any of the input arguments are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if either the input context or root context are wrong.
+//! \return DISIR_STATUS_NO_MEMORY if collection allocation failed.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_get_default_contexts (dc_t *context, dcc_t **collection);
 
 
 //! Add a string as value to the context.
