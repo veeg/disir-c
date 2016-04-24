@@ -36,6 +36,46 @@ const char * dx_value_type_string (enum disir_value_type type);
 //!
 enum disir_value_type dx_value_type_sanify (enum disir_value_type type);
 
+//! \brief Populate output buffer with a string representation of the value structure
+//!
+//! Convert the value held by the input value to a string representation that is
+//! populated in the output buffer. If the output_buffer_size is of insufficient size,
+//! output_size will be equal or greater than output_buffer_size.
+//! The output buffer will be populated with maximum output_buffer_size - 1 bytes of
+//! stringified output data, where the last byte is always used to NULL terminate.
+//! output_size does not include the NULL terminator.
+//!
+//! No input validation is performed.
+//!
+//! \param[in] value Structure that hold a value of any type to output.
+//! \param[in] output_buffer_size Size of the output buffer
+//! \param[in] output Buffer to output string value to.
+//! \param[out] output_size Number of bytes value populates buffer with.
+//!
+//! \return DISIR_STATUS_OK
+//!
+enum disir_status
+dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
+                    char *output, int32_t *output_size);
+
+//! \brief Compare two value structures if they represent the same value
+//!
+//! Compare two value structures of equal type if the value they hold are of equal type.
+//!
+//! \return INT_MIN if their type differ
+//! \return < 0 if v2 is greater than v1
+//! \return > 0 if v1 is greater than v2
+//! \return 0 if v1 and v2 are equal
+//!
+int dx_value_compare (struct disir_value *v1, struct disir_value *v2);
+
+//! \brief Copy source value into destination value
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if types for source and destination differ.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dx_value_copy (struct disir_value *destination, struct disir_value *source);
+
 
 //! \brief Set the input 'value' with the contents of the input 'string'
 //!

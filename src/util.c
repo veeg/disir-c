@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 // Public disir interface
 #include <disir/disir.h>
@@ -158,6 +159,84 @@ dc_semantic_version_convert (const char *input, struct semantic_version *semver)
     semver->sv_patch = parsed_integer;
 
     return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
+                    char *output, int32_t *output_size)
+{
+    int32_t size;
+
+    switch (value->dv_type)
+    {
+    case DISIR_VALUE_TYPE_STRING:
+    {
+        size = value->dv_size;
+        *output_size = size;
+        if (size >= output_buffer_size)
+        {
+            // Decrement one, so we can signal that the supplied buffer is insufficient.
+            size -= 1;
+            log_debug ("Insufficient buffer provided - decrementing output size by one");
+        }
+
+        memcpy (output, value->dv_string, size);
+        output[size] = '\0';
+        break;
+    }
+    // TODO: Implement other DISIR_VALUE_TYPE_*
+    default:
+    {
+        dx_crash_and_burn ("%s: %s not handled",
+                           __FUNCTION__, dx_value_type_string (value->dv_type));
+    }
+    }
+
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+int
+dx_value_compare (struct disir_value *v1, struct disir_value *v2)
+{
+    if (v1->dv_type != v2->dv_type)
+        return (INT_MIN);
+
+    if (v1->dv_size != v2->dv_size)
+        return (v1->dv_size - v2->dv_size);
+
+    return memcmp (v1->dv_string, v2->dv_string, v1->dv_size);
+}
+
+//! INTERNAL API
+enum disir_status
+dx_value_copy (struct disir_value *destination, struct disir_value *source)
+{
+    switch (dx_value_type_sanify (source->dv_type))
+    {
+    case DISIR_VALUE_TYPE_STRING:
+        return dx_value_set_string (destination, source->dv_string, source->dv_size);
+        break;
+    case DISIR_VALUE_TYPE_INTEGER:
+        return dx_value_set_integer (destination, source->dv_integer);
+        break;
+    case DISIR_VALUE_TYPE_FLOAT:
+        return dx_value_set_float (destination, source->dv_float);
+        break;
+    case DISIR_VALUE_TYPE_BOOLEAN:
+        //! TODO: Implement boolean type for value_copy
+        //return dx_value_set_boolean (destination, source->dv_boolean);
+        //break;
+    case DISIR_VALUE_TYPE_ENUM:
+        //! TODO: Implement enum type for value_copy
+    case DISIR_VALUE_TYPE_UNKNOWN:
+        dx_crash_and_burn ("%s unhandled", __FUNCTION__);
+        break;
+    }
+
+    // Never reached
+    return DISIR_STATUS_INTERNAL_ERROR;
 }
 
 // INTERNAL API
