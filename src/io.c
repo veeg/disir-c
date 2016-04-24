@@ -114,8 +114,8 @@ error:
 
 //! PUBLIC API
 enum disir_status
-disir_config_input (struct disir *disir, const char *type,
-                   struct disir_config **config, const char *id)
+disir_config_input (struct disir *disir, const char *id, const char *type,
+                    struct disir_schema *schema, struct disir_config **config)
 {
     enum disir_status status;
     struct disir_input *input;
@@ -129,15 +129,15 @@ disir_config_input (struct disir *disir, const char *type,
     }
     else
     {
-        status = input->config (id, config);
+        status = input->config (id, schema, config);
     }
     return status;
 }
 
 //! PUBLIC API
 enum disir_status
-disir_schema_input (struct disir *disir, const char *type,
-                   struct disir_schema **schema, const char *id)
+disir_schema_input (struct disir *disir, const char *id, const char *type,
+                    struct disir_schema **schema)
 {
     enum disir_status status;
     struct disir_input *input;
@@ -158,8 +158,8 @@ disir_schema_input (struct disir *disir, const char *type,
 
 //! PUBLIC API
 enum disir_status
-disir_config_output (struct disir *disir, const char *type,
-                   struct disir_config *config, const char *id)
+disir_config_output (struct disir *disir, const char *id, const char *type,
+                     struct disir_config *config)
 {
     enum disir_status status;
     struct disir_output *output;
@@ -187,8 +187,8 @@ disir_config_output (struct disir *disir, const char *type,
 
 //! PUBLIC API
 enum disir_status
-disir_schema_output (struct disir *disir, const char *type,
-                   struct disir_schema *schema, const char *id)
+disir_schema_output (struct disir *disir, const char *id, const char *type,
+                     struct disir_schema *schema)
 {
     enum disir_status status;
     struct disir_output *output;
