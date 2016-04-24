@@ -389,14 +389,14 @@ dx_value_set_string (struct disir_value *value, const char *string, int32_t stri
 
 //! INTERNAL API
 enum disir_status
-dx_value_get_string (struct disir_value *value, const char **string, int32_t *size)
+dx_value_get_string (struct disir_value *value, const char **output, int32_t *size)
 {
     if (value == NULL)
     {
         log_debug ("invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    if (string == NULL)
+    if (output == NULL)
     {
         log_debug ("invoked with NULL string pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
@@ -411,7 +411,7 @@ dx_value_get_string (struct disir_value *value, const char **string, int32_t *si
     {
         *size = value->dv_size;
     }
-    *string = value->dv_string;
+    *output = value->dv_string;
     return DISIR_STATUS_OK;
 }
 

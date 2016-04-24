@@ -100,15 +100,15 @@ dx_value_set_string (struct disir_value *value, const char *string, int32_t stri
 //! \brief Reterieve the string type stored in value
 //!
 //! \param[in] value Value object to retrieve the string value from.
-//! \param[out] string Pointer is to redirect to the stored string in 'value'
+//! \param[out] output Pointer is to redirect to the stored string in 'value'
 //! \param[out] size Populated with the size of the output string size if not NULL.
 //!
-//! \return DISIR_STATUS_OK if the 'string' input pointer is pointed to the stored string.
-//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'string' are NULL pointers,
+//! \return DISIR_STATUS_OK if the 'output' input pointer is pointed to the stored string.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'output' are NULL pointers,
 //!     or the value type of 'value' is not DISIR_VALUE_TYPE_STRING
 //!
 enum disir_status
-dx_value_get_string (struct disir_value *value, const char **string, int32_t *size);
+dx_value_get_string (struct disir_value *value, const char **output, int32_t *size);
 
 
 //! \brief Set the input 'value' with the contents of the input 'integer'
