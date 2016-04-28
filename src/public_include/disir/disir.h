@@ -53,6 +53,9 @@ enum disir_status
 //! Forward declare the disir main object
 struct disir;
 
+//! Forward declare the disir_update object
+struct disir_update;
+
 //! Forward declaration of the top-level context disir_config
 struct disir_config;
 //! Forward declaration of the top-level context disir_schema
@@ -124,7 +127,63 @@ enum disir_status
 disir_generate_config_from_schema (struct disir_schema *schema, struct semantic_version *semver,
                                    struct disir_config **config);
 
+//! \brief Update the config 0bject to a new target version
+//!
+//! Update a config to a new semver version. The update state and progress is
+//! recorded in its own disir_update structure which is an output parameter of this function.
+//! If either of the return codes are DISIR_STATUS_OK or DISIR_STATUS_CONFLICT,
+//! then the update operation is successful or underway. If an conflict occurs,
+//! the disir_update_conflict() function is used to retrieve the conflicting keyval.
+//! A resolution must be made with disir_update_resolve()
+//! After a resolution has been successfully determined, the update may continue
+//! using disir_update_continue()
+//!
+//! When either this function or disir_update_continue returns DISIR_STATUS_OK,
+//! the update is successful and the config object is updated to the targeted semver version.
+//! The update structure must be finalized through disir_update_finished() when
+//! the operation is done.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if config or update are NULL.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if the config version is higher than schema version.
+//! \return DISIR_STATUS_NO_CAN_DO if the config and target are of equal version.
+//! \return DISIR_STATUS_NO_MEMORY if memory allocation failed internally.
+//! \return DISIR_STATUS_CONFLICT if there exists a conflicting keyval that requires
+//!     manual resolution through disir_update_resolve.
+//! \return DISIR_STATUS_OK if the update operation went through without any conflicts
+//!
+enum disir_status
+disir_update_config (struct disir_config *config,
+                     struct semantic_version *target, struct disir_update **update);
 
+//! \brief Get the conflicting keyval and altenative values for a conflict in update
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_update_conflict (struct disir_update *update, const char **name,
+                       const char **keyval, const char **schema);
+
+//! \brief Resolve a conflict in an update with the new value
+//!
+//! \return DISIR_STATUS_OK on success.
+//1
+enum disir_status
+disir_update_resolve (struct disir_update *update, const char *resolve);
+
+//! \brief Continue update after a conflict resolution
+//!
+//! \return DISIR_STATUS_OK on success. The config object is now up-to-date with its target
+//!     version. Use disir_update_finished() on the update object to dispose of it.
+//!
+enum disir_status
+disir_update_continue (struct disir_update *update);
+
+//! \brief Finished updating the config structure - Free all resources used to perform the update.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_update_finished (struct disir_update **update);
 
 #endif // _LIBDISIR_H
 
