@@ -12,6 +12,7 @@
 
 // Private
 #include "context_private.h"
+#include "util_private.h"
 #include "config.h"
 #include "schema.h"
 #include "keyval.h"
@@ -75,7 +76,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
     }
 
     exists = MQ_SIZE_COND (*doc_queue,
-                (dx_semantic_version_compare(&entry->dd_introduced, &doc->dd_introduced) == 0));
+                (dx_semantic_version_compare (&entry->dd_introduced, &doc->dd_introduced) == 0));
     if (exists)
     {
         dx_log_context (parent,
