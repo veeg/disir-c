@@ -52,6 +52,32 @@ enum disir_context_type dc_type (dc_t *context);
 //! that if the input context were unknown.
 const char * dc_type_string (dc_t *context);
 
+//! \brief Get the value type enumeration represented by the passed context.
+//!
+//! Retrieve the disir_value_type embedded in the passed context.
+//! If the passed context is NULL, or does not contain a value,
+//! DISIR_VALUE_TYPE_UNKNOWN is returned.
+//!
+//! \return DISIR_VALUE_TYPE_UNKNOWN if the passed context is NULL or the context
+//!     does not contain a value type. Otherwise return the value type of the context.
+//! \return disir_value_type represented by context if context is valid and contains
+//!     a valid disir_value_type
+//!
+enum disir_value_type dc_value_type (dc_t *context);
+
+
+//! \brief Return a string representation of the value this context represents.
+//!
+//! Retrieve the disir_value_type embedded in the passed context, and
+//! return a string representation of this enumeration.
+//! If the passed context is NULL or does not contain a value, UNKNOWN is returned.
+//!
+//! \param context Input context to infere value from.
+//!
+//! \return string representation of the disir_value_type held in context
+//!
+const char * dc_value_type_string (dc_t *context);
+
 
 //
 // Base context API
