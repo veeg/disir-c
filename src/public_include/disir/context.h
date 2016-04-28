@@ -351,15 +351,63 @@ enum disir_status dc_set_value (dc_t *context, const char *value, int32_t value_
 //!
 enum disir_status dc_set_value_string (dc_t *context, const char *value, int32_t value_size);
 
+//! \brief Get the value stored in context in a string representation
+//!
+//! The value, regardless of type, is stringified in the output buffer provided.
+//! if the output_buffer_size is insufficient to hold the full value of context,
+//! then only output_buffer_size - 1 bytes are copied to output and the output_size
+//! will be equal or greater than output_buffer_size.
+//! A terminating NULL character is always added to the end of the output buffer,
+//! but is not part of the outout_size count returned
+//!
+//! Supported contexts are:
+//!     * DISIR_CONTEXT_KEYVAL whose root is CONFIG
+//!
+//! \param[in] context Input context to query for value
+//! \param[in] output_buffer_size Size of the output buffer. Cannot be <= 0
+//! \param[in] output Buffer with at least output_buffer_size capacity.
+//! \param[out] output_size Size in bytes of the stringified value of context,
+//!     not including the terminating NULL character.
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context is supplied.
+//! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs context is not CONFIG.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_get_value (dc_t *context, int32_t output_buffer_size,
+                                char *output, int32_t *output_size);
 
-//! Return the number of bytes stored at the context string value, if applicable
-enum disir_status dc_get_value_string_size (dc_t *context, int64_t *value_size);
+//! \brief Retrieve the string value stored on the context.
+//!
+//! Only applicable on the following contexts:
+//! * DISIR_CONTEXT_KEYVAL whose root is CONFIG
+//! * DISIR_CONTEXT_DOCUMENTATION
+//!
+//! \param context Input context to retrieve string value from.
+//! \param[out] output Pointer to redirect the string value stored in context to.
+//! \param[out] size Optional. Populated with the size of the output string.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or output are NULL
+//! \return DISIR_STATUS_INVALID_ARGUMENT if value type in context is not string.
+//! \return DISIR_STATUS_WRONG_CONTEXT if the context is of wrong type.
+//! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs root context is not CONFIG.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_get_value_string (dc_t *context, const char **output, int32_t *size);
 
-//! Return the stored value of a context, along with the number of octets
-//! contained in the returned valule.
-enum disir_status dc_get_value_string (dc_t *context, char *value,
-                                       int64_t output_buffer_maxsize, int64_t *value_size);
+//! \brief Retrieve the integer value stored on the context.
+//!
+//! TODO: Implement dc_get_value_integer
+//!
+//! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
+//!
 enum disir_status dc_get_value_integer (dc_t *context, int64_t *value);
+
+//! \brief Retrieve the float value stored on the context.
+//!
+//! TODO: Implement dc_get_value_float
+//!
+//! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
+//!
 enum disir_status dc_get_value_float (dc_t *conttext, double *value);
 
 //! Query the context for its intrduced member.

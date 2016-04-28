@@ -434,6 +434,111 @@ dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
 
 //! PUBLIC API
 enum disir_status
+dc_get_value (dc_t *context, int32_t output_buffer_size, char *output, int32_t *output_size)
+{
+    enum disir_status status;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged;
+        return status;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_log_context (context, "cannot get value from non KEYVAL type");
+        return status;
+    }
+    if (dc_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    {
+        dx_log_context (context, "cannot get value from KEYVAL context whose root is not CONFIG");
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    return dx_value_stringify (&context->cx_keyval->kv_value,
+                               output_buffer_size, output, output_size);
+}
+
+//! PUBLIC API
+enum disir_status
+dc_get_value_string (dc_t *context, const char **output, int32_t *size)
+{
+    enum disir_status status;
+    enum disir_value_type type;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_DOCUMENTATION);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged ?
+        return status;
+    }
+
+    if (output == NULL)
+    {
+        log_debug ("invoked with output NULL pointer");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = dc_get_value_type (context, &type);
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_log_context (context, "cannot retrieve value type of context: %s",
+                        disir_status_string (status));
+        return status;
+    }
+
+    if (type != DISIR_VALUE_TYPE_STRING)
+    {
+        dx_log_context (context, "cannot retrieve value from context whose value is of type: %s",
+                        dx_value_type_string (type));
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
+    {
+        if (dc_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+        {
+            dx_log_context (context, "cannot retrieve value when root context is not CONFIG");
+            return DISIR_STATUS_WRONG_CONTEXT;
+        }
+        status = dx_value_get_string (&context->cx_keyval->kv_value, output, size);
+    }
+    else if (dc_type (context) == DISIR_CONTEXT_DOCUMENTATION)
+    {
+        status = dx_value_get_string (&context->cx_documentation->dd_value, output, size);
+    }
+    else
+    {
+        log_fatal_context (context, "slipped through guard - unsupported.");
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_get_value_integer (dc_t *context, int64_t *value)
+{
+    return DISIR_STATUS_INTERNAL_ERROR;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_get_value_float (dc_t *conttext, double *value)
+{
+    return DISIR_STATUS_INTERNAL_ERROR;
+}
+
 dc_add_introduced (dc_t *context, struct semantic_version semver)
 {
     struct semantic_version *introduced;
