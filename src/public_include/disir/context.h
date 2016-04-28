@@ -1,9 +1,6 @@
 #ifndef _LIBDISIR_CONTEXT_H
 #define _LIBDISIR_CONTEXT_H
 
-#include <stdint.h>
-#include <disir/disir.h>
-
 //! The namespace employed for all low-level context operations
 //! is dc_*
 
@@ -21,8 +18,6 @@ struct disir_context;
 typedef struct disir_context dc_t;
 
 
-#include <disir/collection.h>
-
 //! Different types of disir_contexts that are available.
 enum disir_context_type
 {
@@ -36,6 +31,10 @@ enum disir_context_type
 
     DISIR_CONTEXT_UNKNOWN, // Must be last entry in enumeration
 };
+
+#include <stdint.h>
+#include <disir/disir.h>
+#include <disir/collection.h>
 
 //
 // Utility context API

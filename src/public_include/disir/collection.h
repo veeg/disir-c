@@ -2,6 +2,7 @@
 #define _LIBDISIR_COLLECTION_H
 
 #include <disir/disir.h>
+#include <disir/context.h>
 
 //! Abstract Data Type for a collection of Disir Contexts.
 typedef struct disir_context_collection dcc_t;

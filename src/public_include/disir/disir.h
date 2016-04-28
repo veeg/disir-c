@@ -74,6 +74,11 @@ enum disir_restriction
 };
 
 
+#include <disir/util.h>
+#include <disir/context.h>
+#include <disir/collection.h>
+
+
 //! \brief Return a string representation of the disir status
 const char * disir_status_string (enum disir_status status);
 
@@ -101,7 +106,6 @@ enum disir_status
 disir_instance_destroy (struct disir **disir);
 
 
-#include <disir/util.h>
 
 
 #endif // _LIBDISIR_H
