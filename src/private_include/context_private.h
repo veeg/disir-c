@@ -161,6 +161,22 @@ dc_t * dx_context_create (enum disir_context_type type);
 //! Free an allocated disir_context
 void dx_context_destroy (dc_t **context);
 
+//! \brief Associate the input config related context with its equiv schema related context
+//!
+//! The input context must have root CONFIG context, where valid contexts are:
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!
+//! \param context The input context whose root is CONFIG
+//! \param value The value used to locate the schema equivalent
+//! \param value_size Bytes inputted in value
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or value are NULL, if value_size is
+//!     less or equal to zero, or if the input value is not associated in the schema.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dx_set_schema_equiv (dc_t *context, const char *value, int32_t value_size);
+
 
 //! Check that the passed context is either of the passed
 //! DISIR_CONTEXT_* following the variadic list.

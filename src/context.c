@@ -539,6 +539,46 @@ dc_get_value_float (dc_t *conttext, double *value)
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
+//! INTERNAL API
+enum disir_status
+dx_set_schema_equiv (dc_t *context, const char *value, int32_t value_size)
+{
+    enum disir_status status;
+    struct disir_schema *schema;
+    dc_t *queried;
+
+    if (context == NULL || value == NULL || value_size <= 0)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    // TODO: Should resolve within tiered in sections - mayhabs seperated by a period?
+
+    // Holy Moley
+    schema = context->cx_root_context->cx_config->cf_schema;
+
+    if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
+    {
+        status = dx_element_storage_get_first (schema->sc_elements, value, &queried);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Did not find the element with that name
+            log_debug ("failed to get first keyval: %s. name: %s",
+                       disir_status_string (status), value);
+            return DISIR_STATUS_INVALID_ARGUMENT;
+        }
+        context->cx_keyval->kv_schema_equiv = queried;
+        context->cx_keyval->kv_value.dv_type = queried->cx_keyval->kv_type;
+        context->cx_keyval->kv_type = queried->cx_keyval->kv_type;
+    }
+    else
+    {
+        dx_crash_and_burn ("%s invoked with context: %s", __FUNCTION__, dc_type_string (context));
+    }
+
+    return DISIR_STATUS_OK;
+}
+
 dc_add_introduced (dc_t *context, struct semantic_version semver)
 {
     struct semantic_version *introduced;
