@@ -15,6 +15,7 @@ set (_LIBDISIR_SOURCES
     "disir.c"
     "io.c"
     "io/print.c"
+    "update.c"
 )
 
 # Export public include directory as internal cache variable
