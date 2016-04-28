@@ -3,6 +3,7 @@
 
 #include "schema.h"
 #include "keyval.h"
+#include "util_private.h"
 
 void
 test_context_schema_add_keyval (void **state)

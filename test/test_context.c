@@ -3,6 +3,7 @@
 
 #include "context_private.h"
 #include "config.h"
+#include "schema.h"
 
 int setup_context_config(void **state)
 {
@@ -28,6 +29,34 @@ int teardown_context_config(void **state)
     config = *state;
 
     dx_config_destroy(&config->cx_config);
+
+    return 0;
+}
+
+int setup_context_schema(void **state)
+{
+    dc_t *schema;
+
+    schema = dx_context_create(DISIR_CONTEXT_SCHEMA);
+    if (schema== NULL)
+        return -1;
+
+    // Allocate internal disir_documentation
+    schema->cx_schema = dx_schema_create(schema);
+    if (schema->cx_schema == NULL)
+        return -1;
+
+    *state = schema;
+    return 0;
+}
+
+int teardown_context_schema(void **state)
+{
+    dc_t *schema;
+
+    schema= *state;
+
+    dx_schema_destroy(&schema->cx_schema);
 
     return 0;
 }
@@ -175,7 +204,8 @@ void test_context_type_check(void **state)
 
     // Valid context against multiple incorrect, valid contexts.
     context.cx_type = DISIR_CONTEXT_SCHEMA;
-    status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_DEFAULT, DISIR_CONTEXT_SECTION);
+    status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_CONFIG,
+                                DISIR_CONTEXT_DEFAULT, DISIR_CONTEXT_SECTION);
     assert_int_equal(status, DISIR_STATUS_WRONG_CONTEXT);
 
     // Valid context, against correct single valid context
@@ -185,7 +215,8 @@ void test_context_type_check(void **state)
 
     // Valid context against multiple correct, valid contexts.
     context.cx_type = DISIR_CONTEXT_SECTION;
-    status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_DEFAULT, DISIR_CONTEXT_SECTION);
+    status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_CONFIG,
+                                DISIR_CONTEXT_DEFAULT, DISIR_CONTEXT_SECTION);
     assert_int_equal(status, DISIR_STATUS_OK);
 
     LOG_TEST_END

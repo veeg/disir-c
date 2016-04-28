@@ -1,5 +1,6 @@
 #include <disir/util.h>
 #include "value.h"
+#include "util_private.h"
 
 void
 test_semantic_version_compare(void **state)
@@ -154,11 +155,14 @@ test_disir_status_string (void **state)
         case DISIR_STATUS_WRONG_CONTEXT:
             assert_string_equal (status_string, "WRONG CONTEXT");
             break;
-        case DISIR_STATUS_CONTEXT_DESTROYED:
+        case DISIR_STATUS_DESTROYED_CONTEXT:
             assert_string_equal (status_string, "DESTROYED CONTEXT");
             break;
         case DISIR_STATUS_BAD_CONTEXT_OBJECT:
             assert_string_equal (status_string, "BAD CONTEXT OBJECT");
+            break;
+        case DISIR_STATUS_INVALID_CONTEXT:
+            assert_string_equal (status_string, "INVALID CONTEXT");
             break;
         case DISIR_STATUS_NO_MEMORY:
             assert_string_equal (status_string, "NO MEMORY");
@@ -177,6 +181,9 @@ test_disir_status_string (void **state)
             break;
         case DISIR_STATUS_CONFLICTING_SEMVER:
             assert_string_equal (status_string, "CONFLICTING SEMVER");
+            break;
+        case DISIR_STATUS_CONFLICT:
+            assert_string_equal (status_string, "CONFLICT");
             break;
         case DISIR_STATUS_EXHAUSTED:
             assert_string_equal (status_string, "EXHAUSTED");
