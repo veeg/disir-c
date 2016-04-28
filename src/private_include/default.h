@@ -1,6 +1,11 @@
 #ifndef _LIBDISIR_DEFAULT_H
 #define _LIBDISIR_DEFAULT_H
 
+#include <disir/context.h>
+
+#include "util_private.h"
+#include "value.h"
+
 struct disir_default
 {
     //! Context element this default element belongs to.
