@@ -106,6 +106,19 @@ enum disir_status
 disir_instance_destroy (struct disir **disir);
 
 
+//! \brief Generate a config at a given version from the finished schema.
+//!
+//! \param[in] schema The completed schema of which to generate a config object of.
+//! \param[in] semver Version number of schema to generate config of. If NULL, highest
+//!     schema version is used for generation.
+//! \param[out] config Output config object allocated with generated config object.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_generate_config_from_schema (struct disir_schema *schema, struct semantic_version *semver,
+                                   struct disir_config **config);
+
 
 
 #endif // _LIBDISIR_H
