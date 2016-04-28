@@ -500,6 +500,20 @@ enum disir_status dc_add_keyval_float (dc_t *parent, const char *name, double de
 enum disir_status dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t def,
                                          const char *doc, struct semantic_version *semver);
 
+//! \brief Retrieve the version number of the input context.
+//!
+//! Supported contexts are:
+//!     * DISIR_CONTEXT_CONFIG
+//!     * DISIR_CONTEXT_SCHEMA
+//!
+//! \param[in] context To retrieve version from.
+//! \param[out] Semantic version structure to populate the version of context.
+//!
+//! \return DISIR_STATUS_INVALID_ARUGMENT if context or semver are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if context is not of supported type.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_get_version (dc_t *context, struct semantic_version *semver);
 
 //
 // Restriction related context API
@@ -510,6 +524,22 @@ enum disir_status dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t
 //! If any other context than disir_context_restriction is supplied,
 //! an DISIR_STATUS_WRONG_CONTEXT is returned.
 enum disir_status dc_restriction_get_type (dc_t *restriction, enum disir_restriction *type);
+//! \brief Set the version number of the input context
+//!
+//! Supported contexts are:
+//!     * DISIR_CONTEXT_CONFIG
+//!     * DISIR_CONTEXT_SCHEMA
+//!
+//! \param[in] context The context to set version on
+//! \param[in] semver Semantic version structure to get version from
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or semver are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if context is not of supported type.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if semver is higher than schema semver when
+//!     applied to a DISIR_CONTEXT_CONFIG context.
+//! \return DISRI_STATUS_OK on success.
+//!
+enum disir_status dc_set_version (dc_t *context, struct semantic_version *semver);
 
 
 //

@@ -661,6 +661,103 @@ dc_add_deprecrated (dc_t *context, struct semantic_version smever)
 
 //! PUBLIC API
 enum disir_status
+dc_get_version (dc_t *context, struct semantic_version *semver)
+{
+    enum disir_status status;
+
+    TRACE_ENTER ("context: %p, semver: %p", context, semver);
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    if (semver == NULL)
+    {
+        log_debug ("invoked with semver NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SCHEMA);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged ?
+        return status;
+    }
+
+    if (dc_type (context) == DISIR_CONTEXT_CONFIG)
+    {
+        dx_semantic_version_set (semver, &context->cx_config->cf_version);
+    }
+    else if (dc_type (context) == DISIR_CONTEXT_SCHEMA)
+    {
+        dx_semantic_version_set (semver, &context->cx_schema->sc_version);
+    }
+    else
+    {
+        log_fatal_context (context, "slipped through guard - unsupported.");
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    TRACE_EXIT ("");
+    return DISIR_STATUS_OK;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_set_version (dc_t *context, struct semantic_version *semver)
+{
+    enum disir_status status;
+
+    TRACE_ENTER ("context: %p, semver: %p", context, semver);
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    if (semver == NULL)
+    {
+        log_debug ("invoked with semver NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SCHEMA);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged ?
+        return status;
+    }
+
+    if (dc_type (context) == DISIR_CONTEXT_CONFIG)
+    {
+        if (dx_semantic_version_compare (&context->cx_config->cf_schema->sc_version, semver) < 0)
+        {
+            dx_log_context (context, "Cannot set version to CONFIG whose SCHEMA is lower.");
+            return DISIR_STATUS_CONFLICTING_SEMVER;
+        }
+        dx_semantic_version_set (&context->cx_config->cf_version, semver);
+    }
+    else if (dc_type (context) == DISIR_CONTEXT_SCHEMA)
+    {
+        dx_semantic_version_set (&context->cx_schema->sc_version, semver);
+    }
+    else
+    {
+        log_fatal_context (context, "slipped through guard - unsupported.");
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    TRACE_EXIT ("");
+    return DISIR_STATUS_OK;
+}
+
+//! PUBLIC API
+enum disir_status
 dc_get_introduced (dc_t *context, struct semantic_version *semver)
 {
     struct semantic_version *introduced;
