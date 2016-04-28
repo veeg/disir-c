@@ -15,6 +15,7 @@ set (_LIBDISIR_SOURCES
     "disir.c"
     "io.c"
     "io/print.c"
+    "io/ini.c"
     "update.c"
 )
 
