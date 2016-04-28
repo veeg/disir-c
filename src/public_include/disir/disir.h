@@ -40,8 +40,13 @@ enum disir_status
     DISIR_STATUS_EXISTS,
     //! The operations results in conflicting semantic version numbers.
     DISIR_STATUS_CONFLICTING_SEMVER,
+    //! Conflicting result from operation
+    DISIR_STATUS_CONFLICT,
     //! The requested resource is exhausted.
     DISIR_STATUS_EXHAUSTED,
+
+    //! Sentinel status - not returned by any API
+    DISIR_STATUS_UNKNOWN // Must be the last status in enumeration
 
 };
 

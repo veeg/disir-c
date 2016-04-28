@@ -28,6 +28,7 @@ const char *disir_status_strings[] = {
     "INSUFFICIENT RESOURCES",
     "EXISTS",
     "CONFLICTING SEMVER",
+    "CONFLICT",
     "EXHAUSTED",
     "UNKNOWN",
 };
