@@ -86,6 +86,12 @@ disir_instance_create (struct disir **disir)
         goto error;
     }
 
+    status = dio_register_ini (dis);
+    if (status != DISIR_STATUS_OK)
+    {
+        goto error;
+    }
+
     // TODO: Load internal schema
     // TODO: Load external config file
 
