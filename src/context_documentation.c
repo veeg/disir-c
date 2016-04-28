@@ -37,11 +37,6 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
 
     switch(dc_type (parent))
     {
-    case DISIR_CONTEXT_CONFIG:
-    {
-        doc_queue = &(parent->cx_config->cf_documentation_queue);
-        break;
-    }
     case DISIR_CONTEXT_SCHEMA:
     {
         doc_queue = &(parent->cx_schema->sc_documentation_queue);
@@ -58,6 +53,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
                            __FUNCTION__, dc_type_string (parent));
         break;
     }
+    case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
     case DISIR_CONTEXT_DOCUMENTATION:
@@ -105,11 +101,6 @@ dx_documentation_numentries (dc_t *context)
 
     switch (dc_type (context))
     {
-    case DISIR_CONTEXT_CONFIG:
-    {
-        queue = context->cx_config->cf_documentation_queue;
-        break;
-    }
     case DISIR_CONTEXT_SCHEMA:
     {
         queue = context->cx_schema->sc_documentation_queue;
@@ -126,6 +117,7 @@ dx_documentation_numentries (dc_t *context)
                            __FUNCTION__, dc_type_string (context));
         break;
     }
+    case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
     case DISIR_CONTEXT_DOCUMENTATION:
@@ -410,11 +402,6 @@ dx_documentation_destroy (struct disir_documentation **documentation)
 
         switch (dc_type (context))
         {
-        case DISIR_CONTEXT_CONFIG:
-        {
-            queue = &(context->cx_config->cf_documentation_queue);
-            break;
-        }
         case DISIR_CONTEXT_SCHEMA:
         {
             queue = &(context->cx_schema->sc_documentation_queue);
@@ -431,6 +418,7 @@ dx_documentation_destroy (struct disir_documentation **documentation)
                            __FUNCTION__, dc_type_string (context));
             break;
         }
+        case DISIR_CONTEXT_CONFIG:
         case DISIR_CONTEXT_DEFAULT:
         case DISIR_CONTEXT_RESTRICTION:
         case DISIR_CONTEXT_DOCUMENTATION:
