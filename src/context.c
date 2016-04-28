@@ -579,10 +579,13 @@ dx_set_schema_equiv (dc_t *context, const char *value, int32_t value_size)
     return DISIR_STATUS_OK;
 }
 
+//! PUBLIC API
+enum disir_status
 dc_add_introduced (dc_t *context, struct semantic_version semver)
 {
     struct semantic_version *introduced;
     enum disir_status status;
+    char buffer[32];
 
     introduced = NULL;
     status = DISIR_STATUS_OK;
@@ -600,6 +603,10 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
         dx_log_context (context, "no capability to add introduced semver to context");
         return DISIR_STATUS_NO_CAN_DO;
     }
+
+    log_debug_context (context, "adding introduced to root(%s): %s",
+                       dc_type_string (context->cx_root_context),
+                       dc_semantic_version_string (buffer, 32, &semver));
 
     // Update schema with highest version if root context is DISIR_CONTEXT_SCHEMA
     if (dc_type (context->cx_root_context) == DISIR_CONTEXT_SCHEMA)
