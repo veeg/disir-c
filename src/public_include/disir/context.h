@@ -515,15 +515,6 @@ enum disir_status dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t
 //!
 enum disir_status dc_get_version (dc_t *context, struct semantic_version *semver);
 
-//
-// Restriction related context API
-//
-
-//! Return the disir_restriction_type enum type pointed to bytes
-//! the passed disir_context_restriction context.
-//! If any other context than disir_context_restriction is supplied,
-//! an DISIR_STATUS_WRONG_CONTEXT is returned.
-enum disir_status dc_restriction_get_type (dc_t *restriction, enum disir_restriction *type);
 //! \brief Set the version number of the input context
 //!
 //! Supported contexts are:
