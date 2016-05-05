@@ -25,7 +25,7 @@
 #include "test_context.c"
 #include "test_context_default.c"
 #include "test_context_documentation.c"
-#include "test_context_schema.c"
+#include "test_context_mold.c"
 #include "test_introduced.c"
 #include "test_collection.c"
 #include "test_util.c"
@@ -79,8 +79,8 @@ main(int argc, char *argv[])
         NULL,
         NULL);
 
-    returnval += cmocka_run_group_tests_name("Context-schema",
-        disir_context_schema_tests,
+    returnval += cmocka_run_group_tests_name("Context-mold",
+        disir_context_mold_tests,
         NULL,
         NULL);
 

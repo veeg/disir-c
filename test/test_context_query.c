@@ -7,36 +7,36 @@ test_context_get_elements (void **state)
 {
     enum disir_status status;
     dc_t *invalid;
-    dc_t *schema_context;
+    dc_t *mold_context;
     dcc_t *collection;
-    struct disir_schema *schema;
+    struct disir_mold *mold;
 
     LOG_TEST_START
 
-    // Setup schema
-    status = dc_schema_begin (&schema_context);
+    // Setup mold
+    status = dc_mold_begin (&mold_context);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_add_keyval_string (schema_context, "keyval1",
+    status = dc_add_keyval_string (mold_context, "keyval1",
                                    "keyval1_value", "keyval1_doc", NULL);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_add_keyval_string (schema_context, "keyval2", "keyval2_value",
+    status = dc_add_keyval_string (mold_context, "keyval2", "keyval2_value",
                                    "keyval2_doc", NULL);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_add_keyval_string (schema_context, "keyval3", "keyval3_value",
+    status = dc_add_keyval_string (mold_context, "keyval3", "keyval3_value",
                                    "keyval3_doc", NULL);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_add_keyval_string (schema_context, "keyval4", "keyval4_value",
+    status = dc_add_keyval_string (mold_context, "keyval4", "keyval4_value",
                                    "keyval4_doc", NULL);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_schema_finalize (&schema_context, &schema);
+    status = dc_mold_finalize (&mold_context, &mold);
     assert_int_equal (status, DISIR_STATUS_OK);
-    schema_context = dc_schema_getcontext (schema);
-    assert_non_null (schema_context);
+    mold_context = dc_mold_getcontext (mold);
+    assert_non_null (mold_context);
 
     // Invalid input check
     status = dc_get_elements (NULL, NULL);
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
-    status = dc_get_elements (schema_context, NULL);
+    status = dc_get_elements (mold_context, NULL);
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
     status = dc_get_elements (NULL, &collection);
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
@@ -48,7 +48,7 @@ test_context_get_elements (void **state)
     {
         // valid types
         if (invalid->cx_type == DISIR_CONTEXT_CONFIG ||
-            invalid->cx_type == DISIR_CONTEXT_SCHEMA ||
+            invalid->cx_type == DISIR_CONTEXT_MOLD ||
             invalid->cx_type == DISIR_CONTEXT_SECTION)
         {
             invalid->cx_type++;
@@ -61,8 +61,8 @@ test_context_get_elements (void **state)
         invalid->cx_type++;
     }
 
-    // Valid query from schema
-    status = dc_get_elements (schema_context, &collection);
+    // Valid query from mold
+    status = dc_get_elements (mold_context, &collection);
     assert_int_equal (status, DISIR_STATUS_OK);
     assert_int_equal (dc_collection_size (collection), 4);
 
@@ -70,7 +70,7 @@ test_context_get_elements (void **state)
 
     // Cleanup
     dx_context_destroy (&invalid);
-    status = dc_destroy (&schema_context);
+    status = dc_destroy (&mold_context);
     assert_int_equal (status, DISIR_STATUS_OK);
     status = dc_collection_finished (&collection);
     assert_int_equal (status, DISIR_STATUS_OK);
@@ -83,7 +83,7 @@ test_context_get_name (void **state)
 {
     enum disir_status status;
     dc_t *invalid;
-    dc_t *schema;
+    dc_t *mold;
     dc_t *keyval;
     const char *name;
     int32_t size;
@@ -91,9 +91,9 @@ test_context_get_name (void **state)
     LOG_TEST_START
 
     // setup
-    status = dc_schema_begin (&schema);
+    status = dc_mold_begin (&mold);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_begin (schema, DISIR_CONTEXT_KEYVAL, &keyval);
+    status = dc_begin (mold, DISIR_CONTEXT_KEYVAL, &keyval);
     assert_int_equal (status, DISIR_STATUS_OK);
     status = dc_set_name (keyval, "test_keyval", strlen ("test_keyval"));
     assert_int_equal (status, DISIR_STATUS_OK);
@@ -135,7 +135,7 @@ test_context_get_name (void **state)
 
     // cleanup
     dx_context_destroy (&invalid);
-    dc_destroy (&schema);
+    dc_destroy (&mold);
     dc_destroy (&keyval);
 
     LOG_TEST_END
@@ -145,7 +145,7 @@ void
 test_context_get_documentation (void **state)
 {
     enum disir_status status;
-    dc_t *schema;
+    dc_t *mold;
     dc_t *invalid;
     const char *doc;
     int32_t size;
@@ -153,15 +153,15 @@ test_context_get_documentation (void **state)
     LOG_TEST_START
 
     // setup
-    status = dc_schema_begin (&schema);
+    status = dc_mold_begin (&mold);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_add_documentation (schema, "test_doc_string", strlen ("test_doc_string"));
+    status = dc_add_documentation (mold, "test_doc_string", strlen ("test_doc_string"));
     assert_int_equal (status, DISIR_STATUS_OK);
 
     // Invalid argument check
     status = dc_get_documentation (NULL, NULL, NULL, NULL);
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
-    status = dc_get_documentation (schema, NULL, NULL, NULL);
+    status = dc_get_documentation (mold, NULL, NULL, NULL);
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
     status = dc_get_documentation (NULL, NULL, &doc, NULL );
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
@@ -169,7 +169,7 @@ test_context_get_documentation (void **state)
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
     status = dc_get_documentation (NULL, NULL, &doc, &size);
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
-    status = dc_get_documentation (schema, NULL, NULL, &size);
+    status = dc_get_documentation (mold, NULL, NULL, &size);
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
 
     // enumerate all DISIR_CONTEST_* and attempt to get documentation from invalid context type.
@@ -180,7 +180,7 @@ test_context_get_documentation (void **state)
         // valid types
         if (invalid->cx_type == DISIR_CONTEXT_CONFIG ||
             invalid->cx_type == DISIR_CONTEXT_KEYVAL ||
-            invalid->cx_type == DISIR_CONTEXT_SCHEMA ||
+            invalid->cx_type == DISIR_CONTEXT_MOLD ||
             invalid->cx_type == DISIR_CONTEXT_SECTION)
         {
             invalid->cx_type++;
@@ -193,8 +193,8 @@ test_context_get_documentation (void **state)
         invalid->cx_type++;
     }
 
-    // Get valid documentation from schema
-    status = dc_get_documentation (schema, NULL, &doc, &size);
+    // Get valid documentation from mold
+    status = dc_get_documentation (mold, NULL, &doc, &size);
     assert_int_equal (status, DISIR_STATUS_OK);
     assert_string_equal (doc, "test_doc_string");
 
@@ -204,7 +204,7 @@ test_context_get_documentation (void **state)
 
     // cleanup
     dx_context_destroy (&invalid);
-    dc_destroy (&schema);
+    dc_destroy (&mold);
 
     LOG_TEST_END
 }

@@ -3,7 +3,7 @@
 
 #include "context_private.h"
 #include "config.h"
-#include "schema.h"
+#include "mold.h"
 
 int setup_context_config(void **state)
 {
@@ -33,30 +33,30 @@ int teardown_context_config(void **state)
     return 0;
 }
 
-int setup_context_schema(void **state)
+int setup_context_mold(void **state)
 {
-    dc_t *schema;
+    dc_t *mold;
 
-    schema = dx_context_create(DISIR_CONTEXT_SCHEMA);
-    if (schema== NULL)
+    mold = dx_context_create(DISIR_CONTEXT_MOLD);
+    if (mold== NULL)
         return -1;
 
     // Allocate internal disir_documentation
-    schema->cx_schema = dx_schema_create(schema);
-    if (schema->cx_schema == NULL)
+    mold->cx_mold = dx_mold_create(mold);
+    if (mold->cx_mold == NULL)
         return -1;
 
-    *state = schema;
+    *state = mold;
     return 0;
 }
 
-int teardown_context_schema(void **state)
+int teardown_context_mold(void **state)
 {
-    dc_t *schema;
+    dc_t *mold;
 
-    schema= *state;
+    mold= *state;
 
-    dx_schema_destroy(&schema->cx_schema);
+    dx_mold_destroy(&mold->cx_mold);
 
     return 0;
 }
@@ -116,9 +116,9 @@ test_context_type(void **state)
             assert_true(dc_type(context) == DISIR_CONTEXT_CONFIG);
             assert_string_equal(dc_type_string(context), "FILE_CONFIG");
             break;
-        case DISIR_CONTEXT_SCHEMA:
-            assert_true(dc_type(context) == DISIR_CONTEXT_SCHEMA);
-            assert_string_equal(dc_type_string(context), "FILE_SCHEMA");
+        case DISIR_CONTEXT_MOLD:
+            assert_true(dc_type(context) == DISIR_CONTEXT_MOLD);
+            assert_string_equal(dc_type_string(context), "FILE_MOLD");
             break;
         case DISIR_CONTEXT_SECTION:
             assert_true(dc_type(context) == DISIR_CONTEXT_SECTION);
@@ -198,19 +198,19 @@ void test_context_type_check(void **state)
     assert_int_equal(status, DISIR_STATUS_TOO_FEW_ARGUMENTS);
 
     // Valid context, against single incorrect, valid context.
-    context.cx_type = DISIR_CONTEXT_SCHEMA;
+    context.cx_type = DISIR_CONTEXT_MOLD;
     status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_CONFIG);
     assert_int_equal(status, DISIR_STATUS_WRONG_CONTEXT);
 
     // Valid context against multiple incorrect, valid contexts.
-    context.cx_type = DISIR_CONTEXT_SCHEMA;
+    context.cx_type = DISIR_CONTEXT_MOLD;
     status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_CONFIG,
                                 DISIR_CONTEXT_DEFAULT, DISIR_CONTEXT_SECTION);
     assert_int_equal(status, DISIR_STATUS_WRONG_CONTEXT);
 
     // Valid context, against correct single valid context
-    context.cx_type = DISIR_CONTEXT_SCHEMA;
-    status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_SCHEMA);
+    context.cx_type = DISIR_CONTEXT_MOLD;
+    status = CONTEXT_TYPE_CHECK(&context, DISIR_CONTEXT_MOLD);
     assert_int_equal(status, DISIR_STATUS_OK);
 
     // Valid context against multiple correct, valid contexts.

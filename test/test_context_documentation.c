@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "config.h"
-#include "schema.h"
+#include "mold.h"
 #include "context_private.h"
 #include "documentation.h"
 
@@ -56,7 +56,7 @@ test_context_documentation_dx_documentation_add_basic (void **state)
     // Use DISIR_CONTEXT_CONFIG as the testbed
     // Hotfix it with more capabilities as it suits us.
     //
-    status = dc_schema_begin (&parent);
+    status = dc_mold_begin (&parent);
     assert_non_null (parent);
     assert_int_equal (status, DISIR_STATUS_OK);
 
@@ -108,14 +108,14 @@ test_context_documentation_dx_documentation_add_basic (void **state)
     // Add version with lower version number
     status = dx_documentation_add (parent, doc2);
     assert_int_equal (status, DISIR_STATUS_OK);
-    assert_ptr_equal (parent->cx_schema->sc_documentation_queue, doc2);
+    assert_ptr_equal (parent->cx_mold->mo_documentation_queue, doc2);
 
     // Add last entry
     status = dx_documentation_add (parent, doc3);
     assert_int_equal (status, DISIR_STATUS_OK);
 
     // Verify order in storage
-    tmp = parent->cx_schema->sc_documentation_queue;
+    tmp = parent->cx_mold->mo_documentation_queue;
     assert_ptr_equal (tmp, doc2);
     assert_non_null (tmp->next);
     tmp = tmp->next;
@@ -228,7 +228,7 @@ void test_context_documentation_dc_add_documentation_basic (void **state)
     // Use DISIR_CONTEXT_CONFIG as the testbed
     // Hotfix it with more capabilities as it suits us.
     //
-    status = dc_schema_begin (&parent);
+    status = dc_mold_begin (&parent);
     assert_non_null (parent);
     assert_int_equal (status, DISIR_STATUS_OK);
 
@@ -285,7 +285,7 @@ test_context_documentation_dx_documentation_begin_basic (void **state)
     // Use DISIR_CONTEXT_CONFIG as the testbed
     // Hotfix it with more capabilities as it suits us.
     //
-    status = dc_schema_begin (&parent);
+    status = dc_mold_begin (&parent);
     assert_non_null (parent);
     assert_int_equal (status, DISIR_STATUS_OK);
 
@@ -384,24 +384,24 @@ test_context_documentation_verify_queue (void **state)
     doc3->dd_introduced.sv_patch = 2;
 
     // Assert that parent queue is empty when no docs are in it.
-    assert_null (parent->cx_schema->sc_documentation_queue);
+    assert_null (parent->cx_mold->mo_documentation_queue);
 
     // Add first entry
     status = dx_documentation_add (parent, doc1);
     assert_int_equal (status, DISIR_STATUS_OK);
-    assert_ptr_equal (parent->cx_schema->sc_documentation_queue, doc1);
+    assert_ptr_equal (parent->cx_mold->mo_documentation_queue, doc1);
 
     // Add second entry that goes first in queue
     status = dx_documentation_add (parent, doc2);
     assert_int_equal (status, DISIR_STATUS_OK);
-    assert_ptr_equal (parent->cx_schema->sc_documentation_queue, doc2);
+    assert_ptr_equal (parent->cx_mold->mo_documentation_queue, doc2);
 
     // Add last entry
     status = dx_documentation_add (parent, doc3);
     assert_int_equal (status, DISIR_STATUS_OK);
 
     // Verify order in storage
-    tmp = parent->cx_schema->sc_documentation_queue;
+    tmp = parent->cx_mold->mo_documentation_queue;
     assert_ptr_equal (tmp, doc2);
     assert_non_null (tmp->next);
     tmp = tmp->next;
@@ -414,8 +414,8 @@ test_context_documentation_verify_queue (void **state)
     // assert that the parent queue pointer is modified to point to the next in line
     context = doc2->dd_context;
     dc_destroy (&context);
-    assert_ptr_not_equal(parent->cx_schema->sc_documentation_queue, doc2);
-    assert_ptr_equal (parent->cx_schema->sc_documentation_queue, doc1);
+    assert_ptr_not_equal(parent->cx_mold->mo_documentation_queue, doc2);
+    assert_ptr_equal (parent->cx_mold->mo_documentation_queue, doc1);
 
     LOG_TEST_END
 }
@@ -427,12 +427,12 @@ const struct CMUnitTest disir_context_documentation_tests[] = {
     // verify queue
   cmocka_unit_test_setup_teardown (
       test_context_documentation_verify_queue,
-      setup_context_schema, teardown_context_schema),
+      setup_context_mold, teardown_context_mold),
 
     // dc_add_documentation can add single
     cmocka_unit_test_setup_teardown (
         test_context_documentation_dc_add_documentation_can_add_single,
-        setup_context_schema, teardown_context_schema),
+        setup_context_mold, teardown_context_mold),
     // dc_add_documentation cannot add single
     cmocka_unit_test_setup_teardown (
         test_context_documentation_dc_add_documentation_cannot_add_single,

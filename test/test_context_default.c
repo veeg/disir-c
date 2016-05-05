@@ -8,7 +8,7 @@ test_context_default_basic (void **state)
     enum disir_status status;
     struct disir_default *def;
     dc_t *context;
-    dc_t *schema;
+    dc_t *mold;
     dc_t *keyval;
     dc_t *invalid;
 
@@ -17,9 +17,9 @@ test_context_default_basic (void **state)
     LOG_TEST_START
 
     // Setup
-    status = dc_schema_begin (&schema);
+    status = dc_mold_begin (&mold);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_begin (schema, DISIR_CONTEXT_KEYVAL, &keyval);
+    status = dc_begin (mold, DISIR_CONTEXT_KEYVAL, &keyval);
     assert_int_equal (status, DISIR_STATUS_OK);
     invalid = dx_context_create (DISIR_CONTEXT_CONFIG);
 
@@ -70,7 +70,7 @@ test_context_default_basic (void **state)
 
     // cleanup
     dx_context_destroy (&invalid);
-    dc_destroy (&schema);
+    dc_destroy (&mold);
 
     LOG_TEST_END
 }
@@ -80,7 +80,7 @@ test_context_default_integer (void **state)
 {
     enum disir_status status;
     dc_t *keyval;
-    dc_t *schema;
+    dc_t *mold;
     struct semantic_version semver;
 
     semver.sv_major = 1;
@@ -90,9 +90,9 @@ test_context_default_integer (void **state)
     LOG_TEST_START
 
     // Setup
-    status = dc_schema_begin (&schema);
+    status = dc_mold_begin (&mold);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_begin (schema, DISIR_CONTEXT_KEYVAL, &keyval);
+    status = dc_begin (mold, DISIR_CONTEXT_KEYVAL, &keyval);
     assert_int_equal (status, DISIR_STATUS_OK);
     status = dc_set_value_type (keyval, DISIR_VALUE_TYPE_INTEGER);
     assert_int_equal (status, DISIR_STATUS_OK);
@@ -126,7 +126,7 @@ test_context_default_float (void **state)
 {
     enum disir_status status;
     dc_t *keyval;
-    dc_t *schema;
+    dc_t *mold;
     struct semantic_version semver;
 
     semver.sv_major = 1;
@@ -136,9 +136,9 @@ test_context_default_float (void **state)
     LOG_TEST_START
 
     // Setup
-    status = dc_schema_begin (&schema);
+    status = dc_mold_begin (&mold);
     assert_int_equal (status, DISIR_STATUS_OK);
-    status = dc_begin (schema, DISIR_CONTEXT_KEYVAL, &keyval);
+    status = dc_begin (mold, DISIR_CONTEXT_KEYVAL, &keyval);
     assert_int_equal (status, DISIR_STATUS_OK);
     status = dc_set_value_type (keyval, DISIR_VALUE_TYPE_FLOAT);
     assert_int_equal (status, DISIR_STATUS_OK);
