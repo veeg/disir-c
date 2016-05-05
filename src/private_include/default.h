@@ -36,11 +36,11 @@ struct disir_default *dx_default_create (dc_t *parent);
 enum disir_status dx_default_destroy (struct disir_default **def);
 
 
-//! \brief Query a keyval context, whose root is schema, for the active default entry for semver.
+//! \brief Query a keyval context, whose root is mold, for the active default entry for semver.
 //!
 //! Internal function - No input validation is performed.
 //!
-//! \param[in] keyval Context KEYVAL whose root must be SCHEMA.
+//! \param[in] keyval Context KEYVAL whose root must be MOLD.
 //! \param[in] semver Version to retrieve active default entry for. NULL indicates the greatest.
 //! \param[out] Ouput structure pointer populated with matching entry. NULL if no default entries
 //!     on keyval context.

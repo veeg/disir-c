@@ -17,7 +17,7 @@
 const char *disir_context_type_string[] = {
     "INVALID_CONTEXT_VALUE",
     "FILE_CONFIG",
-    "FILE_SCHEMA",
+    "FILE_MOLD",
     "SECTION",
     "KEYVAL",
     "DOCUMENTATION",
@@ -150,7 +150,7 @@ dx_context_type_is_toplevel (enum disir_context_type context_type)
 {
     if (
         context_type == DISIR_CONTEXT_CONFIG    ||
-        context_type == DISIR_CONTEXT_SCHEMA
+        context_type == DISIR_CONTEXT_MOLD
        )
     {
         return 1;
@@ -225,7 +225,7 @@ dx_context_create (enum disir_context_type type)
     case DISIR_CONTEXT_CONFIG:
     {
         // By default, the top-level config capabilities
-        // are limited until a schema is attached
+        // are limited until a mold is attached
         context->CONTEXT_CAPABILITY_ADD_DOCUMENTATION = 1;
         break;
     }
@@ -235,7 +235,7 @@ dx_context_create (enum disir_context_type type)
         context->CONTEXT_CAPABILITY_INTRODUCED = 1;
         break;
     }
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
     {
         // XXX: What capabilitties?
         context->CONTEXT_CAPABILITY_ADD_DOCUMENTATION = 1;
@@ -527,7 +527,7 @@ dc_set_value_type (dc_t *context, enum disir_value_type type)
     case DISIR_CONTEXT_KEYVAL:
     {
         //TODO XXX: Cannot set type if keyval has defaults
-        //TODO XXX: Cannot set type if toplevel context is not DISIR_SCHEMA
+        //TODO XXX: Cannot set type if toplevel context is not DISIR_MOLD
         context->cx_keyval->kv_type = type;
         break;
     }

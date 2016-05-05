@@ -8,7 +8,7 @@
 #include "default.h"
 #include "keyval.h"
 #include "log.h"
-#include "schema.h"
+#include "mold.h"
 #include "update_private.h"
 #include "util_private.h"
 
@@ -33,8 +33,8 @@ disir_update_config (struct disir_config *config,
 
     if (target == NULL)
     {
-        target = &config->cf_schema->sc_version;
-        log_debug ("using highest version from schema: %s\n",
+        target = &config->cf_mold->mo_version;
+        log_debug ("using highest version from mold: %s\n",
                    dc_semantic_version_string (buffer, 512, target));
     }
 
@@ -112,12 +112,12 @@ disir_update_continue (struct disir_update *update)
 
         // Get keyval default of target semver - if semver is less or equal to current
         // Do nothing
-        dx_default_get_active (keyval->kv_schema_equiv, &update->up_target, &target_def);
+        dx_default_get_active (keyval->kv_mold_equiv, &update->up_target, &target_def);
         res = dx_semantic_version_compare (&target_def->de_introduced,
                                            &update->up_config->cf_version);
         if (res <= 0)
         {
-            // Do nothing - schema default value for target is older or equal to config version
+            // Do nothing - mold default value for target is older or equal to config version
             continue;
         }
         // We might get lucky and have the current config value equal the target default value
@@ -133,7 +133,7 @@ disir_update_continue (struct disir_update *update)
         //  * Update config if value of default at config version equals entry in config
         //  * Conflict if default at config version differ from entry in config
 
-        dx_default_get_active (keyval->kv_schema_equiv, &update->up_config->cf_version,
+        dx_default_get_active (keyval->kv_mold_equiv, &update->up_config->cf_version,
                                &config_def);
         res = dx_value_compare (&keyval->kv_value, &config_def->de_value);
         if (res == 0)
@@ -155,8 +155,8 @@ disir_update_continue (struct disir_update *update)
             dx_value_stringify (&keyval->kv_value, 512, update->up_config_value, &size);
             // XXX Handle buffer overflow / insufficient buffer
 
-            update->up_schema_value = malloc (512); // XXX: Handle allocation better
-            dx_value_stringify (&target_def->de_value, 512, update->up_schema_value, &size);
+            update->up_mold_value = malloc (512); // XXX: Handle allocation better
+            dx_value_stringify (&target_def->de_value, 512, update->up_mold_value, &size);
             // XXX Handle buffer overflow / insufficient buffer
 
             // Signal that manual resolution is required.
@@ -178,11 +178,11 @@ disir_update_continue (struct disir_update *update)
 
 enum disir_status
 disir_update_conflict (struct disir_update *update, const char **name,
-                       const char **keyval, const char **schema)
+                       const char **keyval, const char **mold)
 {
     TRACE_ENTER ("");
 
-    if (update == NULL || name == NULL || keyval == NULL || schema == NULL)
+    if (update == NULL || name == NULL || keyval == NULL || mold == NULL)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -195,7 +195,7 @@ disir_update_conflict (struct disir_update *update, const char **name,
 
     *name = update->up_keyval->kv_name.dv_string;
     *keyval = update->up_config_value;
-    *schema = update->up_schema_value;
+    *mold = update->up_mold_value;
 
     TRACE_EXIT ("");
 
@@ -235,8 +235,8 @@ disir_update_resolve (struct disir_update *update, const char *resolve)
     update->up_keyval = NULL;
     free (update->up_config_value);
     update->up_config_value = NULL;
-    free (update->up_schema_value);
-    update->up_schema_value = NULL;
+    free (update->up_mold_value);
+    update->up_mold_value = NULL;
 
     TRACE_EXIT ("");
     return DISIR_STATUS_OK;
@@ -254,9 +254,9 @@ disir_update_finished (struct disir_update **update)
     {
         free (up->up_config_value);
     }
-    if (up->up_schema_value)
+    if (up->up_mold_value)
     {
-        free (up->up_schema_value);
+        free (up->up_mold_value);
     }
 
     free (up);

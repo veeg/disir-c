@@ -12,33 +12,33 @@
 #include "context_private.h"
 #include "disir_private.h"
 #include "config.h"
-#include "schema.h"
+#include "mold.h"
 #include "default.h"
 #include "keyval.h"
 #include "log.h"
 #include "util_private.h"
 
-#define INTERNAL_SCHEMA_DOCSTRING "The Disir Schema for the internal libdisir configuration."
+#define INTERNAL_MOLD_DOCSTRING "The Disir Schema for the internal libdisir configuration."
 #define LOG_FILEPATH_DOCSTRING "The full filepath to the logfile libdisir will output to."
-#define SCHEMA_DIRPATH_DOCSTRING "The full directory path where libdisir will locate " \
-            "it the installed schemas to match against installed configuration files."
+#define MOLD_DIRPATH_DOCSTRING "The full directory path where libdisir will locate " \
+            "it the installed molds to match against installed configuration files."
 
 
 enum disir_status
-dx_internal_schema (struct disir_schema **schema)
+dx_internal_mold (struct disir_mold **mold)
 {
     enum disir_status status;
     dc_t *context;
 
     context = NULL;
 
-    status = dc_schema_begin (&context);
+    status = dc_mold_begin (&context);
     if (status != DISIR_STATUS_OK)
         return status;
 
     status = dc_add_documentation (context,
-                                   INTERNAL_SCHEMA_DOCSTRING,
-                                   strlen (INTERNAL_SCHEMA_DOCSTRING));
+                                   INTERNAL_MOLD_DOCSTRING,
+                                   strlen (INTERNAL_MOLD_DOCSTRING));
     if (status != DISIR_STATUS_OK)
         goto error;
 
@@ -47,12 +47,12 @@ dx_internal_schema (struct disir_schema **schema)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context, "schema_dirpath", "/etc/disir/schemas",
-                                   "Root directory to resolve schema lookups from.", NULL);
+    status = dc_add_keyval_string (context, "mold_dirpath", "/etc/disir/molds",
+                                   "Root directory to resolve mold lookups from.", NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_schema_finalize (&context, schema);
+    status = dc_mold_finalize (&context, mold);
     if (status != DISIR_STATUS_OK)
         goto error;
 
@@ -63,7 +63,7 @@ error:
         dc_destroy (&context);
     }
 
-    *schema = NULL;
+    *mold = NULL;
     return status;
 }
 
@@ -92,7 +92,7 @@ disir_instance_create (struct disir **disir)
         goto error;
     }
 
-    // TODO: Load internal schema
+    // TODO: Load internal mold
     // TODO: Load external config file
 
     *disir = dis;
@@ -122,7 +122,7 @@ disir_instance_destroy (struct disir **disir)
 
 //! PUBLIC API
 enum disir_status
-disir_generate_config_from_schema (struct disir_schema *schema, struct semantic_version *semver,
+disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
                                    struct disir_config **config)
 {
     enum disir_status status;
@@ -134,17 +134,17 @@ disir_generate_config_from_schema (struct disir_schema *schema, struct semantic_
     const char *name;
     int32_t size;
 
-    TRACE_ENTER ("schema: %p, semver: %p", schema, semver);
+    TRACE_ENTER ("mold: %p, semver: %p", mold, semver);
 
-    if (schema == NULL)
+    if (mold == NULL)
     {
-        log_debug ("invoked with schema NULL pointer");
+        log_debug ("invoked with mold NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    // TODO: Validate integrity of schema first?
+    // TODO: Validate integrity of mold first?
 
-    status = dc_config_begin (schema, &config_context);
+    status = dc_config_begin (mold, &config_context);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
@@ -152,7 +152,7 @@ disir_generate_config_from_schema (struct disir_schema *schema, struct semantic_
     }
 
     // Get each element from the element storage. add it
-    status = dc_get_elements (schema->sc_context, &collection);
+    status = dc_get_elements (mold->mo_context, &collection);
     if (status != DISIR_STATUS_OK)
     {
         goto error;
@@ -217,7 +217,7 @@ disir_generate_config_from_schema (struct disir_schema *schema, struct semantic_
     }
     else
     {
-        dx_semantic_version_set (&(*config)->cf_version, &schema->sc_version);
+        dx_semantic_version_set (&(*config)->cf_version, &mold->mo_version);
     }
     log_debug ("sat config version to: %s",
                dc_semantic_version_string (buffer, 32, &(*config)->cf_version));

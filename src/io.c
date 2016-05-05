@@ -8,22 +8,22 @@
 #include <disir/io.h>
 
 #include "log.h"
-#include "schema.h"
+#include "mold.h"
 #include "config.h"
 #include "mqueue.h"
 #include "disir_private.h"
 
 enum disir_status
 disir_register_input (struct disir *disir, const char *type, const char *description,
-                      config_read config, schema_read schema)
+                      config_read config, mold_read mold)
 {
     enum disir_status status;
     struct disir_input *input;
 
-    if (type == NULL || description == NULL || config == NULL || schema == NULL)
+    if (type == NULL || description == NULL || config == NULL || mold == NULL)
     {
         log_debug ("invoked with NULL pointer(s). (%p %p %p %p)",
-                   type, description, config, schema);
+                   type, description, config, mold);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -49,7 +49,7 @@ disir_register_input (struct disir *disir, const char *type, const char *descrip
     }
 
     input->config = config;
-    input->schema = schema;
+    input->mold = mold;
 
     MQ_PUSH (disir->dio_input_queue, input);
 
@@ -64,16 +64,16 @@ error:
 
 enum disir_status
 disir_register_output (struct disir *disir, const char *type, const char *description,
-                      config_write config, schema_write schema)
+                      config_write config, mold_write mold)
 {
     enum disir_status status;
     struct disir_output *output;
 
     log_debug ("invoked");
-    if (type == NULL || description == NULL || config == NULL || schema == NULL)
+    if (type == NULL || description == NULL || config == NULL || mold == NULL)
     {
         log_debug ("invoked with NULL pointer(s). (%p %p %p %p)",
-                   type, description, config, schema);
+                   type, description, config, mold);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -99,7 +99,7 @@ disir_register_output (struct disir *disir, const char *type, const char *descri
     }
 
     output->config = config;
-    output->schema = schema;
+    output->mold = mold;
 
     MQ_PUSH (disir->dio_output_queue, output);
 
@@ -115,7 +115,7 @@ error:
 //! PUBLIC API
 enum disir_status
 disir_config_input (struct disir *disir, const char *id, const char *type,
-                    struct disir_schema *schema, struct disir_config **config)
+                    struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
     struct disir_input *input;
@@ -129,15 +129,15 @@ disir_config_input (struct disir *disir, const char *id, const char *type,
     }
     else
     {
-        status = input->config (id, schema, config);
+        status = input->config (id, mold, config);
     }
     return status;
 }
 
 //! PUBLIC API
 enum disir_status
-disir_schema_input (struct disir *disir, const char *id, const char *type,
-                    struct disir_schema **schema)
+disir_mold_input (struct disir *disir, const char *id, const char *type,
+                    struct disir_mold **mold)
 {
     enum disir_status status;
     struct disir_input *input;
@@ -151,7 +151,7 @@ disir_schema_input (struct disir *disir, const char *id, const char *type,
     }
     else
     {
-        status = input->schema (id, schema);
+        status = input->mold (id, mold);
     }
     return status;
 }
@@ -187,16 +187,16 @@ disir_config_output (struct disir *disir, const char *id, const char *type,
 
 //! PUBLIC API
 enum disir_status
-disir_schema_output (struct disir *disir, const char *id, const char *type,
-                     struct disir_schema *schema)
+disir_mold_output (struct disir *disir, const char *id, const char *type,
+                     struct disir_mold *mold)
 {
     enum disir_status status;
     struct disir_output *output;
 
-    if (disir == NULL || type == NULL || schema == NULL || id == NULL)
+    if (disir == NULL || type == NULL || mold == NULL || id == NULL)
     {
         log_debug ("invoked with NULL parameters (%p %p %p %p)",
-                   disir, type, schema, id);
+                   disir, type, mold, id);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -209,7 +209,7 @@ disir_schema_output (struct disir *disir, const char *id, const char *type,
     }
     else
     {
-        status = output->schema (id, schema);
+        status = output->mold (id, mold);
     }
     return status;
 }

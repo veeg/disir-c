@@ -32,17 +32,17 @@ dc_config_getcontext (struct disir_config *config)
 
 //! PUBLIC API
 enum disir_status
-dc_config_begin (struct disir_schema *schema, dc_t **config)
+dc_config_begin (struct disir_mold *mold, dc_t **config)
 {
     dc_t *context;
 
     context = NULL;
 
     // Disallow non-null content of passed pointer.
-    if (config == NULL || schema == NULL)
+    if (config == NULL || mold == NULL)
     {
         // LOGWARN
-        log_debug ("invoked with NULL pointer(s) (%p %p)", context, schema);
+        log_debug ("invoked with NULL pointer(s) (%p %p)", context, mold);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -64,7 +64,7 @@ dc_config_begin (struct disir_schema *schema, dc_t **config)
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    context->cx_config->cf_schema = schema;
+    context->cx_config->cf_mold = mold;
     context->CONTEXT_CAPABILITY_ADD_ENTRY = 1;
 
     // Set root context to self (such that children can inherit)

@@ -12,14 +12,14 @@ struct disir_config
 
     //! Version of this config instance.
     //! The version of a config shall always represent a snapshot
-    //! of its schema, with appropriate modifications. Version cannot
-    //! be greater than its schema version.
+    //! of its mold, with appropriate modifications. Version cannot
+    //! be greater than its mold version.
     //! The version is by default 1.0.0.
     struct semantic_version         cf_version;
 
-    //! The disir_schema associated with this config instance
-    //! Every disir_config needs a valid schema to validate against.
-    struct disir_schema             *cf_schema;
+    //! The disir_mold associated with this config instance
+    //! Every disir_config needs a valid mold to validate against.
+    struct disir_mold             *cf_mold;
 
     //! Storage of element entries, either:
     //!     * DISIR_CONTEXT_KEYVAL

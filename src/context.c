@@ -15,7 +15,7 @@
 #include "config.h"
 #include "keyval.h"
 #include "log.h"
-#include "schema.h"
+#include "mold.h"
 
 //! PUBLIC API
 enum disir_status
@@ -85,8 +85,8 @@ dc_destroy (dc_t **context)
     case DISIR_CONTEXT_CONFIG:
         status = dx_config_destroy (&((*context)->cx_config));
         break;
-    case DISIR_CONTEXT_SCHEMA:
-        status = dx_schema_destroy (&((*context)->cx_schema));
+    case DISIR_CONTEXT_MOLD:
+        status = dx_mold_destroy (&((*context)->cx_mold));
         break;
     case DISIR_CONTEXT_DOCUMENTATION:
         status = dx_documentation_destroy (&((*context)->cx_documentation));
@@ -163,7 +163,7 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dx_context_type_string (context_type));
     case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_UNKNOWN:
         dx_log_context (parent, "attempted to add context of unknown type( %d )", context_type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
@@ -208,7 +208,7 @@ dc_finalize (dc_t **context)
     case DISIR_CONTEXT_DOCUMENTATION:
         status = dx_documentation_finalize (context);
         break;
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_CONFIG:
         dx_crash_and_burn ("Context %s made to to switch it should never reach",
                 dc_type_string (*context));
@@ -280,10 +280,10 @@ dc_set_name (dc_t *context, const char *name, int32_t name_size)
 
     if (dc_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
     {
-        // Find the name in the schema
-        // TODO: Should be sufficient to query the schema equiv of parent
+        // Find the name in the mold
+        // TODO: Should be sufficient to query the mold equiv of parent
         // That will solve querying sections aswell
-        status = dx_set_schema_equiv (context, name, name_size);
+        status = dx_set_mold_equiv (context, name, name_size);
         if (status != DISIR_STATUS_OK)
         {
             return status;
@@ -408,17 +408,17 @@ dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
             dx_log_context (context, "cannot set value on KEYVAL whose root is not CONFIG.");
             return DISIR_STATUS_WRONG_CONTEXT;
         }
-        if (context->cx_keyval->kv_schema_equiv == NULL)
+        if (context->cx_keyval->kv_mold_equiv == NULL)
         {
-            dx_log_context (context, "cannot set value on KEYVAL not associated with a schema.");
+            dx_log_context (context, "cannot set value on KEYVAL not associated with a mold.");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
-        // TODO: Validate input against schema
+        // TODO: Validate input against mold
         status = dx_value_set_string (&context->cx_keyval->kv_value, value, value_size);
         break;
     }
     case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
@@ -541,10 +541,10 @@ dc_get_value_float (dc_t *conttext, double *value)
 
 //! INTERNAL API
 enum disir_status
-dx_set_schema_equiv (dc_t *context, const char *value, int32_t value_size)
+dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
-    struct disir_schema *schema;
+    struct disir_mold *mold;
     dc_t *queried;
 
     if (context == NULL || value == NULL || value_size <= 0)
@@ -555,11 +555,11 @@ dx_set_schema_equiv (dc_t *context, const char *value, int32_t value_size)
     // TODO: Should resolve within tiered in sections - mayhabs seperated by a period?
 
     // Holy Moley
-    schema = context->cx_root_context->cx_config->cf_schema;
+    mold = context->cx_root_context->cx_config->cf_mold;
 
     if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
     {
-        status = dx_element_storage_get_first (schema->sc_elements, value, &queried);
+        status = dx_element_storage_get_first (mold->mo_elements, value, &queried);
         if (status != DISIR_STATUS_OK)
         {
             // Did not find the element with that name
@@ -567,7 +567,7 @@ dx_set_schema_equiv (dc_t *context, const char *value, int32_t value_size)
                        disir_status_string (status), value);
             return DISIR_STATUS_INVALID_ARGUMENT;
         }
-        context->cx_keyval->kv_schema_equiv = queried;
+        context->cx_keyval->kv_mold_equiv = queried;
         context->cx_keyval->kv_value.dv_type = queried->cx_keyval->kv_type;
         context->cx_keyval->kv_type = queried->cx_keyval->kv_type;
     }
@@ -608,10 +608,10 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
                        dc_type_string (context->cx_root_context),
                        dc_semantic_version_string (buffer, 32, &semver));
 
-    // Update schema with highest version if root context is DISIR_CONTEXT_SCHEMA
-    if (dc_type (context->cx_root_context) == DISIR_CONTEXT_SCHEMA)
+    // Update mold with highest version if root context is DISIR_CONTEXT_MOLD
+    if (dc_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
     {
-        dx_schema_update_version (context->cx_root_context->cx_schema, &semver);
+        dx_mold_update_version (context->cx_root_context->cx_mold, &semver);
     }
 
     switch (dc_type (context))
@@ -632,7 +632,7 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_type_string(context));
     case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
         dx_log_context (context, "invoked %s() with capability it should not have.", __FUNCTION__);
         status = DISIR_STATUS_INTERNAL_ERROR;
         break;
@@ -680,7 +680,7 @@ dc_get_version (dc_t *context, struct semantic_version *semver)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SCHEMA);
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_MOLD);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged ?
@@ -691,9 +691,9 @@ dc_get_version (dc_t *context, struct semantic_version *semver)
     {
         dx_semantic_version_set (semver, &context->cx_config->cf_version);
     }
-    else if (dc_type (context) == DISIR_CONTEXT_SCHEMA)
+    else if (dc_type (context) == DISIR_CONTEXT_MOLD)
     {
-        dx_semantic_version_set (semver, &context->cx_schema->sc_version);
+        dx_semantic_version_set (semver, &context->cx_mold->mo_version);
     }
     else
     {
@@ -726,7 +726,7 @@ dc_set_version (dc_t *context, struct semantic_version *semver)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SCHEMA);
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_MOLD);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged ?
@@ -735,16 +735,16 @@ dc_set_version (dc_t *context, struct semantic_version *semver)
 
     if (dc_type (context) == DISIR_CONTEXT_CONFIG)
     {
-        if (dx_semantic_version_compare (&context->cx_config->cf_schema->sc_version, semver) < 0)
+        if (dx_semantic_version_compare (&context->cx_config->cf_mold->mo_version, semver) < 0)
         {
-            dx_log_context (context, "Cannot set version to CONFIG whose SCHEMA is lower.");
+            dx_log_context (context, "Cannot set version to CONFIG whose MOLD is lower.");
             return DISIR_STATUS_CONFLICTING_SEMVER;
         }
         dx_semantic_version_set (&context->cx_config->cf_version, semver);
     }
-    else if (dc_type (context) == DISIR_CONTEXT_SCHEMA)
+    else if (dc_type (context) == DISIR_CONTEXT_MOLD)
     {
-        dx_semantic_version_set (&context->cx_schema->sc_version, semver);
+        dx_semantic_version_set (&context->cx_mold->mo_version, semver);
     }
     else
     {
@@ -807,7 +807,7 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_type_string(context));
     case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
         dx_log_context (context, "invoked %s() with capability it should not have.", __FUNCTION__);
         status = DISIR_STATUS_INTERNAL_ERROR;
         break;
@@ -853,7 +853,7 @@ dc_get_elements (dc_t *context, dcc_t **collection)
     }
 
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG,
-                                 DISIR_CONTEXT_SCHEMA, DISIR_CONTEXT_SECTION);
+                                 DISIR_CONTEXT_MOLD, DISIR_CONTEXT_SECTION);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
@@ -863,9 +863,9 @@ dc_get_elements (dc_t *context, dcc_t **collection)
     status = DISIR_STATUS_OK;
     switch (dc_type (context))
     {
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
     {
-        status = dx_element_storage_get_all (context->cx_schema->sc_elements, collection);
+        status = dx_element_storage_get_all (context->cx_mold->mo_elements, collection);
         break;
     }
     case DISIR_CONTEXT_CONFIG:

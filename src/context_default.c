@@ -44,9 +44,9 @@ dx_default_begin (dc_t *parent, dc_t **def)
         // Already logged
         return status;
     }
-    if (dc_type (parent->cx_root_context) != DISIR_CONTEXT_SCHEMA)
+    if (dc_type (parent->cx_root_context) != DISIR_CONTEXT_MOLD)
     {
-        dx_log_context (parent, "Cannot add default to a KEYVAL whose root is not a SCHEMA");
+        dx_log_context (parent, "Cannot add default to a KEYVAL whose root is not a MOLD");
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 
@@ -463,10 +463,10 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
     {
         if (dc_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
-            // Get the schema
-            keyval = context->cx_keyval->kv_schema_equiv;
+            // Get the mold
+            keyval = context->cx_keyval->kv_mold_equiv;
         }
-        else if (dc_type (context->cx_root_context) == DISIR_CONTEXT_SCHEMA)
+        else if (dc_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
         {
             keyval = context;
         }
@@ -506,9 +506,9 @@ dc_get_default_contexts (dc_t *context, dcc_t **collection)
     {
         return status;
     }
-    if (dc_type (context->cx_root_context) != DISIR_CONTEXT_SCHEMA)
+    if (dc_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
     {
-        dx_log_context (context, "cannot get defaults for KEYVAL not associated with a schema.");
+        dx_log_context (context, "cannot get defaults for KEYVAL not associated with a mold.");
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 

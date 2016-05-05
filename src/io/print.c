@@ -6,7 +6,7 @@
 #include <disir/io.h>
 
 #include "log.h"
-#include "schema.h"
+#include "mold.h"
 #include "config.h"
 
 
@@ -74,10 +74,10 @@ dio_print_config_write (const char *id, struct disir_config *config)
 }
 
 enum disir_status
-dio_print_schema_write (const char *id, struct disir_schema *schema)
+dio_print_mold_write (const char *id, struct disir_mold *mold)
 {
     enum disir_status status;
-    dc_t *schema_context;
+    dc_t *mold_context;
     dc_t *context;
     dc_t *def;
     dcc_t *collection;
@@ -95,9 +95,9 @@ dio_print_schema_write (const char *id, struct disir_schema *schema)
     defaults_collection = NULL;
     collection = NULL;
 
-    schema_context = dc_schema_getcontext (schema);
+    mold_context = dc_mold_getcontext (mold);
 
-    status = dc_get_elements (schema_context, &collection);
+    status = dc_get_elements (mold_context, &collection);
     if (status != DISIR_STATUS_OK)
     {
         fprintf (stderr, "Buuhuu: failed to get elements: (%d)\n", status);
@@ -189,7 +189,7 @@ dio_register_print (struct disir *disir)
 
 
     status = disir_register_output (disir, "PRINT", "Print the object content to STDOUT",
-                                    dio_print_config_write, dio_print_schema_write);
+                                    dio_print_config_write, dio_print_mold_write);
     return status;
 
 }

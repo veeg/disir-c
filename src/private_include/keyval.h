@@ -12,9 +12,9 @@ struct disir_keyval
     //! Context element this keyval element belongs to.
     dc_t                        *kv_context;
 
-    //! Context schema element this keyval element represents
+    //! Context mold element this keyval element represents
     //! Only applicable to parent toplevel context DISIR_CONTEXT_CONFIG
-    dc_t                        *kv_schema_equiv;
+    dc_t                        *kv_mold_equiv;
 
     //! Type of value this keyval holds
     enum disir_value_type       kv_type;

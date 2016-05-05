@@ -8,7 +8,7 @@
 //! query various components within disir programatically.
 //! It offers a detailed level of abstraction.
 //! Each context is structured heirarchly, with the root
-//! context being either DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SCHEMA
+//! context being either DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_MOLD
 //! The root context will determine the
 //! effect and allowed operations on child contexts.
 struct disir_context;
@@ -22,7 +22,7 @@ typedef struct disir_context dc_t;
 enum disir_context_type
 {
     DISIR_CONTEXT_CONFIG = 1,
-    DISIR_CONTEXT_SCHEMA,
+    DISIR_CONTEXT_MOLD,
     DISIR_CONTEXT_SECTION,
     DISIR_CONTEXT_KEYVAL,
     DISIR_CONTEXT_DOCUMENTATION,
@@ -128,7 +128,7 @@ enum disir_status dc_putcontext (dc_t **context);
 //!     * KEYVAL
 //!     * GROUP
 //!     * CONFIG
-//!     * SCHEMA
+//!     * MOLD
 //! If an unsupported context is provided, DISIR_STATUS_WRONG_CONTEXT
 //! is returned. If a documention entry already exists for this element,
 //! DISIR_STATUS_EXISTS will be returned.
@@ -143,7 +143,7 @@ enum disir_status dc_add_documentation (dc_t *context, const char *doc, int32_t 
 //!     * DISIR_CONTEXT_SECTION
 //!     * DISIR_CONTEXT_KEYVAL
 //!     * DISIR_CONTEXT_CONFIG
-//!     * DISIR_CONTEXT_SCHEMA
+//!     * DISIR_CONTEXT_MOLD
 //!
 //! \param[in] context Input context to retrieve documentation for.
 //! \param[in] semver Matching documentation entry covered by this semantic verison number.
@@ -169,7 +169,7 @@ enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *
 //!     * DISIR_CONTEXT_SECTION
 //!
 //! When adding a name to a context whose root context is CONFIG,
-//! the name must match a KEYVAL entry found in the associated SCHEMA to CONFIG.
+//! the name must match a KEYVAL entry found in the associated MOLD to CONFIG.
 //! If no such association is found, DISIR_STATUS_WRONG_CONTEXT is returned.
 //!
 //! \param context Context to set the name attribute on.
@@ -179,7 +179,7 @@ enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *
 //! \return DISIR_STATUS_INVALID_ARGUMENT if name or name_size are zero
 //! \return DISIR_STATUS_NO_CAN_DO if an unsupported context type
 //! \return DISIR_STATUS_WRONG_CONTEXT if the name attempted to add on a context whose root
-//!     is CONFIG, is not found in the associated SCHEMA.
+//!     is CONFIG, is not found in the associated MOLD.
 //! \return DISIR_STATUS_OK on successful insertion of name to context.
 //!
 enum disir_status dc_set_name (dc_t *context, const char *name, int32_t name_size);
@@ -219,7 +219,7 @@ enum disir_status dc_add_deprecrated(dc_t *context, struct semantic_version smev
 //!
 //! There are a number of restrictions on when you can set a value type on a context.
 //! DISIR_CONTEXT_KEYVAL: Cannot have any default entries on it.
-//!     Can only set type if the toplevel context is DISIR_CONTEXT_SCHEMA
+//!     Can only set type if the toplevel context is DISIR_CONTEXT_MOLD
 //!
 //! \return DISIR_STATUS_OK the input 'context' was succesfuly populated with value type 'type'
 //! \return DISIR_STATUS_INVALID_ARGUMENT if context is NULL or type is out-of-bounds
@@ -262,7 +262,7 @@ enum disir_status dc_add_default (dc_t *context, const char *value,
 //! Type of parent must be DISIR_VALUE_TYPE_STRING. There must not be a default context
 //! in parent with an equal semantic version number.
 //!
-//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_SCHEMA.
+//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_MOLD.
 //! \param value Default string value to add.
 //! \param value_size Size in bytes of the string to copy.
 //! \param semver Semantic version number this default entry is valid from. NULL indicates
@@ -280,7 +280,7 @@ enum disir_status dc_add_default_string (dc_t *parent, const char *value,
 //! Type of parent must be DISIR_VALUE_TYPE_INTEGER. There must not be a default context
 //! in parent with an equal semantic version number.
 //!
-//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_SCHEMA.
+//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_MOLD.
 //! \param value Default integer value to add.
 //! \param semver Semantic version number this default entry is valid from. NULL indicates
 //!     the semantic verssion number 1.0.0
@@ -297,7 +297,7 @@ dc_add_default_integer (dc_t *parent, int64_t value, struct semantic_version *se
 //! Type of parent must be DISIR_VALUE_TYPE_FLOAT. There must not be a default context
 //! in parent with an equal semantic version number.
 //!
-//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_SCHEMA.
+//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_MOLD.
 //! \param value Default float value to add.
 //! \param semver Semantic version number this default entry is valid from. NULL indicates
 //!     the semantic verssion number 1.0.0
@@ -340,7 +340,7 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
 //! \brief Gather all default entries on the context into a collection.
 //!
 //! The supported context for this function is the DISIR_CONTEXT_KEYVAL,
-//! whose root context must be a DISIR_CONTEXT_SCHEMA.
+//! whose root context must be a DISIR_CONTEXT_MOLD.
 //!
 //! \param[in] context Input KEYVAL context to retrieve all default contexts from.
 //! \param[out] collection Output collection populated with default contexts of input context.
@@ -371,7 +371,7 @@ enum disir_status dc_set_value (dc_t *context, const char *value, int32_t value_
 //!     or if value_size is less or equal to zero.
 //! \return DISIR_STATUS_NO_CAN_DO if one cannot add a value string to this context.
 //! \return DISIR_STATUS_WRONG_CONTEXT if root context is not CONFIG.
-//! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a schema equivalent.
+//! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a mold equivalent.
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_set_value_string (dc_t *context, const char *value, int32_t value_size);
@@ -450,7 +450,7 @@ enum disir_status dc_get_deprecrated (dc_t *context, struct semantic_version *se
 //! \param[in] context Parent context to collect child elements from.
 //!     Must be of context ype:
 //!         * DISIR_CONTEXT_CONFIG
-//!         * DISIR_CONTEXT_SCHEMA
+//!         * DISIR_CONTEXT_MOLD
 //!         * DISIR_CONTEXT_SECTION
 //! \param[out] collection Output collection, if return status is DISIR_STATUS_OK
 //!
@@ -530,7 +530,7 @@ enum disir_status dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t
 //!
 //! Supported contexts are:
 //!     * DISIR_CONTEXT_CONFIG
-//!     * DISIR_CONTEXT_SCHEMA
+//!     * DISIR_CONTEXT_MOLD
 //!
 //! \param[in] context To retrieve version from.
 //! \param[out] Semantic version structure to populate the version of context.
@@ -545,14 +545,14 @@ enum disir_status dc_get_version (dc_t *context, struct semantic_version *semver
 //!
 //! Supported contexts are:
 //!     * DISIR_CONTEXT_CONFIG
-//!     * DISIR_CONTEXT_SCHEMA
+//!     * DISIR_CONTEXT_MOLD
 //!
 //! \param[in] context The context to set version on
 //! \param[in] semver Semantic version structure to get version from
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if context or semver are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if context is not of supported type.
-//! \return DISIR_STATUS_CONFLICTING_SEMVER if semver is higher than schema semver when
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if semver is higher than mold semver when
 //!     applied to a DISIR_CONTEXT_CONFIG context.
 //! \return DISRI_STATUS_OK on success.
 //!
@@ -573,7 +573,7 @@ dc_t * dc_config_getcontext (struct disir_config *config);
 
 //! \brief Get the version number of this config.
 //!
-//! \param[in] config Input schema to retrieve semver for
+//! \param[in] config Input mold to retrieve semver for
 //! \param[out] semver Output structure populated with the semver of config.
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if config or semver are NULL
@@ -583,14 +583,14 @@ enum disir_status
 dc_config_get_version (struct disir_config *config, struct semantic_version *semver);
 
 
-//! \brief Begin construction of a CONFIG context based on the passed schema.
+//! \brief Begin construction of a CONFIG context based on the passed mold.
 //!
-//! \param[in] schema Input schema that this CONFIG object shall represent.
+//! \param[in] mold Input mold that this CONFIG object shall represent.
 //! \param[out] config Output CONFIG context object.
 //!
 //! \return DISIR_STATUS_OK on success
 //!
-enum disir_status dc_config_begin (struct disir_schema *schema, dc_t **config);
+enum disir_status dc_config_begin (struct disir_mold *mold, dc_t **config);
 
 //! \brief Finalize the construction of a DISIR_CONTEXT_CONFIG
 //!
@@ -606,32 +606,32 @@ enum disir_status dc_config_finalize (dc_t **context, struct disir_config **conf
 // Schema related context API
 //
 
-//! Retrieve the context associated with an already constructed disir_schema.
-//! This context may be used to manipulate or query the schema object.
-dc_t * dc_schema_getcontext (struct disir_schema *schema);
+//! Retrieve the context associated with an already constructed disir_mold.
+//! This context may be used to manipulate or query the mold object.
+dc_t * dc_mold_getcontext (struct disir_mold *mold);
 
-//! \brief Get the version number of this schema.
+//! \brief Get the version number of this mold.
 //!
-//! \param[in] schema Input schema to retrieve semver for
-//! \param[out] semver Output structure populated with the semver of schema.
+//! \param[in] mold Input mold to retrieve semver for
+//! \param[out] semver Output structure populated with the semver of mold.
 //!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if schema or semver are NULL
+//! \return DISIR_STATUS_INVALID_ARGUMENT if mold or semver are NULL
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-dc_schema_get_version (struct disir_schema *schema, struct semantic_version *semver);
+dc_mold_get_version (struct disir_mold *mold, struct semantic_version *semver);
 
-//! Construct the DISIR_CONTEXT_SCHEMA
-enum disir_status dc_schema_begin (dc_t **schema);
+//! Construct the DISIR_CONTEXT_MOLD
+enum disir_status dc_mold_begin (dc_t **mold);
 
-//! Finalize the construction of a DISIR_CONTEXT_SCHEMA, returning
-//! an allocated disir_schema object in the output parameter.
+//! Finalize the construction of a DISIR_CONTEXT_MOLD, returning
+//! an allocated disir_mold object in the output parameter.
 //! If any unfinalized descendant contexts exists,
 //! DISIR_STATUS_CONTEXT_IN_WRONG_STATE will be returned.
-//! If the context supplied is not of type DISIR_CONTEXT_SCHEMA,
+//! If the context supplied is not of type DISIR_CONTEXT_MOLD,
 //! status DISIR_STATUS_WRONG_CONTEXT will be returned.
 //! On success, DISIR_STATUS_OK is returned.
-enum disir_status dc_schema_finalize (dc_t **context, struct disir_schema **schema);
+enum disir_status dc_mold_finalize (dc_t **context, struct disir_mold **mold);
 
 #endif // _LIBDISIR_CONTEXT_H
 

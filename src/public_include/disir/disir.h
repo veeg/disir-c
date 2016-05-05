@@ -58,8 +58,8 @@ struct disir_update;
 
 //! Forward declaration of the top-level context disir_config
 struct disir_config;
-//! Forward declaration of the top-level context disir_schema
-struct disir_schema;
+//! Forward declaration of the top-level context disir_mold
+struct disir_mold;
 
 //! The different value types that may be held by differrent contexts.
 //! This enumeration also defines the explicit type of a DISIR_CONTEXT_KEYVAL.
@@ -114,17 +114,17 @@ enum disir_status
 disir_instance_destroy (struct disir **disir);
 
 
-//! \brief Generate a config at a given version from the finished schema.
+//! \brief Generate a config at a given version from the finished mold.
 //!
-//! \param[in] schema The completed schema of which to generate a config object of.
-//! \param[in] semver Version number of schema to generate config of. If NULL, highest
-//!     schema version is used for generation.
+//! \param[in] mold The completed mold of which to generate a config object of.
+//! \param[in] semver Version number of mold to generate config of. If NULL, highest
+//!     mold version is used for generation.
 //! \param[out] config Output config object allocated with generated config object.
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_generate_config_from_schema (struct disir_schema *schema, struct semantic_version *semver,
+disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
                                    struct disir_config **config);
 
 //! \brief Update the config 0bject to a new target version
@@ -144,7 +144,7 @@ disir_generate_config_from_schema (struct disir_schema *schema, struct semantic_
 //! the operation is done.
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if config or update are NULL.
-//! \return DISIR_STATUS_CONFLICTING_SEMVER if the config version is higher than schema version.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if the config version is higher than mold version.
 //! \return DISIR_STATUS_NO_CAN_DO if the config and target are of equal version.
 //! \return DISIR_STATUS_NO_MEMORY if memory allocation failed internally.
 //! \return DISIR_STATUS_CONFLICT if there exists a conflicting keyval that requires
@@ -161,7 +161,7 @@ disir_update_config (struct disir_config *config,
 //!
 enum disir_status
 disir_update_conflict (struct disir_update *update, const char **name,
-                       const char **keyval, const char **schema);
+                       const char **keyval, const char **mold);
 
 //! \brief Resolve a conflict in an update with the new value
 //!

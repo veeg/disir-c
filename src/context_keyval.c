@@ -11,7 +11,7 @@
 #include "context_private.h"
 #include "keyval.h"
 #include "config.h"
-#include "schema.h"
+#include "mold.h"
 #include "section.h"
 #include "log.h"
 
@@ -33,7 +33,7 @@ dx_keyval_begin (dc_t *parent, dc_t **keyval)
         // Already logged
         return status;
     }
-    status = CONTEXT_TYPE_CHECK (parent, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SCHEMA,
+    status = CONTEXT_TYPE_CHECK (parent, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_MOLD,
                                  DISIR_CONTEXT_SECTION);
     if (status != DISIR_STATUS_OK)
     {
@@ -42,8 +42,8 @@ dx_keyval_begin (dc_t *parent, dc_t **keyval)
     }
 
     // TODO: Capability / sanity check?
-    // XXX: if parents grantparent is CONTEXT_CONFIG, check parent's schema reference
-    // XXX: Should all these context have a direct schema pointer? To its equivilant schema
+    // XXX: if parents grantparent is CONTEXT_CONFIG, check parent's mold reference
+    // XXX: Should all these context have a direct mold pointer? To its equivilant mold
     //  entry?
 
     context = dx_context_create (DISIR_CONTEXT_KEYVAL);
@@ -95,9 +95,9 @@ dx_keyval_finalize (dc_t **keyval)
         storage = (*keyval)->cx_parent_context->cx_section->se_elements;
         break;
     }
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
     {
-        storage = (*keyval)->cx_parent_context->cx_schema->sc_elements;
+        storage = (*keyval)->cx_parent_context->cx_mold->mo_elements;
         break;
     }
     default:

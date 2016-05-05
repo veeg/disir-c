@@ -7,7 +7,7 @@
 #include <disir/io.h>
 
 #include "log.h"
-#include "schema.h"
+#include "mold.h"
 #include "config.h"
 
 enum disir_status
@@ -175,14 +175,14 @@ error:
 }
 
 enum disir_status
-dio_ini_schema_write (const char *id, struct disir_schema *schema)
+dio_ini_mold_write (const char *id, struct disir_mold *mold)
 {
-    fprintf (stderr, "Output does not support outputting schemas in INI format.\n");
+    fprintf (stderr, "Output does not support outputting molds in INI format.\n");
     return DISIR_STATUS_NO_CAN_DO;
 }
 
 enum disir_status
-dio_ini_config_read (const char *id, struct disir_schema *schema, struct disir_config **config)
+dio_ini_config_read (const char *id, struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
     FILE *file;
@@ -211,7 +211,7 @@ dio_ini_config_read (const char *id, struct disir_schema *schema, struct disir_c
         return DISIR_STATUS_INVALID_ARGUMENT; // XXX
     }
 
-    status = dc_config_begin (schema, &config_context);
+    status = dc_config_begin (mold, &config_context);
     if (status != DISIR_STATUS_OK)
     {
         fprintf (stderr, "Failed to begin config: %s", disir_status_string (status));
@@ -371,9 +371,9 @@ error:
 }
 
 enum disir_status
-dio_ini_schema_read (const char *id, struct disir_schema **schema)
+dio_ini_mold_read (const char *id, struct disir_mold **mold)
 {
-    fprintf (stderr, "Input does not support reading schemas in INI format.\n");
+    fprintf (stderr, "Input does not support reading molds in INI format.\n");
     return DISIR_STATUS_NO_CAN_DO;
 }
 
@@ -386,14 +386,14 @@ dio_register_ini (struct disir *disir)
 
 
     status = disir_register_output (disir, "INI", "Output to filesystem in INI format.",
-                                    dio_ini_config_write, dio_ini_schema_write);
+                                    dio_ini_config_write, dio_ini_mold_write);
     if (status != DISIR_STATUS_OK)
     {
         log_error ("registering output INI failed with errenous condition: %s",
                    disir_status_string (status));
     }
     status = disir_register_input (disir, "INI", "Input from filesystem in INI format.",
-                                    dio_ini_config_read, dio_ini_schema_read);
+                                    dio_ini_config_read, dio_ini_mold_read);
     if (status != DISIR_STATUS_OK)
     {
         log_error ("registering input INI failed with errenous condition: %s",

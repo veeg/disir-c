@@ -9,7 +9,7 @@ struct disir
     struct disir_input      *dio_input_queue;
     struct disir_output     *dio_output_queue;
 
-    struct disir_schema     *internal_schema;
+    struct disir_mold     *internal_mold;
 };
 
 struct disir_input
@@ -22,8 +22,8 @@ struct disir_input
     //! Read a config object
     config_read config;
 
-    //! Read a schema object
-    schema_read schema;
+    //! Read a mold object
+    mold_read mold;
 
     struct disir_input *next, *prev;
 };
@@ -38,8 +38,8 @@ struct disir_output
     //! Write a config object
     config_write config;
 
-    //! Write a schema object
-    schema_write schema;
+    //! Write a mold object
+    mold_write mold;
 
     struct disir_output *next, *prev;
 };

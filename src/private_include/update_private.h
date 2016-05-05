@@ -19,7 +19,7 @@ struct disir_update
     //! Conflict state - NULL when no conflict
     struct disir_keyval         *up_keyval;
     char                        *up_config_value;
-    char                        *up_schema_value;
+    char                        *up_mold_value;
 };
 
 #endif // _LIBDISIR_UPDATE_PRIVATE_H

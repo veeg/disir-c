@@ -63,7 +63,7 @@ struct disir_context
         struct disir_config         *cx_config;
         struct disir_default        *cx_default;
         struct disir_section        *cx_section;
-        struct disir_schema         *cx_schema;
+        struct disir_mold         *cx_mold;
         struct disir_group          *cx_group;
         struct disir_keyval         *cx_keyval;
         struct disir_documentation  *cx_documentation;
@@ -75,7 +75,7 @@ struct disir_context
     //! Root context to this context.
     //! A root context may only be one of:
     //!     * DISIR_CONTEXT_CONFIG
-    //!     * DISIR_CONTEXT_SCHEMA
+    //!     * DISIR_CONTEXT_MOLD
     dc_t                        *cx_root_context;
 
 
@@ -161,21 +161,21 @@ dc_t * dx_context_create (enum disir_context_type type);
 //! Free an allocated disir_context
 void dx_context_destroy (dc_t **context);
 
-//! \brief Associate the input config related context with its equiv schema related context
+//! \brief Associate the input config related context with its equiv mold related context
 //!
 //! The input context must have root CONFIG context, where valid contexts are:
 //!     * DISIR_CONTEXT_KEYVAL
 //!     * DISIR_CONTEXT_SECTION
 //!
 //! \param context The input context whose root is CONFIG
-//! \param value The value used to locate the schema equivalent
+//! \param value The value used to locate the mold equivalent
 //! \param value_size Bytes inputted in value
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if context or value are NULL, if value_size is
-//!     less or equal to zero, or if the input value is not associated in the schema.
+//!     less or equal to zero, or if the input value is not associated in the mold.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dx_set_schema_equiv (dc_t *context, const char *value, int32_t value_size);
+enum disir_status dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size);
 
 
 //! Check that the passed context is either of the passed

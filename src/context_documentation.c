@@ -14,7 +14,7 @@
 #include "context_private.h"
 #include "util_private.h"
 #include "config.h"
-#include "schema.h"
+#include "mold.h"
 #include "keyval.h"
 #include "documentation.h"
 #include "mqueue.h"
@@ -38,9 +38,9 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
 
     switch(dc_type (parent))
     {
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
     {
-        doc_queue = &(parent->cx_schema->sc_documentation_queue);
+        doc_queue = &(parent->cx_mold->mo_documentation_queue);
         break;
     }
     case DISIR_CONTEXT_KEYVAL:
@@ -102,9 +102,9 @@ dx_documentation_numentries (dc_t *context)
 
     switch (dc_type (context))
     {
-    case DISIR_CONTEXT_SCHEMA:
+    case DISIR_CONTEXT_MOLD:
     {
-        queue = context->cx_schema->sc_documentation_queue;
+        queue = context->cx_mold->mo_documentation_queue;
         break;
     }
     case DISIR_CONTEXT_KEYVAL:
@@ -201,7 +201,7 @@ dc_get_documentation (dc_t *context, struct semantic_version *semver,
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
                                           DISIR_CONTEXT_CONFIG,
                                           DISIR_CONTEXT_SECTION,
-                                          DISIR_CONTEXT_SCHEMA);
+                                          DISIR_CONTEXT_MOLD);
     if (status != DISIR_STATUS_OK)
     {
         dx_log_context (context, "cannot fetch documentation for context.");
@@ -218,8 +218,8 @@ dc_get_documentation (dc_t *context, struct semantic_version *semver,
     case DISIR_CONTEXT_KEYVAL:
         doc_parent = &context->cx_keyval->kv_documentation_queue;
         break;
-    case DISIR_CONTEXT_SCHEMA:
-        doc_parent = &context->cx_schema->sc_documentation_queue;
+    case DISIR_CONTEXT_MOLD:
+        doc_parent = &context->cx_mold->mo_documentation_queue;
         break;
     default:
     {
@@ -403,9 +403,9 @@ dx_documentation_destroy (struct disir_documentation **documentation)
 
         switch (dc_type (context))
         {
-        case DISIR_CONTEXT_SCHEMA:
+        case DISIR_CONTEXT_MOLD:
         {
-            queue = &(context->cx_schema->sc_documentation_queue);
+            queue = &(context->cx_mold->mo_documentation_queue);
             break;
         }
         case DISIR_CONTEXT_KEYVAL:
