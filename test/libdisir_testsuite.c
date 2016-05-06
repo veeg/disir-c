@@ -12,14 +12,14 @@
 #define LOG_TEST_CONTEXT_START(context) \
     _log_disir_level(DISIR_LOG_LEVEL_TEST, \
                      "START TESTING (context: %s) %s()", \
-                     dc_type_string(context), __FUNCTION__)
+                     dc_context_type_string (context), __FUNCTION__)
 
 #define LOG_TEST_END \
     _log_disir_level(DISIR_LOG_LEVEL_TEST, "END TESTING %s()", __FUNCTION__);
 #define LOG_TEST_CONTEXT_END(context) \
     _log_disir_level(DISIR_LOG_LEVEL_TEST, \
                      "END TESTING (context: %s) %s()", \
-                     dc_type_string(context), __FUNCTION__)
+                     dc_context_type_string (context), __FUNCTION__)
 
 //! Include the individual test group source files.
 #include "test_context.c"
