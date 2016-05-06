@@ -41,6 +41,8 @@ include_directories (
     ${VOID-LIST_PUBLIC_INCLUDE_DIR}
 )
 
+set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
+
 add_definitions ("-Wall")
 add_definitions ("-Werror")
 
