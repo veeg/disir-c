@@ -95,7 +95,7 @@ test_context_destroy(void **state)
 
 
 // Test the allocator for each context type, and
-// query that dc_type returns the correct type.
+// query that dc_context_type returns the correct type.
 // Verify that the correct type returns the correct string representation.
 static void
 test_context_type(void **state)
@@ -113,35 +113,35 @@ test_context_type(void **state)
         switch (type)
         {
         case DISIR_CONTEXT_CONFIG:
-            assert_true(dc_type(context) == DISIR_CONTEXT_CONFIG);
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_CONFIG);
             assert_string_equal(dc_type_string(context), "FILE_CONFIG");
             break;
         case DISIR_CONTEXT_MOLD:
-            assert_true(dc_type(context) == DISIR_CONTEXT_MOLD);
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_MOLD);
             assert_string_equal(dc_type_string(context), "FILE_MOLD");
             break;
         case DISIR_CONTEXT_SECTION:
-            assert_true(dc_type(context) == DISIR_CONTEXT_SECTION);
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_SECTION);
             assert_string_equal(dc_type_string(context), "SECTION");
             break;
         case DISIR_CONTEXT_DOCUMENTATION:
-            assert_true(dc_type(context) == DISIR_CONTEXT_DOCUMENTATION);
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_DOCUMENTATION);
             assert_string_equal(dc_type_string(context), "DOCUMENTATION");
             break;
         case DISIR_CONTEXT_KEYVAL:
-            assert_true(dc_type(context) == DISIR_CONTEXT_KEYVAL);
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_KEYVAL);
             assert_string_equal(dc_type_string(context), "KEYVAL");
             break;
         case DISIR_CONTEXT_DEFAULT:
-            assert_true(dc_type(context) == DISIR_CONTEXT_DEFAULT);
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_DEFAULT);
             assert_string_equal(dc_type_string(context), "DEFAULT");
             break;
         case DISIR_CONTEXT_RESTRICTION:
-            assert_true(dc_type(context) == DISIR_CONTEXT_RESTRICTION);
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_RESTRICTION);
             assert_string_equal(dc_type_string(context), "RESTRICTION");
             break;
         case DISIR_CONTEXT_UNKNOWN:
-            assert_true(dc_type(context) == DISIR_CONTEXT_UNKNOWN);
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_UNKNOWN);
             assert_string_equal(dc_type_string(context), "UNKNOWN");
             break;
          // No default entry - let compiler warn us if we have not handled a case.
@@ -150,17 +150,17 @@ test_context_type(void **state)
 
     //! Zero value
     c.cx_type = 0;
-    assert_true(dc_type(context) == DISIR_CONTEXT_UNKNOWN);
+    assert_true(dc_context_type (context) == DISIR_CONTEXT_UNKNOWN);
     assert_string_equal(dc_type_string(context), "UNKNOWN");
 
     //! Negative value
     c.cx_type = -5;
-    assert_true(dc_type(context) == DISIR_CONTEXT_UNKNOWN);
+    assert_true(dc_context_type (context) == DISIR_CONTEXT_UNKNOWN);
     assert_string_equal(dc_type_string(context), "UNKNOWN");
 
     // Random waay to high value
     c.cx_type = 87634;
-    assert_true(dc_type(context) == DISIR_CONTEXT_UNKNOWN);
+    assert_true(dc_context_type (context) == DISIR_CONTEXT_UNKNOWN);
     assert_string_equal(dc_type_string(context), "UNKNOWN");
 
     LOG_TEST_END

@@ -133,9 +133,9 @@ test_context_mold_basic (void **state)
     status = dc_mold_finalize (NULL, &mold);
     assert_int_equal (status, DISIR_STATUS_INVALID_ARGUMENT);
     // Check every other context type except mold as input
-    while (dc_type (context) != DISIR_CONTEXT_UNKNOWN)
+    while (dc_context_type (context) != DISIR_CONTEXT_UNKNOWN)
     {
-        if (dc_type (context) == DISIR_CONTEXT_MOLD)
+        if (dc_context_type (context) == DISIR_CONTEXT_MOLD)
         {
             context->cx_type++;
             continue;
@@ -157,7 +157,7 @@ test_context_mold_basic (void **state)
     assert_null (mold_context);
     mold_context = dc_mold_getcontext (mold);
     assert_non_null (mold_context);
-    assert_int_equal (dc_type (mold_context), DISIR_CONTEXT_MOLD);
+    assert_int_equal (dc_context_type (mold_context), DISIR_CONTEXT_MOLD);
 
     LOG_TEST_END
 }
