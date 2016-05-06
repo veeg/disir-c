@@ -95,7 +95,7 @@ dc_config_finalize (dc_t **context, struct disir_config **config)
     if (dx_context_type_sanify ((*context)->cx_type) != DISIR_CONTEXT_CONFIG)
     {
         dx_log_context (*context, "Cannot call %s() on top-level context( %s )",
-                        __FUNCTION__, dc_type_string (*context));
+                        __FUNCTION__, dc_context_type_string (*context));
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 

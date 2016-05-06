@@ -50,7 +50,7 @@ enum disir_context_type dc_context_type (dc_t *context);
 //! parameter is ignored.
 //! If context is NULL, the returned string is equal to
 //! that if the input context were unknown.
-const char * dc_type_string (dc_t *context);
+const char * dc_context_type_string (dc_t *context);
 
 //! \brief Get the value type enumeration represented by the passed context.
 //!

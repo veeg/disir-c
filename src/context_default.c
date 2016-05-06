@@ -176,7 +176,7 @@ dx_default_destroy (struct disir_default **def)
         default:
         {
             dx_crash_and_burn ("invoked on invalid context type (%s) - impossible",
-                               dc_type_string (context));
+                               dc_context_type_string (context));
         }
         }
 
@@ -473,7 +473,7 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
         else
         {
             log_warn ("root context type unhandled: %s",
-                      dc_type_string (context->cx_root_context));
+                      dc_context_type_string (context->cx_root_context));
             return DISIR_STATUS_INTERNAL_ERROR;
         }
 

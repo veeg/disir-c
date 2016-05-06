@@ -100,7 +100,7 @@ dc_destroy (dc_t **context)
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dc_type_string (*context));
+                __FUNCTION__, dc_context_type_string (*context));
     case DISIR_CONTEXT_UNKNOWN:
         // Nothing to be done. We dont know what to do!
         break;
@@ -198,7 +198,7 @@ dc_finalize (dc_t **context)
     if (dx_context_type_is_toplevel ((*context)->cx_type))
     {
         dx_log_context (*context, "Cannot call %s() on top-level context( %s )",
-                        __FUNCTION__, dc_type_string (*context));
+                        __FUNCTION__, dc_context_type_string (*context));
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 
@@ -211,7 +211,7 @@ dc_finalize (dc_t **context)
     case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_CONFIG:
         dx_crash_and_burn ("Context %s made to to switch it should never reach",
-                dc_type_string (*context));
+                dc_context_type_string (*context));
         break;
     case DISIR_CONTEXT_KEYVAL:
         status = dx_keyval_finalize (context);
@@ -222,7 +222,7 @@ dc_finalize (dc_t **context)
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dc_type_string (*context));
+                __FUNCTION__, dc_context_type_string (*context));
     case DISIR_CONTEXT_UNKNOWN:
         status = DISIR_STATUS_BAD_CONTEXT_OBJECT;
         log_warn ("Malwormed context object: Type value( %d )", (*context)->cx_type);
@@ -343,7 +343,8 @@ dc_get_name (dc_t *context, const char **name, int32_t *name_size)
     case DISIR_CONTEXT_SECTION:
     default:
     {
-        dx_crash_and_burn ("%s: %s invoked unhandled", __FUNCTION__, dc_type_string (context));
+        dx_crash_and_burn ("%s: %s invoked unhandled",
+                           __FUNCTION__, dc_context_type_string (context));
     }
     }
 
@@ -423,7 +424,7 @@ dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dc_type_string (context));
+                __FUNCTION__, dc_context_type_string (context));
     case DISIR_CONTEXT_UNKNOWN:
         status = DISIR_STATUS_BAD_CONTEXT_OBJECT;
     // No default case - let compiler warn us of unhandled context
@@ -573,7 +574,8 @@ dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size)
     }
     else
     {
-        dx_crash_and_burn ("%s invoked with context: %s", __FUNCTION__, dc_type_string (context));
+        dx_crash_and_burn ("%s invoked with context: %s",
+                           __FUNCTION__, dc_context_type_string (context));
     }
 
     return DISIR_STATUS_OK;
@@ -605,7 +607,7 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
     }
 
     log_debug_context (context, "adding introduced to root(%s): %s",
-                       dc_type_string (context->cx_root_context),
+                       dc_context_type_string (context->cx_root_context),
                        dc_semantic_version_string (buffer, 32, &semver));
 
     // Update mold with highest version if root context is DISIR_CONTEXT_MOLD
@@ -630,7 +632,7 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dc_type_string(context));
+                __FUNCTION__, dc_context_type_string (context));
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_MOLD:
         dx_log_context (context, "invoked %s() with capability it should not have.", __FUNCTION__);
@@ -805,7 +807,7 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dc_type_string(context));
+                __FUNCTION__, dc_context_type_string (context));
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_MOLD:
         dx_log_context (context, "invoked %s() with capability it should not have.", __FUNCTION__);
@@ -877,7 +879,7 @@ dc_get_elements (dc_t *context, dcc_t **collection)
     default:
     {
         dx_crash_and_burn ("%s: %s not handled/implemented/supported",
-                           __FUNCTION__, dc_type_string (context));
+                           __FUNCTION__, dc_context_type_string (context));
     }
     }
 

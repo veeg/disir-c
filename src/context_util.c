@@ -56,7 +56,7 @@ dc_context_type (dc_t *context)
 
 //! PUBLIC API
 const char *
-dc_type_string (dc_t *context)
+dc_context_type_string (dc_t *context)
 {
     return disir_context_type_string[dc_context_type (context)];
 }
@@ -333,7 +333,7 @@ dx_context_sp_full_check_log_error (dc_t *context, const char *function_name)
     if (context->cx_state == CONTEXT_STATE_DESTROYED)
     {
         dx_log_context (context, "%s() invoked on destroyed context %s",
-                function_name, dc_type_string (context));
+                function_name, dc_context_type_string (context));
         return DISIR_STATUS_DESTROYED_CONTEXT;
     }
 
@@ -533,7 +533,7 @@ dc_set_value_type (dc_t *context, enum disir_value_type type)
     }
     default:
     {
-        dx_crash_and_burn ("%s: %s not handled", __FUNCTION__, dc_type_string (context));
+        dx_crash_and_burn ("%s: %s not handled", __FUNCTION__, dc_context_type_string (context));
         return DISIR_STATUS_INTERNAL_ERROR; // not reached
     }
     }

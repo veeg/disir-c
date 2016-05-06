@@ -51,7 +51,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
     case DISIR_CONTEXT_SECTION:
     {
         dx_crash_and_burn ("%s: %s unhandled not implemented",
-                           __FUNCTION__, dc_type_string (parent));
+                           __FUNCTION__, dc_context_type_string (parent));
         break;
     }
     case DISIR_CONTEXT_CONFIG:
@@ -115,7 +115,7 @@ dx_documentation_numentries (dc_t *context)
     case DISIR_CONTEXT_SECTION:
     {
         dx_crash_and_burn ("%s: %s unhandled not implemented",
-                           __FUNCTION__, dc_type_string (context));
+                           __FUNCTION__, dc_context_type_string (context));
         break;
     }
     case DISIR_CONTEXT_CONFIG:
@@ -223,7 +223,7 @@ dc_get_documentation (dc_t *context, struct semantic_version *semver,
         break;
     default:
     {
-        dx_crash_and_burn ("%s: %s unhandled", __FUNCTION__, dc_type_string (context));
+        dx_crash_and_burn ("%s: %s unhandled", __FUNCTION__, dc_context_type_string (context));
     }
     }
 
@@ -416,7 +416,7 @@ dx_documentation_destroy (struct disir_documentation **documentation)
         case DISIR_CONTEXT_SECTION:
         {
             dx_crash_and_burn ("%s: %s unhandled not implemented",
-                           __FUNCTION__, dc_type_string (context));
+                           __FUNCTION__, dc_context_type_string (context));
             break;
         }
         case DISIR_CONTEXT_CONFIG:
@@ -427,7 +427,8 @@ dx_documentation_destroy (struct disir_documentation **documentation)
         {
             // These types do not accept a documentation entry
             // No default - let compiler handle unreferenced context type
-            dx_crash_and_burn ("invoked on invalid context type (%s)", dc_type_string (context));
+            dx_crash_and_burn ("invoked on invalid context type (%s)",
+                               dc_context_type_string (context));
         }
         }
 

@@ -206,7 +206,7 @@ dx_log_disir (enum disir_log_level dll,
     if (context)
     {
         //! Prepare the log prefix message.
-        res = snprintf (buffer, prefix_size, "Context[%s]", dc_type_string (context));
+        res = snprintf (buffer, prefix_size, "Context[%s]", dc_context_type_string (context));
         if (res > 0 || res < prefix_size)
         {
             buffer[res] = '\0';

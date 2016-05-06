@@ -103,7 +103,7 @@ dx_keyval_finalize (dc_t **keyval)
     default:
     {
         dx_crash_and_burn ("%s: %s not supported - Impossible", __FUNCTION__,
-                           dc_type_string ((*keyval)->cx_parent_context));
+                           dc_context_type_string ((*keyval)->cx_parent_context));
     }
     }
 
