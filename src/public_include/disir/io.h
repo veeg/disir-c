@@ -16,7 +16,7 @@ typedef enum disir_status (*config_read) (const char *id, struct disir_mold *mol
 //! \brief Function signature for outputting disir_config to external source.
 //!
 //! \param[in] id String identifier for the config file to write.
-//! \parm[in] config The config object to persist to 'id' locatiton.
+//! \param[in] config The config object to persist to 'id' locatiton.
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
@@ -34,7 +34,7 @@ typedef enum disir_status (*mold_read) (const char *id, struct disir_mold **mold
 //! \brief Function signature for outputting disir_mold to external source.
 //!
 //! \param[in] id String identifier for the mold file to write.
-//! \param[int] mold The mold object to presist to 'id' location.
+//! \param[in] mold The mold object to presist to 'id' location.
 //!
 //! \return DISIR_STATUS_OK on success
 //!

@@ -3,12 +3,19 @@
 
 #include <disir/disir.h>
 
-//! \struct semantic_version provides a dedicated data type
-//! to represent semantically versioned objects.
+//! \brief Structure represents a semantic version number.
+//!
+//! A semantic version number is used to denote the version
+//! of any key element within disir is either introduced or deprecrated.
+//! An often used abbreviation for semantic version is semver.
+//!
 struct semantic_version
 {
+    //! The major number component of a semantic version number.
     uint32_t    sv_major;
+    //! The minor number component of a semantic version number.
     uint32_t    sv_minor;
+    //! The patch number component of a semantic version number.
     uint32_t    sv_patch;
 };
 

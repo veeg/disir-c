@@ -3,9 +3,8 @@
 
 #include <stdint.h>
 
-//! The public interface for libdisir
 
-//! libdisir status return codes
+//! \brief Status return codes returned by most libdisir API functions.
 enum disir_status
 {
     //! Ooperation successful
@@ -50,12 +49,10 @@ enum disir_status
 
 };
 
-//! Forward declare the disir main object
+//! Forward declare the main disir object
 struct disir;
-
 //! Forward declare the disir_update object
 struct disir_update;
-
 //! Forward declaration of the top-level context disir_config
 struct disir_config;
 //! Forward declaration of the top-level context disir_mold
@@ -75,6 +72,7 @@ enum disir_value_type
 };
 
 //! The different restrictions that can be held by a DISIR_CONTEXT_RESTRICTION
+//! TODO: Implement restrictions
 enum disir_restriction
 {
     DISIR_RESTRICTION_VALUE = 1,
@@ -92,7 +90,7 @@ const char * disir_status_string (enum disir_status status);
 
 //! \brief Allocate a new libdisir instance
 //!
-//! \param[in,out] Pointer will be populated with the address of the allocated instance.
+//! \param[in,out] disir Pointer will be populated with the address of the allocated instance.
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if the input address is NULL
 //! \return DISIR_STATUS_NO_MEMORY if memory allocation failed.

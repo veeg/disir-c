@@ -21,7 +21,9 @@ typedef struct disir_context dc_t;
 //! Different types of disir_contexts that are available.
 enum disir_context_type
 {
+    //! Top-level context - product of a MOLD
     DISIR_CONTEXT_CONFIG = 1,
+    //! Top-level context - describes a CONFIG
     DISIR_CONTEXT_MOLD,
     DISIR_CONTEXT_SECTION,
     DISIR_CONTEXT_KEYVAL,
@@ -29,6 +31,7 @@ enum disir_context_type
     DISIR_CONTEXT_DEFAULT,
     DISIR_CONTEXT_RESTRICTION,
 
+    //! Sentinel context - not a valid context.
     DISIR_CONTEXT_UNKNOWN, // Must be last entry in enumeration
 };
 
@@ -83,35 +86,52 @@ const char * dc_value_type_string (dc_t *context);
 // Base context API
 //
 
-//! Start the construction of a new context as a child of parent.
+//! \brief Start the construction of a new context as a child of parent.
+//!
+//! Top-level contexts cannot be added as children of other contexts.
 //! No state is altered in the parent until dc_finalize() is called.
+//!
 //! \param parent is the parent context to which a child shall be added.
-//! \param context_type determines the type of context for the child.
-//!     Top-level contexts cannot be added as children of other contexts.
+//! \param context_type The type of context for the child.
+//! \param child Output pointer is populated with the allocated context.
+//!
 //! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context type is submitted.
 //! \return DISIR_STATUS_OK when everything is OK!
+//!
 enum disir_status dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child);
 
-//! Destroy the object pointed to by this context.
-//! This will delete all children objects.
-//! If any of the contexts, children or this one,
-//! is referenced by any other pointers, the context will
-//! turn INVALID and every operation attempted will result
-//! in a DISIR_STATUS_INVALID_CONTEXT status code.
-//! If a context pointer is INVALID, dc_destroy() must be invoked
-//! on it to decrement the reference count.
+//! \brief Destroy the object pointed to by this context.
+//!
+//! This will delete all children objects. If any of the contexts, children or this one,
+//! is referenced by any other pointers, the context will turn INVALID
+//! and every operation attempted will result in a DISIR_STATUS_INVALID_CONTEXT status code.
+//! If a context pointer is INVALID, dc_destroy() must be invoked on it to
+//! decrement the reference count.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
 enum disir_status dc_destroy (dc_t **context);
 
-//! Submit all state built on the passed context to the parent.
-//! On DISIR_STATUS_OK, context pointer is invalidated and set to NULL.
+//! \brief Submit the context to the parent.
+//!
+//! If any invalid state or missing elements that are required is not present
+//! in the context, an appropriate status code is returned.
+//! Upon success, the input context pointer is set to NULL.
+//!
+//! \return DISIR_STATUS_OK on success, context pointer is invalidated and set to NULL.
+//!
 enum disir_status dc_finalize (dc_t **context);
 
-//! When a context is not in 'constructing' mode,
-//! any context returned is referenced counted.
-//! When you are finished with a non-constructing mode context,
-//! please put it back.
+//! \brief Put away a context obtained while querying a parent context.
+//!
+//! Contexts, who have yet to be finalized and are made available through any
+//! querying interface, are referenced counted when made available.
+//! To balance the reference count, the caller is required to put the context back
+//! to the disir library after he is finished operating on it.
+//!
 //! \return DISIR_STATUS_CONTEXT_IN_WRONG_STATE if context is not in constructing mode
 //! \return DISIR_STATUS_OK when successful. Passed context pointer is set tp NULL.
+//!
 enum disir_status dc_putcontext (dc_t **context);
 
 
@@ -119,7 +139,8 @@ enum disir_status dc_putcontext (dc_t **context);
 // Documentation context API
 //
 
-//! Add a documentation string to an entry.
+//! \brief Add a documentation string to an entry.
+//!
 //! This will have the default introduced semver.
 //! This is a shortcut between opening a new context,
 //! adding value before finalizing it.
@@ -129,10 +150,15 @@ enum disir_status dc_putcontext (dc_t **context);
 //!     * GROUP
 //!     * CONFIG
 //!     * MOLD
-//! If an unsupported context is provided, DISIR_STATUS_WRONG_CONTEXT
-//! is returned. If a documention entry already exists for this element,
-//! DISIR_STATUS_EXISTS will be returned.
-//! On success, DISIR_STATUS_OK is returned.
+//!
+//! \param context The input context to add documentation to.
+//! \param doc The documentation string
+//! \param doc_size The size of the `doc` string.
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context is provided.
+//! \return DISIR_STATUS_EXISTS  if a documentation entry already exists.
+//! \return DISIR_STATUS_OK on success.
+//!
 enum disir_status dc_add_documentation (dc_t *context, const char *doc, int32_t doc_size);
 
 //! \brief Get the documentation entry for a given semver on the context.
@@ -174,7 +200,7 @@ enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *
 //!
 //! \param context Context to set the name attribute on.
 //! \param name The input name to associate with the context.
-//! \param name_size Size in bytes of the input name. Does not include null terminator.
+//! \param name_size Size in bytes of the input `name`. Does not include null terminator.
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if name or name_size are zero
 //! \return DISIR_STATUS_NO_CAN_DO if an unsupported context type
@@ -191,8 +217,8 @@ enum disir_status dc_set_name (dc_t *context, const char *name, int32_t name_siz
 //!     * DISIR_CONTEXT_SECTION
 //!
 //! \param[in] context Context to get name attribute from
-//! \param[out] Pointer will be re-directed to the name constant
-//! \param[out] Address is populated wth the output name size in bytes. May be NULL.
+//! \param[out] name Pointer will be re-directed to the `name` constant pointer.
+//! \param[out] name_size Address is populated wth the output `name` size in bytes. May be NULL.
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if context or name are NULL pointers.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not of the supported types.
@@ -200,14 +226,20 @@ enum disir_status dc_set_name (dc_t *context, const char *name, int32_t name_siz
 //!
 enum disir_status dc_get_name (dc_t *context, const char **name, int32_t *name_size);
 
-//! Add an introduced semantic version number to an entry.
-//! One can only add an introduced semver to a context who is in construction mode.
-//! Add a deprecrated semantic version number to an entry.
-//! Depending on the context, checks for compatabilit with existing
-//! elements in the parent may result in an errornous condition.
-//! DISIR_STATUS_EXISTS is returned if an introduced entry already exists.
-//! DISIR_STATUS_OK is returned on success.
+//! \brief Add an introduced semantic version number to a context.
+//!
+//! \return DISIR_STATUS_EXISTS is returned if an introduced entry already exists.
+//! \return DISIR_STATUS_OK on success.
+//!
 enum disir_status dc_add_introduced(dc_t *context, struct semantic_version semver);
+
+//! \brief Add a deprecrated semantic version number to a context.
+//!
+//! TODO: Implement me
+//!
+//! \return DISIR_STATUS_EXISTS is returned if an deprecrated entry already exists.
+//! \return DISIR_STATUS_OK on success.
+//!
 enum disir_status dc_add_deprecrated(dc_t *context, struct semantic_version smever);
 
 
@@ -221,8 +253,8 @@ enum disir_status dc_add_deprecrated(dc_t *context, struct semantic_version smev
 //! DISIR_CONTEXT_KEYVAL: Cannot have any default entries on it.
 //!     Can only set type if the toplevel context is DISIR_CONTEXT_MOLD
 //!
-//! \return DISIR_STATUS_OK the input 'context' was succesfuly populated with value type 'type'
-//! \return DISIR_STATUS_INVALID_ARGUMENT if context is NULL or type is out-of-bounds
+//! \return DISIR_STATUS_OK the input `context` was succesfuly populated with value type `type`
+//! \return DISIR_STATUS_INVALID_ARGUMENT if `context` is NULL or `type` is out-of-bounds
 //!
 enum disir_status dc_set_value_type (dc_t *context, enum disir_value_type type);
 
@@ -533,10 +565,10 @@ enum disir_status dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t
 //!     * DISIR_CONTEXT_MOLD
 //!
 //! \param[in] context To retrieve version from.
-//! \param[out] Semantic version structure to populate the version of context.
+//! \param[out] semver Semantic version structure to populate the version of `context`.
 //!
-//! \return DISIR_STATUS_INVALID_ARUGMENT if context or semver are NULL.
-//! \return DISIR_STATUS_WRONG_CONTEXT if context is not of supported type.
+//! \return DISIR_STATUS_INVALID_ARUGMENT if `context` or `semver` are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context` is not of supported type.
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_get_version (dc_t *context, struct semantic_version *semver);
