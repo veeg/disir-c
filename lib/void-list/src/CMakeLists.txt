@@ -22,6 +22,8 @@ add_library (${PROJECT_NAME} STATIC ${LIST_SOURCES})
 
 include_directories (${VOID-LIST_PUBLIC_INCLUDE_DIR})
 
+set_target_properties (${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-fPIC")
+
 add_definitions ("-Wall")
 add_definitions ("-Werror")
 
