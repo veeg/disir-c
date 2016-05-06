@@ -31,8 +31,9 @@ set (LIBDISIR_PRIVATE_INCLUDE_DIR
     CACHE INTERNAL "${PROJECT_NAME}: Private include directory" FORCE
 )
 
-# Define a static libdisir library
-add_library(${PROJECT_NAME} STATIC ${_LIBDISIR_SOURCES})
+set (PROJECT_SO_LIBRARY disir)
+# Define shared library
+add_library(${PROJECT_SO_LIBRARY} SHARED ${_LIBDISIR_SOURCES})
 
 include_directories (
     ${LIBDISIR_PUBLIC_INCLUDE_DIR}
@@ -46,10 +47,10 @@ set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
 add_definitions ("-Wall")
 add_definitions ("-Werror")
 
-target_link_libraries (${PROJECT_NAME} void-multimap)
-target_link_libraries (${PROJECT_NAME} void-list)
+target_link_libraries (${PROJECT_SO_LIBRARY} void-multimap)
+target_link_libraries (${PROJECT_SO_LIBRARY} void-list)
 
-install (TARGETS ${PROJECT_NAME}
+install (TARGETS ${PROJECT_SO_LIBRARY}
     EXPORT ${EXPORT_TARGET}
     ARCHIVE DESTINATION lib
     LIBRARY DESTINATION lib
