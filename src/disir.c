@@ -160,7 +160,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
 
     while (dc_collection_next (collection, &parent) != DISIR_STATUS_EXHAUSTED)
     {
-        status = dc_begin (config_context, dc_type (parent), &context);
+        status = dc_begin (config_context, dc_context_type (parent), &context);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged

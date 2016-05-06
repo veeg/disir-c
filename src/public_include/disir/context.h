@@ -42,7 +42,7 @@ enum disir_context_type
 
 //! Return the disir_context_type associated with the passed
 //! DISIR_CONTEXT.
-enum disir_context_type dc_type (dc_t *context);
+enum disir_context_type dc_context_type (dc_t *context);
 
 //! Return a string representation of the passed context.
 //! type_string_size is populated with the size in octets for

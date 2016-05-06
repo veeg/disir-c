@@ -36,7 +36,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
 
     log_info_context (parent, "Adding documentation entry to context,");
 
-    switch(dc_type (parent))
+    switch(dc_context_type (parent))
     {
     case DISIR_CONTEXT_MOLD:
     {
@@ -100,7 +100,7 @@ dx_documentation_numentries (dc_t *context)
 {
     struct disir_documentation *queue;
 
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_MOLD:
     {
@@ -213,7 +213,7 @@ dc_get_documentation (dc_t *context, struct semantic_version *semver,
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_KEYVAL:
         doc_parent = &context->cx_keyval->kv_documentation_queue;
@@ -401,7 +401,7 @@ dx_documentation_destroy (struct disir_documentation **documentation)
     {
         context = context->cx_parent_context;
 
-        switch (dc_type (context))
+        switch (dc_context_type (context))
         {
         case DISIR_CONTEXT_MOLD:
         {

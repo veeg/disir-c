@@ -46,7 +46,7 @@ const char *disir_capability_string[] = {
 
 //! PUBLIC API
 enum disir_context_type
-dc_type (dc_t *context)
+dc_context_type (dc_t *context)
 {
     if (context == NULL)
         return DISIR_CONTEXT_UNKNOWN;
@@ -58,7 +58,7 @@ dc_type (dc_t *context)
 const char *
 dc_type_string (dc_t *context)
 {
-    return disir_context_type_string[dc_type (context)];
+    return disir_context_type_string[dc_context_type (context)];
 }
 
 //! INTERNAL API
@@ -109,7 +109,7 @@ dc_value_type (dc_t *context)
     }
 
     value_type = DISIR_VALUE_TYPE_UNKNOWN;
-    context_type = dc_type (context);
+    context_type = dc_context_type (context);
 
     if (context_type == DISIR_CONTEXT_DEFAULT)
         value_type = context->cx_default->de_value.dv_type;
@@ -522,7 +522,7 @@ dc_set_value_type (dc_t *context, enum disir_value_type type)
     }
 
     status = DISIR_STATUS_OK;
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_KEYVAL:
     {
@@ -568,7 +568,7 @@ dc_get_value_type (dc_t *context, enum disir_value_type *type)
     }
 
     status = DISIR_STATUS_OK;
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_DEFAULT:
         *type = context->cx_default->de_value.dv_type;

@@ -44,7 +44,7 @@ dx_default_begin (dc_t *parent, dc_t **def)
         // Already logged
         return status;
     }
-    if (dc_type (parent->cx_root_context) != DISIR_CONTEXT_MOLD)
+    if (dc_context_type (parent->cx_root_context) != DISIR_CONTEXT_MOLD)
     {
         dx_log_context (parent, "Cannot add default to a KEYVAL whose root is not a MOLD");
         return DISIR_STATUS_WRONG_CONTEXT;
@@ -166,7 +166,7 @@ dx_default_destroy (struct disir_default **def)
     context = tmp->de_context;
     if (context && context->cx_parent_context)
     {
-        switch (dc_type (context->cx_parent_context))
+        switch (dc_context_type (context->cx_parent_context))
         {
         case DISIR_CONTEXT_KEYVAL:
         {
@@ -459,14 +459,14 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
     }
 
     // Get the default entry associated with the input keyval
-    if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
+    if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
     {
-        if (dc_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+        if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
             // Get the mold
             keyval = context->cx_keyval->kv_mold_equiv;
         }
-        else if (dc_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
+        else if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
         {
             keyval = context;
         }
@@ -479,7 +479,7 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
 
         dx_default_get_active (keyval, semver, &def);
     }
-    else if (dc_type (context) == DISIR_CONTEXT_DEFAULT)
+    else if (dc_context_type (context) == DISIR_CONTEXT_DEFAULT)
     {
         def = context->cx_default;
     }
@@ -506,7 +506,7 @@ dc_get_default_contexts (dc_t *context, dcc_t **collection)
     {
         return status;
     }
-    if (dc_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
     {
         dx_log_context (context, "cannot get defaults for KEYVAL not associated with a mold.");
         return DISIR_STATUS_WRONG_CONTEXT;

@@ -83,7 +83,7 @@ dx_keyval_finalize (dc_t **keyval)
     }
 
     // Get parent element storage
-    switch (dc_type ((*keyval)->cx_parent_context))
+    switch (dc_context_type ((*keyval)->cx_parent_context))
     {
     case DISIR_CONTEXT_CONFIG:
     {

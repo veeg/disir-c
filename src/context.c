@@ -80,7 +80,7 @@ dc_destroy (dc_t **context)
 
     // Call destroy on the object pointed to by context.
     // This shall destroy the element, and every single child.
-    switch (dc_type (*context))
+    switch (dc_context_type (*context))
     {
     case DISIR_CONTEXT_CONFIG:
         status = dx_config_destroy (&((*context)->cx_config));
@@ -278,7 +278,7 @@ dc_set_name (dc_t *context, const char *name, int32_t name_size)
         return status;
     }
 
-    if (dc_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+    if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
     {
         // Find the name in the mold
         // TODO: Should be sufficient to query the mold equiv of parent
@@ -290,11 +290,11 @@ dc_set_name (dc_t *context, const char *name, int32_t name_size)
         }
     }
 
-    if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
+    if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
     {
         status = dx_value_set_string (&context->cx_keyval->kv_name, name, name_size);
     }
-    else if (dc_type (context) == DISIR_CONTEXT_SECTION)
+    else if (dc_context_type (context) == DISIR_CONTEXT_SECTION)
     {
         dx_crash_and_burn ("%s: Implement section", __FUNCTION__);
         //status = dx_value_set_string (&context->cx_section->se_name, value, value_size);
@@ -333,7 +333,7 @@ dc_get_name (dc_t *context, const char **name, int32_t *name_size)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_KEYVAL:
     {
@@ -394,7 +394,7 @@ dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
         return DISIR_STATUS_NO_CAN_DO;
     }
 
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_DOCUMENTATION:
     {
@@ -403,7 +403,7 @@ dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
     }
     case DISIR_CONTEXT_KEYVAL:
     {
-        if (dc_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+        if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
         {
             dx_log_context (context, "cannot set value on KEYVAL whose root is not CONFIG.");
             return DISIR_STATUS_WRONG_CONTEXT;
@@ -451,7 +451,7 @@ dc_get_value (dc_t *context, int32_t output_buffer_size, char *output, int32_t *
         dx_log_context (context, "cannot get value from non KEYVAL type");
         return status;
     }
-    if (dc_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
     {
         dx_log_context (context, "cannot get value from KEYVAL context whose root is not CONFIG");
         return DISIR_STATUS_WRONG_CONTEXT;
@@ -503,16 +503,16 @@ dc_get_value_string (dc_t *context, const char **output, int32_t *size)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
+    if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
     {
-        if (dc_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+        if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
         {
             dx_log_context (context, "cannot retrieve value when root context is not CONFIG");
             return DISIR_STATUS_WRONG_CONTEXT;
         }
         status = dx_value_get_string (&context->cx_keyval->kv_value, output, size);
     }
-    else if (dc_type (context) == DISIR_CONTEXT_DOCUMENTATION)
+    else if (dc_context_type (context) == DISIR_CONTEXT_DOCUMENTATION)
     {
         status = dx_value_get_string (&context->cx_documentation->dd_value, output, size);
     }
@@ -557,7 +557,7 @@ dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size)
     // Holy Moley
     mold = context->cx_root_context->cx_config->cf_mold;
 
-    if (dc_type (context) == DISIR_CONTEXT_KEYVAL)
+    if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
     {
         status = dx_element_storage_get_first (mold->mo_elements, value, &queried);
         if (status != DISIR_STATUS_OK)
@@ -609,12 +609,12 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
                        dc_semantic_version_string (buffer, 32, &semver));
 
     // Update mold with highest version if root context is DISIR_CONTEXT_MOLD
-    if (dc_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
+    if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
     {
         dx_mold_update_version (context->cx_root_context->cx_mold, &semver);
     }
 
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_DOCUMENTATION:
     {
@@ -687,11 +687,11 @@ dc_get_version (dc_t *context, struct semantic_version *semver)
         return status;
     }
 
-    if (dc_type (context) == DISIR_CONTEXT_CONFIG)
+    if (dc_context_type (context) == DISIR_CONTEXT_CONFIG)
     {
         dx_semantic_version_set (semver, &context->cx_config->cf_version);
     }
-    else if (dc_type (context) == DISIR_CONTEXT_MOLD)
+    else if (dc_context_type (context) == DISIR_CONTEXT_MOLD)
     {
         dx_semantic_version_set (semver, &context->cx_mold->mo_version);
     }
@@ -733,7 +733,7 @@ dc_set_version (dc_t *context, struct semantic_version *semver)
         return status;
     }
 
-    if (dc_type (context) == DISIR_CONTEXT_CONFIG)
+    if (dc_context_type (context) == DISIR_CONTEXT_CONFIG)
     {
         if (dx_semantic_version_compare (&context->cx_config->cf_mold->mo_version, semver) < 0)
         {
@@ -742,7 +742,7 @@ dc_set_version (dc_t *context, struct semantic_version *semver)
         }
         dx_semantic_version_set (&context->cx_config->cf_version, semver);
     }
-    else if (dc_type (context) == DISIR_CONTEXT_MOLD)
+    else if (dc_context_type (context) == DISIR_CONTEXT_MOLD)
     {
         dx_semantic_version_set (&context->cx_mold->mo_version, semver);
     }
@@ -785,7 +785,7 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
     introduced = NULL;
     status = DISIR_STATUS_OK;
 
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_DOCUMENTATION:
     {
@@ -861,7 +861,7 @@ dc_get_elements (dc_t *context, dcc_t **collection)
     }
 
     status = DISIR_STATUS_OK;
-    switch (dc_type (context))
+    switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_MOLD:
     {
