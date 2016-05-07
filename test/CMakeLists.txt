@@ -22,7 +22,7 @@ include_directories (
 add_definitions ("-Wall")
 add_definitions ("-Werror")
 
-target_link_libraries (${LIBDISIR_TESTSUITE_TARGET} ${PROJECT_NAME})
+target_link_libraries (${LIBDISIR_TESTSUITE_TARGET} ${PROJECT_SO_LIBRARY})
 target_link_libraries (${LIBDISIR_TESTSUITE_TARGET} cmocka)
 target_link_libraries (${LIBDISIR_TESTSUITE_TARGET} void-multimap)
 target_link_libraries (${LIBDISIR_TESTSUITE_TARGET} void-list)
