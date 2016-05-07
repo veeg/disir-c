@@ -49,7 +49,8 @@ set (LIBDISIR_PRIVATE_INCLUDE_DIR
 )
 
 
-set (PROJECT_SO_LIBRARY disir)
+set (PROJECT_SO_LIBRARY disir
+    CACHE INTERNAL "${PROJECT_NAME}: shared library" FORCE)
 # Define shared library
 add_library(${PROJECT_SO_LIBRARY} SHARED ${_LIBDISIR_SOURCES})
 add_dependencies (${PROJECT_SO_LIBRARY} configure_version)
