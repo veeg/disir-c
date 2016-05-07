@@ -1,4 +1,20 @@
 
+
+add_custom_target (configure_version ALL
+  COMMAND ${CMAKE_COMMAND}
+    -D SRC_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+    -D BIN_DIR=${CMAKE_CURRENT_BINARY_DIR}
+    -D PROJECT_VERSION=${PROJECT_VERSION}
+    -D PROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
+    -D PROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR}
+    -D PROJECT_VERSION_PATCH=${PROJECT_VERSION_PATCH}
+    -P ${CMAKE_SOURCE_DIR}/cmake/configure_version.cmake
+  DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.c.in
+  COMMENT "Configuring version.c"
+)
+
+
 # Define all libdisir source files
 set (_LIBDISIR_SOURCES
     "log.c"
@@ -17,6 +33,7 @@ set (_LIBDISIR_SOURCES
     "io/print.c"
     "io/ini.c"
     "update.c"
+    "${CMAKE_CURRENT_BINARY_DIR}/version.c"
 )
 
 # Export public include directory as internal cache variable
@@ -31,9 +48,11 @@ set (LIBDISIR_PRIVATE_INCLUDE_DIR
     CACHE INTERNAL "${PROJECT_NAME}: Private include directory" FORCE
 )
 
+
 set (PROJECT_SO_LIBRARY disir)
 # Define shared library
 add_library(${PROJECT_SO_LIBRARY} SHARED ${_LIBDISIR_SOURCES})
+add_dependencies (${PROJECT_SO_LIBRARY} configure_version)
 
 include_directories (
     ${LIBDISIR_PUBLIC_INCLUDE_DIR}

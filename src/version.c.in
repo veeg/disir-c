@@ -1,0 +1,12 @@
+
+
+const unsigned int libdisir_version_major = @PROJECT_VERSION_MAJOR@;
+const unsigned int libdisir_version_minor = @PROJECT_VERSION_MINOR@;
+const unsigned int libdisir_version_patch = @PROJECT_VERSION_PATCH@;
+
+const char *libdisir_version_string = "@PROJECT_VERSION_MAJOR@." \
+                                        "@PROJECT_VERSION_MINOR@." \
+                                        "@PROJECT_VERSION_PATCH@";
+
+const char *libdisir_build_string = "@build@";
+
