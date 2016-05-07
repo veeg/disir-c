@@ -1,6 +1,11 @@
 #ifndef _LIBDISIR_H
 #define _LIBDISIR_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif // _cplusplus
+
+
 #include <stdint.h>
 
 
@@ -183,6 +188,11 @@ disir_update_continue (struct disir_update *update);
 //!
 enum disir_status
 disir_update_finished (struct disir_update **update);
+
+
+#ifdef __cplusplus
+}
+#endif // _cplusplus
 
 #endif // _LIBDISIR_H
 

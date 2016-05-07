@@ -1,6 +1,11 @@
 #ifndef _LIBDISIR_CONTEXT_H
 #define _LIBDISIR_CONTEXT_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif // _cplusplus
+
+
 //! The namespace employed for all low-level context operations
 //! is dc_*
 
@@ -664,6 +669,11 @@ enum disir_status dc_mold_begin (dc_t **mold);
 //! status DISIR_STATUS_WRONG_CONTEXT will be returned.
 //! On success, DISIR_STATUS_OK is returned.
 enum disir_status dc_mold_finalize (dc_t **context, struct disir_mold **mold);
+
+
+#ifdef __cplusplus
+}
+#endif // _cplusplus
 
 #endif // _LIBDISIR_CONTEXT_H
 

@@ -1,6 +1,11 @@
 #ifndef _LIBDISIR_UTIL_H
 #define _LIBDISIR_UTIL_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif // _cplusplus
+
+
 #include <disir/disir.h>
 
 //! \brief Structure represents a semantic version number.
@@ -44,6 +49,10 @@ char * dc_semantic_version_string (char *buffer, int32_t buffer_size,
 //!
 enum disir_status dc_semantic_version_convert (const char *input, struct semantic_version *semver);
 
+
+#ifdef __cplusplus
+}
+#endif // _cplusplus
 
 #endif // _LIBDISIR_UTIL_H
 

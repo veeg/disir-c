@@ -1,6 +1,11 @@
 #ifndef _LIBDISIR_IO_H
 #define _LIBDISIR_IO_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif // _cplusplus
+
+
 //! \brief Function signature for inputting disir_config from external source.
 //!
 //! \param[in] id String identifier for the config file to read.
@@ -216,6 +221,10 @@ enum disir_status
 disir_config_list (struct disir *disir, const char *type,
                    char ***ids, int *id_count);
 
+
+#ifdef __cplusplus
+}
+#endif // _cplusplus
 
 #endif // _LIBDISIR_IO_H
 

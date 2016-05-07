@@ -1,6 +1,10 @@
 #ifndef _LIBDISIR_COLLECTION_H
 #define _LIBDISIR_COLLECTION_H
 
+#ifdef __cplusplus
+extern "C"{
+#endif // _cplusplus
+
 #include <disir/disir.h>
 #include <disir/context.h>
 
@@ -20,6 +24,9 @@ int32_t dc_collection_size (dcc_t *collection);
 //! Finished using the context collection.
 enum disir_status dc_collection_finished (dcc_t **collection);
 
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif // _LIBDISIR_COLLECTION_H
 
