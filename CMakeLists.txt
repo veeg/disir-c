@@ -2,7 +2,7 @@
 cmake_minimum_required (VERSION 3.2.0)
 
 # Define the LibDisir project
-project (libdisir VERSION 0.1.0 LANGUAGES C)
+project (libdisir VERSION 0.1.0 LANGUAGES C CXX)
 
 include (CMakePackageConfigHelpers)
 
