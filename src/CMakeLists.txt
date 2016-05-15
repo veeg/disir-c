@@ -30,7 +30,6 @@ set (_LIBDISIR_SOURCES
     "element_storage.c"
     "disir.c"
     "io.c"
-    "io/print.c"
     "io/ini.c"
     "update.c"
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
