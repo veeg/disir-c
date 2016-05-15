@@ -262,6 +262,44 @@ disir_config_list (struct disir *disir, const char *type, struct disir_collectio
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+disir_input_plugin_list (struct disir *disir, struct disir_collection **collection)
+{
+    struct disir_collection *col;
+    dc_t *context;
+
+    context = NULL;
+
+    if (disir == NULL || collection == NULL)
+    {
+        log_debug ("invoked with NULL pointers (%p %p)", disir, collection);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    // No registered entries
+    if (disir->dio_input_queue == NULL)
+    {
+        return DISIR_STATUS_EXHAUSTED;
+    }
+
+    col = dc_collection_create ();
+    if (col == NULL)
+    {
+        return DISIR_STATUS_NO_MEMORY;
+    }
+
+    MQ_FOREACH (disir->dio_input_queue,
+    ({
+        dc_free_text_create (entry->di_type, &context);
+        dc_collection_push_context (col, context);
+        dc_putcontext (&context);
+    }));
+
+    *collection = col;
+    return DISIR_STATUS_OK;
+}
+
 //! INTERNAL API
 struct disir_output *
 dx_disir_output_create (void)

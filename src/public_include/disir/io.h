@@ -234,6 +234,17 @@ enum disir_status
 disir_config_list (struct disir *disir, const char *type,
                    struct disir_collection **collection);
 
+//! \brief List all registered input plugins
+//!
+//! \param[in] disir Libdisir instance to query for input plugins
+//! \param[out] collection A context collection with FREE_TEXT contexts
+//!
+//! \return DISIR_STATUS_NO_MEMORY if collection memory allocation failed.
+//! \return DISIR_STATUS_EXHAUSTED if there were no input plugins registered.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_input_plugin_list (struct disir *disir, struct disir_collection **collection);
 
 #ifdef __cplusplus
 }
