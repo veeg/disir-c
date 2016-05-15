@@ -119,6 +119,42 @@ disir_instance_create (struct disir **disir);
 enum disir_status
 disir_instance_destroy (struct disir **disir);
 
+//! \brief Set an error message to the disir instance.
+//!
+//! This will also issue a ERROR level log event to the log stream.
+//!
+void disir_error_set (struct disir *disir, const char *message, ...);
+
+//! \brief Clear any error message previously sat on the disir instance.
+void disir_error_clear (struct disir *disir);
+
+//! \brief Copy the contents of the error message
+//!
+//! If the buffer is of an insufficient size, and over 4 bytes large,
+//! a partial error message will be populated. Status return code
+//! DISIR_STATUS_INSSUFICIENT_RESOURCES indicates insufficient buffer.
+//! Output parameter `bytes_written` will be filled with the total size of the error message.
+//! The buffer will automatically be appended with a NUL terminator,
+//! which means the input buffer must be atleast 1 byte greater than
+//! the total size of the error message.
+//!
+//! \param[in] disir Libdisir instance to copy error message from.
+//! \param[in,out] buffer Output buffer to write error message to.
+//! \param[in] buffer_size Size of the output `buffer`.
+//! \param[out] bytes_written Number of bytes written to `buffer`.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if `disir` or `buffer` are NULL.
+//! \return DISIR_STATUS_INSSUFICIENT_RESOURCES if `buffer` is of an insufficient size.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_error_copy (struct disir *disir, char *buffer, int32_t buffer_size, int32_t *bytes_written);
+
+//! \brief Return the error message from the instance.
+//!
+//!If no error message exists, NULL is returned.
+//!
+const char * disir_error (struct disir *disir);
 
 //! \brief Generate a config at a given version from the finished mold.
 //!

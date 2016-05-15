@@ -11,6 +11,13 @@ struct disir
     struct disir_output     *dio_output_queue;
 
     struct disir_mold     *internal_mold;
+
+    //! Error message sat on the disir instance.
+    //! Set with disir_error_set() and clear with disir_error_clear()
+    //! Retrievable through disir_error() and disir_error_copy()
+    char                    *disir_error_message;
+    //! Bytes allocated/occupied by the disir_error_message.
+    int32_t                 disir_error_message_size;
 };
 
 //! \brief The internal input plugin structure.
