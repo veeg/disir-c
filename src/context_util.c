@@ -23,6 +23,7 @@ const char *disir_context_type_string[] = {
     "DOCUMENTATION",
     "DEFAULT",
     "RESTRICTION",
+    "FREE TEXT",
     "UNKNOWN",
 };
 
@@ -150,7 +151,8 @@ dx_context_type_is_toplevel (enum disir_context_type context_type)
 {
     if (
         context_type == DISIR_CONTEXT_CONFIG    ||
-        context_type == DISIR_CONTEXT_MOLD
+        context_type == DISIR_CONTEXT_MOLD      ||
+        context_type == DISIR_CONTEXT_FREE_TEXT
        )
     {
         return 1;
@@ -254,6 +256,11 @@ dx_context_create (enum disir_context_type type)
     {
         // XXX: What capabilities?
         context->CONTEXT_CAPABILITY_INTRODUCED = 1;
+        break;
+    }
+    case DISIR_CONTEXT_FREE_TEXT:
+    {
+        context->CONTEXT_CAPABILITY_ADD_VALUE_STRING = 1;
         break;
     }
     case DISIR_CONTEXT_RESTRICTION:
@@ -575,6 +582,9 @@ dc_get_value_type (dc_t *context, enum disir_value_type *type)
         break;
     case DISIR_CONTEXT_KEYVAL:
         *type = context->cx_keyval->kv_type;
+        break;
+    case DISIR_CONTEXT_FREE_TEXT:
+        *type = context->cx_value->dv_type;
         break;
     default:
         log_debug_context (context, "invoked but does not contain/handle type");

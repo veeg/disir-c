@@ -98,6 +98,7 @@ dc_destroy (dc_t **context)
         status = dx_default_destroy (&((*context)->cx_default));
         break;
     case DISIR_CONTEXT_SECTION:
+    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_context_type_string (*context));
@@ -164,6 +165,7 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
                 __FUNCTION__, dx_context_type_string (context_type));
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_MOLD:
+    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:
         dx_log_context (parent, "attempted to add context of unknown type( %d )", context_type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
@@ -210,6 +212,7 @@ dc_finalize (dc_t **context)
         break;
     case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_CONFIG:
+    case DISIR_CONTEXT_FREE_TEXT:
         dx_crash_and_burn ("Context %s made to to switch it should never reach",
                 dc_context_type_string (*context));
         break;
@@ -422,6 +425,7 @@ dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
     case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_DEFAULT:
+    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_context_type_string (context));
@@ -446,20 +450,40 @@ dc_get_value (dc_t *context, int32_t output_buffer_size, char *output, int32_t *
         return status;
     }
 
-    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_FREE_TEXT);
     if (status != DISIR_STATUS_OK)
     {
-        dx_log_context (context, "cannot get value from non KEYVAL type");
+        dx_log_context (context, "cannot get value from context type");
         return status;
     }
-    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    switch (dc_context_type (context))
     {
-        dx_log_context (context, "cannot get value from KEYVAL context whose root is not CONFIG");
-        return DISIR_STATUS_WRONG_CONTEXT;
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+        {
+            dx_log_context (context,
+                            "cannot get value from KEYVAL context whose root is not CONFIG");
+            return DISIR_STATUS_WRONG_CONTEXT;
+        }
+        status = dx_value_stringify (&context->cx_keyval->kv_value,
+                                     output_buffer_size, output, output_size);
+        break;
+    }
+    case DISIR_CONTEXT_FREE_TEXT:
+    {
+        status = dx_value_stringify (context->cx_value, output_buffer_size, output, output_size);
+        break;
+    }
+    default:
+    {
+        status = DISIR_STATUS_INTERNAL_ERROR;
+        dx_crash_and_burn ("%s - UNHANDLED_CONTEXT_TYPE: %s",
+                           __FUNCTION__, dc_context_type_string (context));
+    }
     }
 
-    return dx_value_stringify (&context->cx_keyval->kv_value,
-                               output_buffer_size, output, output_size);
+    return status;
 }
 
 //! PUBLIC API
@@ -476,7 +500,10 @@ dc_get_value_string (dc_t *context, const char **output, int32_t *size)
         return status;
     }
 
-    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_DOCUMENTATION);
+    status = CONTEXT_TYPE_CHECK (context,
+                                 DISIR_CONTEXT_KEYVAL,
+                                 DISIR_CONTEXT_DOCUMENTATION,
+                                 DISIR_CONTEXT_FREE_TEXT);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged ?
@@ -504,7 +531,9 @@ dc_get_value_string (dc_t *context, const char **output, int32_t *size)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
+    switch (dc_context_type (context))
+    {
+    case DISIR_CONTEXT_KEYVAL:
     {
         if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
         {
@@ -512,15 +541,23 @@ dc_get_value_string (dc_t *context, const char **output, int32_t *size)
             return DISIR_STATUS_WRONG_CONTEXT;
         }
         status = dx_value_get_string (&context->cx_keyval->kv_value, output, size);
+        break;
     }
-    else if (dc_context_type (context) == DISIR_CONTEXT_DOCUMENTATION)
+    case DISIR_CONTEXT_DOCUMENTATION:
     {
         status = dx_value_get_string (&context->cx_documentation->dd_value, output, size);
+        break;
     }
-    else
+    case DISIR_CONTEXT_FREE_TEXT:
+    {
+        status = dx_value_get_string (context->cx_value, output, size);
+        break;
+    }
+    default:
     {
         log_fatal_context (context, "slipped through guard - unsupported.");
         return DISIR_STATUS_INTERNAL_ERROR;
+    }
     }
 
     return status;
@@ -635,6 +672,7 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
                 __FUNCTION__, dc_context_type_string (context));
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_MOLD:
+    case DISIR_CONTEXT_FREE_TEXT:
         dx_log_context (context, "invoked %s() with capability it should not have.", __FUNCTION__);
         status = DISIR_STATUS_INTERNAL_ERROR;
         break;
@@ -810,6 +848,7 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
                 __FUNCTION__, dc_context_type_string (context));
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_MOLD:
+    case DISIR_CONTEXT_FREE_TEXT:
         dx_log_context (context, "invoked %s() with capability it should not have.", __FUNCTION__);
         status = DISIR_STATUS_INTERNAL_ERROR;
         break;

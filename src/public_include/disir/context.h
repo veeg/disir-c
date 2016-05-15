@@ -35,6 +35,7 @@ enum disir_context_type
     DISIR_CONTEXT_DOCUMENTATION,
     DISIR_CONTEXT_DEFAULT,
     DISIR_CONTEXT_RESTRICTION,
+    DISIR_CONTEXT_FREE_TEXT,
 
     //! Sentinel context - not a valid context.
     DISIR_CONTEXT_UNKNOWN, // Must be last entry in enumeration
@@ -670,6 +671,17 @@ enum disir_status dc_mold_begin (dc_t **mold);
 //! On success, DISIR_STATUS_OK is returned.
 enum disir_status dc_mold_finalize (dc_t **context, struct disir_mold **mold);
 
+//! \brief Construct a FREE_TEXT context to store a string
+//!
+//! Creates a free-standing context which holds a string value.
+//! The context is freed by the first dc_putcontext() invoked on it.
+//!
+//! \param[in] text String value to store in the allocated context
+//! \param[out] context Allocated context to store the string.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_free_text_create (const char *text, dc_t **context);
 
 #ifdef __cplusplus
 }

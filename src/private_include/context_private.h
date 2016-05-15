@@ -67,6 +67,7 @@ struct disir_context
         struct disir_group          *cx_group;
         struct disir_keyval         *cx_keyval;
         struct disir_documentation  *cx_documentation;
+        struct disir_value          *cx_value;
     };
 
     //! Parent context of this context.
