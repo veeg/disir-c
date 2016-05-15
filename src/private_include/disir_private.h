@@ -56,11 +56,6 @@ struct disir_input * dx_disir_input_create (void);
 //! \brief Destroy a previously allocated disir_input structure
 enum disir_status dx_disir_input_destroy (struct disir_input **output);
 
-
-// TMP - REWORK
-enum disir_status
-dio_register_print (struct disir *disir);
-
 // TMP - REWORK
 enum disir_status
 dio_register_ini (struct disir *disir);

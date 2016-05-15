@@ -80,12 +80,6 @@ disir_instance_create (struct disir **disir)
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    status = dio_register_print (dis);
-    if (status != DISIR_STATUS_OK)
-    {
-        goto error;
-    }
-
     status = dio_register_ini (dis);
     if (status != DISIR_STATUS_OK)
     {
