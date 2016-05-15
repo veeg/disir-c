@@ -140,6 +140,10 @@ test_context_type(void **state)
             assert_true(dc_context_type (context) == DISIR_CONTEXT_RESTRICTION);
             assert_string_equal(dc_context_type_string (context), "RESTRICTION");
             break;
+        case DISIR_CONTEXT_FREE_TEXT:
+            assert_true(dc_context_type (context) == DISIR_CONTEXT_FREE_TEXT);
+            assert_string_equal(dc_context_type_string (context), "FREE TEXT");
+            break;
         case DISIR_CONTEXT_UNKNOWN:
             assert_true(dc_context_type (context) == DISIR_CONTEXT_UNKNOWN);
             assert_string_equal(dc_context_type_string (context), "UNKNOWN");
