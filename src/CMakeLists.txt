@@ -27,6 +27,7 @@ set (_LIBDISIR_SOURCES
     "context_util.c"
     "context_config.c"
     "context_documentation.c"
+    "context_free_text.c"
     "collection.c"
     "element_storage.c"
     "disir.c"
