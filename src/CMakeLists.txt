@@ -1,5 +1,6 @@
 
-
+set (build "ini")
+configure_file (version.c.in ${CMAKE_CURRENT_BINARY_DIR}/version.c)
 add_custom_target (configure_version ALL
   COMMAND ${CMAKE_COMMAND}
     -D SRC_DIR=${CMAKE_CURRENT_SOURCE_DIR}
