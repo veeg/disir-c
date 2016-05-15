@@ -378,22 +378,68 @@ dio_ini_mold_read (const char *id, struct disir_mold **mold)
 }
 
 enum disir_status
+dio_ini_config_list (char ***ids, int *id_count)
+{
+    // XXX: Hardcoded proof of API concept
+    *ids = calloc(1, 10 * sizeof (const char **));
+
+    (*ids)[0] = strdup ("/etc/disir.ini");
+    *id_count = 1;
+
+    return DISIR_STATUS_OK;
+}
+
+enum disir_status
+dio_ini_mold_list (char ***ids, int *id_count)
+{
+    // XXX: Hardcoded proof of API concept
+    *ids = calloc(1, 10 * sizeof (const char **));
+
+    (*ids)[0] = strdup ("/etc/disir.ini");
+    *id_count = 1;
+
+    return DISIR_STATUS_OK;
+}
+
+enum disir_status
+dio_ini_mold_query (const char *id)
+{
+    return DISIR_STATUS_INTERNAL_ERROR;
+}
+
+enum disir_status
 dio_register_ini (struct disir *disir)
 {
     enum disir_status status;
 
+    struct disir_input_plugin in;
+    struct disir_output_plugin out;
+
     log_info ("Registering INI I/O type");
 
 
+    out.out_struct_size = sizeof (struct disir_output_plugin);
+    out.out_config_write = dio_ini_config_write;
+    out.out_mold_write = dio_ini_mold_write;
+
     status = disir_register_output (disir, "INI", "Output to filesystem in INI format.",
-                                    dio_ini_config_write, dio_ini_mold_write);
+                                    &out);
     if (status != DISIR_STATUS_OK)
     {
         log_error ("registering output INI failed with errenous condition: %s",
                    disir_status_string (status));
     }
+
+    in.in_struct_size = sizeof (struct disir_input_plugin);
+    in.in_config_read = dio_ini_config_read;
+    in.in_config_list =  dio_ini_config_list;
+    in.in_config_version =  NULL;
+    in.in_mold_read = dio_ini_mold_read;
+    in.in_mold_list = dio_ini_mold_list;
+
+
     status = disir_register_input (disir, "INI", "Input from filesystem in INI format.",
-                                    dio_ini_config_read, dio_ini_mold_read);
+                                    &in);
     if (status != DISIR_STATUS_OK)
     {
         log_error ("registering input INI failed with errenous condition: %s",

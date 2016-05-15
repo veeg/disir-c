@@ -83,6 +83,7 @@ enum disir_restriction
 #include <disir/util.h>
 #include <disir/context.h>
 #include <disir/collection.h>
+#include <disir/io.h>
 
 
 //! \brief Return a string representation of the disir status

@@ -4,6 +4,7 @@
 #include <disir/disir.h>
 #include <disir/io.h>
 
+//! \brief The main libdisir instance structure. All I/O operations requires an instance of it.
 struct disir
 {
     struct disir_input      *dio_input_queue;
@@ -12,34 +13,31 @@ struct disir
     struct disir_mold     *internal_mold;
 };
 
+//! \brief The internal input plugin structure.
 struct disir_input
 {
     //! String identifier of the input type.
-    char *type;
+    char                            *di_type;
     //! String description of the input type.
-    char *description;
+    char                            *di_description;
 
-    //! Read a config object
-    config_read config;
+    //! Input structure holds all function callbaks to perform the input for this plugin.
+    struct disir_input_plugin       di_input;
 
-    //! Read a mold object
-    mold_read mold;
-
+    //! linked list pointers
     struct disir_input *next, *prev;
 };
 
+//! \brief The internal output plugin structure.
 struct disir_output
 {
     //! String identifier of the output type.
-    char *type;
+    char                            *do_type;
     //! String description of the output type.
-    char *description;
+    char                            *do_description;
 
-    //! Write a config object
-    config_write config;
-
-    //! Write a mold object
-    mold_write mold;
+    //! Output structure holds all function callbacks to perform the output for this plugin.
+    struct disir_output_plugin      do_output;
 
     struct disir_output *next, *prev;
 };
