@@ -12,7 +12,7 @@ struct disir_update
     //! TODO: When iterating nested sections of collections,
     //! we need to handle the nested level and store collections
     //! on a stack
-    dcc_t       *up_collection;
+    struct disir_collection       *up_collection;
 
     int                         up_updated;
 

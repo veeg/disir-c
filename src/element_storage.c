@@ -234,11 +234,11 @@ dx_element_storage_remove (struct disir_element_storage *storage,
 enum disir_status
 dx_element_storage_get (struct disir_element_storage *storage,
                         const char * const name,
-                        struct disir_context_collection **collection)
+                        struct disir_collection **collection)
 {
     enum disir_status status;
     dc_t *context;
-    dcc_t *col;
+    struct disir_collection *col;
     struct multimap_value_iterator *iter;
 
     iter = multimap_fetch (storage->es_map, (void *) name);
@@ -246,7 +246,7 @@ dx_element_storage_get (struct disir_element_storage *storage,
     {
         return DISIR_STATUS_NO_MEMORY;
     }
-    col = dx_collection_create ();
+    col = dc_collection_create ();
     if (collection == NULL)
     {
         status = DISIR_STATUS_NO_MEMORY;
@@ -255,7 +255,7 @@ dx_element_storage_get (struct disir_element_storage *storage,
 
     while ((context = multimap_iterator_next (iter)))
     {
-        status = dx_collection_push_context (col, context);
+        status = dc_collection_push_context (col, context);
         if (status != DISIR_STATUS_OK)
         {
             goto error;
@@ -283,11 +283,11 @@ error:
 // INTERNAL API
 enum disir_status
 dx_element_storage_get_all (struct disir_element_storage *storage,
-                            struct disir_context_collection **collection)
+                            struct disir_collection **collection)
 {
     enum disir_status status;
     dc_t *context;
-    struct disir_context_collection *coll;
+    struct disir_collection *coll;
     struct list_iterator *iter;
 
     coll = NULL;
@@ -312,11 +312,11 @@ dx_element_storage_get_all (struct disir_element_storage *storage,
         goto error;
     }
 
-    coll = dx_collection_create ();
+    coll = dc_collection_create ();
     if (coll == NULL)
     {
         log_warn (
-            "in element_storage (%p) - dx_collection_create failed to allocate sufficient memory",
+            "in element_storage (%p) - dc_collection_create failed to allocate sufficient memory",
             storage);
         status = DISIR_STATUS_NO_MEMORY;
         goto error;
@@ -324,7 +324,7 @@ dx_element_storage_get_all (struct disir_element_storage *storage,
 
     while ((context = list_iterator_next (iter)))
     {
-        status = dx_collection_push_context (coll, context);
+        status = dc_collection_push_context (coll, context);
         if (status != DISIR_STATUS_OK)
             goto error;
     }

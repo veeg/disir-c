@@ -490,10 +490,10 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
 
 //! PUBLIC API
 enum disir_status
-dc_get_default_contexts (dc_t *context, dcc_t **collection)
+dc_get_default_contexts (dc_t *context, struct disir_collection **collection)
 {
     enum disir_status status;
-    dcc_t *col;
+    struct disir_collection *col;
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)

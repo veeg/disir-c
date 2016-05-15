@@ -123,7 +123,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
     dc_t *config_context;
     dc_t *context;
     dc_t *parent;
-    dcc_t *collection;
+    struct disir_collection *collection;
     char buffer[512];
     const char *name;
     int32_t size;

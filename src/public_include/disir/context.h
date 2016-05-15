@@ -387,7 +387,7 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
 //! \return DISIR_STATUS_NO_MEMORY if collection allocation failed.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_get_default_contexts (dc_t *context, dcc_t **collection);
+enum disir_status dc_get_default_contexts (dc_t *context, struct disir_collection **collection);
 
 
 //! \brief Set a value to the context. Type is extracted from string where applicable
@@ -496,7 +496,7 @@ enum disir_status dc_get_deprecrated (dc_t *context, struct semantic_version *se
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input parameters are NULL
 //! \return DISRI_STATUS_WRONG_CONTEXT if the input context is not of correct type.
 //!
-enum disir_status dc_get_elements (dc_t *context, dcc_t **collection);
+enum disir_status dc_get_elements (dc_t *context, struct disir_collection **collection);
 
 
 //

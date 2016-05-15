@@ -838,7 +838,7 @@ dc_get_deprecrated (dc_t *context, struct semantic_version *semver)
 
 //! PUBLIC API
 enum disir_status
-dc_get_elements (dc_t *context, dcc_t **collection)
+dc_get_elements (dc_t *context, struct disir_collection **collection)
 {
     enum disir_status status;
 

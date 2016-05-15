@@ -63,6 +63,8 @@ struct disir_config;
 //! Forward declaration of the top-level context disir_mold
 struct disir_mold;
 
+struct disir_collection;
+
 //! The different value types that may be held by differrent contexts.
 //! This enumeration also defines the explicit type of a DISIR_CONTEXT_KEYVAL.
 enum disir_value_type

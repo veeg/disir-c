@@ -8,7 +8,7 @@
 
 //! PUBLIC API
 int32_t
-dc_collection_size (dcc_t *collection)
+dc_collection_size (struct disir_collection *collection)
 {
     // QUESTION: Should this return -1 instead?
     if (collection == NULL)
@@ -22,7 +22,7 @@ dc_collection_size (dcc_t *collection)
 
 //! PUBLIC API
 enum disir_status
-dc_collection_next (dcc_t *collection, dc_t **context)
+dc_collection_next (struct disir_collection *collection, dc_t **context)
 {
     enum disir_status status;
 
@@ -67,7 +67,7 @@ dc_collection_next (dcc_t *collection, dc_t **context)
 
 //! PUBLIC API
 enum disir_status
-dc_collection_reset (dcc_t *collection)
+dc_collection_reset (struct disir_collection *collection)
 {
     if (collection == NULL)
     {
@@ -83,7 +83,7 @@ dc_collection_reset (dcc_t *collection)
 
 //! INTERNAL API
 enum disir_status
-dx_collection_coalesce(dcc_t *collection)
+dx_collection_coalesce(struct disir_collection *collection)
 {
     dc_t *context;
     int32_t index;
@@ -155,12 +155,12 @@ dx_collection_coalesce(dcc_t *collection)
 }
 
 //! INTERNAL API
-dcc_t *
-dx_collection_create (void)
+struct disir_collection *
+dc_collection_create (void)
 {
-    dcc_t *collection;
+    struct disir_collection *collection;
 
-    collection = calloc (1, sizeof (dcc_t));
+    collection = calloc (1, sizeof (struct disir_collection));
     if (collection == NULL)
         return NULL;
 
@@ -178,7 +178,7 @@ dx_collection_create (void)
 
 //! PUBLIC API
 enum disir_status
-dc_collection_finished (dcc_t **collection)
+dc_collection_finished (struct disir_collection **collection)
 {
     uint32_t index;
     dc_t *context;
@@ -210,7 +210,7 @@ dc_collection_finished (dcc_t **collection)
 
 //! INTERNAL API
 enum disir_status
-dx_collection_push_context (dcc_t *collection, dc_t *context)
+dc_collection_push_context (struct disir_collection *collection, dc_t *context)
 {
     enum disir_status status;
     void *reallocated_collection;

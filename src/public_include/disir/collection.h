@@ -8,21 +8,29 @@ extern "C"{
 #include <disir/disir.h>
 #include <disir/context.h>
 
-//! Abstract Data Type for a collection of Disir Contexts.
-typedef struct disir_context_collection dcc_t;
+//! \brief Allocate a new context collection instance
+struct disir_collection * dc_collection_create (void);
+
+//! \brief Append the context to the end of the collection.
+//!
+//! Will increment the context reference count.
+//!
+//! \return DISIR_STATUS_OK on success
+//!
+enum disir_status dc_collection_push_context (struct disir_collection *collection, dc_t *context);
 
 //! PUBLIC API
-enum disir_status dc_collection_next (dcc_t *collection, dc_t **context);
+enum disir_status dc_collection_next (struct disir_collection *collection, dc_t **context);
 
 //! PUBLC API
-enum disir_status dc_collection_reset (dcc_t *collection);
+enum disir_status dc_collection_reset (struct disir_collection *collection);
 
 //! PUBLIC API
-int32_t dc_collection_size (dcc_t *collection);
+int32_t dc_collection_size (struct disir_collection *collection);
 
 //! PUBLIC API
 //! Finished using the context collection.
-enum disir_status dc_collection_finished (dcc_t **collection);
+enum disir_status dc_collection_finished (struct disir_collection **collection);
 
 #ifdef __cplusplus
 }

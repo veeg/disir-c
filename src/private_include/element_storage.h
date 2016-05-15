@@ -76,7 +76,7 @@ dx_element_storage_remove (struct disir_element_storage *storage,
 enum disir_status
 dx_element_storage_get (struct disir_element_storage *storage,
                         const char * const name,
-                        struct disir_context_collection **collection);
+                        struct disir_collection **collection);
 
 //! \brief Get all context in storage in insertion order
 //!
@@ -94,7 +94,7 @@ dx_element_storage_get (struct disir_element_storage *storage,
 //!
 enum disir_status
 dx_element_storage_get_all (struct disir_element_storage *storage,
-                            struct disir_context_collection **collection);
+                            struct disir_collection **collection);
 
 
 //! \brief Convenience method to get the first context with input name from storage.
