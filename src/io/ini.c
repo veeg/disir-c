@@ -11,7 +11,7 @@
 #include "config.h"
 
 enum disir_status
-dio_ini_config_write (const char *id, struct disir_config *config)
+dio_ini_config_write (struct disir *disir, const char *id, struct disir_config *config)
 {
     enum disir_status status;
     dc_t *config_context;
@@ -175,14 +175,15 @@ error:
 }
 
 enum disir_status
-dio_ini_mold_write (const char *id, struct disir_mold *mold)
+dio_ini_mold_write (struct disir *disir, const char *id, struct disir_mold *mold)
 {
     fprintf (stderr, "Output does not support outputting molds in INI format.\n");
     return DISIR_STATUS_NO_CAN_DO;
 }
 
 enum disir_status
-dio_ini_config_read (const char *id, struct disir_mold *mold, struct disir_config **config)
+dio_ini_config_read (struct disir *disir, const char *id,
+                     struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
     FILE *file;
@@ -371,14 +372,14 @@ error:
 }
 
 enum disir_status
-dio_ini_mold_read (const char *id, struct disir_mold **mold)
+dio_ini_mold_read (struct disir *disir, const char *id, struct disir_mold **mold)
 {
     fprintf (stderr, "Input does not support reading molds in INI format.\n");
     return DISIR_STATUS_NO_CAN_DO;
 }
 
 enum disir_status
-dio_ini_config_list (struct disir_collection **collection)
+dio_ini_config_list (struct disir *disir, struct disir_collection **collection)
 {
     enum disir_status status;
     dc_t *context;
@@ -410,7 +411,7 @@ dio_ini_config_list (struct disir_collection **collection)
 }
 
 enum disir_status
-dio_ini_mold_list (struct disir_collection **collection)
+dio_ini_mold_list (struct disir *disir, struct disir_collection **collection)
 {
     enum disir_status status;
     dc_t *context;
@@ -442,7 +443,7 @@ dio_ini_mold_list (struct disir_collection **collection)
 }
 
 enum disir_status
-dio_ini_mold_query (const char *id)
+dio_ini_mold_query (struct disir *disir, const char *id)
 {
     return DISIR_STATUS_INTERNAL_ERROR;
 }

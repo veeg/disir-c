@@ -15,7 +15,8 @@ extern "C"{
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-typedef enum disir_status (*config_read) (const char *id,
+typedef enum disir_status (*config_read) (struct disir *disir,
+                                          const char *id,
                                           struct disir_mold *mold,
                                           struct disir_config **config);
 
@@ -26,13 +27,15 @@ typedef enum disir_status (*config_read) (const char *id,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-typedef enum disir_status (*config_write) (const char *id,
+typedef enum disir_status (*config_write) (struct disir *disir,
+                                           const char *id,
                                            struct disir_config *config);
 
 //! \brief Retrieve all configs available
 //! TODO: Docs
 //! XXX: implement as output list?
-typedef enum disir_status (*config_list) (struct disir_collection **collection);
+typedef enum disir_status (*config_list) (struct disir *disir,
+                                          struct disir_collection **collection);
 
 //! \brief Retrieve the mold version from this configuration file
 //!
@@ -41,10 +44,13 @@ typedef enum disir_status (*config_list) (struct disir_collection **collection);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-typedef enum disir_status (*config_version) (const char *id, struct semantic_version *semver);
+typedef enum disir_status (*config_version) (struct disir *disir,
+                                             const char *id,
+                                             struct semantic_version *semver);
 
 //! \brief Query if the config with passed id exists
-typedef enum disir_status (*config_query) (const char *id);
+typedef enum disir_status (*config_query) (struct disir *disir,
+                                           const char *id);
 
 //! \brief Function signature for inputting disir_mold from external source.
 //!
@@ -53,7 +59,9 @@ typedef enum disir_status (*config_query) (const char *id);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-typedef enum disir_status (*mold_read) (const char *id, struct disir_mold **mold);
+typedef enum disir_status (*mold_read) (struct disir *disir,
+                                        const char *id,
+                                        struct disir_mold **mold);
 
 //! \brief Function signature for outputting disir_mold to external source.
 //!
@@ -62,15 +70,19 @@ typedef enum disir_status (*mold_read) (const char *id, struct disir_mold **mold
 //!
 //! \return DISIR_STATUS_OK on success
 //!
-typedef enum disir_status (*mold_write) (const char *id, struct disir_mold *mold);
+typedef enum disir_status (*mold_write) (struct disir *disir,
+                                         const char *id,
+                                         struct disir_mold *mold);
 
 //! TODO: Docs
 //! XXX: implement as output list?
-typedef enum disir_status (*mold_list) (struct disir_collection **collection);
+typedef enum disir_status (*mold_list) (struct disir *disir,
+                                        struct disir_collection **collection);
 
 //! \brief Query if the mold with passed id exists
 //! TODO: docs
-typedef enum disir_status (*mold_query) (const char *id);
+typedef enum disir_status (*mold_query) (struct disir *disir,
+                                         const char *id);
 
 //! Maximum number of bytes the 'type' parameter can identify an I/O type.
 #define DISIR_IO_TYPE_MAXLENGTH             32

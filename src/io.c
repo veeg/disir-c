@@ -147,7 +147,7 @@ disir_config_input (struct disir *disir, const char *type, const char *id,
     }
     else
     {
-        status = input->di_input.in_config_read (id, mold, config);
+        status = input->di_input.in_config_read (disir, id, mold, config);
     }
     return status;
 }
@@ -169,7 +169,7 @@ disir_mold_input (struct disir *disir, const char *type, const char *id,
     }
     else
     {
-        status = input->di_input.in_mold_read (id, mold);
+        status = input->di_input.in_mold_read (disir, id, mold);
     }
     return status;
 }
@@ -198,7 +198,7 @@ disir_config_output (struct disir *disir, const char *type, const char *id,
     }
     else
     {
-        status = output->do_output.out_config_write (id, config);
+        status = output->do_output.out_config_write (disir, id, config);
     }
     return status;
 }
@@ -227,7 +227,7 @@ disir_mold_output (struct disir *disir, const char *type, const char *id,
     }
     else
     {
-        status = output->do_output.out_mold_write (id, mold);
+        status = output->do_output.out_mold_write (disir, id, mold);
     }
     return status;
 }
@@ -256,7 +256,7 @@ disir_config_list (struct disir *disir, const char *type, struct disir_collectio
     }
     else
     {
-        status = input->di_input.in_config_list (collection);
+        status = input->di_input.in_config_list (disir, collection);
     }
 
     return status;
