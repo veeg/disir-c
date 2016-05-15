@@ -234,15 +234,15 @@ disir_mold_output (struct disir *disir, const char *type, const char *id,
 
 //! PUBLIC API
 enum disir_status
-disir_config_list (struct disir *disir, const char *type, char ***ids, int *id_count)
+disir_config_list (struct disir *disir, const char *type, struct disir_collection **collection)
 {
     enum disir_status status;
     struct disir_input  *input;
 
-    if (disir == NULL || type == NULL || ids == NULL || id_count == NULL)
+    if (disir == NULL || type == NULL || collection == NULL)
     {
-        log_debug ("invoked with NULL parameters (%p %p %p %p)",
-                   disir, type, ids, id_count);
+        log_debug ("invoked with NULL parameters (%p %p %p)",
+                   disir, type, collection);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -256,7 +256,7 @@ disir_config_list (struct disir *disir, const char *type, char ***ids, int *id_c
     }
     else
     {
-        status = input->di_input.in_config_list (ids, id_count);
+        status = input->di_input.in_config_list (collection);
     }
 
     return status;

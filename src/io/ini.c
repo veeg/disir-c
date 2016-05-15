@@ -378,26 +378,66 @@ dio_ini_mold_read (const char *id, struct disir_mold **mold)
 }
 
 enum disir_status
-dio_ini_config_list (char ***ids, int *id_count)
+dio_ini_config_list (struct disir_collection **collection)
 {
-    // XXX: Hardcoded proof of API concept
-    *ids = calloc(1, 10 * sizeof (const char **));
+    enum disir_status status;
+    dc_t *context;
+    struct disir_collection *col;
 
-    (*ids)[0] = strdup ("/etc/disir.ini");
-    *id_count = 1;
+    col = dc_collection_create ();
+    if (col == NULL)
+    {
+        return DISIR_STATUS_NO_MEMORY;
+    }
 
+    status = dc_free_text_create ("/etc/disir.ini.test", &context);
+    if (status != DISIR_STATUS_OK)
+    {
+        dc_collection_finished (&col);
+        return status;
+    }
+
+    status = dc_collection_push_context (col, context);
+    dc_putcontext (&context);
+    if (status != DISIR_STATUS_OK)
+    {
+        dc_collection_finished (&col);
+        return status;
+    }
+
+    *collection = col;
     return DISIR_STATUS_OK;
 }
 
 enum disir_status
-dio_ini_mold_list (char ***ids, int *id_count)
+dio_ini_mold_list (struct disir_collection **collection)
 {
-    // XXX: Hardcoded proof of API concept
-    *ids = calloc(1, 10 * sizeof (const char **));
+    enum disir_status status;
+    dc_t *context;
+    struct disir_collection *col;
 
-    (*ids)[0] = strdup ("/etc/disir.ini");
-    *id_count = 1;
+    col = dc_collection_create ();
+    if (col == NULL)
+    {
+        return DISIR_STATUS_NO_MEMORY;
+    }
 
+    status = dc_free_text_create ("/etc/disir.ini.test", &context);
+    if (status != DISIR_STATUS_OK)
+    {
+        dc_collection_finished (&col);
+        return status;
+    }
+
+    status = dc_collection_push_context (col, context);
+    dc_putcontext (&context);
+    if (status != DISIR_STATUS_OK)
+    {
+        dc_collection_finished (&col);
+        return status;
+    }
+
+    *collection = col;
     return DISIR_STATUS_OK;
 }
 

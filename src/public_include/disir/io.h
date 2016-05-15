@@ -32,7 +32,7 @@ typedef enum disir_status (*config_write) (const char *id,
 //! \brief Retrieve all configs available
 //! TODO: Docs
 //! XXX: implement as output list?
-typedef enum disir_status (*config_list) (char ***ids, int *id_count);
+typedef enum disir_status (*config_list) (struct disir_collection **collection);
 
 //! \brief Retrieve the mold version from this configuration file
 //!
@@ -43,7 +43,8 @@ typedef enum disir_status (*config_list) (char ***ids, int *id_count);
 //!
 typedef enum disir_status (*config_version) (const char *id, struct semantic_version *semver);
 
-//! \brief Query if the config with passed id exists typedef enum disir_status (*config_query) (const char *id);
+//! \brief Query if the config with passed id exists
+typedef enum disir_status (*config_query) (const char *id);
 
 //! \brief Function signature for inputting disir_mold from external source.
 //!
@@ -65,7 +66,7 @@ typedef enum disir_status (*mold_write) (const char *id, struct disir_mold *mold
 
 //! TODO: Docs
 //! XXX: implement as output list?
-typedef enum disir_status (*mold_list) (char ***ids, int *id_count);
+typedef enum disir_status (*mold_list) (struct disir_collection **collection);
 
 //! \brief Query if the mold with passed id exists
 //! TODO: docs
@@ -219,7 +220,7 @@ disir_mold_output (struct disir *disir, const char *type, const char *id,
 //! \param type Input type. Must be previously registed with disir
 enum disir_status
 disir_config_list (struct disir *disir, const char *type,
-                   char ***ids, int *id_count);
+                   struct disir_collection **collection);
 
 
 #ifdef __cplusplus
