@@ -30,7 +30,7 @@ disir_register_input (struct disir *disir, const char *type,
     if (plugin->in_struct_size != sizeof (struct disir_input_plugin))
     {
         // TODO: Log disir
-        log_warn ("%s input plugin structure mismatched structure size (%d vs %d)",
+        disir_error_set(disir, "%s input plugin structure mismatched structure size (%d vs %d)",
                   type, plugin->in_struct_size, sizeof (struct disir_input_plugin));
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -90,7 +90,7 @@ disir_register_output (struct disir *disir, const char *type, const char *descri
     if (plugin->out_struct_size != sizeof (struct disir_output_plugin))
     {
         // TODO: Log disir
-        log_warn ("%s output plugin structure mismatched structure size (%d vs %d)",
+        disir_error_set (disir, "%s output plugin structure mismatched structure size (%d vs %d)",
                   type, plugin->out_struct_size, sizeof (struct disir_output_plugin));
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -142,7 +142,7 @@ disir_config_input (struct disir *disir, const char *type, const char *id,
                       (strncmp(entry->di_type, type, DISIR_IO_TYPE_MAXLENGTH) == 0));
     if (input == NULL)
     {
-        log_warn ("no input type '%s'", type);
+        disir_error_set (disir, "no input type '%s' registered.", type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
     }
     else
@@ -164,7 +164,7 @@ disir_mold_input (struct disir *disir, const char *type, const char *id,
                       (strncmp(entry->di_type, type, DISIR_IO_TYPE_MAXLENGTH) == 0));
     if (input== NULL)
     {
-        log_warn ("no input type '%s'", type);
+        disir_error_set (disir, "no input type '%s' registered.", type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
     }
     else
@@ -193,7 +193,7 @@ disir_config_output (struct disir *disir, const char *type, const char *id,
                       (strncmp(entry->do_type, type, DISIR_IO_TYPE_MAXLENGTH) == 0));
     if (output == NULL)
     {
-        log_warn ("no output type '%s'", type);
+        disir_error_set (disir, "no input type '%s' registered.", type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
     }
     else
@@ -222,7 +222,7 @@ disir_mold_output (struct disir *disir, const char *type, const char *id,
                       (strncmp(entry->do_type, type, DISIR_IO_TYPE_MAXLENGTH) == 0));
     if (output == NULL)
     {
-        log_warn ("no output type '%s'", type);
+        disir_error_set (disir, "no input type '%s' registered.", type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
     }
     else
@@ -251,7 +251,7 @@ disir_config_list (struct disir *disir, const char *type, struct disir_collectio
 
     if (input == NULL)
     {
-        log_warn ("no input type '%s'", type);
+        disir_error_set (disir, "no input type '%s' registered.", type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
     }
     else
