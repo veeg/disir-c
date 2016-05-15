@@ -4,12 +4,12 @@
 void test_collection_basic(void **state)
 {
     enum disir_status status;
-    dcc_t *collection;
+    struct disir_collection *collection;
     int32_t size;
 
     LOG_TEST_START
 
-    collection = dx_collection_create();
+    collection = dc_collection_create();
     assert_non_null(collection);
 
     // *_size invalid param
@@ -32,20 +32,20 @@ void test_collection_basic(void **state)
 void test_collection_add_to_trigger_resize(void **state)
 {
     enum disir_status status;
-    dcc_t *collection;
+    struct disir_collection *collection;
     dc_t *contexts[255];
     uint32_t i;
     int32_t size;
 
     LOG_TEST_START
 
-    collection = dx_collection_create();
+    collection = dc_collection_create();
     assert_non_null(collection);
 
     for (i = 0; i < 255; i++)
     {
         contexts[i] = dx_context_create(DISIR_CONTEXT_DOCUMENTATION);
-        status = dx_collection_push_context(collection, contexts[i]);
+        status = dc_collection_push_context(collection, contexts[i]);
         assert_int_equal(status, DISIR_STATUS_OK);
         size = dc_collection_size(collection);
         assert_int_equal(size, i + 1);
@@ -70,21 +70,21 @@ void test_collection_add_to_trigger_resize(void **state)
 void test_collection_next(void **state)
 {
     enum disir_status status;
-    dcc_t *collection;
+    struct disir_collection *collection;
     dc_t *contexts[100];
     dc_t *current;
     uint32_t i;
 
     LOG_TEST_START
 
-    collection = dx_collection_create();
+    collection = dc_collection_create();
     assert_non_null(collection);
 
     // Insert 100 entries
     for (i = 0; i < 100; i++)
     {
         contexts[i] = dx_context_create(DISIR_CONTEXT_DOCUMENTATION);
-        status = dx_collection_push_context(collection, contexts[i]);
+        status = dc_collection_push_context(collection, contexts[i]);
         assert_int_equal(status, DISIR_STATUS_OK);
     }
 
@@ -150,14 +150,14 @@ void test_collection_next(void **state)
 void test_collection_add_multiple(void **state)
 {
     enum disir_status status;
-    dcc_t *collection;
+    struct disir_collection *collection;
     uint32_t i;
     int32_t size;
     dc_t *contexts[20];
 
     LOG_TEST_START
 
-    collection = dx_collection_create();
+    collection = dc_collection_create();
     assert_non_null(collection);
 
     for (i =  0; i < 10; i++)
@@ -165,7 +165,7 @@ void test_collection_add_multiple(void **state)
         // QUESTION: Can we safely only allocate a context, without allocating the
         // corresponding value? :s
         contexts[i] = dx_context_create(DISIR_CONTEXT_DOCUMENTATION);
-        status = dx_collection_push_context(collection, contexts[i]);
+        status = dc_collection_push_context(collection, contexts[i]);
         assert_int_equal(status, DISIR_STATUS_OK);
     }
 
@@ -178,7 +178,7 @@ void test_collection_add_multiple(void **state)
     for (; i < 15; i++)
     {
         contexts[i] = dx_context_create(DISIR_CONTEXT_DOCUMENTATION);
-        status = dx_collection_push_context(collection, contexts[i]);
+        status = dc_collection_push_context(collection, contexts[i]);
         assert_int_equal(status, DISIR_STATUS_OK);
     }
 

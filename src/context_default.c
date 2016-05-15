@@ -512,7 +512,7 @@ dc_get_default_contexts (dc_t *context, struct disir_collection **collection)
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 
-    col = dx_collection_create ();
+    col = dc_collection_create ();
     if (col == NULL)
     {
         log_debug ("failed to allocate sufficient meory for output collection");
@@ -522,7 +522,7 @@ dc_get_default_contexts (dc_t *context, struct disir_collection **collection)
     //! Populate collection with each default entry on keyval
     status = DISIR_STATUS_OK;
     MQ_FOREACH (context->cx_keyval->kv_default_queue,
-      {status = dx_collection_push_context (col, entry->de_context);
+      {status = dc_collection_push_context (col, entry->de_context);
        if (status != DISIR_STATUS_OK) break;});
 
     if (status != DISIR_STATUS_OK)

@@ -16,7 +16,7 @@ dio_ini_config_write (const char *id, struct disir_config *config)
     enum disir_status status;
     dc_t *config_context;
     dc_t *context;
-    dcc_t *collection;
+    struct disir_collection *collection;
     int32_t size;
     const char *name;
     const char *value;

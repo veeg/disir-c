@@ -8,7 +8,7 @@ test_context_get_elements (void **state)
     enum disir_status status;
     dc_t *invalid;
     dc_t *mold_context;
-    dcc_t *collection;
+    struct disir_collection *collection;
     struct disir_mold *mold;
 
     LOG_TEST_START

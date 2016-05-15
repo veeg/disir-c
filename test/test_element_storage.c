@@ -109,7 +109,7 @@ test_element_storage_get_all (void **state)
 {
     enum disir_status status;
     struct disir_element_storage *storage;
-    struct disir_context_collection *collection;
+    struct disir_collection *collection;
     const char *key;
     dc_t *context;
     int i;
