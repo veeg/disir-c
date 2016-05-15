@@ -4,8 +4,11 @@
 #include <time.h>
 #include <string.h>
 
+#include <disir/disir.h>
+
 #include "log.h"
 #include "context_private.h"
+#include "disir_private.h"
 
 
 //! Variable to control the loglevel
@@ -120,11 +123,10 @@ dx_log_format (enum disir_log_level dll, const char *prefix,
 
 
 //! INTERNAL API
-//! Log the message to the context, such that the error message isalnum
-//! programmatically retrievable.
-//! Will also log to standard log source with DISIR_LOG_LEVEL_ERROR
+//! Log the message to the a storage pointer
 static void
-dx_internal_log_context (dc_t *context, const char* fmt_message, va_list args)
+dx_internal_log_to_storage (char **error_message, int32_t *error_message_size,
+                            const char* fmt_message, va_list args)
 {
     int message_size;
     int res;
@@ -149,21 +151,21 @@ dx_internal_log_context (dc_t *context, const char* fmt_message, va_list args)
     }
 
     // Allocate sufficiently large buffer, write message
-    if (context->cx_error_message_size < message_size + 1)
+    if (*error_message_size < message_size + 1)
     {
-        context->cx_error_message = realloc (context->cx_error_message, message_size + 1);
-        if (context->cx_error_message == NULL)
+        *error_message = realloc (*error_message, message_size + 1);
+        if (*error_message == NULL)
         {
             // What should we do!? Throw a tantrum!?
             return;
         }
-        context->cx_error_message_size = message_size + 1;
+        *error_message_size = message_size + 1;
     }
 
-    res = vsnprintf (context->cx_error_message, message_size + 1, fmt_message, args);
+    res = vsnprintf (*error_message, message_size + 1, fmt_message, args);
 
     // Put a null terminator to it.
-    context->cx_error_message[message_size] = '\0';
+    (*error_message)[message_size] = '\0';
 
     if (res < 0 || res > message_size)
     {
@@ -172,8 +174,9 @@ dx_internal_log_context (dc_t *context, const char* fmt_message, va_list args)
 }
 
 void
-dx_log_disir (enum disir_log_level dll,
+dx_log_disir_va (enum disir_log_level dll,
             dc_t *context,
+            struct disir *disir,
             int32_t log_context,
             const char *file,
             const char *function,
@@ -182,13 +185,32 @@ dx_log_disir (enum disir_log_level dll,
             const char *fmt_message,
             ...)
 {
+    va_list args;
+    va_start (args, fmt_message);
+    dx_log_disir (dll, context, disir, log_context,
+                  file, function, line, message_prefix, fmt_message, args);
+    va_end (args);
+}
+
+void
+dx_log_disir (enum disir_log_level dll,
+            dc_t *context,
+            struct disir *disir,
+            int32_t log_context,
+            const char *file,
+            const char *function,
+            int line,
+            const char *message_prefix,
+            const char *fmt_message,
+            va_list args)
+{
     char *prefix;
     char *suffix;
     char buffer[60];
     char suffix_buffer[255];
     int prefix_size = 60;
     int res;
-    va_list args;
+    va_list args_copy;
 
     char enter_string[] = "ENTER";
     char exit_string[] = "EXIT";
@@ -198,9 +220,20 @@ dx_log_disir (enum disir_log_level dll,
 
     if (log_context)
     {
-        va_start (args, fmt_message);
-        dx_internal_log_context (context, fmt_message, args);
-        va_end (args);
+        va_copy (args_copy, args);
+
+        dx_internal_log_to_storage (&context->cx_error_message,
+                                    &context->cx_error_message_size, fmt_message, args_copy);
+        va_end (args_copy);
+    }
+
+    if (disir != NULL)
+    {
+        va_copy (args_copy, args);
+
+        dx_internal_log_to_storage (&disir->disir_error_message,
+                                    &disir->disir_error_message_size, fmt_message, args_copy);
+        va_end (args_copy);
     }
 
     if (context)
@@ -241,12 +274,10 @@ dx_log_disir (enum disir_log_level dll,
         }
     }
 
-    va_start (args, fmt_message);
     dx_log_format (dll,
             (prefix != NULL ? prefix : message_prefix),
             (suffix != NULL ? suffix : ""),
             fmt_message,
             args);
-    va_end (args);
 }
 

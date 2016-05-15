@@ -1,6 +1,8 @@
 #ifndef _LIBDISIR_LOG_H
 #define _LIBDISIR_LOG_H
 
+#include <stdarg.h>
+
 #include <disir/context.h>
 
 //! All defined LOG LEVELS for disir logging
@@ -26,8 +28,19 @@ enum disir_log_level {
 
 
 //! Generic function signature for all logging methods
-void dx_log_disir( enum disir_log_level dll,
+void dx_log_disir (enum disir_log_level dll,
                 dc_t *context,
+                struct disir *disir,
+                int32_t log_context,
+                const char *file,
+                const char *function,
+                int line,
+                const char *message_prefix,
+                const char *fmt_message, va_list args);
+
+void dx_log_disir_va (enum disir_log_level dll,
+                dc_t *context,
+                struct disir *disir,
                 int32_t log_context,
                 const char *file,
                 const char *function,
@@ -35,9 +48,11 @@ void dx_log_disir( enum disir_log_level dll,
                 const char *message_prefix,
                 const char *fmt_message, ...);
 
-#define _log_disir_full(level, context, log_context, prefix, message, ...) \
-    dx_log_disir (level, \
+
+#define _log_disir_full(level, context, disir, log_context, prefix, message, ...) \
+    dx_log_disir_va (level, \
                  context, \
+                 disir, \
                  log_context, \
                  __FILE__, \
                  __FUNCTION__, \
@@ -48,9 +63,9 @@ void dx_log_disir( enum disir_log_level dll,
 
 // Hide away some details for log_disir
 #define _log_disir_level(level, message, ...) \
-    _log_disir_full (level, NULL, 0, NULL, message, ##__VA_ARGS__)
+    _log_disir_full (level, NULL, NULL, 0, NULL, message, ##__VA_ARGS__)
 #define _log_disir_level_context(level, context, message, ...) \
-    _log_disir_full (level, context, 0, NULL, message, ##__VA_ARGS__)
+    _log_disir_full (level, context, NULL, 0, NULL, message, ##__VA_ARGS__)
 
 
 #define log_fatal_context(context, message, ...) \
@@ -78,7 +93,7 @@ void dx_log_disir( enum disir_log_level dll,
 // Log specially to context
 // Will issue a DISIR_LOG_LEVEL_ERROR log entry to stream.
 #define dx_log_context(context, message, ...) \
-    _log_disir_full(DISIR_LOG_LEVEL_ERROR, context, 1, NULL, message, ##__VA_ARGS__)
+    _log_disir_full(DISIR_LOG_LEVEL_ERROR, context, NULL, 1, NULL, message, ##__VA_ARGS__)
 
 
 //! Crash and burn.. Output message on stderr before it aborts.
