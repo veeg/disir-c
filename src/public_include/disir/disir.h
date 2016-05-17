@@ -111,7 +111,7 @@ enum disir_status disir_libdisir_config_to_disk (struct disir *disir, struct dis
                                                  const char *filepath);
 
 
-//! \brief Return a string representation of the disir status
+//! \brief Return a string representation of the disir status.
 const char * disir_status_string (enum disir_status status);
 
 //! \brief Allocate a new libdisir instance.
