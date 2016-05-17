@@ -64,9 +64,29 @@ struct disir_input * dx_disir_input_create (void);
 //! \brief Destroy a previously allocated disir_input structure
 enum disir_status dx_disir_input_destroy (struct disir_input **output);
 
-// TMP - REWORK
+//! \brief Read INI formatted configuration file from id filepath
+//!
+//! \param[in] disir A libdisir instance to associate with the read operation.
+//! \param[in] id An entry identifier for which file to read. Corresponds to a full filepath.
+//! \param[in] mold A associated mold with this config read operation. Required parameter.
+//! \param[out] config Output parameter populated with the read config object.
+//!
+//! \return DISIR_STATUS_OK on success
+//!
 enum disir_status
-dio_register_ini (struct disir *disir);
+dio_ini_config_read (struct disir *disir, const char *id,
+                     struct disir_mold *mold, struct disir_config **config);
+
+//! \brief Write INI formatted configuration file to id filepath
+//!
+//! \param[in] disir A libdisir instance to associate with the write operation.
+//! \param[in] id An entry identifier for which to write the file. Corresponds to a full filepath.
+//! \param[in] config The config object to persist to disk at filepath location `id`.
+//!
+//! \return DISIR_STATUS_OK on success
+//!
+enum disir_status
+dio_ini_config_write (struct disir *disir, const char *id, struct disir_config *config);
 
 
 #endif // _LIBDISIR_DISIR_PRIVATE_H
