@@ -211,6 +211,8 @@ enum disir_status
 disir_instance_destroy (struct disir **disir)
 {
     struct disir_plugin *plugin;
+    struct disir_input *input;
+    struct disir_output *output;
 
     if (disir == NULL || *disir == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
@@ -225,6 +227,30 @@ disir_instance_destroy (struct disir **disir)
         dlclose (plugin->pl_dl_handler);
         free (plugin->pl_filepath);
         free (plugin);
+    }
+
+    // Free loaded input
+    while (1)
+    {
+        input = MQ_POP ((*disir)->dio_input_queue);
+        if (input == NULL)
+            break;
+
+        free (input->di_type);
+        free (input->di_description);
+        free (input);
+    }
+
+    // Free loaded output
+    while (1)
+    {
+        output = MQ_POP ((*disir)->dio_output_queue);
+        if (output == NULL)
+            break;
+
+        free (output->do_type);
+        free (output->do_description);
+        free (output);
     }
 
     free (*disir);
