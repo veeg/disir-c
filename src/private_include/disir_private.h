@@ -7,10 +7,13 @@
 //! \brief The main libdisir instance structure. All I/O operations requires an instance of it.
 struct disir
 {
+    //! Double-linked list queue of registered input plugins
     struct disir_input      *dio_input_queue;
+    //! Double-linked list queue of registered output plugins
     struct disir_output     *dio_output_queue;
 
-    struct disir_mold     *internal_mold;
+    //! Mold of configuration entry for libdisir itself.
+    struct disir_mold       *libdisir_mold;
 
     //! Error message sat on the disir instance.
     //! Set with disir_error_set() and clear with disir_error_clear()
