@@ -68,6 +68,7 @@ set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
 add_definitions ("-Wall")
 add_definitions ("-Werror")
 
+target_link_libraries (${PROJECT_SO_LIBRARY} ${CMAKE_DL_LIBS})
 target_link_libraries (${PROJECT_SO_LIBRARY} void-multimap)
 target_link_libraries (${PROJECT_SO_LIBRARY} void-list)
 
