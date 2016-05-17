@@ -92,6 +92,13 @@ enum disir_restriction
 #include <disir/collection.h>
 #include <disir/io.h>
 
+//! \brief Create a mold for the libdisir configuration entry.
+//!
+//! \param[out] mold Populated address with the created mold.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status disir_libdisir_mold (struct disir_mold **mold);
 
 //! \brief Return a string representation of the disir status
 const char * disir_status_string (enum disir_status status);

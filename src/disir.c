@@ -25,7 +25,7 @@
 
 
 enum disir_status
-dx_internal_mold (struct disir_mold **mold)
+disir_libdisir_mold (struct disir_mold **mold)
 {
     enum disir_status status;
     dc_t *context;
@@ -51,6 +51,12 @@ dx_internal_mold (struct disir_mold **mold)
                                    "Root directory to resolve mold lookups from.", NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
+
+    status = dc_add_keyval_string (context, "plugin_filepath", "/usr/lib/disir/plugins/",
+                                   "Load specified I/O plugin", NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
 
     status = dc_mold_finalize (&context, mold);
     if (status != DISIR_STATUS_OK)
