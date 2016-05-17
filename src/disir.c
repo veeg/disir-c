@@ -83,10 +83,22 @@ disir_libdisir_config_to_disk (struct disir *disir, struct disir_config *config,
 
 // PUBLIC API
 enum disir_status
-disir_instance_create (struct disir **disir)
+disir_instance_create (const char *config_filepath, struct disir_config *config,
+                       struct disir **disir)
 {
     enum disir_status status;
     struct disir *dis;
+
+    struct disir_config *libconf;
+    struct disir_mold *libmold;
+
+    status = DISIR_STATUS_OK;
+
+    if (disir == NULL)
+    {
+        log_debug ("invoked with disir NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
 
     dis = calloc (1, sizeof (struct disir));
     if (dis == NULL)
@@ -94,14 +106,37 @@ disir_instance_create (struct disir **disir)
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    status = dio_register_ini (dis);
+    status = disir_libdisir_mold (&libmold);
     if (status != DISIR_STATUS_OK)
     {
         goto error;
     }
 
-    // TODO: Load internal mold
-    // TODO: Load external config file
+    if (config)
+    {
+        // Use user-provided config
+        libconf = config;
+    }
+    else if (config_filepath)
+    {
+        // Read from disk
+        status = dio_ini_config_read (dis, config_filepath, libmold, &libconf);
+    }
+    else
+    {
+        // Load default config
+        status = disir_generate_config_from_mold (libmold, NULL, &libconf);
+    }
+
+    if (status != DISIR_STATUS_OK)
+    {
+        // TODO: Propogate error message?
+        goto error;
+    }
+
+    // TODO: Validate libconf
+    // XXX: Validate version? Upgrade?
+
 
     *disir = dis;
     return DISIR_STATUS_OK;
@@ -109,6 +144,10 @@ error:
     if (dis)
     {
         free (dis);
+    }
+    if (libmold)
+    {
+        disir_mold_finished (&libmold);
     }
 
     return status;

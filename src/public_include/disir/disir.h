@@ -114,16 +114,32 @@ enum disir_status disir_libdisir_config_to_disk (struct disir *disir, struct dis
 //! \brief Return a string representation of the disir status
 const char * disir_status_string (enum disir_status status);
 
-//! \brief Allocate a new libdisir instance
+//! \brief Allocate a new libdisir instance.
 //!
-//! \param[in,out] disir Pointer will be populated with the address of the allocated instance.
+//! If a `config` parameter is present, this configuration is used within
+//! this libdisir instance. If NULL, it is ignored.
+//! If `config_filepath` parameter is non-NULL, the INI-formatted file
+//! is parsed and validated against the libdisir mold. If NULL, it is ignored.
+//! If both `config` and `config_filepath` are NULL, the defaults from libdisir_mold
+//! are used instead.
+//! On validation error for either of these arguments, the disir instance creation
+//! is aborted and this function fails.
+//!
+//! \param[in] config Valid configuration entry based on the libdisir_mold.
+//!     Takes precedense over the `config_filepath` argument.
+//!     May be NULL.
+//! \param[in] config_filepath Location on disk to read libdisir configuration file from.
+//!     May be NULL, in case the internal defaults will be used.
+//!     `config` takes precedense over filepath option.
+//! \param[out] disir Pointer will be populated with the address of the allocated instance.
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if the input address is NULL
 //! \return DISIR_STATUS_NO_MEMORY if memory allocation failed.
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_instance_create (struct disir **disir);
+disir_instance_create (const char *config_filepath, struct disir_config *config,
+                       struct disir **disir);
 
 //! \brief Destroy a previously allocated libdisir instance
 //!
