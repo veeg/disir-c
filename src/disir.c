@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <dlfcn.h>
 
 // public disir interface
 #include <disir/disir.h>
@@ -17,12 +18,64 @@
 #include "keyval.h"
 #include "log.h"
 #include "util_private.h"
+#include "mqueue.h"
 
 #define INTERNAL_MOLD_DOCSTRING "The Disir Schema for the internal libdisir configuration."
 #define LOG_FILEPATH_DOCSTRING "The full filepath to the logfile libdisir will output to."
 #define MOLD_DIRPATH_DOCSTRING "The full directory path where libdisir will locate " \
             "it the installed molds to match against installed configuration files."
 
+//! INTERNAL STATIC
+static void
+load_plugin (struct disir *disir, const char *plugin_filepath)
+{
+    enum disir_status status;
+    void *handle;
+    struct disir_plugin *plugin;
+    enum disir_status (*dio_reg)(struct disir *);
+
+    // Attempt to load the filepath dynamically
+    handle = dlopen (plugin_filepath, RTLD_NOW | RTLD_LOCAL);
+    if (handle == NULL)
+    {
+        disir_error_set (disir, "Plugin located at filepath could not be loaded: %s: %s",
+                         plugin_filepath, dlerror());
+        return;
+    }
+
+    dlerror();
+    dio_reg = dlsym (handle, "dio_register_plugin");
+    if (dio_reg == NULL)
+    {
+        disir_error_set (disir,
+                         "Plugin could not locate symbol 'dio_register_plugin' in SO '%s': %s",
+                         plugin_filepath, dlerror());
+        dlclose (handle);
+        return;
+    }
+
+    status = dio_reg (disir);
+    if (status != DISIR_STATUS_OK)
+    {
+        dlclose (handle);
+        return;
+    }
+
+    // Allocate some storage handler and store this shit
+    plugin = calloc (1, sizeof (struct disir_plugin));
+    if (plugin == NULL)
+    {
+        // Ship is going down - abandon
+        return;
+    }
+
+    plugin->pl_dl_handler = handle;
+    plugin->pl_filepath = strdup (plugin_filepath);
+
+    MQ_ENQUEUE (disir->dio_plugin_queue, plugin);
+
+    return;
+}
 
 enum disir_status
 disir_libdisir_mold (struct disir_mold **mold)
@@ -157,10 +210,23 @@ error:
 enum disir_status
 disir_instance_destroy (struct disir **disir)
 {
+    struct disir_plugin *plugin;
+
     if (disir == NULL || *disir == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
-    // TODO: Remove allocated input/output instances
+    // Free loaded plugins
+    while (1)
+    {
+        plugin = MQ_POP ((*disir)->dio_plugin_queue);
+        if (plugin == NULL)
+            break;
+
+        dlclose (plugin->pl_dl_handler);
+        free (plugin->pl_filepath);
+        free (plugin);
+    }
+
     free (*disir);
 
     *disir = NULL;

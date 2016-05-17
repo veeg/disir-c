@@ -7,6 +7,9 @@
 //! \brief The main libdisir instance structure. All I/O operations requires an instance of it.
 struct disir
 {
+    //! Double-linked list queue of dynamically loaded plugins
+    struct disir_plugin     *dio_plugin_queue;
+
     //! Double-linked list queue of registered input plugins
     struct disir_input      *dio_input_queue;
     //! Double-linked list queue of registered output plugins
@@ -21,6 +24,14 @@ struct disir
     char                    *disir_error_message;
     //! Bytes allocated/occupied by the disir_error_message.
     int32_t                 disir_error_message_size;
+};
+
+struct disir_plugin
+{
+    void                    *pl_dl_handler;
+    char                    *pl_filepath;
+
+    struct disir_plugin     *next, *prev;
 };
 
 //! \brief The internal input plugin structure.
