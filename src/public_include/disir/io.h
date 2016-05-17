@@ -234,6 +234,27 @@ enum disir_status
 disir_config_list (struct disir *disir, const char *type,
                    struct disir_collection **collection);
 
+//! \brief Mark yourself finished with the configuration object
+//!
+//! \param[in,out] config Object to mark as finished. Turns the pointer to NULL
+//!     on success.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_config_finished (struct disir_config **config);
+
+//! \brief Mark yourself finished with the mold object.
+//!
+//! \\param[in,out] mold Object to mark as finished. Turns the pointer to NULL
+//!     on success.
+//!
+//! \return DISIR_STATUS_OK on success
+//!
+enum disir_status
+disir_mold_finished (struct disir_mold **mold);
+
+
 //! \brief List all registered input plugins
 //!
 //! \param[in] disir Libdisir instance to query for input plugins

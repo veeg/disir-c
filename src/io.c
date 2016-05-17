@@ -300,6 +300,34 @@ disir_input_plugin_list (struct disir *disir, struct disir_collection **collecti
     return DISIR_STATUS_OK;
 }
 
+//! PUBLIC API
+enum disir_status
+disir_config_finished (struct disir_config **config)
+{
+    enum disir_status status;
+    dc_t *context;
+
+    context = (*config)->cf_context;
+    status = dc_destroy (&context);
+    if (status == DISIR_STATUS_OK)
+        *config = NULL;
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+disir_mold_finished (struct disir_mold **mold)
+{
+    enum disir_status status;
+    dc_t *context;
+
+    context = (*mold)->mo_context;
+    status = dc_destroy (&context);
+    if (status == DISIR_STATUS_OK)
+        *mold = NULL;
+    return status;
+}
+
 //! INTERNAL API
 struct disir_output *
 dx_disir_output_create (void)
