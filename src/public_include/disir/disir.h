@@ -100,6 +100,17 @@ enum disir_restriction
 //!
 enum disir_status disir_libdisir_mold (struct disir_mold **mold);
 
+//! \brief Output the libdisir config entry to disk.
+//!
+//! \param config Valid configuration object based of libdisir_mold
+//! \param filepath Path to disk location to write the INI-formatted config file.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status disir_libdisir_config_to_disk (struct disir *disir, struct disir_config *config,
+                                                 const char *filepath);
+
+
 //! \brief Return a string representation of the disir status
 const char * disir_status_string (enum disir_status status);
 

@@ -73,6 +73,14 @@ error:
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+disir_libdisir_config_to_disk (struct disir *disir, struct disir_config *config,
+                               const char *filepath)
+{
+    return dio_ini_config_write (disir, filepath, config);
+}
+
 // PUBLIC API
 enum disir_status
 disir_instance_create (struct disir **disir)
