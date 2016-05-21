@@ -77,6 +77,58 @@ load_plugin (struct disir *disir, const char *plugin_filepath)
     return;
 }
 
+//! INTERNAL STATIC
+void
+load_plugins_from_config (struct disir *disir, struct disir_config *config)
+{
+    enum disir_status status;
+    struct disir_collection *collection;
+    dc_t *element;
+    dc_t *context;
+    const char *name;
+    const char *value;
+
+    context = dc_config_getcontext (config);
+    if (context == NULL)
+    {
+        disir_error_set (disir, "Failed to retrieve context from config object.");
+        return;
+    }
+
+    status = dc_get_elements (context, &collection);
+    if (status != DISIR_STATUS_OK)
+    {
+        dc_putcontext (&context);
+        return;
+    }
+
+    while (dc_collection_next (collection, &element) == DISIR_STATUS_OK)
+    {
+        status = dc_get_name (element, &name, NULL);
+        if (status != DISIR_STATUS_OK)
+        {
+            log_warn ("libdisir config: Failed to get_name in element from collection: %s",
+                      disir_status_string (status));
+            continue;
+        }
+
+        status = dc_get_value_string (element, &value, NULL);
+        if (status != DISIR_STATUS_OK)
+        {
+            log_warn ("libdisir config: Failed to get value string from elements: %s",
+                      disir_status_string (status));
+            continue;
+        }
+
+        if (strcmp (name, "plugin_filepath") == 0)
+        {
+            load_plugin (disir, value);
+        }
+    }
+
+    dc_collection_finished (&collection);
+}
+
 enum disir_status
 disir_libdisir_mold (struct disir_mold **mold)
 {
@@ -190,6 +242,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
     // TODO: Validate libconf
     // XXX: Validate version? Upgrade?
 
+    load_plugins_from_config (dis, libconf);
 
     *disir = dis;
     return DISIR_STATUS_OK;
