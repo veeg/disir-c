@@ -1,0 +1,22 @@
+enable_testing()
+
+set (TESTS_PUBLIC_API tests_public_api)
+file (GLOB TESTS_PUBLIC_API_SOURCES *.cc)
+
+add_executable (${TESTS_PUBLIC_API} ${TESTS_PUBLIC_API_SOURCES})
+
+set_property (TARGET ${TESTS_PUBLIC_API} PROPERTY CXX_STANDARD 11)
+set_property (TARGET ${TESTS_PUBLIC_API} PROPERTY CXX_STANDARD_REQUIRED ON)
+
+add_definitions ("-Wall")
+add_definitions ("-Werror")
+
+include_directories (${LIBDISIR_TEST_INCLUDE_DIRS})
+
+target_link_libraries (${TESTS_PUBLIC_API} ${PROJECT_SO_LIBRARY})
+target_link_libraries (${TESTS_PUBLIC_API} ${GTEST_BOTH_LIBRARIES})
+target_link_libraries (${TESTS_PUBLIC_API} void-multimap)
+target_link_libraries (${TESTS_PUBLIC_API} void-list)
+
+add_test (LibDisirPublicAPITests ${TESTS_PUBLIC_API})
+
