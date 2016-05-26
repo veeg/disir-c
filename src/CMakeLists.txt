@@ -67,10 +67,20 @@ set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
 
 add_definitions ("-Wall")
 add_definitions ("-Werror")
+add_definitions ("-fsanitize=undefined")
+add_definitions ("-fsanitize=shift")
+add_definitions ("-fsanitize=integer-divide-by-zero")
+add_definitions ("-fsanitize=unreachable")
+add_definitions ("-fsanitize=vla-bound")
+add_definitions ("-fsanitize=null")
+add_definitions ("-fsanitize=return")
+add_definitions ("-fsanitize=signed-integer-overflow")
 
 target_link_libraries (${PROJECT_SO_LIBRARY} ${CMAKE_DL_LIBS})
 target_link_libraries (${PROJECT_SO_LIBRARY} void-multimap)
 target_link_libraries (${PROJECT_SO_LIBRARY} void-list)
+# TODO: Find a dynamic way to detect existance of library
+target_link_libraries (${PROJECT_SO_LIBRARY} ubsan)
 
 install (TARGETS ${PROJECT_SO_LIBRARY}
     EXPORT ${EXPORT_TARGET}
