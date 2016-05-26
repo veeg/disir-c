@@ -313,6 +313,12 @@ disir_instance_destroy (struct disir **disir)
     disir_config_finished(&(*disir)->libdisir_config);
     disir_mold_finished(&(*disir)->libdisir_mold);
 
+    // Free any error message set on instance
+    if ((*disir)->disir_error_message)
+    {
+        free ((*disir)->disir_error_message);
+    }
+
     free (*disir);
 
     *disir = NULL;
