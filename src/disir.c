@@ -126,6 +126,7 @@ load_plugins_from_config (struct disir *disir, struct disir_config *config)
         }
     }
 
+    dc_putcontext (&context);
     dc_collection_finished (&collection);
 }
 
