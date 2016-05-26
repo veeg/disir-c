@@ -3,7 +3,6 @@
 
 #include <disir/context.h>
 
-#include "util_private.h"
 #include "value.h"
 
 struct disir_default

@@ -17,7 +17,6 @@
 #include "default.h"
 #include "keyval.h"
 #include "log.h"
-#include "util_private.h"
 #include "mqueue.h"
 
 #define INTERNAL_MOLD_DOCSTRING "The Disir Schema for the internal libdisir configuration."
@@ -418,11 +417,11 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
 
     if (semver)
     {
-        dx_semantic_version_set (&(*config)->cf_version, semver);
+        dc_semantic_version_set (&(*config)->cf_version, semver);
     }
     else
     {
-        dx_semantic_version_set (&(*config)->cf_version, &mold->mo_version);
+        dc_semantic_version_set (&(*config)->cf_version, &mold->mo_version);
     }
     log_debug ("sat config version to: %s",
                dc_semantic_version_string (buffer, 32, &(*config)->cf_version));

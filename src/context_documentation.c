@@ -12,7 +12,6 @@
 
 // Private
 #include "context_private.h"
-#include "util_private.h"
 #include "config.h"
 #include "mold.h"
 #include "keyval.h"
@@ -77,7 +76,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
     }
 
     exists = MQ_SIZE_COND (*doc_queue,
-                (dx_semantic_version_compare (&entry->dd_introduced, &doc->dd_introduced) == 0));
+                (dc_semantic_version_compare (&entry->dd_introduced, &doc->dd_introduced) == 0));
     if (exists)
     {
         dx_log_context (parent,
@@ -88,7 +87,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
     else
     {
         MQ_ENQUEUE_CONDITIONAL (*doc_queue, doc,
-            (dx_semantic_version_compare (&entry->dd_introduced, &doc->dd_introduced) > 0));
+            (dc_semantic_version_compare (&entry->dd_introduced, &doc->dd_introduced) > 0));
         status = DISIR_STATUS_OK;
     }
 
@@ -239,7 +238,7 @@ dc_get_documentation (dc_t *context, struct semantic_version *semver,
         // Get the prev entry from the found entry
         //  NULL is returned if the tail is lower than our version compare input
         doc_context = MQ_FIND (*doc_parent,
-                (dx_semantic_version_compare (&entry->dd_introduced, semver) > 0));
+                (dc_semantic_version_compare (&entry->dd_introduced, semver) > 0));
         if (doc_context != NULL && doc_context->prev != MQ_TAIL (*doc_parent))
         {
             doc_context = doc_context->prev;

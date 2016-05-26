@@ -70,9 +70,9 @@ dc_semantic_version_string (char *buffer, int32_t buffer_size, struct semantic_v
     return buffer;
 }
 
-//! INTERNAL API
+//! PUBLIC API
 int
-dx_semantic_version_compare (struct semantic_version *s1, struct semantic_version *s2)
+dc_semantic_version_compare (struct semantic_version *s1, struct semantic_version *s2)
 {
     int res;
 
@@ -87,9 +87,9 @@ dx_semantic_version_compare (struct semantic_version *s1, struct semantic_versio
     return res;
 }
 
-//! INTERNAL API
+//! PUBLIC API
 void
-dx_semantic_version_set (struct semantic_version *destination, struct semantic_version *source)
+dc_semantic_version_set (struct semantic_version *destination, struct semantic_version *source)
 {
     log_debug ("setting semver (%p) to %d.%d.%d from source (%p)",
                destination,

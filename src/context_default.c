@@ -14,7 +14,6 @@
 #include "keyval.h"
 #include "default.h"
 #include "context_private.h"
-#include "util_private.h"
 #include "collection.h"
 
 
@@ -106,7 +105,7 @@ dx_default_finalize (dc_t **default_context)
     // TODO: Verify that the default respect the restrictions on the parent keyval
 
     exists = MQ_SIZE_COND (*queue,
-            (dx_semantic_version_compare (&entry->de_introduced, &def->de_introduced) == 0));
+            (dc_semantic_version_compare (&entry->de_introduced, &def->de_introduced) == 0));
     if (exists)
     {
         dx_log_context (*default_context,
@@ -117,7 +116,7 @@ dx_default_finalize (dc_t **default_context)
     else
     {
         MQ_ENQUEUE_CONDITIONAL (*queue, def,
-            (dx_semantic_version_compare (&entry->de_introduced, &def->de_introduced) > 0));
+            (dc_semantic_version_compare (&entry->de_introduced, &def->de_introduced) > 0));
         status = DISIR_STATUS_OK;
     }
 
@@ -550,7 +549,7 @@ dx_default_get_active (dc_t *keyval, struct semantic_version *semver, struct dis
     else if (semver)
     {
         current = MQ_FIND (keyval->cx_keyval->kv_default_queue,
-                (dx_semantic_version_compare (&entry->de_introduced, semver) > 0));
+                (dc_semantic_version_compare (&entry->de_introduced, semver) > 0));
         if (current != NULL && current->prev != MQ_TAIL (keyval->cx_keyval->kv_default_queue))
         {
             current = current->prev;

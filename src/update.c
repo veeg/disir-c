@@ -10,7 +10,6 @@
 #include "log.h"
 #include "mold.h"
 #include "update_private.h"
-#include "util_private.h"
 
 //! PUBLIC API
 enum disir_status
@@ -38,7 +37,7 @@ disir_update_config (struct disir_config *config,
                    dc_semantic_version_string (buffer, 512, target));
     }
 
-    res = dx_semantic_version_compare (&config->cf_version, target);
+    res = dc_semantic_version_compare (&config->cf_version, target);
     if (res > 0)
     {
         log_warn ("Config has higher version (%s) than target (%s)",
@@ -70,7 +69,7 @@ disir_update_config (struct disir_config *config,
     }
 
     up->up_config = config;
-    dx_semantic_version_set (&up->up_target, target);
+    dc_semantic_version_set (&up->up_target, target);
 
     *update = up;
     return disir_update_continue (up);
@@ -113,7 +112,7 @@ disir_update_continue (struct disir_update *update)
         // Get keyval default of target semver - if semver is less or equal to current
         // Do nothing
         dx_default_get_active (keyval->kv_mold_equiv, &update->up_target, &target_def);
-        res = dx_semantic_version_compare (&target_def->de_introduced,
+        res = dc_semantic_version_compare (&target_def->de_introduced,
                                            &update->up_config->cf_version);
         if (res <= 0)
         {
@@ -170,7 +169,7 @@ disir_update_continue (struct disir_update *update)
     }
 
     // Update version number of config
-    dx_semantic_version_set (&update->up_config->cf_version, &update->up_target);
+    dc_semantic_version_set (&update->up_config->cf_version, &update->up_target);
 
     TRACE_EXIT ("");
     return DISIR_STATUS_OK;

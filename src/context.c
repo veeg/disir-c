@@ -11,7 +11,6 @@
 
 // Private
 #include "context_private.h"
-#include "util_private.h"
 #include "config.h"
 #include "keyval.h"
 #include "log.h"
@@ -732,11 +731,11 @@ dc_get_version (dc_t *context, struct semantic_version *semver)
 
     if (dc_context_type (context) == DISIR_CONTEXT_CONFIG)
     {
-        dx_semantic_version_set (semver, &context->cx_config->cf_version);
+        dc_semantic_version_set (semver, &context->cx_config->cf_version);
     }
     else if (dc_context_type (context) == DISIR_CONTEXT_MOLD)
     {
-        dx_semantic_version_set (semver, &context->cx_mold->mo_version);
+        dc_semantic_version_set (semver, &context->cx_mold->mo_version);
     }
     else
     {
@@ -778,16 +777,16 @@ dc_set_version (dc_t *context, struct semantic_version *semver)
 
     if (dc_context_type (context) == DISIR_CONTEXT_CONFIG)
     {
-        if (dx_semantic_version_compare (&context->cx_config->cf_mold->mo_version, semver) < 0)
+        if (dc_semantic_version_compare (&context->cx_config->cf_mold->mo_version, semver) < 0)
         {
             dx_log_context (context, "Cannot set version to CONFIG whose MOLD is lower.");
             return DISIR_STATUS_CONFLICTING_SEMVER;
         }
-        dx_semantic_version_set (&context->cx_config->cf_version, semver);
+        dc_semantic_version_set (&context->cx_config->cf_version, semver);
     }
     else if (dc_context_type (context) == DISIR_CONTEXT_MOLD)
     {
-        dx_semantic_version_set (&context->cx_mold->mo_version, semver);
+        dc_semantic_version_set (&context->cx_mold->mo_version, semver);
     }
     else
     {

@@ -49,6 +49,22 @@ char * dc_semantic_version_string (char *buffer, int32_t buffer_size,
 //!
 enum disir_status dc_semantic_version_convert (const char *input, struct semantic_version *semver);
 
+//! \brief Populate the destination semver with the values of source semver
+//!
+//! No input validation is performed.
+//!
+void
+dc_semantic_version_set (struct semantic_version *destination, struct semantic_version *source);
+
+//! \brief Compare the two input semantic versions structures
+//!
+//! \return < 0 if s1 is lesser than s2,
+//! \return 0 if s1 == s2
+//! \return > 0 if s2 is greater than s1.
+//!
+int
+dc_semantic_version_compare (struct semantic_version *s1, struct semantic_version *s2);
+
 
 #ifdef __cplusplus
 }
