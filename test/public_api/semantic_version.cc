@@ -68,3 +68,23 @@ TEST_F (SemanticVersionTest, compare_patch)
     EXPECT_LT (res, 0);
 }
 
+TEST_F (SemanticVersionTest, set_invalid)
+{
+    // Should basically not crash. Thats the test
+    dc_semantic_version_set (NULL, &sv2);
+    dc_semantic_version_set (&sv1, NULL);
+}
+
+TEST_F (SemanticVersionTest, set_valid)
+{
+    // Should basically not crash. Thats the test
+    memset (&sv1, 0, sizeof (struct semantic_version));
+
+    dc_semantic_version_set (&sv1, &sv2);
+
+    EXPECT_EQ (sv1.sv_major, sv2.sv_major);
+    EXPECT_EQ (sv1.sv_minor, sv2.sv_minor);
+    EXPECT_EQ (sv1.sv_patch, sv2.sv_patch);
+}
+
+
