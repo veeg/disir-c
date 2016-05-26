@@ -9,6 +9,7 @@
 // Private
 #include "context_private.h"
 #include "config.h"
+#include "mold.h"
 #include "mqueue.h"
 #include "log.h"
 #include "element_storage.h"
@@ -64,6 +65,7 @@ dc_config_begin (struct disir_mold *mold, dc_t **config)
         return DISIR_STATUS_NO_MEMORY;
     }
 
+    dx_context_incref (mold->mo_context);
     context->cx_config->cf_mold = mold;
     context->CONTEXT_CAPABILITY_ADD_ENTRY = 1;
 
@@ -148,8 +150,14 @@ error:
 enum disir_status
 dx_config_destroy (struct disir_config **config)
 {
+    dc_t *context;
+
     if (config == NULL || *config == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
+
+    // Decref our count on mold context.
+    context = (*config)->cf_mold->mo_context;
+    dx_context_decref (&context);
 
     dx_element_storage_destroy (&(*config)->cf_elements);
 
