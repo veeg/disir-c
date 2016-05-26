@@ -14,6 +14,7 @@
 #include "mold.h"
 #include "section.h"
 #include "log.h"
+#include "mqueue.h"
 
 //! INTERNAL API
 enum disir_status
@@ -324,14 +325,47 @@ dx_keyval_create (dc_t *parent)
 enum disir_status
 dx_keyval_destroy (struct disir_keyval **keyval)
 {
+    dc_t *context;
+    struct disir_documentation *doc;
+    struct disir_default *def;
+
     if (keyval == NULL || *keyval == NULL)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
+    // Free allocated name
     if ((*keyval)->kv_name.dv_size != 0)
     {
         free ((*keyval)->kv_name.dv_string);
+    }
+
+    // Free allocated value, if string
+    if ((*keyval)->kv_value.dv_type == DISIR_VALUE_TYPE_STRING &&
+        (*keyval)->kv_value.dv_size != 0)
+    {
+        free ((*keyval)->kv_value.dv_string);
+    }
+
+    // Decref mold_equiv if set
+    if ((*keyval)->kv_mold_equiv)
+    {
+        dx_context_decref (&(*keyval)->kv_mold_equiv);
+        (*keyval)->kv_mold_equiv = NULL;
+    }
+
+    // Destroy (all) documentation entries on the keyval.
+    while ((doc = MQ_POP((*keyval)->kv_documentation_queue)))
+    {
+        context = doc->dd_context;
+        dc_destroy (&context);
+    }
+
+    // Destroy all default entries on the keyval.
+    while ((def = MQ_POP((*keyval)->kv_default_queue)))
+    {
+        context = def->de_context;
+        dc_destroy (&context);
     }
 
     free (*keyval);
