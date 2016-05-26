@@ -176,6 +176,7 @@ void
 dx_context_incref (dc_t *context)
 {
     context->cx_refcount++;
+    log_debug_context (context, "(%p) increased refcount to: %d", context, context->cx_refcount);
 }
 
 //! INTERNAL API
@@ -190,6 +191,11 @@ dx_context_decref (dc_t **context)
     if ((*context)->cx_refcount == 0)
     {
         dx_context_destroy (context);
+    }
+    else
+    {
+        log_debug_context (*context, "(%p) reduced refcount to: %d",
+                           *context, (*context)->cx_refcount);
     }
 }
 
@@ -289,6 +295,8 @@ dx_context_destroy  (dc_t **context)
     {
         free ((*context)->cx_error_message);
     }
+
+    log_debug_context (*context, " (%p) reached refcount zero. Freeing.", *context);
 
     free(*context);
     *context = NULL;
