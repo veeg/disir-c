@@ -91,6 +91,11 @@ dc_semantic_version_compare (struct semantic_version *s1, struct semantic_versio
 void
 dc_semantic_version_set (struct semantic_version *destination, struct semantic_version *source)
 {
+    if (destination == NULL || source == NULL)
+    {
+        return;
+    }
+
     log_debug ("setting semver (%p) to %d.%d.%d from source (%p)",
                destination,
                source->sv_major, source->sv_minor, source->sv_patch,
