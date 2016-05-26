@@ -27,6 +27,10 @@ basic_keyval(void)
     if (status != DISIR_STATUS_OK)
         goto error;
 
+    status = dc_mold_finalize (&context, &mold);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
     return std::pair<const char *, struct disir_mold *>("basic_keyval", mold);
 error:
     return std::pair<const char *, struct disir_mold *>(NULL, NULL);
