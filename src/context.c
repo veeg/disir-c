@@ -603,6 +603,7 @@ dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size)
             // Did not find the element with that name
             log_debug ("failed to get first keyval: %s. name: %s",
                        disir_status_string (status), value);
+            // XXX revise return status
             return DISIR_STATUS_INVALID_ARGUMENT;
         }
         context->cx_keyval->kv_mold_equiv = queried;
