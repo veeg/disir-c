@@ -15,6 +15,8 @@ struct disir
     //! Double-linked list queue of registered output plugins
     struct disir_output     *dio_output_queue;
 
+    //! Active configuration based of libdisir_mold
+    struct disir_config     *libdisir_config;
     //! Mold of configuration entry for libdisir itself.
     struct disir_mold       *libdisir_mold;
 

@@ -245,6 +245,9 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 
     load_plugins_from_config (dis, libconf);
 
+    dis->libdisir_mold = libmold;
+    dis->libdisir_config = libconf;
+
     *disir = dis;
     return DISIR_STATUS_OK;
 error:
@@ -306,6 +309,9 @@ disir_instance_destroy (struct disir **disir)
         free (output->do_description);
         free (output);
     }
+
+    disir_config_finished(&(*disir)->libdisir_config);
+    disir_mold_finished(&(*disir)->libdisir_mold);
 
     free (*disir);
 
