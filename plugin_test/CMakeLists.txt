@@ -15,6 +15,7 @@ add_definitions ("-Werror")
 
 include_directories (
   ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${LIBDISIR_PUBLIC_INCLUDE_DIR}
 )
 
 target_link_libraries (${TEST_TARGET} void-multimap)
