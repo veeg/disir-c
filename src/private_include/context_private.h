@@ -63,7 +63,7 @@ struct disir_context
         struct disir_config         *cx_config;
         struct disir_default        *cx_default;
         struct disir_section        *cx_section;
-        struct disir_mold         *cx_mold;
+        struct disir_mold           *cx_mold;
         struct disir_group          *cx_group;
         struct disir_keyval         *cx_keyval;
         struct disir_documentation  *cx_documentation;
