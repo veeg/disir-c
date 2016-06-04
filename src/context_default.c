@@ -165,21 +165,25 @@ dx_default_destroy (struct disir_default **def)
     context = tmp->de_context;
     if (context && context->cx_parent_context)
     {
-        switch (dc_context_type (context->cx_parent_context))
+        // Don't access parent context type if context is destoyed
+        if (context->cx_parent_context->cx_state != CONTEXT_STATE_DESTROYED)
         {
-        case DISIR_CONTEXT_KEYVAL:
-        {
-            queue = &(context->cx_parent_context->cx_keyval->kv_default_queue);
-            break;
-        }
-        default:
-        {
-            dx_crash_and_burn ("invoked on invalid context type (%s) - impossible",
-                               dc_context_type_string (context));
-        }
-        }
+            switch (dc_context_type (context->cx_parent_context))
+            {
+            case DISIR_CONTEXT_KEYVAL:
+            {
+                queue = &(context->cx_parent_context->cx_keyval->kv_default_queue);
+                break;
+            }
+            default:
+            {
+                dx_crash_and_burn ("invoked on invalid context type (%s) - impossible",
+                                   dc_context_type_string (context));
+            }
+            }
 
-        MQ_REMOVE_SAFE (*queue, tmp);
+            MQ_REMOVE_SAFE (*queue, tmp);
+        }
     }
 
     free (tmp);
