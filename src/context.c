@@ -110,6 +110,13 @@ dc_destroy (dc_t **context)
     // Set the context to destroyed
     (*context)->cx_state = CONTEXT_STATE_DESTROYED;
 
+    // Decref the parent ref count attained in dx_context_attach
+    // Guard against decrefing ourselves (top-level contexts)
+    if ((*context)->cx_parent_context && (*context)->cx_parent_context != *context)
+    {
+        dx_context_decref (&(*context)->cx_parent_context);
+    }
+
     // Simply decref the context - When it reaches zero, it will be dealloced
     dx_context_decref (context);
 

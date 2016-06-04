@@ -169,6 +169,10 @@ dx_context_attach (dc_t *parent, dc_t *context)
         return;
 
     context->cx_parent_context = parent;
+    // Child holds a reference to its parent. If parent is destroyed,
+    // without the child having finalized, the child wont be destroyed
+    // and may attempt to access parent context after it is destroyed.
+    dx_context_incref (parent);
 }
 
 //! INTERNAL API
