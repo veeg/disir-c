@@ -22,3 +22,13 @@ Because its **manual**. It does not aid you in resolving conflict between the sa
 [horizontal]
 Restrictions:: No restritions are implemented on neither section nor keyval.
 
+
+== Developer dependencies
+
+* cmake
+* gtest
+* gtest-devel
+* (cmocka until it is deprecrated)
+* doxygen
+* gem install asciidoctor
+* git@github.com:veeg/doxml2asciidoc
