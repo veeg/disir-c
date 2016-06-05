@@ -178,6 +178,8 @@ void dx_context_destroy (dc_t **context);
 //!
 enum disir_status dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size);
 
+//! \brief Set the input message to the error string of context
+void dx_context_error_set (dc_t *context, const char *fmt_message, ...);
 
 //! Check that the passed context is either of the passed
 //! DISIR_CONTEXT_* following the variadic list.
