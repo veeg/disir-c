@@ -215,6 +215,10 @@ dc_add_default (dc_t *parent, const char *value,
         // Already logged
         return status;
     }
+    if (value == NULL)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
 
     status = DISIR_STATUS_INTERNAL_ERROR;
 
