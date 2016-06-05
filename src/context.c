@@ -867,12 +867,20 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
         introduced = &context->cx_keyval->kv_introduced;
         break;
     }
+    case DISIR_CONTEXT_CONFIG:
+    {
+        introduced = &context->cx_config->cf_version;
+        break;
+    }
+    case DISIR_CONTEXT_MOLD:
+    {
+        introduced = &context->cx_mold->mo_version;
+        break;
+    }
     case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_context_type_string (context));
-    case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_FREE_TEXT:
         dx_log_context (context, "invoked %s() with capability it should not have.", __FUNCTION__);
         status = DISIR_STATUS_INTERNAL_ERROR;
