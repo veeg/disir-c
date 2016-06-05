@@ -613,8 +613,7 @@ dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size)
             return DISIR_STATUS_INVALID_ARGUMENT;
         }
         context->cx_keyval->kv_mold_equiv = queried;
-        context->cx_keyval->kv_value.dv_type = queried->cx_keyval->kv_type;
-        context->cx_keyval->kv_type = queried->cx_keyval->kv_type;
+        context->cx_keyval->kv_value.dv_type = queried->cx_keyval->kv_value.dv_type;
 
         dx_context_incref (queried);
     }

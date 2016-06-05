@@ -16,9 +16,6 @@ struct disir_keyval
     //! Only applicable to parent toplevel context DISIR_CONTEXT_CONFIG
     dc_t                        *kv_mold_equiv;
 
-    //! Type of value this keyval holds
-    enum disir_value_type       kv_type;
-
     //! Version this keyval entry was introduced.
     struct semantic_version     kv_introduced;
 
@@ -36,6 +33,7 @@ struct disir_keyval
     struct disir_value          kv_name;
 
     //! Value held by this KEYVAL, given its root is CONFIG.
+    //! The value type is infered from this structure
     struct disir_value          kv_value;
 
     //! Whether or not this keyval entry is disabled.

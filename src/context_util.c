@@ -115,7 +115,7 @@ dc_value_type (dc_t *context)
     if (context_type == DISIR_CONTEXT_DEFAULT)
         value_type = context->cx_default->de_value.dv_type;
     else if (context_type == DISIR_CONTEXT_KEYVAL)
-        value_type = context->cx_keyval->kv_type;
+        value_type = context->cx_keyval->kv_value.dv_type;
 
     return dx_value_type_sanify (value_type);
 }
@@ -547,7 +547,7 @@ dc_set_value_type (dc_t *context, enum disir_value_type type)
     {
         //TODO XXX: Cannot set type if keyval has defaults
         //TODO XXX: Cannot set type if toplevel context is not DISIR_MOLD
-        context->cx_keyval->kv_type = type;
+        context->cx_keyval->kv_value.dv_type = type;
         break;
     }
     default:
@@ -593,7 +593,7 @@ dc_get_value_type (dc_t *context, enum disir_value_type *type)
         *type = context->cx_default->de_value.dv_type;
         break;
     case DISIR_CONTEXT_KEYVAL:
-        *type = context->cx_keyval->kv_type;
+        *type = context->cx_keyval->kv_value.dv_type;
         break;
     case DISIR_CONTEXT_FREE_TEXT:
         *type = context->cx_value->dv_type;

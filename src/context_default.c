@@ -49,7 +49,7 @@ dx_default_begin (dc_t *parent, dc_t **def)
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 
-    if (dx_value_type_sanify (parent->cx_keyval->kv_type) == DISIR_VALUE_TYPE_UNKNOWN)
+    if (dx_value_type_sanify (parent->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN)
     {
         dx_log_context (parent,
                         "Cannot add a default entry to a keyval \
@@ -75,7 +75,7 @@ dx_default_begin (dc_t *parent, dc_t **def)
     log_debug_context (parent, "allocated new default instance: %p", context->cx_default);
 
     // Inherrit keyval's value type to the newly allocated default's value type.
-    context->cx_default->de_value.dv_type = parent->cx_keyval->kv_type;
+    context->cx_default->de_value.dv_type = parent->cx_keyval->kv_value.dv_type;
 
     dx_context_attach (parent, context);
     *def = context;
