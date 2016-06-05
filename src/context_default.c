@@ -52,8 +52,8 @@ dx_default_begin (dc_t *parent, dc_t **def)
     if (dx_value_type_sanify (parent->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN)
     {
         dx_log_context (parent,
-                        "Cannot add a default entry to a keyval \
-                        who has not yet defined a value type.");
+                        "Cannot add a default entry to a keyval"
+                        " who has not yet defined a value type.");
         return DISIR_STATUS_INVALID_CONTEXT; // XXX: Revise error return code
     }
 
