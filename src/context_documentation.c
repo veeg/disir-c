@@ -160,7 +160,7 @@ dc_add_documentation (dc_t *parent, const char *doc, int32_t doc_size)
     // Any invalid state building operation is reported to parent context
     log_debug ("Arguments ok - begining doc");
 
-    status = dx_documentation_begin (parent, &context);
+    status = dc_begin (parent, DISIR_CONTEXT_DOCUMENTATION, &context);
     if (status != DISIR_STATUS_OK)
     {
         // dc_documentation_begin performs LOGWARN
