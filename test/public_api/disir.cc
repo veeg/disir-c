@@ -6,7 +6,6 @@
 #include "test_helper.h"
 
 
-
 class DisirInstanceTest : public testing::Test
 {
     void SetUp()
@@ -27,11 +26,11 @@ public:
 TEST_F (DisirInstanceTest, should_create_destroy_disir_instance)
 {
     status = disir_instance_create (NULL, NULL, &disir);
-    ASSERT_EQ (status, DISIR_STATUS_OK);
+    ASSERT_EQ (DISIR_STATUS_OK, status);
     ASSERT_TRUE (disir != NULL);
 
     status = disir_instance_destroy (&disir);
-    ASSERT_EQ (status, DISIR_STATUS_OK);
+    ASSERT_EQ (DISIR_STATUS_OK, status);
     ASSERT_TRUE (disir == NULL);
 }
 
