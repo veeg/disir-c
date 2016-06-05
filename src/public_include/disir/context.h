@@ -290,6 +290,8 @@ enum disir_status dc_get_value_type (dc_t *context, enum disir_value_type *type)
 //! Parse the input string to retrieve the value whose type is inferred from the
 //! parent context. This function is merely a convenient wrapper around all
 //! other dc_add_default_* functions.
+//! The `value_size` parameter is only applicable for default entries whose
+//! KEYVAL is STRING.
 //!
 //! \param context Parent context of which to add a new default entry
 //! \param value String to parse the relevant value information from
