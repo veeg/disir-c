@@ -115,6 +115,25 @@ dx_keyval_finalize (dc_t **keyval)
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
+    // Cannot add without known type.
+    if (dx_value_type_sanify((*keyval)->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN)
+    {
+        dx_context_error_set (*keyval, "Missing type component for keyval.");
+        return DISIR_STATUS_INVALID_CONTEXT;
+    }
+
+
+    // Additional restrictions apply for keyvals added to a root mold
+    if (dc_context_type ((*keyval)->cx_root_context) == DISIR_CONTEXT_MOLD)
+    {
+        // Cannot add without atleast one default entry.
+        if ((*keyval)->cx_keyval->kv_default_queue == NULL)
+        {
+            dx_context_error_set (*keyval, "Missing default entry for keyval.");
+            return DISIR_STATUS_INVALID_CONTEXT;
+        }
+    }
+
     // TODO: Verify that adding this entry does not conflict with the restrictions
     // inplace for parent
 
