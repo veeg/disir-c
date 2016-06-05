@@ -17,10 +17,12 @@ struct disir_collection * dc_collection_create (void);
 //!
 //! \return DISIR_STATUS_OK on success
 //!
-enum disir_status dc_collection_push_context (struct disir_collection *collection, dc_t *context);
+enum disir_status dc_collection_push_context (struct disir_collection *collection,
+                                              struct disir_context *context);
 
 //! PUBLIC API
-enum disir_status dc_collection_next (struct disir_collection *collection, dc_t **context);
+enum disir_status dc_collection_next (struct disir_collection *collection,
+                                      struct disir_context **context);
 
 //! PUBLC API
 enum disir_status dc_collection_reset (struct disir_collection *collection);

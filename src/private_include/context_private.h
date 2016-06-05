@@ -71,13 +71,13 @@ struct disir_context
     };
 
     //! Parent context of this context.
-    dc_t                        *cx_parent_context;
+    struct disir_context                        *cx_parent_context;
 
     //! Root context to this context.
     //! A root context may only be one of:
     //!     * DISIR_CONTEXT_CONFIG
     //!     * DISIR_CONTEXT_MOLD
-    dc_t                        *cx_root_context;
+    struct disir_context                        *cx_root_context;
 
 
     //! Reference count on how many context pointers the user
@@ -120,7 +120,7 @@ struct disir_context
 //! \brief Increment the reference count for the passed context.
 //!
 //!
-void dx_context_incref (dc_t *context);
+void dx_context_incref (struct disir_context *context);
 
 //! \brief Decrement the reference count for the passed context.
 //!
@@ -131,10 +131,10 @@ void dx_context_incref (dc_t *context);
 //! If the context ends up destroyed, since its reference count reaches zero,
 //! the context pointer is sat to NULL.
 //!
-void dx_context_decref (dc_t **context);
+void dx_context_decref (struct disir_context **context);
 
 //! Attach 'parent' as parent context to 'context'
-void dx_context_attach (dc_t *parent, dc_t *context);
+void dx_context_attach (struct disir_context *parent, struct disir_context *context);
 
 //! Return the string representation of the disir_context_type enumeration
 const char * dx_context_type_string (enum disir_context_type type);
@@ -157,10 +157,10 @@ uint32_t dx_context_type_is_toplevel (enum disir_context_type type);
 enum disir_context_type dx_context_type_sanify (enum disir_context_type type);
 
 //! Allocate a disir_context
-dc_t * dx_context_create (enum disir_context_type type);
+struct disir_context * dx_context_create (enum disir_context_type type);
 
 //! Free an allocated disir_context
-void dx_context_destroy (dc_t **context);
+void dx_context_destroy (struct disir_context **context);
 
 //! \brief Associate the input config related context with its equiv mold related context
 //!
@@ -176,10 +176,11 @@ void dx_context_destroy (dc_t **context);
 //!     less or equal to zero, or if the input value is not associated in the mold.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size);
+enum disir_status dx_set_mold_equiv (struct disir_context *context,
+                                     const char *value, int32_t value_size);
 
 //! \brief Set the input message to the error string of context
-void dx_context_error_set (dc_t *context, const char *fmt_message, ...);
+void dx_context_error_set (struct disir_context *context, const char *fmt_message, ...);
 
 //! Check that the passed context is either of the passed
 //! DISIR_CONTEXT_* following the variadic list.
@@ -201,24 +202,26 @@ void dx_context_error_set (dc_t *context, const char *fmt_message, ...);
 //! \return DISIR_STATUS_INTERNAL_ERROR is returned upon encoding error.
 //! \return DISIR_STATUS_OK is returned when passed context exists in set
 //!     of variadic arguments of DISIR_CONTEXT_*
-enum disir_status dx_context_type_check_log_error (dc_t *context, ...);
+enum disir_status dx_context_type_check_log_error (struct disir_context *context, ...);
 
 //! Check if the passed context single pointer is INVALID.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if null pointer is supplied.
 //! \return DISIR_STATUS_INVALID_CONTEXT if the passed context is INVALID.
 //! \return DISIR_STATUS_OK if everything is great!
-enum disir_status dx_context_sp_full_check_log_error (dc_t *context, const char *function_name);
+enum disir_status dx_context_sp_full_check_log_error (struct disir_context *context,
+                                                      const char *function_name);
 
 //! Check if the passed context double pointer is INVALID.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if null pointer is supplied.
 //! \return DISIR_STATUS_INVALID_CONTEXT if the passed context is INVALID.
 //! \return DISIR_STATUS_OK if everything is great!
-enum disir_status dx_context_dp_full_check_log_error (dc_t **context, const char *function_name);
+enum disir_status dx_context_dp_full_check_log_error (struct disir_context **context,
+                                                      const char *function_name);
 
 
 
 // Transfer the logwarn entry from source to destination
-void dx_context_transfer_logwarn (dc_t *destination, dc_t *source);
+void dx_context_transfer_logwarn (struct disir_context *destination, struct disir_context *source);
 
 
 #endif // _LIBDISIR_CONTEXT_PRIVATE_H

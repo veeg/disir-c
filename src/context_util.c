@@ -47,7 +47,7 @@ const char *disir_capability_string[] = {
 
 //! PUBLIC API
 enum disir_context_type
-dc_context_type (dc_t *context)
+dc_context_type (struct disir_context *context)
 {
     if (context == NULL)
         return DISIR_CONTEXT_UNKNOWN;
@@ -57,7 +57,7 @@ dc_context_type (dc_t *context)
 
 //! PUBLIC API
 const char *
-dc_context_type_string (dc_t *context)
+dc_context_type_string (struct disir_context *context)
 {
     return disir_context_type_string[dc_context_type (context)];
 }
@@ -99,7 +99,7 @@ dx_context_type_sanify (enum disir_context_type type)
 }
 
 enum disir_value_type
-dc_value_type (dc_t *context)
+dc_value_type (struct disir_context *context)
 {
     enum disir_value_type value_type;
     enum disir_context_type context_type;
@@ -121,7 +121,7 @@ dc_value_type (dc_t *context)
 }
 
 const char *
-dc_value_type_string (dc_t *context)
+dc_value_type_string (struct disir_context *context)
 {
     return dx_value_type_string (dc_value_type (context));
 }
@@ -163,7 +163,7 @@ dx_context_type_is_toplevel (enum disir_context_type context_type)
 
 //! INTERNAL API
 void
-dx_context_attach (dc_t *parent, dc_t *context)
+dx_context_attach (struct disir_context *parent, struct disir_context *context)
 {
     if (parent == NULL || context == NULL)
         return;
@@ -177,7 +177,7 @@ dx_context_attach (dc_t *parent, dc_t *context)
 
 //! INTERNAL API
 void
-dx_context_incref (dc_t *context)
+dx_context_incref (struct disir_context *context)
 {
     context->cx_refcount++;
     log_debug_context (context, "(%p) increased refcount to: %d", context, context->cx_refcount);
@@ -185,7 +185,7 @@ dx_context_incref (dc_t *context)
 
 //! INTERNAL API
 void
-dx_context_decref (dc_t **context)
+dx_context_decref (struct disir_context **context)
 {
     if (context == NULL)
         return;
@@ -204,10 +204,10 @@ dx_context_decref (dc_t **context)
 }
 
 //! INTERNAL API
-dc_t *
+struct disir_context *
 dx_context_create (enum disir_context_type type)
 {
-    dc_t *context;
+    struct disir_context *context;
 
     context = NULL;
 
@@ -289,7 +289,7 @@ dx_context_create (enum disir_context_type type)
 
 //! INTERNAL API
 void
-dx_context_destroy  (dc_t **context)
+dx_context_destroy  (struct disir_context **context)
 {
     if (context == NULL || *context == NULL)
         return;
@@ -308,7 +308,7 @@ dx_context_destroy  (dc_t **context)
 
 //! INTERNAL API
 void
-dx_context_transfer_logwarn (dc_t *destination, dc_t *source)
+dx_context_transfer_logwarn (struct disir_context *destination, struct disir_context *source)
 {
     // Simply inherhit the memory allocated by source to destination
 
@@ -340,7 +340,7 @@ dx_context_transfer_logwarn (dc_t *destination, dc_t *source)
 
 //! INTERNAL API
 enum disir_status
-dx_context_sp_full_check_log_error (dc_t *context, const char *function_name)
+dx_context_sp_full_check_log_error (struct disir_context *context, const char *function_name)
 {
     // Check argument
     if (context == NULL)
@@ -367,7 +367,7 @@ dx_context_sp_full_check_log_error (dc_t *context, const char *function_name)
 
 //! INTERNAL API
 enum disir_status
-dx_context_dp_full_check_log_error (dc_t **context, const char *function_name)
+dx_context_dp_full_check_log_error (struct disir_context **context, const char *function_name)
 {
     // Check argument
     if (context == NULL)
@@ -383,7 +383,7 @@ dx_context_dp_full_check_log_error (dc_t **context, const char *function_name)
 
 //! INTERNAL API
 enum disir_status
-dx_context_type_check_log_error (dc_t *context, ...)
+dx_context_type_check_log_error (struct disir_context *context, ...)
 {
     enum disir_status status;
     enum disir_context_type variadic_type;
@@ -524,7 +524,7 @@ dx_context_type_check_log_error (dc_t *context, ...)
 
 //! PUBLIC API
 enum disir_status
-dc_set_value_type (dc_t *context, enum disir_value_type type)
+dc_set_value_type (struct disir_context *context, enum disir_value_type type)
 {
     enum disir_status status;
 
@@ -568,7 +568,7 @@ dc_set_value_type (dc_t *context, enum disir_value_type type)
 
 //! PUBLIC API
 enum disir_status
-dc_get_value_type (dc_t *context, enum disir_value_type *type)
+dc_get_value_type (struct disir_context *context, enum disir_value_type *type)
 {
     enum disir_status status;
 
@@ -607,7 +607,7 @@ dc_get_value_type (dc_t *context, enum disir_value_type *type)
 }
 
 const char *
-dc_context_error (dc_t *context)
+dc_context_error (struct disir_context *context)
 {
     if (context == NULL)
         return NULL;

@@ -78,7 +78,7 @@ enum disir_status
 dio_test_mold_list (struct disir *disir, struct disir_collection **collection)
 {
     struct disir_collection *col;
-    dc_t *context;
+    struct disir_context *context;
 
     col = dc_collection_create ();
     if (col == NULL)

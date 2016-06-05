@@ -99,7 +99,7 @@ enum disir_status
 dx_element_storage_destroy (struct disir_element_storage **storage)
 {
     list_iterator_t *iter;
-    dc_t *context;
+    struct disir_context *context;
 
     if (storage == NULL || *storage == NULL)
     {
@@ -237,7 +237,7 @@ dx_element_storage_get (struct disir_element_storage *storage,
                         struct disir_collection **collection)
 {
     enum disir_status status;
-    dc_t *context;
+    struct disir_context *context;
     struct disir_collection *col;
     struct multimap_value_iterator *iter;
 
@@ -286,7 +286,7 @@ dx_element_storage_get_all (struct disir_element_storage *storage,
                             struct disir_collection **collection)
 {
     enum disir_status status;
-    dc_t *context;
+    struct disir_context *context;
     struct disir_collection *coll;
     struct list_iterator *iter;
 
@@ -351,7 +351,7 @@ dx_element_storage_get_first(struct disir_element_storage *storage,
                              const char *name,
                              struct disir_context **context)
 {
-    dc_t *keyval;
+    struct disir_context *keyval;
 
     keyval = multimap_get_first (storage->es_map, (void *) name);
     if (keyval == NULL)

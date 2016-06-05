@@ -14,8 +14,8 @@ enum disir_status
 dio_ini_config_write (struct disir *disir, const char *id, struct disir_config *config)
 {
     enum disir_status status;
-    dc_t *config_context;
-    dc_t *context;
+    struct disir_context *config_context;
+    struct disir_context *context;
     struct disir_collection *collection;
     int32_t size;
     const char *name;
@@ -190,8 +190,8 @@ dio_ini_config_read (struct disir *disir, const char *id,
     char *current;
     char *seperator;
     struct semantic_version semver;
-    dc_t *config_context;
-    dc_t *keyval;
+    struct disir_context *config_context;
+    struct disir_context *keyval;
 
     keyval = config_context = NULL;
     line = key = value = current = seperator = NULL;

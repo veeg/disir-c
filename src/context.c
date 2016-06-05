@@ -18,7 +18,8 @@
 
 //! PUBLIC API
 enum disir_status
-dc_printerror (dc_t *context, char *buffer, int32_t buffer_size, int32_t *bytes_written)
+dc_printerror (struct disir_context *context, char *buffer,
+               int32_t buffer_size, int32_t *bytes_written)
 {
     int32_t min_bytes;
 
@@ -54,7 +55,7 @@ dc_printerror (dc_t *context, char *buffer, int32_t buffer_size, int32_t *bytes_
 //! INTERNAL USAGE: Be careful not to enter a context pointer address that originate
 //! from within the structure to be deleted.
 enum disir_status
-dc_destroy (dc_t **context)
+dc_destroy (struct disir_context **context)
 {
     enum disir_status status;
 
@@ -128,7 +129,8 @@ dc_destroy (dc_t **context)
 
 //! PUBLIC API
 enum disir_status
-dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
+dc_begin (struct disir_context *parent, enum disir_context_type context_type,
+          struct disir_context **child)
 {
     enum disir_status status;
 
@@ -190,7 +192,7 @@ dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child)
 
 //! PUBLIC API
 enum disir_status
-dc_finalize (dc_t **context)
+dc_finalize (struct disir_context **context)
 {
     enum disir_status status;
 
@@ -244,7 +246,7 @@ dc_finalize (dc_t **context)
 
 //! PUBLIC API
 enum disir_status
-dc_putcontext (dc_t **context)
+dc_putcontext (struct disir_context **context)
 {
     enum disir_status status;
 
@@ -271,7 +273,7 @@ dc_putcontext (dc_t **context)
 
 //! PUBLIC API
 enum disir_status
-dc_set_name (dc_t *context, const char *name, int32_t name_size)
+dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
 {
     enum disir_status status;
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
@@ -319,7 +321,7 @@ dc_set_name (dc_t *context, const char *name, int32_t name_size)
 
 //! PUBLIC API
 enum disir_status
-dc_get_name (dc_t *context, const char **name, int32_t *name_size)
+dc_get_name (struct disir_context *context, const char **name, int32_t *name_size)
 {
     enum disir_status status;
     struct disir_value *value;
@@ -371,14 +373,14 @@ dc_get_name (dc_t *context, const char **name, int32_t *name_size)
 
 // PUBLIC API
 enum disir_status
-dc_set_value (dc_t *context, const char *value, int32_t value_size)
+dc_set_value (struct disir_context *context, const char *value, int32_t value_size)
 {
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
 //! PUBLIC API
 enum disir_status
-dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
+dc_set_value_string (struct disir_context *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
 
@@ -445,7 +447,8 @@ dc_set_value_string (dc_t *context, const char *value, int32_t value_size)
 
 //! PUBLIC API
 enum disir_status
-dc_get_value (dc_t *context, int32_t output_buffer_size, char *output, int32_t *output_size)
+dc_get_value (struct disir_context *context, int32_t output_buffer_size,
+              char *output, int32_t *output_size)
 {
     enum disir_status status;
 
@@ -494,7 +497,7 @@ dc_get_value (dc_t *context, int32_t output_buffer_size, char *output, int32_t *
 
 //! PUBLIC API
 enum disir_status
-dc_get_value_string (dc_t *context, const char **output, int32_t *size)
+dc_get_value_string (struct disir_context *context, const char **output, int32_t *size)
 {
     enum disir_status status;
     enum disir_value_type type;
@@ -571,25 +574,25 @@ dc_get_value_string (dc_t *context, const char **output, int32_t *size)
 
 //! PUBLIC API
 enum disir_status
-dc_get_value_integer (dc_t *context, int64_t *value)
+dc_get_value_integer (struct disir_context *context, int64_t *value)
 {
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
 //! PUBLIC API
 enum disir_status
-dc_get_value_float (dc_t *conttext, double *value)
+dc_get_value_float (struct disir_context *conttext, double *value)
 {
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
 //! INTERNAL API
 enum disir_status
-dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size)
+dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
     struct disir_mold *mold;
-    dc_t *queried;
+    struct disir_context *queried;
 
     if (context == NULL || value == NULL || value_size <= 0)
     {
@@ -628,7 +631,7 @@ dx_set_mold_equiv (dc_t *context, const char *value, int32_t value_size)
 
 //! PUBLIC API
 enum disir_status
-dc_add_introduced (dc_t *context, struct semantic_version semver)
+dc_add_introduced (struct disir_context *context, struct semantic_version semver)
 {
     struct semantic_version *introduced;
     enum disir_status status;
@@ -711,14 +714,14 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
 
 //! PUBLIC API
 enum disir_status
-dc_add_deprecrated (dc_t *context, struct semantic_version smever)
+dc_add_deprecrated (struct disir_context *context, struct semantic_version smever)
 {
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
 //! PUBLIC API
 enum disir_status
-dc_get_version (dc_t *context, struct semantic_version *semver)
+dc_get_version (struct disir_context *context, struct semantic_version *semver)
 {
     enum disir_status status;
 
@@ -764,7 +767,7 @@ dc_get_version (dc_t *context, struct semantic_version *semver)
 
 //! PUBLIC API
 enum disir_status
-dc_set_version (dc_t *context, struct semantic_version *semver)
+dc_set_version (struct disir_context *context, struct semantic_version *semver)
 {
     enum disir_status status;
 
@@ -815,7 +818,7 @@ dc_set_version (dc_t *context, struct semantic_version *semver)
 
 //! PUBLIC API
 enum disir_status
-dc_get_introduced (dc_t *context, struct semantic_version *semver)
+dc_get_introduced (struct disir_context *context, struct semantic_version *semver)
 {
     struct semantic_version *introduced;
     enum disir_status status;
@@ -903,14 +906,14 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
 
 //! PUBLIC API
 enum disir_status
-dc_get_deprecrated (dc_t *context, struct semantic_version *semver)
+dc_get_deprecrated (struct disir_context *context, struct semantic_version *semver)
 {
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
 //! PUBLIC API
 enum disir_status
-dc_get_elements (dc_t *context, struct disir_collection **collection)
+dc_get_elements (struct disir_context *context, struct disir_collection **collection)
 {
     enum disir_status status;
 

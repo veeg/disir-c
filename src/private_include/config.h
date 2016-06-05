@@ -8,7 +8,7 @@
 struct disir_config
 {
     //! Context object for this config
-    dc_t                            *cf_context;
+    struct disir_context                            *cf_context;
 
     //! Version of this config instance.
     //! The version of a config shall always represent a snapshot
@@ -34,7 +34,7 @@ struct disir_config
 //! \return NULL if memory allocation failed.
 //! \return newly allocated and initialized config structure
 //!
-struct disir_config *dx_config_create (dc_t *context);
+struct disir_config *dx_config_create (struct disir_context *context);
 
 //! \brief Destroy a previously allocated disir_config structure. Destroys all children as well.
 //!

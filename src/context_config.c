@@ -15,7 +15,7 @@
 #include "element_storage.h"
 
 //! PUBLIC API
-dc_t *
+struct disir_context *
 dc_config_getcontext (struct disir_config *config)
 {
     // Check arguments
@@ -33,9 +33,9 @@ dc_config_getcontext (struct disir_config *config)
 
 //! PUBLIC API
 enum disir_status
-dc_config_begin (struct disir_mold *mold, dc_t **config)
+dc_config_begin (struct disir_mold *mold, struct disir_context **config)
 {
-    dc_t *context;
+    struct disir_context *context;
 
     context = NULL;
 
@@ -78,7 +78,7 @@ dc_config_begin (struct disir_mold *mold, dc_t **config)
 
 // PUBLIC API
 enum disir_status
-dc_config_finalize (dc_t **context, struct disir_config **config)
+dc_config_finalize (struct disir_context **context, struct disir_config **config)
 {
     enum disir_status status;
 
@@ -113,7 +113,7 @@ dc_config_finalize (dc_t **context, struct disir_config **config)
 
 //! INTERNAL API
 struct disir_config *
-dx_config_create (dc_t *context)
+dx_config_create (struct disir_context *context)
 {
     struct disir_config *config;
 
@@ -150,7 +150,7 @@ error:
 enum disir_status
 dx_config_destroy (struct disir_config **config)
 {
-    dc_t *context;
+    struct disir_context *context;
 
     if (config == NULL || *config == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;

@@ -15,10 +15,10 @@
 
 //! PUBLIC API
 enum disir_status
-dc_free_text_create (const char *text, dc_t **free_text)
+dc_free_text_create (const char *text, struct disir_context **free_text)
 {
     enum disir_status status;
-    dc_t *context;
+    struct disir_context *context;
 
     if (free_text == NULL)
     {

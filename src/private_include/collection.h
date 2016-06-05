@@ -15,7 +15,7 @@ struct disir_collection
 {
     // Dynamically allocated array of disir_context objects.
     // cc_capacity holds the total size of this array.
-    dc_t            **cc_collection;
+    struct disir_context            **cc_collection;
 
     //! Number of entries allocated to fit in cc_collection.
     int32_t         cc_capacity;

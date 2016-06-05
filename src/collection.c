@@ -22,7 +22,7 @@ dc_collection_size (struct disir_collection *collection)
 
 //! PUBLIC API
 enum disir_status
-dc_collection_next (struct disir_collection *collection, dc_t **context)
+dc_collection_next (struct disir_collection *collection, struct disir_context **context)
 {
     enum disir_status status;
 
@@ -85,7 +85,7 @@ dc_collection_reset (struct disir_collection *collection)
 enum disir_status
 dx_collection_coalesce(struct disir_collection *collection)
 {
-    dc_t *context;
+    struct disir_context *context;
     int32_t index;
     int32_t probe;
     int32_t invalid_entries_count;
@@ -166,7 +166,7 @@ dc_collection_create (void)
 
     collection->cc_capacity = 10;
 
-    collection->cc_collection = calloc (collection->cc_capacity, sizeof (dc_t *));
+    collection->cc_collection = calloc (collection->cc_capacity, sizeof (struct disir_context *));
     if (collection->cc_collection == NULL)
     {
         free(collection);
@@ -181,7 +181,7 @@ enum disir_status
 dc_collection_finished (struct disir_collection **collection)
 {
     uint32_t index;
-    dc_t *context;
+    struct disir_context *context;
 
     if (collection == NULL || *collection == NULL)
     {
@@ -210,7 +210,7 @@ dc_collection_finished (struct disir_collection **collection)
 
 //! INTERNAL API
 enum disir_status
-dc_collection_push_context (struct disir_collection *collection, dc_t *context)
+dc_collection_push_context (struct disir_collection *collection, struct disir_context *context)
 {
     enum disir_status status;
     void *reallocated_collection;
@@ -239,7 +239,7 @@ dc_collection_push_context (struct disir_collection *collection, dc_t *context)
     if (collection->cc_numentries == collection->cc_capacity)
     {
         reallocated_capacity = collection->cc_capacity + 10;
-        reallocated_size = reallocated_capacity * sizeof (dc_t*);
+        reallocated_size = reallocated_capacity * sizeof (struct disir_context*);
         log_debug ("Reallocating collection to new size( %d )", reallocated_size);
         reallocated_collection = realloc (collection->cc_collection, reallocated_size);
         if (reallocated_collection == NULL)

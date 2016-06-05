@@ -18,10 +18,10 @@
 
 //! INTERNAL API
 enum disir_status
-dx_keyval_begin (dc_t *parent, dc_t **keyval)
+dx_keyval_begin (struct disir_context *parent, struct disir_context **keyval)
 {
     enum disir_status status;
-    dc_t *context;
+    struct disir_context *context;
 
     if (keyval == NULL)
     {
@@ -71,7 +71,7 @@ dx_keyval_begin (dc_t *parent, dc_t **keyval)
 
 //! INTERNAL API
 enum disir_status
-dx_keyval_finalize (dc_t **keyval)
+dx_keyval_finalize (struct disir_context **keyval)
 {
     enum disir_status status;
     struct disir_element_storage *storage;
@@ -152,7 +152,7 @@ dx_keyval_finalize (dc_t **keyval)
 }
 
 static enum disir_status
-add_keyval_generic (dc_t *parent, const char *name, const char *doc,
+add_keyval_generic (struct disir_context *parent, const char *name, const char *doc,
                     struct semantic_version *semver, enum disir_value_type type,
                     const char *string_input,
                     double float_input,
@@ -161,7 +161,7 @@ add_keyval_generic (dc_t *parent, const char *name, const char *doc,
                     )
 {
     enum disir_status status;
-    dc_t *keyval;
+    struct disir_context *keyval;
 
     keyval = NULL;
 
@@ -275,7 +275,7 @@ error:
 
 //! PUBLIC API
 enum disir_status
-dc_add_keyval_string (dc_t *parent, const char *name, const char *def,
+dc_add_keyval_string (struct disir_context *parent, const char *name, const char *def,
                       const char *doc, struct semantic_version *semver)
 {
     return add_keyval_generic (parent, name, doc, semver,
@@ -289,7 +289,7 @@ dc_add_keyval_string (dc_t *parent, const char *name, const char *def,
 
 //! PUBLIC API
 enum disir_status
-dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t def,
+dc_add_keyval_boolean (struct disir_context *parent, const char *name, uint8_t def,
                        const char* doc, struct semantic_version *semver)
 {
     dx_crash_and_burn ("%s invoked - not implemented yet");
@@ -305,7 +305,7 @@ dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t def,
 
 //! PUBLIC API
 enum disir_status
-dc_add_keyval_float (dc_t *parent, const char *name, double def,
+dc_add_keyval_float (struct disir_context *parent, const char *name, double def,
                      const char *doc, struct semantic_version *semver)
 {
     return add_keyval_generic (parent, name, doc, semver,
@@ -319,7 +319,7 @@ dc_add_keyval_float (dc_t *parent, const char *name, double def,
 
 //! PUBLIC API
 enum disir_status
-dc_add_keyval_integer (dc_t *parent, const char *name, int64_t def,
+dc_add_keyval_integer (struct disir_context *parent, const char *name, int64_t def,
                      const char *doc, struct semantic_version *semver)
 {
     return add_keyval_generic (parent, name, doc, semver,
@@ -333,7 +333,7 @@ dc_add_keyval_integer (dc_t *parent, const char *name, int64_t def,
 
 //! INTERNAL API
 struct disir_keyval *
-dx_keyval_create (dc_t *parent)
+dx_keyval_create (struct disir_context *parent)
 {
     struct disir_keyval *keyval;
 
@@ -352,7 +352,7 @@ dx_keyval_create (dc_t *parent)
 enum disir_status
 dx_keyval_destroy (struct disir_keyval **keyval)
 {
-    dc_t *context;
+    struct disir_context *context;
     struct disir_documentation *doc;
     struct disir_default *def;
 

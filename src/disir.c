@@ -82,8 +82,8 @@ load_plugins_from_config (struct disir *disir, struct disir_config *config)
 {
     enum disir_status status;
     struct disir_collection *collection;
-    dc_t *element;
-    dc_t *context;
+    struct disir_context *element;
+    struct disir_context *context;
     const char *name;
     const char *value;
 
@@ -133,7 +133,7 @@ enum disir_status
 disir_libdisir_mold (struct disir_mold **mold)
 {
     enum disir_status status;
-    dc_t *context;
+    struct disir_context *context;
 
     context = NULL;
 
@@ -330,9 +330,9 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
                                    struct disir_config **config)
 {
     enum disir_status status;
-    dc_t *config_context;
-    dc_t *context;
-    dc_t *parent;
+    struct disir_context *config_context;
+    struct disir_context *context;
+    struct disir_context *parent;
     struct disir_collection *collection;
     char buffer[512];
     const char *name;

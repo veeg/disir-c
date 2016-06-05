@@ -18,11 +18,6 @@ extern "C"{
 //! effect and allowed operations on child contexts.
 struct disir_context;
 
-//! Define a shortcut for struct disir_context, since it
-//! is a often used construct.
-typedef struct disir_context dc_t;
-
-
 //! Different types of disir_contexts that are available.
 enum disir_context_type
 {
@@ -51,7 +46,7 @@ enum disir_context_type
 
 //! Return the disir_context_type associated with the passed
 //! DISIR_CONTEXT.
-enum disir_context_type dc_context_type (dc_t *context);
+enum disir_context_type dc_context_type (struct disir_context *context);
 
 //! Return a string representation of the passed context.
 //! type_string_size is populated with the size in octets for
@@ -59,7 +54,7 @@ enum disir_context_type dc_context_type (dc_t *context);
 //! parameter is ignored.
 //! If context is NULL, the returned string is equal to
 //! that if the input context were unknown.
-const char * dc_context_type_string (dc_t *context);
+const char * dc_context_type_string (struct disir_context *context);
 
 //! \brief Get the value type enumeration represented by the passed context.
 //!
@@ -72,7 +67,7 @@ const char * dc_context_type_string (dc_t *context);
 //! \return disir_value_type represented by context if context is valid and contains
 //!     a valid disir_value_type
 //!
-enum disir_value_type dc_value_type (dc_t *context);
+enum disir_value_type dc_value_type (struct disir_context *context);
 
 
 //! \brief Return a string representation of the value this context represents.
@@ -85,7 +80,7 @@ enum disir_value_type dc_value_type (dc_t *context);
 //!
 //! \return string representation of the disir_value_type held in context
 //!
-const char * dc_value_type_string (dc_t *context);
+const char * dc_value_type_string (struct disir_context *context);
 
 
 //! \brief Return the error message on input context.
@@ -93,7 +88,7 @@ const char * dc_value_type_string (dc_t *context);
 //! \return NULL if no error message is associated with input context
 //! \return const char pointer to error message.
 //!
-const char *dc_context_error (dc_t *context);
+const char *dc_context_error (struct disir_context *context);
 
 //
 // Base context API
@@ -111,7 +106,8 @@ const char *dc_context_error (dc_t *context);
 //! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context type is submitted.
 //! \return DISIR_STATUS_OK when everything is OK!
 //!
-enum disir_status dc_begin (dc_t *parent, enum disir_context_type context_type, dc_t **child);
+enum disir_status dc_begin (struct disir_context *parent, enum disir_context_type context_type,
+                            struct disir_context **child);
 
 //! \brief Destroy the object pointed to by this context.
 //!
@@ -130,7 +126,7 @@ enum disir_status dc_begin (dc_t *parent, enum disir_context_type context_type, 
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_destroy (dc_t **context);
+enum disir_status dc_destroy (struct disir_context **context);
 
 //! \brief Submit the context to the parent.
 //!
@@ -140,7 +136,7 @@ enum disir_status dc_destroy (dc_t **context);
 //!
 //! \return DISIR_STATUS_OK on success, context pointer is invalidated and set to NULL.
 //!
-enum disir_status dc_finalize (dc_t **context);
+enum disir_status dc_finalize (struct disir_context **context);
 
 //! \brief Put away a context obtained while querying a parent context.
 //!
@@ -152,7 +148,7 @@ enum disir_status dc_finalize (dc_t **context);
 //! \return DISIR_STATUS_CONTEXT_IN_WRONG_STATE if context is not in constructing mode
 //! \return DISIR_STATUS_OK when successful. Passed context pointer is set tp NULL.
 //!
-enum disir_status dc_putcontext (dc_t **context);
+enum disir_status dc_putcontext (struct disir_context **context);
 
 
 //
@@ -179,7 +175,8 @@ enum disir_status dc_putcontext (dc_t **context);
 //! \return DISIR_STATUS_EXISTS  if a documentation entry already exists.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_add_documentation (dc_t *context, const char *doc, int32_t doc_size);
+enum disir_status dc_add_documentation (struct disir_context *context,
+                                        const char *doc, int32_t doc_size);
 
 //! \brief Get the documentation entry for a given semver on the context.
 //!
@@ -201,7 +198,8 @@ enum disir_status dc_add_documentation (dc_t *context, const char *doc, int32_t 
 //! \return DISIR_STATUS_WRONG_CONTEXT if context is not of supported type.
 //! \return DISIR_STATUS_OK if doc is popualted with documentation string of context.
 //!
-enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *semver,
+enum disir_status dc_get_documentation (struct disir_context *context,
+                                        struct semantic_version *semver,
                                         const char **doc, int32_t *doc_size);
 
 //
@@ -228,7 +226,7 @@ enum disir_status dc_get_documentation (dc_t *context, struct semantic_version *
 //!     is CONFIG, is not found in the associated MOLD.
 //! \return DISIR_STATUS_OK on successful insertion of name to context.
 //!
-enum disir_status dc_set_name (dc_t *context, const char *name, int32_t name_size);
+enum disir_status dc_set_name (struct disir_context *context, const char *name, int32_t name_size);
 
 //! \brief Get a name attribute associated with the context entry
 //!
@@ -244,14 +242,16 @@ enum disir_status dc_set_name (dc_t *context, const char *name, int32_t name_siz
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not of the supported types.
 //! \return DISIR_STATUS_OK if name is successfully populated with the name attribute of context.
 //!
-enum disir_status dc_get_name (dc_t *context, const char **name, int32_t *name_size);
+enum disir_status dc_get_name (struct disir_context *context,
+                               const char **name, int32_t *name_size);
 
 //! \brief Add an introduced semantic version number to a context.
 //!
 //! \return DISIR_STATUS_EXISTS is returned if an introduced entry already exists.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_add_introduced(dc_t *context, struct semantic_version semver);
+enum disir_status dc_add_introduced (struct disir_context *context,
+                                     struct semantic_version semver);
 
 //! \brief Add a deprecrated semantic version number to a context.
 //!
@@ -260,7 +260,8 @@ enum disir_status dc_add_introduced(dc_t *context, struct semantic_version semve
 //! \return DISIR_STATUS_EXISTS is returned if an deprecrated entry already exists.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_add_deprecrated(dc_t *context, struct semantic_version smever);
+enum disir_status dc_add_deprecrated (struct disir_context *context,
+                                      struct semantic_version smever);
 
 
 //! \brief Set the value type associated with input context
@@ -276,7 +277,7 @@ enum disir_status dc_add_deprecrated(dc_t *context, struct semantic_version smev
 //! \return DISIR_STATUS_OK the input `context` was succesfuly populated with value type `type`
 //! \return DISIR_STATUS_INVALID_ARGUMENT if `context` is NULL or `type` is out-of-bounds
 //!
-enum disir_status dc_set_value_type (dc_t *context, enum disir_value_type type);
+enum disir_status dc_set_value_type (struct disir_context *context, enum disir_value_type type);
 
 //! \brief Retrieve the value type stored in the input context
 //!
@@ -290,7 +291,7 @@ enum disir_status dc_set_value_type (dc_t *context, enum disir_value_type type);
 //! \return DISIR_STATUS_WRONG_CONTEXT if it does not contain a value type.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either context or type are NULL pointer.
 //!
-enum disir_status dc_get_value_type (dc_t *context, enum disir_value_type *type);
+enum disir_status dc_get_value_type (struct disir_context *context, enum disir_value_type *type);
 
 //! \brief  Add a default value to an entry, type inferred from the parent context
 //!
@@ -308,7 +309,7 @@ enum disir_status dc_get_value_type (dc_t *context, enum disir_value_type *type)
 //!     a semantic version number of 1.0.0
 //!
 //! \return DISIR_STATUS_OK if a new default object was associated with the parent context.t
-enum disir_status dc_add_default (dc_t *context, const char *value,
+enum disir_status dc_add_default (struct disir_context *context, const char *value,
                                   int32_t value_size, struct semantic_version *semver);
 
 //! \brief Add a default string value to the parent context.
@@ -326,7 +327,7 @@ enum disir_status dc_add_default (dc_t *context, const char *value,
 //!     to the parent context.
 //! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
 //!
-enum disir_status dc_add_default_string (dc_t *parent, const char *value,
+enum disir_status dc_add_default_string (struct disir_context *parent, const char *value,
                                          int32_t value_size, struct semantic_version *semver);
 
 //! \brief Add a default integer value to the parent context.
@@ -344,7 +345,8 @@ enum disir_status dc_add_default_string (dc_t *parent, const char *value,
 //! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
 //!
 enum disir_status
-dc_add_default_integer (dc_t *parent, int64_t value, struct semantic_version *semver);
+dc_add_default_integer (struct disir_context *parent, int64_t value,
+                        struct semantic_version *semver);
 
 //! \brief Add a default float value to the parent context.
 //!
@@ -361,7 +363,7 @@ dc_add_default_integer (dc_t *parent, int64_t value, struct semantic_version *se
 //! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
 //!
 enum disir_status
-dc_add_default_float (dc_t *parent, double value, struct semantic_version *semver);
+dc_add_default_float (struct disir_context *parent, double value, struct semantic_version *semver);
 
 //! \brief Add a default boolean value to the parent context.
 //!
@@ -378,7 +380,8 @@ dc_add_default_float (dc_t *parent, double value, struct semantic_version *semve
 //! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
 //!
 enum disir_status
-dc_add_default_boolean (dc_t *parent, uint8_t boolean, struct semantic_version *semver);
+dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
+                        struct semantic_version *semver);
 
 
 //! \brief Return the default value as a string representation from context.
@@ -405,7 +408,8 @@ dc_add_default_boolean (dc_t *parent, uint8_t boolean, struct semantic_version *
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_buffer_size,
+dc_get_default (struct disir_context *context, struct semantic_version *semver,
+                int32_t output_buffer_size,
                 char *output, int32_t *output_string_size);
 
 
@@ -422,7 +426,8 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
 //! \return DISIR_STATUS_NO_MEMORY if collection allocation failed.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_get_default_contexts (dc_t *context, struct disir_collection **collection);
+enum disir_status dc_get_default_contexts (struct disir_context *context,
+                                           struct disir_collection **collection);
 
 
 //! \brief Set a value to the context. Type is extracted from string where applicable
@@ -431,7 +436,8 @@ enum disir_status dc_get_default_contexts (dc_t *context, struct disir_collectio
 //!
 //! \return DISIR_STATUS_INTERNAL_ERROR - Not Implemeneted
 //!
-enum disir_status dc_set_value (dc_t *context, const char *value, int32_t value_size);
+enum disir_status dc_set_value (struct disir_context *context,
+                                const char *value, int32_t value_size);
 
 //! \brief Set a string value to the context.
 //!
@@ -446,7 +452,8 @@ enum disir_status dc_set_value (dc_t *context, const char *value, int32_t value_
 //! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a mold equivalent.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_set_value_string (dc_t *context, const char *value, int32_t value_size);
+enum disir_status dc_set_value_string (struct disir_context *context,
+                                       const char *value, int32_t value_size);
 
 //! \brief Get the value stored in context in a string representation
 //!
@@ -470,7 +477,7 @@ enum disir_status dc_set_value_string (dc_t *context, const char *value, int32_t
 //! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs context is not CONFIG.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_get_value (dc_t *context, int32_t output_buffer_size,
+enum disir_status dc_get_value (struct disir_context *context, int32_t output_buffer_size,
                                 char *output, int32_t *output_size);
 
 //! \brief Retrieve the string value stored on the context.
@@ -489,7 +496,8 @@ enum disir_status dc_get_value (dc_t *context, int32_t output_buffer_size,
 //! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs root context is not CONFIG.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_get_value_string (dc_t *context, const char **output, int32_t *size);
+enum disir_status dc_get_value_string (struct disir_context *context,
+                                       const char **output, int32_t *size);
 
 //! \brief Retrieve the integer value stored on the context.
 //!
@@ -497,7 +505,7 @@ enum disir_status dc_get_value_string (dc_t *context, const char **output, int32
 //!
 //! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
 //!
-enum disir_status dc_get_value_integer (dc_t *context, int64_t *value);
+enum disir_status dc_get_value_integer (struct disir_context *context, int64_t *value);
 
 //! \brief Retrieve the float value stored on the context.
 //!
@@ -505,17 +513,19 @@ enum disir_status dc_get_value_integer (dc_t *context, int64_t *value);
 //!
 //! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
 //!
-enum disir_status dc_get_value_float (dc_t *conttext, double *value);
+enum disir_status dc_get_value_float (struct disir_context *conttext, double *value);
 
 //! Query the context for its intrduced member.
 //! If no such member exists on the context,
 //! DISIR_STATUS_NO_CAN_DO is returned.
-enum disir_status dc_get_introduced (dc_t *context, struct semantic_version *semver);
+enum disir_status dc_get_introduced (struct disir_context *context,
+                                     struct semantic_version *semver);
 
 //! Query the context for its deprecrated member.
 //! If no such member exists on the context,
 //! DISIR_STATUS_NO_CAN_DO is returned.
-enum disir_status dc_get_deprecrated (dc_t *context, struct semantic_version *semver);
+enum disir_status dc_get_deprecrated (struct disir_context *context,
+                                      struct semantic_version *semver);
 
 //!  \brief Collect all direct child elements of the passed context.
 //!
@@ -531,7 +541,8 @@ enum disir_status dc_get_deprecrated (dc_t *context, struct semantic_version *se
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input parameters are NULL
 //! \return DISRI_STATUS_WRONG_CONTEXT if the input context is not of correct type.
 //!
-enum disir_status dc_get_elements (dc_t *context, struct disir_collection **collection);
+enum disir_status dc_get_elements (struct disir_context *context,
+                                   struct disir_collection **collection);
 
 
 //
@@ -550,8 +561,11 @@ enum disir_status dc_get_elements (dc_t *context, struct disir_collection **coll
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
-enum disir_status dc_add_keyval_string (dc_t *parent, const char *name, const char *def,
-                                        const char *doc, struct semantic_version *semver);
+enum disir_status dc_add_keyval_string (struct disir_context *parent,
+                                        const char *name,
+                                        const char *def,
+                                        const char *doc,
+                                        struct semantic_version *semver);
 
 //! \brief Shortcut to add a KEYVAL integer entry to a parent context.
 //!
@@ -565,8 +579,11 @@ enum disir_status dc_add_keyval_string (dc_t *parent, const char *name, const ch
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
-enum disir_status dc_add_keyval_integer (dc_t *parent, const char *name, int64_t def,
-                                         const char *doc, struct semantic_version *semver);
+enum disir_status dc_add_keyval_integer (struct disir_context *parent,
+                                         const char *name,
+                                         int64_t def,
+                                         const char *doc,
+                                         struct semantic_version *semver);
 
 //! \brief Shortcut to add a KEYVAL float entry to a parent context.
 //!
@@ -580,8 +597,11 @@ enum disir_status dc_add_keyval_integer (dc_t *parent, const char *name, int64_t
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
-enum disir_status dc_add_keyval_float (dc_t *parent, const char *name, double def,
-                                       const char *doc, struct semantic_version *semver);
+enum disir_status dc_add_keyval_float (struct disir_context *parent,
+                                       const char *name,
+                                       double def,
+                                       const char *doc,
+                                       struct semantic_version *semver);
 
 //! \brief Shortcut to add a KEYVAL boolean entry to a parent context.
 //!
@@ -595,8 +615,11 @@ enum disir_status dc_add_keyval_float (dc_t *parent, const char *name, double de
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
-enum disir_status dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t def,
-                                         const char *doc, struct semantic_version *semver);
+enum disir_status dc_add_keyval_boolean (struct disir_context *parent,
+                                         const char *name,
+                                         uint8_t def,
+                                         const char *doc,
+                                         struct semantic_version *semver);
 
 //! \brief Retrieve the version number of the input context.
 //!
@@ -611,7 +634,7 @@ enum disir_status dc_add_keyval_boolean (dc_t *parent, const char *name, uint8_t
 //! \return DISIR_STATUS_WRONG_CONTEXT if `context` is not of supported type.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_get_version (dc_t *context, struct semantic_version *semver);
+enum disir_status dc_get_version (struct disir_context *context, struct semantic_version *semver);
 
 //! \brief Set the version number of the input context
 //!
@@ -628,7 +651,7 @@ enum disir_status dc_get_version (dc_t *context, struct semantic_version *semver
 //!     applied to a DISIR_CONTEXT_CONFIG context.
 //! \return DISRI_STATUS_OK on success.
 //!
-enum disir_status dc_set_version (dc_t *context, struct semantic_version *semver);
+enum disir_status dc_set_version (struct disir_context *context, struct semantic_version *semver);
 
 
 //
@@ -641,7 +664,7 @@ enum disir_status dc_set_version (dc_t *context, struct semantic_version *semver
 //!
 //! \return context of type DISIR_CONTEXT_CONFIG
 //!
-dc_t * dc_config_getcontext (struct disir_config *config);
+struct disir_context * dc_config_getcontext (struct disir_config *config);
 
 //! \brief Get the version number of this config.
 //!
@@ -662,7 +685,7 @@ dc_config_get_version (struct disir_config *config, struct semantic_version *sem
 //!
 //! \return DISIR_STATUS_OK on success
 //!
-enum disir_status dc_config_begin (struct disir_mold *mold, dc_t **config);
+enum disir_status dc_config_begin (struct disir_mold *mold, struct disir_context **config);
 
 //! \brief Finalize the construction of a DISIR_CONTEXT_CONFIG
 //!
@@ -672,7 +695,8 @@ enum disir_status dc_config_begin (struct disir_mold *mold, dc_t **config);
 //! \return DISIRSTATUS_WRONG_CONTEXT if input context is not of type CONFIG.
 //! \return DISIR_STATUS_OK on success
 //!
-enum disir_status dc_config_finalize (dc_t **context, struct disir_config **config);
+enum disir_status dc_config_finalize (struct disir_context **context,
+                                      struct disir_config **config);
 
 //
 // Schema related context API
@@ -680,7 +704,7 @@ enum disir_status dc_config_finalize (dc_t **context, struct disir_config **conf
 
 //! Retrieve the context associated with an already constructed disir_mold.
 //! This context may be used to manipulate or query the mold object.
-dc_t * dc_mold_getcontext (struct disir_mold *mold);
+struct disir_context * dc_mold_getcontext (struct disir_mold *mold);
 
 //! \brief Get the version number of this mold.
 //!
@@ -694,7 +718,7 @@ enum disir_status
 dc_mold_get_version (struct disir_mold *mold, struct semantic_version *semver);
 
 //! Construct the DISIR_CONTEXT_MOLD
-enum disir_status dc_mold_begin (dc_t **mold);
+enum disir_status dc_mold_begin (struct disir_context **mold);
 
 //! Finalize the construction of a DISIR_CONTEXT_MOLD, returning
 //! an allocated disir_mold object in the output parameter.
@@ -703,7 +727,7 @@ enum disir_status dc_mold_begin (dc_t **mold);
 //! If the context supplied is not of type DISIR_CONTEXT_MOLD,
 //! status DISIR_STATUS_WRONG_CONTEXT will be returned.
 //! On success, DISIR_STATUS_OK is returned.
-enum disir_status dc_mold_finalize (dc_t **context, struct disir_mold **mold);
+enum disir_status dc_mold_finalize (struct disir_context **context, struct disir_mold **mold);
 
 //! \brief Construct a FREE_TEXT context to store a string
 //!
@@ -715,7 +739,7 @@ enum disir_status dc_mold_finalize (dc_t **context, struct disir_mold **mold);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_free_text_create (const char *text, dc_t **context);
+enum disir_status dc_free_text_create (const char *text, struct disir_context **context);
 
 #ifdef __cplusplus
 }

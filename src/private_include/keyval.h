@@ -10,11 +10,11 @@
 struct disir_keyval
 {
     //! Context element this keyval element belongs to.
-    dc_t                        *kv_context;
+    struct disir_context                        *kv_context;
 
     //! Context mold element this keyval element represents
     //! Only applicable to parent toplevel context DISIR_CONTEXT_CONFIG
-    dc_t                        *kv_mold_equiv;
+    struct disir_context                        *kv_mold_equiv;
 
     //! Version this keyval entry was introduced.
     struct semantic_version     kv_introduced;
@@ -41,13 +41,13 @@ struct disir_keyval
 };
 
 //! Construct a DISIR_CONTEXT_KEYVAL as a child of parent.
-enum disir_status dx_keyval_begin (dc_t *parent, dc_t **doc);
+enum disir_status dx_keyval_begin (struct disir_context *parent, struct disir_context **doc);
 
 //! Finalize the construction of a DISIR_CONTEXT_KEYVAL
-enum disir_status dx_keyval_finalize (dc_t **doc);
+enum disir_status dx_keyval_finalize (struct disir_context **doc);
 
 //! Allocate a disir_keyval structure
-struct disir_keyval *dx_keyval_create (dc_t *parent);
+struct disir_keyval *dx_keyval_create (struct disir_context *parent);
 
 //! Destroy a disir_keyval structure, freeing all associated
 //! memory and unhooking from linked list storage.

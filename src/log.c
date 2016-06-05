@@ -174,7 +174,7 @@ dx_internal_log_to_storage (char **error_message, int32_t *error_message_size,
 
 //! INTERNAL API
 void
-dx_context_error_set (dc_t *context, const char *fmt_message, ...)
+dx_context_error_set (struct disir_context *context, const char *fmt_message, ...)
 {
     va_list args;
     va_start (args, fmt_message);
@@ -186,7 +186,7 @@ dx_context_error_set (dc_t *context, const char *fmt_message, ...)
 
 void
 dx_log_disir_va (enum disir_log_level dll,
-            dc_t *context,
+            struct disir_context *context,
             struct disir *disir,
             int32_t log_context,
             const char *file,
@@ -205,7 +205,7 @@ dx_log_disir_va (enum disir_log_level dll,
 
 void
 dx_log_disir (enum disir_log_level dll,
-            dc_t *context,
+            struct disir_context *context,
             struct disir *disir,
             int32_t log_context,
             const char *file,

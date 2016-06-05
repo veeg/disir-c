@@ -29,7 +29,7 @@ enum disir_log_level {
 
 //! Generic function signature for all logging methods
 void dx_log_disir (enum disir_log_level dll,
-                dc_t *context,
+                struct disir_context *context,
                 struct disir *disir,
                 int32_t log_context,
                 const char *file,
@@ -39,7 +39,7 @@ void dx_log_disir (enum disir_log_level dll,
                 const char *fmt_message, va_list args);
 
 void dx_log_disir_va (enum disir_log_level dll,
-                dc_t *context,
+                struct disir_context *context,
                 struct disir *disir,
                 int32_t log_context,
                 const char *file,

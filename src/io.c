@@ -267,7 +267,7 @@ enum disir_status
 disir_input_plugin_list (struct disir *disir, struct disir_collection **collection)
 {
     struct disir_collection *col;
-    dc_t *context;
+    struct disir_context *context;
 
     context = NULL;
 
@@ -305,7 +305,7 @@ enum disir_status
 disir_config_finished (struct disir_config **config)
 {
     enum disir_status status;
-    dc_t *context;
+    struct disir_context *context;
 
     context = (*config)->cf_context;
     status = dc_destroy (&context);
@@ -319,7 +319,7 @@ enum disir_status
 disir_mold_finished (struct disir_mold **mold)
 {
     enum disir_status status;
-    dc_t *context;
+    struct disir_context *context;
 
     context = (*mold)->mo_context;
     status = dc_destroy (&context);

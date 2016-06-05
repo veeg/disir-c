@@ -9,7 +9,7 @@
 struct disir_mold
 {
     //! Context object for this mold
-    dc_t                            *mo_context;
+    struct disir_context                            *mo_context;
 
     //! Semantic version of this mold.
     //! This value is determined by the highest semantic version number found
@@ -25,7 +25,7 @@ struct disir_mold
 
 //! INTERNAL API
 //! Allocate a struct disir_mold
-struct disir_mold *dx_mold_create (dc_t *context);
+struct disir_mold *dx_mold_create (struct disir_context *context);
 
 //! INTERNAL API
 //! Destroy the passed struct disir_mold

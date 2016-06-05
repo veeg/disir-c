@@ -21,7 +21,7 @@
 
 //! INTERNAL API
 enum disir_status
-dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
+dx_documentation_add (struct disir_context *parent, struct disir_documentation *doc)
 {
     struct disir_documentation **doc_queue;
     enum disir_status status;
@@ -96,7 +96,7 @@ dx_documentation_add (dc_t *parent, struct disir_documentation *doc)
 
 //! INTERNAL API
 int32_t
-dx_documentation_numentries (dc_t *context)
+dx_documentation_numentries (struct disir_context *context)
 {
     struct disir_documentation *queue;
 
@@ -136,9 +136,9 @@ dx_documentation_numentries (dc_t *context)
 
 //! PUBLIC API
 enum disir_status
-dc_add_documentation (dc_t *parent, const char *doc, int32_t doc_size)
+dc_add_documentation (struct disir_context *parent, const char *doc, int32_t doc_size)
 {
-    dc_t *context;
+    struct disir_context *context;
     enum disir_status status;
 
     // Check arguments
@@ -186,7 +186,7 @@ dc_add_documentation (dc_t *parent, const char *doc, int32_t doc_size)
 
 //! PUBLIC API
 enum disir_status
-dc_get_documentation (dc_t *context, struct semantic_version *semver,
+dc_get_documentation (struct disir_context *context, struct semantic_version *semver,
                       const char **doc, int32_t *doc_size)
 {
     enum disir_status status;
@@ -262,9 +262,9 @@ dc_get_documentation (dc_t *context, struct semantic_version *semver,
 
 //! INTERNAL API
 enum disir_status
-dx_documentation_begin (dc_t *parent, dc_t **doc)
+dx_documentation_begin (struct disir_context *parent, struct disir_context **doc)
 {
-    dc_t *context;
+    struct disir_context *context;
 
     // Check arguments
     if (parent == NULL || doc == NULL)
@@ -329,7 +329,7 @@ dx_documentation_begin (dc_t *parent, dc_t **doc)
 
 //! INTERNAL API
 enum disir_status
-dx_documentation_finalize (dc_t **doc)
+dx_documentation_finalize (struct disir_context **doc)
 {
     enum disir_status status;
 
@@ -367,7 +367,7 @@ dx_documentation_add_value_string (struct disir_documentation *doc,
 
 //! INTERNAL API
 struct disir_documentation *
-dx_documentation_create (dc_t *context)
+dx_documentation_create (struct disir_context *context)
 {
     struct disir_documentation *doc;
 
@@ -387,7 +387,7 @@ dx_documentation_destroy (struct disir_documentation **documentation)
 {
     struct disir_documentation *tmp;
     struct disir_documentation **queue;
-    dc_t *context;
+    struct disir_context *context;
 
     if (documentation == NULL || *documentation == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;

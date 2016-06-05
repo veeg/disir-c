@@ -19,10 +19,10 @@
 
 //! INTERNAL API
 enum disir_status
-dx_default_begin (dc_t *parent, dc_t **def)
+dx_default_begin (struct disir_context *parent, struct disir_context **def)
 {
     enum disir_status status;
-    dc_t *context;
+    struct disir_context *context;
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (parent);
     if (status != DISIR_STATUS_OK)
@@ -85,7 +85,7 @@ dx_default_begin (dc_t *parent, dc_t **def)
 
 //! INTERNAL API
 enum disir_status
-dx_default_finalize (dc_t **default_context)
+dx_default_finalize (struct disir_context **default_context)
 {
     enum disir_status status;
     struct disir_default *def;
@@ -125,7 +125,7 @@ dx_default_finalize (dc_t **default_context)
 
 //! INTERNAL API
 struct disir_default *
-dx_default_create (dc_t *context)
+dx_default_create (struct disir_context *context)
 {
     struct disir_default *def;
 
@@ -147,7 +147,7 @@ dx_default_destroy (struct disir_default **def)
 {
     struct disir_default *tmp;
     struct disir_default **queue;
-    dc_t *context;
+    struct disir_context *context;
 
     if (def == NULL || *def == NULL)
     {
@@ -194,7 +194,7 @@ dx_default_destroy (struct disir_default **def)
 
 //! PUBLIC API
 enum disir_status
-dc_add_default (dc_t *parent, const char *value,
+dc_add_default (struct disir_context *parent, const char *value,
                 int32_t value_size, struct semantic_version *semver)
 {
     enum disir_status status;
@@ -286,11 +286,11 @@ dc_add_default (dc_t *parent, const char *value,
 
 //! PUBLIC API
 enum disir_status
-dc_add_default_string (dc_t *parent, const char *value,
+dc_add_default_string (struct disir_context *parent, const char *value,
                        int32_t value_size, struct semantic_version *semver)
 {
     enum disir_status status;
-    dc_t *def;
+    struct disir_context *def;
 
     def = NULL;
 
@@ -337,10 +337,11 @@ error:
 
 //! PUBLIC API
 enum disir_status
-dc_add_default_integer (dc_t *parent, int64_t value, struct semantic_version *semver)
+dc_add_default_integer (struct disir_context *parent, int64_t value,
+                        struct semantic_version *semver)
 {
     enum disir_status status;
-    dc_t *def;
+    struct disir_context *def;
 
     def = NULL;
 
@@ -388,10 +389,10 @@ error:
 
 //! PUBLIC API
 enum disir_status
-dc_add_default_float (dc_t *parent, double value, struct semantic_version *semver)
+dc_add_default_float (struct disir_context *parent, double value, struct semantic_version *semver)
 {
     enum disir_status status;
-    dc_t *def;
+    struct disir_context *def;
 
     def = NULL;
 
@@ -439,10 +440,11 @@ error:
 
 //! PUBLIC API
 enum disir_status
-dc_add_default_boolean (dc_t *parent, uint8_t boolean, struct semantic_version *semver)
+dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
+                        struct semantic_version *semver)
 {
     enum disir_status status;
-    dc_t *def;
+    struct disir_context *def;
 
     def = NULL;
 
@@ -495,12 +497,12 @@ error:
 
 //! PUBLIC API
 enum disir_status
-dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_buffer_size,
-                char *output, int32_t *output_string_size)
+dc_get_default (struct disir_context *context, struct semantic_version *semver,
+                int32_t output_buffer_size, char *output, int32_t *output_string_size)
 {
     enum disir_status status;
     struct disir_value *value;
-    dc_t *keyval;
+    struct disir_context *keyval;
     struct disir_default *def;
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
@@ -553,7 +555,7 @@ dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_b
 
 //! PUBLIC API
 enum disir_status
-dc_get_default_contexts (dc_t *context, struct disir_collection **collection)
+dc_get_default_contexts (struct disir_context *context, struct disir_collection **collection)
 {
     enum disir_status status;
     struct disir_collection *col;
@@ -601,7 +603,8 @@ dc_get_default_contexts (dc_t *context, struct disir_collection **collection)
 
 //! INTERNAL API
 void
-dx_default_get_active (dc_t *keyval, struct semantic_version *semver, struct disir_default **def)
+dx_default_get_active (struct disir_context *keyval, struct semantic_version *semver,
+                       struct disir_default **def)
 {
     struct disir_default *current;
 

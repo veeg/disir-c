@@ -4,7 +4,7 @@
 struct disir_section
 {
     //! Context element this section element belongs to.
-    dc_t                            *se_context;
+    struct disir_context                            *se_context;
 
     //! Version this section entry was introduced.
     struct semantic_version         se_introduced;
@@ -14,13 +14,13 @@ struct disir_section
 };
 
 //! Construct a DISIR_CONTEXT_SECTION as a child of parent.
-enum disir_status dx_section_begin (dc_t *parent, dc_t **section);
+enum disir_status dx_section_begin (struct disir_context *parent, struct disir_context **section);
 
 //! Finalize the construction of a DISIR_CONTEXT_SECTION
-enum disir_status dx_section_finalize (dc_t **section);
+enum disir_status dx_section_finalize (struct disir_context **section);
 
 //! Allocate a disir_section structure
-struct disir_section *dx_section_create (dc_t *parent);
+struct disir_section *dx_section_create (struct disir_context *parent);
 
 //! Destroy a disir_section structure, freeing all associated
 //! memory and unhooking from linked list storage.

@@ -15,7 +15,7 @@
 
 
 //! PUBLIC API
-dc_t *
+struct disir_context *
 dc_mold_getcontext (struct disir_mold *mold)
 {
     if (mold == NULL)
@@ -31,9 +31,9 @@ dc_mold_getcontext (struct disir_mold *mold)
 
 //! PUBLIC API
 enum disir_status
-dc_mold_begin (dc_t **mold)
+dc_mold_begin (struct disir_context **mold)
 {
-    dc_t *context;
+    struct disir_context *context;
 
     if (mold == NULL)
     {
@@ -65,7 +65,7 @@ dc_mold_begin (dc_t **mold)
 
 // PUBLIC API
 enum disir_status
-dc_mold_finalize (dc_t **context, struct disir_mold **mold)
+dc_mold_finalize (struct disir_context **context, struct disir_mold **mold)
 {
     enum disir_status status;
 
@@ -101,7 +101,7 @@ dc_mold_finalize (dc_t **context, struct disir_mold **mold)
 
 //! INTERNAL API
 struct disir_mold *
-dx_mold_create (dc_t *context)
+dx_mold_create (struct disir_context *context)
 {
     struct disir_mold *mold;
 
@@ -142,7 +142,7 @@ error:
 enum disir_status
 dx_mold_destroy (struct disir_mold **mold)
 {
-    dc_t *context;
+    struct disir_context *context;
     struct disir_documentation *doc;
 
     if (mold == NULL || *mold == NULL)

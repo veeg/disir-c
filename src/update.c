@@ -80,7 +80,7 @@ enum disir_status
 disir_update_continue (struct disir_update *update)
 {
     enum disir_status status;
-    dc_t *config_keyval;
+    struct disir_context *config_keyval;
     struct disir_keyval *keyval;
     struct disir_default *config_def;
     struct disir_default *target_def;

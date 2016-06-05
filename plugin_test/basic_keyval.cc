@@ -4,7 +4,7 @@ basic_keyval(void)
 {
     enum disir_status status;
     struct disir_mold *mold;
-    dc_t *context;
+    struct disir_context *context;
 
 
     status = dc_mold_begin (&context);
