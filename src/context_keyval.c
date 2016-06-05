@@ -108,6 +108,12 @@ dx_keyval_finalize (dc_t **keyval)
     }
     }
 
+    // Cannot add keyval without a name
+    if ((*keyval)->cx_keyval->kv_name.dv_string == NULL)
+    {
+        dx_context_error_set (*keyval, "Missing name component for keyval.");
+        return DISIR_STATUS_INVALID_CONTEXT;
+    }
 
     // TODO: Verify that adding this entry does not conflict with the restrictions
     // inplace for parent
