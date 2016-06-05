@@ -673,8 +673,12 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
         introduced = &context->cx_default->de_introduced;
         break;
     }
-    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_KEYVAL:
+    {
+        introduced = &context->cx_keyval->kv_introduced;
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_context_type_string (context));
