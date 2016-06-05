@@ -645,10 +645,15 @@ dc_add_introduced (dc_t *context, struct semantic_version semver)
         return status;
     }
 
-    if (context->CONTEXT_CAPABILITY_INTRODUCED == 0)
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
+                                          DISIR_CONTEXT_DEFAULT,
+                                          DISIR_CONTEXT_DOCUMENTATION);
+    if (status != DISIR_STATUS_OK)
     {
-        dx_log_context (context, "no capability to add introduced semver to context");
-        return DISIR_STATUS_NO_CAN_DO;
+        // Set more context-related error message
+        dx_context_error_set (context, "Cannot add introduced version to %s",
+                              dc_context_type_string (context));
+        return status;
     }
 
     log_debug_context (context, "adding introduced to root(%s): %s",
