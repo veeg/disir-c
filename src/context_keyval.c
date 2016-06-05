@@ -136,6 +136,8 @@ dx_keyval_finalize (dc_t **keyval)
 
     // TODO: Verify that adding this entry does not conflict with the restrictions
     // inplace for parent
+    // We should probably allow to insert invalid entries, but mark them
+    // as an invalid state and return a special status code indicating such.
 
     status = dx_element_storage_add (storage, (*keyval)->cx_keyval->kv_name.dv_string, *keyval);
     if (status != DISIR_STATUS_OK)
