@@ -347,6 +347,24 @@ dc_add_default_integer (dc_t *parent, int64_t value, struct semantic_version *se
 enum disir_status
 dc_add_default_float (dc_t *parent, double value, struct semantic_version *semver);
 
+//! \brief Add a default boolean value to the parent context.
+//!
+//! Type of parent must be DISIR_VALUE_TYPE_BOOLEAN. There must not be a default context
+//! in parent with an equal semantic version number.
+//!
+//! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_MOLD.
+//! \param booelan Default bool value to add.
+//! \param semver Semantic version number this default entry is valid from. NULL indicates
+//!     the semantic verssion number 1.0.0
+//!
+//! \return DISIR_STATUS_OK if the default 'boolean' entry succesfully added
+//!     to the parent context.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
+//!
+enum disir_status
+dc_add_default_boolean (dc_t *parent, uint8_t boolean, struct semantic_version *semver);
+
+
 //! \brief Return the default value as a string representation from context.
 //!
 //! Retrieve the default value of input context as a string representation.

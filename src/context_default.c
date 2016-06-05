@@ -439,6 +439,62 @@ error:
 
 //! PUBLIC API
 enum disir_status
+dc_add_default_boolean (dc_t *parent, uint8_t boolean, struct semantic_version *semver)
+{
+    enum disir_status status;
+    dc_t *def;
+
+    def = NULL;
+
+    status = dx_default_begin (parent, &def);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto error;
+    }
+
+    if (boolean > 1)
+    {
+        boolean = 1;
+    }
+    status = dx_value_set_integer (&def->cx_default->de_value, boolean);
+    if (status != DISIR_STATUS_OK)
+    {
+        // not logged to context
+        goto error;
+    }
+
+    if (semver)
+    {
+        status = dc_add_introduced(def, *semver);
+        if (status != DISIR_STATUS_OK)
+        {
+            // already logged
+            goto error;
+        }
+    }
+
+    status = dx_default_finalize (&def);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged to context
+        goto error;
+    }
+
+    return DISIR_STATUS_OK;
+error:
+    if (def)
+    {
+        dx_context_transfer_logwarn (parent, def);
+        dc_destroy (&def);
+    }
+
+    return status;
+}
+
+
+//! PUBLIC API
+enum disir_status
 dc_get_default (dc_t *context, struct semantic_version *semver, int32_t output_buffer_size,
                 char *output, int32_t *output_string_size)
 {
