@@ -121,7 +121,6 @@ dx_log_format (enum disir_log_level dll, const char *prefix,
     fclose (stream);
 }
 
-
 //! INTERNAL API
 //! Log the message to the a storage pointer
 static void
