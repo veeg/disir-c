@@ -16,8 +16,8 @@
 //! disir_context_type enumeration value.
 const char *disir_context_type_string[] = {
     "INVALID_CONTEXT_VALUE",
-    "FILE_CONFIG",
-    "FILE_MOLD",
+    "CONFIG",
+    "MOLD",
     "SECTION",
     "KEYVAL",
     "DOCUMENTATION",
