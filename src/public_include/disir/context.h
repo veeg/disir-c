@@ -121,6 +121,13 @@ enum disir_status dc_begin (dc_t *parent, enum disir_context_type context_type, 
 //! If a context pointer is INVALID, dc_destroy() must be invoked on it to
 //! decrement the reference count.
 //!
+//! NOTE: For DISIR_CONTEXT_MOLD and DISIR_CONTEXT_CONFIG,
+//! if you have already finalized them and retrieved a context object to query with
+//! (through dc_*_getcontext()), you CANNOT pass this context to dc_destroy().
+//! This will lead to invalid memory access when accessing the config/mold structure
+//! since you are effectivly free'ing this structure through this call.
+//! Simply dc_putcontext() instead and call the appropriate disir_*_finished() instead,
+//!
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_destroy (dc_t **context);
