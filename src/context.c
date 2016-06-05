@@ -833,11 +833,19 @@ dc_get_introduced (dc_t *context, struct semantic_version *semver)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    if (context->CONTEXT_CAPABILITY_INTRODUCED == 0)
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
+                                          DISIR_CONTEXT_DEFAULT,
+                                          DISIR_CONTEXT_MOLD,
+                                          DISIR_CONTEXT_CONFIG,
+                                          DISIR_CONTEXT_DOCUMENTATION);
+    if (status != DISIR_STATUS_OK)
     {
-        dx_log_context (context, "no capability to get introduced semver from context");
-        return DISIR_STATUS_NO_CAN_DO;
+        // Set more context-related error message
+        dx_context_error_set (context, "Cannot get introduced version from %s",
+                              dc_context_type_string (context));
+        return status;
     }
+
 
     introduced = NULL;
     status = DISIR_STATUS_OK;
