@@ -107,7 +107,8 @@ enum disir_status disir_libdisir_mold (struct disir_mold **mold);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status disir_libdisir_config_to_disk (struct disir *disir, struct disir_config *config,
+enum disir_status disir_libdisir_config_to_disk (struct disir_instance *disir,
+                                                 struct disir_config *config,
                                                  const char *filepath);
 
 
@@ -139,7 +140,7 @@ const char * disir_status_string (enum disir_status status);
 //!
 enum disir_status
 disir_instance_create (const char *config_filepath, struct disir_config *config,
-                       struct disir **disir);
+                       struct disir_instance **disir);
 
 //! \brief Destroy a previously allocated libdisir instance
 //!
@@ -151,16 +152,16 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 //!     are NULL:
 //! \return DISIR_STATUS_OK on success.
 enum disir_status
-disir_instance_destroy (struct disir **disir);
+disir_instance_destroy (struct disir_instance **disir);
 
 //! \brief Set an error message to the disir instance.
 //!
 //! This will also issue a ERROR level log event to the log stream.
 //!
-void disir_error_set (struct disir *disir, const char *message, ...);
+void disir_error_set (struct disir_instance *disir, const char *message, ...);
 
 //! \brief Clear any error message previously sat on the disir instance.
-void disir_error_clear (struct disir *disir);
+void disir_error_clear (struct disir_instance *disir);
 
 //! \brief Copy the contents of the error message
 //!
@@ -182,13 +183,14 @@ void disir_error_clear (struct disir *disir);
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_error_copy (struct disir *disir, char *buffer, int32_t buffer_size, int32_t *bytes_written);
+disir_error_copy (struct disir_instance *disir,
+                  char *buffer, int32_t buffer_size, int32_t *bytes_written);
 
 //! \brief Return the error message from the instance.
 //!
 //!If no error message exists, NULL is returned.
 //!
-const char * disir_error (struct disir *disir);
+const char * disir_error (struct disir_instance *disir);
 
 //! \brief Generate a config at a given version from the finished mold.
 //!

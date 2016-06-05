@@ -187,7 +187,7 @@ dx_context_error_set (struct disir_context *context, const char *fmt_message, ..
 void
 dx_log_disir_va (enum disir_log_level dll,
             struct disir_context *context,
-            struct disir *disir,
+            struct disir_instance *disir,
             int32_t log_context,
             const char *file,
             const char *function,
@@ -206,7 +206,7 @@ dx_log_disir_va (enum disir_log_level dll,
 void
 dx_log_disir (enum disir_log_level dll,
             struct disir_context *context,
-            struct disir *disir,
+            struct disir_instance *disir,
             int32_t log_context,
             const char *file,
             const char *function,

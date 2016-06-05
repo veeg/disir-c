@@ -15,7 +15,7 @@ extern "C"{
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-typedef enum disir_status (*config_read) (struct disir *disir,
+typedef enum disir_status (*config_read) (struct disir_instance *disir,
                                           const char *id,
                                           struct disir_mold *mold,
                                           struct disir_config **config);
@@ -27,14 +27,14 @@ typedef enum disir_status (*config_read) (struct disir *disir,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-typedef enum disir_status (*config_write) (struct disir *disir,
+typedef enum disir_status (*config_write) (struct disir_instance *disir,
                                            const char *id,
                                            struct disir_config *config);
 
 //! \brief Retrieve all configs available
 //! TODO: Docs
 //! XXX: implement as output list?
-typedef enum disir_status (*config_list) (struct disir *disir,
+typedef enum disir_status (*config_list) (struct disir_instance *disir,
                                           struct disir_collection **collection);
 
 //! \brief Retrieve the mold version from this configuration file
@@ -44,12 +44,12 @@ typedef enum disir_status (*config_list) (struct disir *disir,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-typedef enum disir_status (*config_version) (struct disir *disir,
+typedef enum disir_status (*config_version) (struct disir_instance *disir,
                                              const char *id,
                                              struct semantic_version *semver);
 
 //! \brief Query if the config with passed id exists
-typedef enum disir_status (*config_query) (struct disir *disir,
+typedef enum disir_status (*config_query) (struct disir_instance *disir,
                                            const char *id);
 
 //! \brief Function signature for inputting disir_mold from external source.
@@ -59,7 +59,7 @@ typedef enum disir_status (*config_query) (struct disir *disir,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-typedef enum disir_status (*mold_read) (struct disir *disir,
+typedef enum disir_status (*mold_read) (struct disir_instance *disir,
                                         const char *id,
                                         struct disir_mold **mold);
 
@@ -70,18 +70,18 @@ typedef enum disir_status (*mold_read) (struct disir *disir,
 //!
 //! \return DISIR_STATUS_OK on success
 //!
-typedef enum disir_status (*mold_write) (struct disir *disir,
+typedef enum disir_status (*mold_write) (struct disir_instance *disir,
                                          const char *id,
                                          struct disir_mold *mold);
 
 //! TODO: Docs
 //! XXX: implement as output list?
-typedef enum disir_status (*mold_list) (struct disir *disir,
+typedef enum disir_status (*mold_list) (struct disir_instance *disir,
                                         struct disir_collection **collection);
 
 //! \brief Query if the mold with passed id exists
 //! TODO: docs
-typedef enum disir_status (*mold_query) (struct disir *disir,
+typedef enum disir_status (*mold_query) (struct disir_instance *disir,
                                          const char *id);
 
 //! Maximum number of bytes the 'type' parameter can identify an I/O type.
@@ -141,7 +141,7 @@ struct disir_output_plugin
 //! \return DISIR_STATUS_OK on success
 //!
 enum disir_status
-disir_register_input (struct disir *disir, const char *type, const char *description,
+disir_register_input (struct disir_instance *disir, const char *type, const char *description,
                       struct disir_input_plugin *plugin);
 
 //! \brief Register a write output plugin with the libdisir instance
@@ -159,7 +159,7 @@ disir_register_input (struct disir *disir, const char *type, const char *descrip
 //! \return DISIR_STATUS_OK on success
 //!
 enum disir_status
-disir_register_output (struct disir *disir, const char *type, const char *description,
+disir_register_output (struct disir_instance *disir, const char *type, const char *description,
                        struct disir_output_plugin *plugin);
 
 //! \brief Input a config object with of I/O plugin 'type', identified by 'id'
@@ -178,7 +178,7 @@ disir_register_output (struct disir *disir, const char *type, const char *descri
 //! \return DISIR_STATUS_OK on success
 //!
 enum disir_status
-disir_config_input (struct disir *disir, const char *type, const char *id,
+disir_config_input (struct disir_instance *disir, const char *type, const char *id,
                     struct disir_mold *mold, struct disir_config **config);
 
 
@@ -194,7 +194,7 @@ disir_config_input (struct disir *disir, const char *type, const char *id,
 //! \return DISIR_STATUS_OK on success
 //!
 enum disir_status
-disir_mold_input (struct disir *disir, const char *type, const char *id,
+disir_mold_input (struct disir_instance *disir, const char *type, const char *id,
                     struct disir_mold **mold);
 
 //! \brief Output the config object to a register type output plugin
@@ -209,7 +209,7 @@ disir_mold_input (struct disir *disir, const char *type, const char *id,
 //! \return status of the output plugin
 //!
 enum disir_status
-disir_config_output (struct disir *disir, const char *type, const char *id,
+disir_config_output (struct disir_instance *disir, const char *type, const char *id,
                      struct disir_config *config);
 
 //! \brief Output the mold object to a register type output plugin
@@ -224,14 +224,14 @@ disir_config_output (struct disir *disir, const char *type, const char *id,
 //! \return status of the output plugin
 //!
 enum disir_status
-disir_mold_output (struct disir *disir, const char *type, const char *id,
+disir_mold_output (struct disir_instance *disir, const char *type, const char *id,
                      struct disir_mold *mold);
 
 //! \brief List the available configuration files from this input plugin
 //!
 //! \param type Input type. Must be previously registed with disir
 enum disir_status
-disir_config_list (struct disir *disir, const char *type,
+disir_config_list (struct disir_instance *disir, const char *type,
                    struct disir_collection **collection);
 
 //! \brief Mark yourself finished with the configuration object
@@ -265,7 +265,7 @@ disir_mold_finished (struct disir_mold **mold);
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_input_plugin_list (struct disir *disir, struct disir_collection **collection);
+disir_input_plugin_list (struct disir_instance *disir, struct disir_collection **collection);
 
 #ifdef __cplusplus
 }

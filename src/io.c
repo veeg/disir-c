@@ -14,7 +14,7 @@
 #include "disir_private.h"
 
 enum disir_status
-disir_register_input (struct disir *disir, const char *type,
+disir_register_input (struct disir_instance *disir, const char *type,
                       const char *description, struct disir_input_plugin *plugin)
 {
     enum disir_status status;
@@ -74,7 +74,7 @@ error:
 }
 
 enum disir_status
-disir_register_output (struct disir *disir, const char *type, const char *description,
+disir_register_output (struct disir_instance *disir, const char *type, const char *description,
                        struct disir_output_plugin *plugin)
 {
     enum disir_status status;
@@ -132,7 +132,7 @@ error:
 
 //! PUBLIC API
 enum disir_status
-disir_config_input (struct disir *disir, const char *type, const char *id,
+disir_config_input (struct disir_instance *disir, const char *type, const char *id,
                     struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
@@ -154,7 +154,7 @@ disir_config_input (struct disir *disir, const char *type, const char *id,
 
 //! PUBLIC API
 enum disir_status
-disir_mold_input (struct disir *disir, const char *type, const char *id,
+disir_mold_input (struct disir_instance *disir, const char *type, const char *id,
                     struct disir_mold **mold)
 {
     enum disir_status status;
@@ -176,7 +176,7 @@ disir_mold_input (struct disir *disir, const char *type, const char *id,
 
 //! PUBLIC API
 enum disir_status
-disir_config_output (struct disir *disir, const char *type, const char *id,
+disir_config_output (struct disir_instance *disir, const char *type, const char *id,
                      struct disir_config *config)
 {
     enum disir_status status;
@@ -205,7 +205,7 @@ disir_config_output (struct disir *disir, const char *type, const char *id,
 
 //! PUBLIC API
 enum disir_status
-disir_mold_output (struct disir *disir, const char *type, const char *id,
+disir_mold_output (struct disir_instance *disir, const char *type, const char *id,
                      struct disir_mold *mold)
 {
     enum disir_status status;
@@ -234,7 +234,8 @@ disir_mold_output (struct disir *disir, const char *type, const char *id,
 
 //! PUBLIC API
 enum disir_status
-disir_config_list (struct disir *disir, const char *type, struct disir_collection **collection)
+disir_config_list (struct disir_instance *disir, const char *type,
+                   struct disir_collection **collection)
 {
     enum disir_status status;
     struct disir_input  *input;
@@ -264,7 +265,7 @@ disir_config_list (struct disir *disir, const char *type, struct disir_collectio
 
 //! PUBLIC API
 enum disir_status
-disir_input_plugin_list (struct disir *disir, struct disir_collection **collection)
+disir_input_plugin_list (struct disir_instance *disir, struct disir_collection **collection)
 {
     struct disir_collection *col;
     struct disir_context *context;

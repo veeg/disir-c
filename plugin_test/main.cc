@@ -10,16 +10,17 @@
 
 // Forward declaration
 enum disir_status
-dio_test_config_read (struct disir *disir, const char *id,
+dio_test_config_read (struct disir_instance *disir, const char *id,
                       struct disir_mold *mold, struct disir_config **config);
 enum disir_status
-dio_test_config_list (struct disir *disir, struct disir_collection **collection);
+dio_test_config_list (struct disir_instance *disir, struct disir_collection **collection);
 enum disir_status
-dio_test_config_version (struct disir *disir, const char *id, struct semantic_version *semver);
+dio_test_config_version (struct disir_instance *disir,
+                         const char *id, struct semantic_version *semver);
 enum disir_status
-dio_test_mold_read (struct disir *disir, const char *id, struct disir_mold **mold);
+dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_mold **mold);
 enum disir_status
-dio_test_mold_list (struct disir *disir, struct disir_collection **collection);
+dio_test_mold_list (struct disir_instance *disir, struct disir_collection **collection);
 
 
 //! Internal static map to store test molds by id
@@ -29,20 +30,21 @@ static std::map<const char *, struct disir_mold *> molds
 };
 
 enum disir_status
-dio_test_config_read (struct disir *disir, const char *id,
+dio_test_config_read (struct disir_instance *disir, const char *id,
                       struct disir_mold *mold, struct disir_config **config)
 {
     return disir_generate_config_from_mold (molds[id], NULL, config);
 }
 
 enum disir_status
-dio_test_config_list (struct disir *disir, struct disir_collection **collection)
+dio_test_config_list (struct disir_instance *disir, struct disir_collection **collection)
 {
     return dio_test_mold_list (disir, collection);
 }
 
 enum disir_status
-dio_test_config_version (struct disir *disir, const char *id, struct semantic_version *semver)
+dio_test_config_version (struct disir_instance *disir,
+                         const char *id, struct semantic_version *semver)
 {
     struct disir_mold *mold;
 
@@ -62,7 +64,7 @@ dio_test_config_version (struct disir *disir, const char *id, struct semantic_ve
 }
 
 enum disir_status
-dio_test_mold_read (struct disir *disir, const char *id, struct disir_mold **mold)
+dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_mold **mold)
 {
     *mold = molds[id];
     if (*mold == NULL)
@@ -75,7 +77,7 @@ dio_test_mold_read (struct disir *disir, const char *id, struct disir_mold **mol
 }
 
 enum disir_status
-dio_test_mold_list (struct disir *disir, struct disir_collection **collection)
+dio_test_mold_list (struct disir_instance *disir, struct disir_collection **collection)
 {
     struct disir_collection *col;
     struct disir_context *context;
@@ -98,7 +100,7 @@ dio_test_mold_list (struct disir *disir, struct disir_collection **collection)
 }
 
 extern "C" enum disir_status
-dio_register_plugin (struct disir *disir)
+dio_register_plugin (struct disir_instance *disir)
 {
     struct disir_input_plugin input;
 

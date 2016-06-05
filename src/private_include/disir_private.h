@@ -87,7 +87,7 @@ enum disir_status dx_disir_input_destroy (struct disir_input **output);
 //! \return DISIR_STATUS_OK on success
 //!
 enum disir_status
-dio_ini_config_read (struct disir *disir, const char *id,
+dio_ini_config_read (struct disir_instance *disir, const char *id,
                      struct disir_mold *mold, struct disir_config **config);
 
 //! \brief Write INI formatted configuration file to id filepath
@@ -99,7 +99,7 @@ dio_ini_config_read (struct disir *disir, const char *id,
 //! \return DISIR_STATUS_OK on success
 //!
 enum disir_status
-dio_ini_config_write (struct disir *disir, const char *id, struct disir_config *config);
+dio_ini_config_write (struct disir_instance *disir, const char *id, struct disir_config *config);
 
 
 #endif // _LIBDISIR_DISIR_PRIVATE_H

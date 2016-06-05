@@ -26,12 +26,12 @@
 
 //! INTERNAL STATIC
 static void
-load_plugin (struct disir *disir, const char *plugin_filepath)
+load_plugin (struct disir_instance *disir, const char *plugin_filepath)
 {
     enum disir_status status;
     void *handle;
     struct disir_plugin *plugin;
-    enum disir_status (*dio_reg)(struct disir *);
+    enum disir_status (*dio_reg)(struct disir_instance *);
 
     // Attempt to load the filepath dynamically
     handle = dlopen (plugin_filepath, RTLD_NOW | RTLD_LOCAL);
@@ -78,7 +78,7 @@ load_plugin (struct disir *disir, const char *plugin_filepath)
 
 //! INTERNAL STATIC
 void
-load_plugins_from_config (struct disir *disir, struct disir_config *config)
+load_plugins_from_config (struct disir_instance *disir, struct disir_config *config)
 {
     enum disir_status status;
     struct disir_collection *collection;
@@ -180,7 +180,7 @@ error:
 
 //! PUBLIC API
 enum disir_status
-disir_libdisir_config_to_disk (struct disir *disir, struct disir_config *config,
+disir_libdisir_config_to_disk (struct disir_instance *disir, struct disir_config *config,
                                const char *filepath)
 {
     return dio_ini_config_write (disir, filepath, config);
@@ -189,10 +189,10 @@ disir_libdisir_config_to_disk (struct disir *disir, struct disir_config *config,
 // PUBLIC API
 enum disir_status
 disir_instance_create (const char *config_filepath, struct disir_config *config,
-                       struct disir **disir)
+                       struct disir_instance **disir)
 {
     enum disir_status status;
-    struct disir *dis;
+    struct disir_instance *dis;
 
     struct disir_config *libconf;
     struct disir_mold *libmold;
@@ -264,7 +264,7 @@ error:
 
 //! PUBLIC API
 enum disir_status
-disir_instance_destroy (struct disir **disir)
+disir_instance_destroy (struct disir_instance **disir)
 {
     struct disir_plugin *plugin;
     struct disir_input *input;
@@ -449,7 +449,7 @@ error:
 
 //! PUBLIC API
 void
-disir_error_set (struct disir *disir, const char *message, ...)
+disir_error_set (struct disir_instance *disir, const char *message, ...)
 {
     va_list args;
 
@@ -463,7 +463,7 @@ disir_error_set (struct disir *disir, const char *message, ...)
 
 //! PUBLIC API
 void
-disir_error_clear (struct disir *disir)
+disir_error_clear (struct disir_instance *disir)
 {
     if (disir->disir_error_message_size != 0)
     {
@@ -475,7 +475,8 @@ disir_error_clear (struct disir *disir)
 
 //! PUBLIC API
 enum disir_status
-disir_error_copy (struct disir *disir, char *buffer, int32_t buffer_size, int32_t *bytes_written)
+disir_error_copy (struct disir_instance *disir,
+                  char *buffer, int32_t buffer_size, int32_t *bytes_written)
 {
     enum disir_status status;
     int32_t size;
@@ -519,7 +520,7 @@ disir_error_copy (struct disir *disir, char *buffer, int32_t buffer_size, int32_
 
 //! PUBLIC API
 const char *
-disir_error (struct disir *disir)
+disir_error (struct disir_instance *disir)
 {
     return disir->disir_error_message;
 }
