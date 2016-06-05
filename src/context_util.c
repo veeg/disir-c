@@ -606,3 +606,14 @@ dc_get_value_type (dc_t *context, enum disir_value_type *type)
     return status;
 }
 
+const char *
+dc_context_error (dc_t *context)
+{
+    if (context == NULL)
+        return NULL;
+    if (dc_context_type (context) == DISIR_CONTEXT_UNKNOWN)
+        return NULL;
+
+    return context->cx_error_message;
+}
+

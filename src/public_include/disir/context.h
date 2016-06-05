@@ -88,6 +88,13 @@ enum disir_value_type dc_value_type (dc_t *context);
 const char * dc_value_type_string (dc_t *context);
 
 
+//! \brief Return the error message on input context.
+//!
+//! \return NULL if no error message is associated with input context
+//! \return const char pointer to error message.
+//!
+const char *dc_context_error (dc_t *context);
+
 //
 // Base context API
 //
