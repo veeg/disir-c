@@ -22,6 +22,38 @@ Because its **manual**. It does not aid you in resolving conflict between the sa
 [horizontal]
 Restrictions:: No restritions are implemented on neither section nor keyval.
 
+Sections:: Sections are not implemented on neither mold nor config.
+
+Update:: Allow update procedure to generate a collection of conflicts, instead of
+resolving them immediately
+
+Update:: Do not override the input config object, rather create a new one.
+
+Update:: Iterate mold instead of config, to support add/removal/rename(?)
+
+dc_context_compare()::  Implement a compare method. This should only every be true if
+all children and state, even order-of-elements, are equal.
+It might be reasonable to add a CRC or equivalent checksum that is computed for all contexts.
+If so, this checksum MUST be take the order of operations into account.
+
+verify:: Add some method to verify the state of the context. Should pinpoint an error message
+to the invalid state characteristic.
+
+value type:: Support more than just string keyvals. (experimental support now?)
+
+Deprecrated:: Implement a deprecrated notion. KEYVALS and sections can be deprecrated
+
+Rename:: KEYVALS and SECTION should possible be renamed across versions?
+
+visiblity flag:: Annotate mold entries with a 'hidden' flag to indicate their presence,
+but make them optional to a config entry - if queried and does not exist in the config,
+it can be retrieved from the mold instead? This would allow us to hide ugly configuration
+options that are so rarely changed, but still have them active in the configuration.
+
+fixed flag:: Similar to visibilty flag, let the mold decide that this entry is of a fixed value
+and wont show up on the configuration entry, but can be queried from it because
+it will be retrieved in the mold instead.
+
 
 == Developer dependencies
 
