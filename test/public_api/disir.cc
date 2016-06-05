@@ -20,7 +20,7 @@ class DisirInstanceTest : public testing::Test
 
 public:
     enum disir_status status;
-    struct disir *disir;
+    struct disir_instance *disir;
 };
 
 TEST_F (DisirInstanceTest, should_create_destroy_disir_instance)
