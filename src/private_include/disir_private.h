@@ -5,7 +5,7 @@
 #include <disir/io.h>
 
 //! \brief The main libdisir instance structure. All I/O operations requires an instance of it.
-struct disir
+struct disir_instance
 {
     //! Double-linked list queue of dynamically loaded plugins
     struct disir_plugin     *dio_plugin_queue;

@@ -205,7 +205,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    dis = calloc (1, sizeof (struct disir));
+    dis = calloc (1, sizeof (struct disir_instance));
     if (dis == NULL)
     {
         return DISIR_STATUS_NO_MEMORY;

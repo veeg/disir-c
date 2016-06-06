@@ -55,7 +55,7 @@ enum disir_status
 };
 
 //! Forward declare the main disir object
-struct disir;
+struct disir_instance;
 //! Forward declare the disir_update object
 struct disir_update;
 //! Forward declaration of the top-level context disir_config
