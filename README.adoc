@@ -31,6 +31,11 @@ Update:: Do not override the input config object, rather create a new one.
 
 Update:: Iterate mold instead of config, to support add/removal/rename(?)
 
+Update:: Create a detailed update report. Every keyval that changes value, either implicitly or
+explicitly, should be part of the report. It should be split into entry sections, so they can be
+merged into a single grand report detailing all changes. This should be implemented
+after sections.
+
 dc_context_compare()::  Implement a compare method. This should only every be true if
 all children and state, even order-of-elements, are equal.
 It might be reasonable to add a CRC or equivalent checksum that is computed for all contexts.
