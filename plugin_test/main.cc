@@ -6,6 +6,7 @@
 #include <disir/disir.h>
 
 #include "basic_keyval.cc"
+#include "basic_section.cc"
 
 
 // Forward declaration
@@ -27,6 +28,7 @@ dio_test_mold_list (struct disir_instance *disir, struct disir_collection **coll
 static std::map<const char *, struct disir_mold *> molds
 {
     basic_keyval (),
+    basic_section (),
 };
 
 enum disir_status
