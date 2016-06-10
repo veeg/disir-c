@@ -12,6 +12,7 @@
 // Private
 #include "context_private.h"
 #include "config.h"
+#include "section.h"
 #include "keyval.h"
 #include "log.h"
 #include "mold.h"
@@ -167,8 +168,10 @@ dc_begin (struct disir_context *parent, enum disir_context_type context_type,
     case DISIR_CONTEXT_DEFAULT:
         status = dx_default_begin (parent, child);
         break;
-    case DISIR_CONTEXT_RESTRICTION:
     case DISIR_CONTEXT_SECTION:
+        status = dx_section_begin (parent, child);
+        break;
+    case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dx_context_type_string (context_type));
     case DISIR_CONTEXT_CONFIG:
@@ -231,6 +234,8 @@ dc_finalize (struct disir_context **context)
         status = dx_default_finalize (context);
         break;
     case DISIR_CONTEXT_SECTION:
+        status = dx_section_finalize (context);
+        break;
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_context_type_string (*context));
@@ -307,8 +312,7 @@ dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
     }
     else if (dc_context_type (context) == DISIR_CONTEXT_SECTION)
     {
-        dx_crash_and_burn ("%s: Implement section", __FUNCTION__);
-        //status = dx_value_set_string (&context->cx_section->se_name, value, value_size);
+        status = dx_value_set_string (&context->cx_section->se_name, name, name_size);
     }
     else
     {
