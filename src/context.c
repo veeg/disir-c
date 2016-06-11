@@ -99,6 +99,8 @@ dc_destroy (struct disir_context **context)
         status = dx_default_destroy (&((*context)->cx_default));
         break;
     case DISIR_CONTEXT_SECTION:
+        status = dx_section_destroy (&((*context)->cx_section));
+        break;
     case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
