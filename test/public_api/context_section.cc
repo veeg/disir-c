@@ -41,6 +41,11 @@ class ContextSectionTest : public testing::DisirTestWrapper
             status = dc_destroy (&context_keyval);
             EXPECT_STATUS (DISIR_STATUS_OK, status);
         }
+        if (context_section)
+        {
+            status = dc_destroy (&context_section);
+            EXPECT_STATUS (DISIR_STATUS_OK, status);
+        }
 
         DisirLogCurrentTestExit ();
     }
