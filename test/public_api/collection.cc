@@ -186,6 +186,16 @@ TEST_F (CollectionTest, next)
         EXPECT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (current == contexts[i]);
     }
+
+
+    // Cleanup allocated contexts (collection has the final refcount
+    for (i = 0; i < 100; i++)
+    {
+        if (contexts[i] != NULL)
+        {
+            dc_destroy (&contexts[i]);
+        }
+    }
 }
 
 TEST_F (CollectionTest, push_context_until_internal_resize)
