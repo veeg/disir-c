@@ -115,6 +115,15 @@ TEST_F (CollectionTest, push_context)
 
     size = dc_collection_size (collection);
     ASSERT_EQ (12, size);
+
+    // Cleanup allocated contexts (collection has the final refcount
+    for (i = 0; i < 15; i++)
+    {
+        if (contexts[i] != NULL)
+        {
+            dc_destroy (&contexts[i]);
+        }
+    }
 }
 
 TEST_F (CollectionTest, next)
