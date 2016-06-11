@@ -309,9 +309,6 @@ TEST_F (ContextMoldTest, get_elements)
 {
     // TODO: Use existig test MOLD instead of adding to this myself
 
-    // Setup mold
-    status = dc_mold_begin (&context_mold);
-    ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_add_keyval_string (context_mold, "keyval1",
                                    "keyval1_value", "keyval1_doc", NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
