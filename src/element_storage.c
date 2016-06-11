@@ -118,8 +118,7 @@ dx_element_storage_destroy (struct disir_element_storage **storage)
     while ((context = list_iterator_next (iter)))
     {
         // Ignore return code - we just want to destroy and get out of town.
-        // Decref first, before destroying
-        dx_context_decref (&context);
+        // Destroying the context will decref our reference on it.
         if (context)
         {
             dc_destroy (&context);
