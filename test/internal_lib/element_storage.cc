@@ -39,6 +39,7 @@ protected:
         DisirLogCurrentTestEnter();
 
         context = NULL;
+        collection = NULL;
 
         storage = dx_element_storage_create ();
         ASSERT_TRUE (storage != NULL);
@@ -48,6 +49,12 @@ protected:
     {
         status = dx_element_storage_destroy (&storage);
         ASSERT_EQ (NULL, storage);
+
+        if (collection)
+        {
+            status = dc_collection_finished (&collection);
+            EXPECT_STATUS (DISIR_STATUS_OK, status);
+        }
 
         DisirLogCurrentTestExit ();
     }
@@ -84,27 +91,14 @@ class ElementStoragePopulatedTest : public ElementStorageEmptyTest
                 status = dx_element_storage_add (storage, key, context);
                 ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+                // Put back the context - soley the element_storage that keeps reference
+                dx_context_decref (&context);
+
                 list.push_back (context);
             }
         }
     }
 
-    void TearDown()
-    {
-        for (auto it = list.begin(); it != list.end(); ++it)
-        {
-            context = (*it);
-            dx_context_decref (&context);
-        }
-
-        if (collection)
-        {
-            status = dc_collection_finished (&collection);
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
-        }
-
-        ElementStorageEmptyTest::TearDown();
-    }
 public:
     std::list<struct disir_context *>   list;
 };
