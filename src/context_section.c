@@ -143,8 +143,10 @@ dx_section_create (struct disir_context *self)
 enum disir_status
 dx_section_destroy (struct disir_section **section)
 {
+    enum disir_status status;
     struct disir_context *context;
     struct disir_documentation *doc;
+    struct disir_collection *collection;
 
     if (section == NULL || *section == NULL)
     {
@@ -171,7 +173,23 @@ dx_section_destroy (struct disir_section **section)
         dc_destroy (&context);
     }
 
-    // TODO: Destroy element storage
+    // Destroy all element_storage children
+    status = dx_element_storage_get_all ((*section)->se_elements, &collection);
+    if (status == DISIR_STATUS_OK)
+    {
+        while (dc_collection_next (collection, &context) != DISIR_STATUS_EXHAUSTED)
+        {
+            dx_context_decref (&context);
+        }
+        dc_collection_finished (&collection);
+    }
+    else
+    {
+        log_warn ("failed to get_all from internal element storage: %s",
+                  disir_status_string (status));
+    }
+
+    dx_element_storage_destroy (&(*section)->se_elements);
 
     free (*section);
     *section = NULL;

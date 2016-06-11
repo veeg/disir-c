@@ -150,7 +150,9 @@ error:
 enum disir_status
 dx_config_destroy (struct disir_config **config)
 {
+    enum disir_status status;
     struct disir_context *context;
+    struct disir_collection *collection;
 
     if (config == NULL || *config == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
@@ -158,6 +160,22 @@ dx_config_destroy (struct disir_config **config)
     // Decref our count on mold context.
     context = (*config)->cf_mold->mo_context;
     dx_context_decref (&context);
+
+    // Destroy all element_storage children
+    status = dx_element_storage_get_all ((*config)->cf_elements, &collection);
+    if (status == DISIR_STATUS_OK)
+    {
+        while (dc_collection_next (collection, &context) != DISIR_STATUS_EXHAUSTED)
+        {
+            dx_context_decref (&context);
+        }
+        dc_collection_finished (&collection);
+    }
+    else
+    {
+        log_warn ("failed to get_all from internal element storage: %s",
+                  disir_status_string (status));
+    }
 
     dx_element_storage_destroy (&(*config)->cf_elements);
 
