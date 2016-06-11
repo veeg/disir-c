@@ -26,6 +26,13 @@ protected:
 
     void TearDown()
     {
+        if (value.dv_type == DISIR_VALUE_TYPE_STRING)
+        {
+            if (value.dv_string)
+            {
+                free (value.dv_string);
+            }
+        }
         DisirLogCurrentTestExit ();
     }
 
