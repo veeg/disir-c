@@ -38,60 +38,57 @@ set (_LIBDISIR_SOURCES
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
 )
 
-# Export public include directory as internal cache variable
-set (LIBDISIR_PUBLIC_INCLUDE_DIR
-    "${CMAKE_CURRENT_SOURCE_DIR}/public_include"
-    CACHE INTERNAL "${PROJECT_NAME}: Public include directory" FORCE
-)
-
-# Export the private include directory as internal cache variable
-set (LIBDISIR_PRIVATE_INCLUDE_DIR
-    "${CMAKE_CURRENT_SOURCE_DIR}/private_include"
-    CACHE INTERNAL "${PROJECT_NAME}: Private include directory" FORCE
-)
-
-
 set (PROJECT_SO_LIBRARY disir
     CACHE INTERNAL "${PROJECT_NAME}: shared library" FORCE)
 # Define shared library
 add_library(${PROJECT_SO_LIBRARY} SHARED ${_LIBDISIR_SOURCES})
 add_dependencies (${PROJECT_SO_LIBRARY} configure_version)
 
-include_directories (
-    ${LIBDISIR_PUBLIC_INCLUDE_DIR}
-    ${LIBDISIR_PRIVATE_INCLUDE_DIR}
-    ${VOID-MULTIMAP_PUBLIC_INCLUDE_DIR}
-    ${VOID-LIST_PUBLIC_INCLUDE_DIR}
+target_include_directories (${PROJECT_SO_LIBRARY} PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/private_include/
+  ${VOID-MULTIMAP_PUBLIC_INCLUDE_DIR}
+  ${VOID-LIST_PUBLIC_INCLUDE_DIR}
+)
+
+target_include_directories (${PROJECT_SO_LIBRARY} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/public_include/>
+  $<INSTALL_INTERFACE:include/>
 )
 
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
 
 add_definitions ("-Wall")
 add_definitions ("-Werror")
-add_definitions ("-fsanitize=undefined")
-add_definitions ("-fsanitize=shift")
-add_definitions ("-fsanitize=integer-divide-by-zero")
-add_definitions ("-fsanitize=unreachable")
-add_definitions ("-fsanitize=vla-bound")
-add_definitions ("-fsanitize=null")
-add_definitions ("-fsanitize=return")
-add_definitions ("-fsanitize=signed-integer-overflow")
+# TODO: Add check for gcc > 4.9
+#add_definitions ("-fsanitize=undefined")
+#add_definitions ("-fsanitize=shift")
+#add_definitions ("-fsanitize=integer-divide-by-zero")
+#add_definitions ("-fsanitize=unreachable")
+#add_definitions ("-fsanitize=vla-bound")
+#add_definitions ("-fsanitize=null")
+#add_definitions ("-fsanitize=return")
+#add_definitions ("-fsanitize=signed-integer-overflow")
 
+# We require DL_LIBS for your loading plugin functionality.
 target_link_libraries (${PROJECT_SO_LIBRARY} ${CMAKE_DL_LIBS})
+# TODO: Do we need to export these library dependencies?
+# Research if we can simply link them private so they are not exported.
 target_link_libraries (${PROJECT_SO_LIBRARY} void-multimap)
 target_link_libraries (${PROJECT_SO_LIBRARY} void-list)
 # TODO: Find a dynamic way to detect existance of library
-target_link_libraries (${PROJECT_SO_LIBRARY} ubsan)
+# Do we need to link this for release mode? Only add definitions and lib to debug builds?
+# TODO: Add check for gcc > 4.9
+#target_link_libraries (${PROJECT_SO_LIBRARY} ubsan)
 
 install (TARGETS ${PROJECT_SO_LIBRARY}
     EXPORT ${EXPORT_TARGET}
-    ARCHIVE DESTINATION lib
-    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     INCLUDES DESTINATION include
 )
 
 install (
-  DIRECTORY ${LIBDISIR_PUBLIC_INCLUDE_DIR}/
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/public_include/
   DESTINATION include
   COMPONENT Devel
 )

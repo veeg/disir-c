@@ -5,6 +5,7 @@ cmake_minimum_required (VERSION 3.2.0)
 project (libdisir VERSION 0.1.0 LANGUAGES C CXX)
 
 include (CMakePackageConfigHelpers)
+include (GNUInstallDirs)
 
 set (EXPORT_TARGET libdisir-targets)
 set (EXPORT_NAMESPACE disir::)
@@ -32,7 +33,7 @@ configure_file (
     COPYONLY
 )
 
-set (LIBDISIR_PACKAGE_LOCATION lib/cmake/libdisir)
+set (LIBDISIR_PACKAGE_LOCATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
 install (
     EXPORT ${EXPORT_TARGET}
     FILE "${EXPORT_TARGET}.cmake"

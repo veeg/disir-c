@@ -15,6 +15,8 @@ include_directories (${LIBDISIR_TEST_INCLUDE_DIRS})
 
 target_link_libraries (${TESTS_INTERNAL_UTIL} ${PROJECT_SO_LIBRARY})
 target_link_libraries (${TESTS_INTERNAL_UTIL} ${GTEST_BOTH_LIBRARIES})
+# TODO: Why pthread not part of gtest?? (it is on fedora)
+target_link_libraries (${TESTS_INTERNAL_UTIL} pthread)
 target_link_libraries (${TESTS_INTERNAL_UTIL} void-multimap)
 target_link_libraries (${TESTS_INTERNAL_UTIL} void-list)
 
