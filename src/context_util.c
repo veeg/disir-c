@@ -189,6 +189,11 @@ dx_context_decref (struct disir_context **context)
 {
     if (context == NULL)
         return;
+    if (*context == NULL)
+    {
+        log_warn ("decref invoked with content of ptr (%p) NULL", context);
+        return;
+    }
 
     (*context)->cx_refcount--;
 

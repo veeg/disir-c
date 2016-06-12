@@ -32,7 +32,8 @@ disir_update_config (struct disir_config *config,
 
     if (target == NULL)
     {
-        target = &config->cf_mold->mo_version;
+        // TODO: Check mold context is still valid.
+        target = &config->cf_context_mold->cx_mold->mo_version;
         log_debug ("using highest version from mold: %s\n",
                    dc_semantic_version_string (buffer, 512, target));
     }

@@ -19,7 +19,9 @@ struct disir_config
 
     //! The disir_mold associated with this config instance
     //! Every disir_config needs a valid mold to validate against.
-    struct disir_mold             *cf_mold;
+    //! This is a context reference to guard against stupid usage of our library.
+    //! e.g, someone destroying your mold and THEN destroying the config.
+    struct disir_context                            *cf_context_mold;
 
     //! Storage of element entries, either:
     //!     * DISIR_CONTEXT_KEYVAL

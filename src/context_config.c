@@ -66,7 +66,7 @@ dc_config_begin (struct disir_mold *mold, struct disir_context **config)
     }
 
     dx_context_incref (mold->mo_context);
-    context->cx_config->cf_mold = mold;
+    context->cx_config->cf_context_mold = mold->mo_context;
     context->CONTEXT_CAPABILITY_ADD_ENTRY = 1;
 
     // Set root context to self (such that children can inherit)
@@ -158,7 +158,7 @@ dx_config_destroy (struct disir_config **config)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
     // Decref our count on mold context.
-    context = (*config)->cf_mold->mo_context;
+    context = (*config)->cf_context_mold;
     dx_context_decref (&context);
 
     // Destroy all element_storage children

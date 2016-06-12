@@ -608,7 +608,8 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
     // TODO: Should resolve within tiered in sections - mayhabs seperated by a period?
 
     // Holy Moley
-    mold = context->cx_root_context->cx_config->cf_mold;
+    // XXX: Checl that mold is still valid
+    mold = context->cx_root_context->cx_config->cf_context_mold->cx_mold;
 
     if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
     {
@@ -801,7 +802,9 @@ dc_set_version (struct disir_context *context, struct semantic_version *semver)
 
     if (dc_context_type (context) == DISIR_CONTEXT_CONFIG)
     {
-        if (dc_semantic_version_compare (&context->cx_config->cf_mold->mo_version, semver) < 0)
+        // TODO: Verify that the mold context is still valid. Extract into variable
+        if (dc_semantic_version_compare (
+                &context->cx_config->cf_context_mold->cx_mold->mo_version, semver) < 0)
         {
             dx_log_context (context, "Cannot set version to CONFIG whose MOLD is lower.");
             return DISIR_STATUS_CONFLICTING_SEMVER;
