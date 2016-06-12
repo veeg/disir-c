@@ -1,8 +1,8 @@
 
 find_program(ENV_EXECUTABLE env)
 find_program(RUBY_EXECUTABLE ruby)
-find_program(DOXML2ASCIIDOC_EXECUTABLE doxml2asciidoc)
-find_program(ASCIIDOCTOR_EXECUTABLE asciidoctor)
+find_program(DOXML2ASCIIDOC_EXECUTABLE NAMES doxml2asciidoc doxml2asciidoc.ruby2.1 doxml2asciidoc.ruby2.2 doxml2asciidoc.ruby2.3)
+find_program(ASCIIDOCTOR_EXECUTABLE NAMES asciidoctor asciidoctor.ruby2.1 asciidoctor.ruby2.2 asciidoctor.ruby2.3)
 
 find_package(Doxygen)
 
