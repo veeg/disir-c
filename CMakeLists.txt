@@ -33,7 +33,7 @@ configure_file (
     COPYONLY
 )
 
-set (LIBDISIR_PACKAGE_LOCATION ${CMAKE_INSTALL_LIBDIR}/cmake/)
+set (LIBDISIR_PACKAGE_LOCATION ${CMAKE_INSTALL_LIBDIR}/cmake/libdisir/)
 install (
     EXPORT ${EXPORT_TARGET}
     FILE "${EXPORT_TARGET}.cmake"
