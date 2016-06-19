@@ -135,8 +135,23 @@ dx_section_create (struct disir_context *self)
 
     section->se_name.dv_type = DISIR_VALUE_TYPE_STRING;
     section->se_context = self;
+    section->se_elements = dx_element_storage_create ();
+    if (section->se_elements == NULL)
+    {
+        goto error;
+    }
 
     return section;
+error:
+    if (section && section->se_elements)
+    {
+        dx_element_storage_destroy (&section->se_elements);
+    }
+    if (section)
+    {
+        free (section);
+    }
+    return NULL;
 }
 
 //! INTERNAL API
