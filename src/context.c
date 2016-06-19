@@ -677,41 +677,46 @@ enum disir_status
 dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
-    struct disir_mold *mold;
     struct disir_context *queried;
+    struct disir_element_storage *storage;
 
     if (context == NULL || value == NULL || value_size <= 0)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    // TODO: Should resolve within tiered in sections - mayhabs seperated by a period?
+    // TODO: Check that context->cx_parent_context is valid. Handle accordingly
 
-    // Holy Moley
-    // XXX: Checl that mold is still valid
-    mold = context->cx_root_context->cx_config->cf_context_mold->cx_mold;
-
-    if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
+    // TODO: add mold_equiv checks
+    if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_CONFIG)
     {
-        status = dx_element_storage_get_first (mold->mo_elements, value, &queried);
-        if (status != DISIR_STATUS_OK)
-        {
-            // Did not find the element with that name
-            log_debug ("failed to get first keyval: %s. name: %s",
-                       disir_status_string (status), value);
-            // XXX revise return status
-            return DISIR_STATUS_INVALID_ARGUMENT;
-        }
-        context->cx_keyval->kv_mold_equiv = queried;
-        context->cx_keyval->kv_value.dv_type = queried->cx_keyval->kv_value.dv_type;
-
-        dx_context_incref (queried);
+        storage = context->cx_parent_context->cx_config->cf_context_mold->cx_mold->mo_elements;
+    }
+    else if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_SECTION)
+    {
+        storage = context->cx_parent_context->cx_section->se_mold_equiv->cx_section->se_elements;
     }
     else
     {
-        dx_crash_and_burn ("%s invoked with context: %s",
-                           __FUNCTION__, dc_context_type_string (context));
+        dx_context_error_set (context, "attempted to set mold_equiv on wrong context type: %s",
+                              dc_context_type_string (context));
+        return DISIR_STATUS_INTERNAL_ERROR;
     }
+
+
+    status = dx_element_storage_get_first (storage, value, &queried);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Did not find the element with that name
+        log_debug ("failed to find name %s in parent mold equiv elements: %s",
+                   value, disir_status_string (status));
+        // XXX revise return status
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    context->cx_keyval->kv_mold_equiv = queried;
+    context->cx_keyval->kv_value.dv_type = queried->cx_keyval->kv_value.dv_type;
+
+    dx_context_incref (queried);
 
     return DISIR_STATUS_OK;
 }
