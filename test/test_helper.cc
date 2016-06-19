@@ -7,30 +7,30 @@ struct disir_instance * testing::DisirTestTestPlugin::instance = NULL;
 struct disir_mold * testing::DisirTestTestPlugin::libdisir_mold = NULL;
 struct disir_config * testing::DisirTestTestPlugin::libdisir_config = NULL;
 
+
 void
-testing::DisirTestWrapper::DisirLogCurrentTestEnter ()
+testing::DisirTestWrapper::DisirLogCurrentTest (const char *prefix)
 {
     // Log current test running
     const ::testing::TestInfo* const test_info =
         ::testing::UnitTest::GetInstance()->current_test_info();
     if (test_info != NULL)
     {
-        _log_disir_level (DISIR_LOG_LEVEL_TEST, "STARTING TEST %s.%s",
+        _log_disir_level (DISIR_LOG_LEVEL_TEST, "%s %s.%s", prefix,
                           test_info->test_case_name(), test_info->name());
     }
 }
 
 void
+testing::DisirTestWrapper::DisirLogCurrentTestEnter ()
+{
+   DisirLogCurrentTest ("ENTERING TEST");
+}
+
+void
 testing::DisirTestWrapper::DisirLogCurrentTestExit ()
 {
-    // Log current test running
-    const ::testing::TestInfo* const test_info =
-        ::testing::UnitTest::GetInstance()->current_test_info();
-    if (test_info != NULL)
-    {
-        _log_disir_level (DISIR_LOG_LEVEL_TEST, "EXITING TEST %s.%s",
-                          test_info->test_case_name(), test_info->name());
-    }
+    DisirLogCurrentTest ("EXITING TEST");
 }
 
 void

@@ -56,6 +56,8 @@ namespace testing
     class DisirTestWrapper : public testing::Test
     {
     protected:
+        void DisirLogCurrentTest (const char *prefix);
+
         void DisirLogCurrentTestEnter ();
 
         void DisirLogCurrentTestExit ();
