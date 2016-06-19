@@ -345,17 +345,17 @@ dc_add_default_integer (struct disir_context *parent, int64_t value,
 
     def = NULL;
 
-    status = dx_default_begin (parent, &def);
+    status = dc_begin (parent, DISIR_CONTEXT_DEFAULT, &def);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
         goto error;
     }
 
-    status = dx_value_set_integer (&def->cx_default->de_value, value);
+    status = dc_set_value_integer (def, value);
     if (status != DISIR_STATUS_OK)
     {
-        // not logged to context
+        // Already logged
         goto error;
     }
 
