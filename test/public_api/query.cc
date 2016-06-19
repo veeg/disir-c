@@ -6,48 +6,49 @@
 #include "test_helper.h"
 
 
-class QueryTest : public testing::DisirTestWrapper
+class QueryTest : public testing::DisirTestTestPlugin
 {
     void SetUp()
     {
-        DisirLogCurrentTestEnter ();
+        DisirTestTestPlugin::SetUp ();
 
         status = DISIR_STATUS_OK;
         collection = NULL;
+        mold = NULL;
+        config = NULL;
         context = NULL;
+        context_keyval = NULL;
+        context_mold = NULL;
 
-        status = dc_mold_begin (&context_mold);
+        status = disir_mold_input (instance, "test", "basic_keyval", &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_TRUE (mold != NULL);
+
+        context_mold = dc_mold_getcontext (mold);
+        ASSERT_TRUE (context_mold != NULL);
+
         status = dc_begin (context_mold, DISIR_CONTEXT_KEYVAL, &context_keyval);
-        ASSERT_STATUS (DISIR_STATUS_OK, status);
-        status = dc_set_name (context_keyval, "test_keyval", strlen ("test_keyval"));
         ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 
     void TearDown()
     {
-        if (collection != NULL)
+        if (mold)
         {
-            status = dc_collection_finished (&collection);
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
-        }
-        if (context)
-        {
-            status = dc_destroy (&context);
+            status = disir_mold_finished (&mold);
             EXPECT_STATUS (DISIR_STATUS_OK, status);
         }
         if (context_mold)
         {
-            status = dc_destroy (&context_mold);
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
-        }
-        if (context_keyval)
-        {
-            status = dc_destroy (&context_keyval);
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
+            dc_putcontext (&context_mold);
         }
 
-        DisirLogCurrentTestExit ();
+        if (context_keyval)
+        {
+            dc_destroy (&context_keyval);
+        }
+
+        DisirTestTestPlugin::TearDown ();
     }
 
 public:
@@ -55,6 +56,9 @@ public:
     struct disir_context *context;
     struct disir_context *context_mold;
     struct disir_context *context_keyval;
+
+    struct disir_mold   *mold;
+    struct disir_config *config;
 
     struct disir_collection *collection;
     int32_t size;

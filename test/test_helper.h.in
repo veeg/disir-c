@@ -1,9 +1,16 @@
 #ifndef _LIBDISIR_TEST_HELPER_H
 #define _LIBDISIR_TEST_HELPER_H
 
+#include <gtest/gtest.h>
+
 extern "C" {
 #include "log.h"
 }
+
+#include <disir/disir.h>
+#include <disir/context.h>
+
+#define CMAKE_BUILD_DIRECTORY "@CMAKE_BINARY_DIR@"
 
 #define ASSERT_STATUS(a,b)                                                  \
     {                                                                       \
@@ -49,29 +56,34 @@ namespace testing
     class DisirTestWrapper : public testing::Test
     {
     protected:
-        void DisirLogCurrentTestEnter()
+        void DisirLogCurrentTestEnter ();
+
+        void DisirLogCurrentTestExit ();
+    };
+
+    class DisirTestTestPlugin : public DisirTestWrapper
+    {
+    protected:
+
+        static void SetUpTestCase ();
+        static void TearDownTestCase ();
+
+        void SetUp ()
         {
-            // Log current test running
-            const ::testing::TestInfo* const test_info =
-                ::testing::UnitTest::GetInstance()->current_test_info();
-            if (test_info != NULL)
-            {
-                _log_disir_level (DISIR_LOG_LEVEL_TEST, "STARTING TEST %s.%s",
-                                  test_info->test_case_name(), test_info->name());
-            }
+            DisirLogCurrentTestEnter ();
         }
 
-        void DisirLogCurrentTestExit()
+        void TearDown ()
         {
-            // Log current test running
-            const ::testing::TestInfo* const test_info =
-                ::testing::UnitTest::GetInstance()->current_test_info();
-            if (test_info != NULL)
-            {
-                _log_disir_level (DISIR_LOG_LEVEL_TEST, "EXITING TEST %s.%s",
-                                  test_info->test_case_name(), test_info->name());
-            }
+            DisirLogCurrentTestExit ();
         }
+
+    public:
+        static struct disir_instance   *instance;
+        static struct disir_mold    *libdisir_mold;
+        static struct disir_config  *libdisir_config;
+
+        enum disir_status status;
     };
 }
 
