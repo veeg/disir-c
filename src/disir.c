@@ -189,7 +189,7 @@ disir_libdisir_config_to_disk (struct disir_instance *disir, struct disir_config
 // PUBLIC API
 enum disir_status
 disir_instance_create (const char *config_filepath, struct disir_config *config,
-                       struct disir_instance **disir)
+                       struct disir_instance **instance)
 {
     enum disir_status status;
     struct disir_instance *dis;
@@ -199,7 +199,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 
     status = DISIR_STATUS_OK;
 
-    if (disir == NULL)
+    if (instance == NULL)
     {
         log_debug ("invoked with disir NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
@@ -247,7 +247,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
     dis->libdisir_mold = libmold;
     dis->libdisir_config = libconf;
 
-    *disir = dis;
+    *instance= dis;
     return DISIR_STATUS_OK;
 error:
     if (dis)

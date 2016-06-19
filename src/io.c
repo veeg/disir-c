@@ -154,22 +154,22 @@ disir_config_input (struct disir_instance *disir, const char *type, const char *
 
 //! PUBLIC API
 enum disir_status
-disir_mold_input (struct disir_instance *disir, const char *type, const char *id,
+disir_mold_input (struct disir_instance *instance, const char *type, const char *id,
                     struct disir_mold **mold)
 {
     enum disir_status status;
     struct disir_input *input;
 
-    input = MQ_FIND (disir->dio_input_queue,
+    input = MQ_FIND (instance->dio_input_queue,
                       (strncmp(entry->di_type, type, DISIR_IO_TYPE_MAXLENGTH) == 0));
     if (input== NULL)
     {
-        disir_error_set (disir, "no input type '%s' registered.", type);
+        disir_error_set (instance, "no input type '%s' registered.", type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
     }
     else
     {
-        status = input->di_input.in_mold_read (disir, id, mold);
+        status = input->di_input.in_mold_read (instance, id, mold);
     }
     return status;
 }
