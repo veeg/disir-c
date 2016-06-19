@@ -30,6 +30,7 @@ const char *disir_status_strings[] = {
     "CONFLICTING SEMVER",
     "CONFLICT",
     "EXHAUSTED",
+    "MOLD MISSING",
     "UNKNOWN",
 };
 
