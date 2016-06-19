@@ -8,7 +8,7 @@
 
 
 // Test mold API with empty mold.
-class ContextKeyvalTest : public testing::DisirTestWrapper
+class MoldKeyvalTest : public testing::DisirTestWrapper
 {
     void SetUp()
     {
@@ -52,17 +52,17 @@ public:
 };
 
 
-TEST_F (ContextKeyvalTest, context_type)
+TEST_F (MoldKeyvalTest, context_type)
 {
     ASSERT_EQ (dc_context_type (context_keyval), DISIR_CONTEXT_KEYVAL);
 }
 
-TEST_F (ContextKeyvalTest, context_type_string)
+TEST_F (MoldKeyvalTest, context_type_string)
 {
     ASSERT_STREQ (dc_context_type_string (context_keyval), "KEYVAL");
 }
 
-TEST_F (ContextKeyvalTest, set_name)
+TEST_F (MoldKeyvalTest, set_name)
 {
     const char rname[] = "test_keyval_name";
 
@@ -70,7 +70,7 @@ TEST_F (ContextKeyvalTest, set_name)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (ContextKeyvalTest, get_name)
+TEST_F (MoldKeyvalTest, get_name)
 {
     const char rname[] = "test_keyval_name";
     const char *qname;
