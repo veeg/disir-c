@@ -208,7 +208,7 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
         dx_log_context (context, "cannot fetch documentation for context.");
         return status;
     }
-    if (doc == NULL || doc_size == NULL)
+    if (doc == NULL)
     {
         // Already logged
         return DISIR_STATUS_INVALID_ARGUMENT;
