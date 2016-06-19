@@ -214,16 +214,22 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    status = disir_libdisir_mold (&libmold);
-    if (status != DISIR_STATUS_OK)
+    // We do not need to generate a mold entry - simply steal the one provided by the user.
+    if (config == NULL)
     {
-        goto error;
+        status = disir_libdisir_mold (&libmold);
+        if (status != DISIR_STATUS_OK)
+        {
+            goto error;
+        }
     }
 
     if (config)
     {
         // Use user-provided config
         libconf = config;
+        libmold = config->cf_context_mold->cx_mold;
+        dx_context_incref (libmold->mo_context);
     }
     else if (config_filepath)
     {
@@ -238,7 +244,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 
     if (status != DISIR_STATUS_OK)
     {
-        // TODO: Propogate error message?
+        log_error ("Failed to generate internal configuration: %s", disir_status_string (status));
         goto error;
     }
 
