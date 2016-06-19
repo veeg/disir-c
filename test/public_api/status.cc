@@ -125,6 +125,13 @@ TEST_F (StatusTest, exhausted)
     ASSERT_STREQ (status_string, "EXHAUSTED");
 }
 
+TEST_F (StatusTest, mold_missing)
+{
+    status =  DISIR_STATUS_MOLD_MISSING;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "MOLD MISSING");
+}
+
 TEST_F (StatusTest, unknown)
 {
     status = DISIR_STATUS_UNKNOWN;
