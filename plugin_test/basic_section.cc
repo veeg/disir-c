@@ -37,7 +37,7 @@ basic_section(struct disir_mold **mold)
         goto error;
 
     status = dc_finalize (&context_section);
-    if (status != DISIR_STATUS_OK);
+    if (status != DISIR_STATUS_OK)
         goto error;
 
     status = dc_mold_finalize (&context_mold, mold);
