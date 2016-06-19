@@ -199,6 +199,9 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 
     status = DISIR_STATUS_OK;
 
+    TRACE_ENTER ("config_filepath: %s, config: %p, instance: %p",
+                 config_filepath, config, instance);
+
     if (instance == NULL)
     {
         log_debug ("invoked with disir NULL pointer.");
@@ -248,6 +251,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
     dis->libdisir_config = libconf;
 
     *instance= dis;
+    TRACE_EXIT ("*instance: %p", *instance);
     return DISIR_STATUS_OK;
 error:
     if (dis)
