@@ -456,6 +456,17 @@ enum disir_status dc_set_value (struct disir_context *context,
 enum disir_status dc_set_value_string (struct disir_context *context,
                                        const char *value, int32_t value_size);
 
+//! \brief Set a integer value to the context.
+//!
+//! Applicable contexts are:
+//!     * DISIR_CONTEXT_KEYVAL whose top-level is CONFIG
+//!     * DISIR_CONTEXT_DEFAULT
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_set_value_integer (struct disir_context *context, int64_t value);
+
 //! \brief Get the value stored in context in a string representation
 //!
 //! The value, regardless of type, is stringified in the output buffer provided.
