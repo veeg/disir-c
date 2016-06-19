@@ -5,6 +5,9 @@
 
 #include <disir/disir.h>
 
+
+typedef enum disir_status (*output_mold)(struct disir_mold **);
+
 #include "basic_keyval.cc"
 #include "basic_section.cc"
 
@@ -23,19 +26,33 @@ dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_m
 enum disir_status
 dio_test_mold_list (struct disir_instance *disir, struct disir_collection **collection);
 
+struct cmp_str
+{
+   bool operator()(char const *a, char const *b)
+   {
+      return strcmp(a, b) < 0;
+   }
+};
 
 //! Internal static map to store test molds by id
-static std::map<const char *, struct disir_mold *> molds
-{
-    basic_keyval (),
-    basic_section (),
-};
+static std::map<const char *, output_mold, cmp_str> *molds;
 
 enum disir_status
 dio_test_config_read (struct disir_instance *disir, const char *id,
                       struct disir_mold *mold, struct disir_config **config)
 {
-    return disir_generate_config_from_mold (molds[id], NULL, config);
+    enum disir_status status;
+    output_mold func_mold;
+
+    func_mold = (*molds)[id];
+    if (func_mold == NULL)
+        return DISIR_STATUS_INVALID_ARGUMENT;
+
+    status = func_mold (&mold);
+    if (status != DISIR_STATUS_OK)
+        return status;
+
+    return disir_generate_config_from_mold (mold, NULL, config);
 }
 
 enum disir_status
@@ -48,19 +65,22 @@ enum disir_status
 dio_test_config_version (struct disir_instance *disir,
                          const char *id, struct semantic_version *semver)
 {
+    enum disir_status status;
     struct disir_mold *mold;
+    output_mold func_mold;
 
     if (id == NULL || semver == NULL)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    mold = molds[id];
-    if (mold == NULL)
-    {
-        // XXX STATUS: does not exist error
+    func_mold = (*molds)[id];
+    if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
-    }
+
+    status = func_mold (&mold);
+    if (status != DISIR_STATUS_OK)
+        return status;
 
     return dc_mold_get_version (mold, semver);
 }
@@ -68,12 +88,16 @@ dio_test_config_version (struct disir_instance *disir,
 enum disir_status
 dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_mold **mold)
 {
-    *mold = molds[id];
-    if (*mold == NULL)
-    {
-        // XXX STATUS: does not exist error
+    enum disir_status status;
+    output_mold func_mold;
+
+    func_mold = (*molds)[id];
+    if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
-    }
+
+    status = func_mold (mold);
+    if (status != DISIR_STATUS_OK)
+        return status;
 
     return DISIR_STATUS_OK;;
 }
@@ -90,7 +114,7 @@ dio_test_mold_list (struct disir_instance *disir, struct disir_collection **coll
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    for (auto i = molds.begin(); i != molds.end(); ++i)
+    for (auto i = molds->begin(); i != molds->end(); ++i)
     {
         dc_free_text_create (i->first, &context);
         dc_collection_push_context (col, context);
@@ -105,6 +129,29 @@ extern "C" enum disir_status
 dio_register_plugin (struct disir_instance *disir)
 {
     struct disir_input_plugin input;
+
+    if (molds == NULL)
+    {
+        // allocate molds
+        std::pair<const char *, output_mold> p;
+        molds = new std::map<const char *, output_mold, cmp_str> ();
+
+        std::pair <const char *, output_mold> pairs[] = {
+            std::make_pair ("basic_keyval", basic_keyval),
+            std::make_pair ("basic_section", basic_section),
+        };
+
+        int count = sizeof (pairs) / sizeof (std::pair<const char *, output_mold>);
+
+        for (int i = 0; i < count; i++)
+        {
+            p = pairs[i];
+            if (p.first != NULL)
+            {
+                molds->insert (p);
+            }
+        }
+    }
 
     input.in_struct_size = sizeof (struct disir_input_plugin);
     input.in_config_read = dio_test_config_read;

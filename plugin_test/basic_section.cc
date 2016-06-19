@@ -1,10 +1,9 @@
 
 
-std::pair<const char *, struct disir_mold *>
-basic_section(void)
+enum disir_status
+basic_section(struct disir_mold **mold)
 {
     enum disir_status status;
-    struct disir_mold *mold;
     struct disir_context *context_section;
     struct disir_context *context_mold;
 
@@ -41,11 +40,11 @@ basic_section(void)
     if (status != DISIR_STATUS_OK);
         goto error;
 
-    status = dc_mold_finalize (&context_mold, &mold);
+    status = dc_mold_finalize (&context_mold, mold);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    return std::pair<const char *, struct disir_mold *>("basic_section", mold);
+    return DISIR_STATUS_OK;
 error:
     if (context_section)
     {
@@ -55,6 +54,6 @@ error:
     {
         dc_destroy (&context_mold);
     }
-    return std::pair<const char *, struct disir_mold *>(NULL, NULL);
+    return status;
 }
 

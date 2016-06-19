@@ -1,9 +1,8 @@
 
-std::pair<const char *, struct disir_mold *>
-basic_keyval(void)
+enum disir_status
+basic_keyval(struct disir_mold **mold)
 {
     enum disir_status status;
-    struct disir_mold *mold;
     struct disir_context *context;
 
 
@@ -27,12 +26,12 @@ basic_keyval(void)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_mold_finalize (&context, &mold);
+    status = dc_mold_finalize (&context, mold);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    return std::pair<const char *, struct disir_mold *>("basic_keyval", mold);
+    return DISIR_STATUS_OK;
 error:
-    return std::pair<const char *, struct disir_mold *>(NULL, NULL);
+    return status;
 }
 
