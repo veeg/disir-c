@@ -160,6 +160,12 @@ disir_mold_input (struct disir_instance *instance, const char *type, const char 
     enum disir_status status;
     struct disir_input *input;
 
+    if (instance == NULL || type == NULL || id == NULL || mold == NULL)
+    {
+        log_debug ("called with NULL pointer(s) (%p %p %p %p)", instance, type, id, mold);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
     input = MQ_FIND (instance->dio_input_queue,
                       (strncmp(entry->di_type, type, DISIR_IO_TYPE_MAXLENGTH) == 0));
     if (input== NULL)
