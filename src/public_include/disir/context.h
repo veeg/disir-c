@@ -275,6 +275,7 @@ enum disir_status dc_add_deprecrated (struct disir_context *context,
 //!     Can only set type if the toplevel context is DISIR_CONTEXT_MOLD
 //!
 //! \return DISIR_STATUS_OK the input `context` was succesfuly populated with value type `type`
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context`'s toplevel context is CONFIG.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if `context` is NULL or `type` is out-of-bounds
 //!
 enum disir_status dc_set_value_type (struct disir_context *context, enum disir_value_type type);

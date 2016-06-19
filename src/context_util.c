@@ -545,6 +545,12 @@ dc_set_value_type (struct disir_context *context, enum disir_value_type type)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
+    if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+    {
+        dx_context_error_set (context, "cannot set value type on context whose root is CONFIG");
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
     status = DISIR_STATUS_OK;
     switch (dc_context_type (context))
     {
