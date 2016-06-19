@@ -7,7 +7,7 @@
 
 
 // Test mold API with empty mold.
-class ContextSectionTest : public testing::DisirTestWrapper
+class MoldSectionTest : public testing::DisirTestWrapper
 {
     void SetUp()
     {
@@ -59,24 +59,24 @@ public:
 };
 
 
-TEST_F (ContextSectionTest, context_type)
+TEST_F (MoldSectionTest, context_type)
 {
     ASSERT_EQ (DISIR_CONTEXT_SECTION, dc_context_type (context_section));
 }
 
-TEST_F (ContextSectionTest, context_type_string)
+TEST_F (MoldSectionTest, context_type_string)
 {
     ASSERT_STREQ ("SECTION", dc_context_type_string (context_section));
 }
 
-TEST_F (ContextSectionTest, finalizing_without_name_shall_fail)
+TEST_F (MoldSectionTest, finalizing_without_name_shall_fail)
 {
     status = dc_finalize (&context_section);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
     EXPECT_STREQ ("Missing name component for section.", dc_context_error (context_section));
 }
 
-TEST_F (ContextSectionTest, set_name_on_mold)
+TEST_F (MoldSectionTest, set_name_on_mold)
 {
     status = dc_set_name (context_section, "test_name", strlen ("test_name"));
     EXPECT_STATUS (DISIR_STATUS_OK, status);
