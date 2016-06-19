@@ -254,7 +254,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         goto error;
     }
 
-    status = dx_keyval_finalize (&keyval);
+    status = dc_finalize (&keyval);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
