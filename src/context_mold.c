@@ -69,6 +69,8 @@ dc_mold_finalize (struct disir_context **context, struct disir_mold **mold)
 {
     enum disir_status status;
 
+    TRACE_ENTER ("context: %p, mold: %p", context, mold);
+
     status = CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
@@ -95,6 +97,7 @@ dc_mold_finalize (struct disir_context **context, struct disir_mold **mold)
     *context = NULL;
     // We do not decref context refcount on finalize
 
+    TRACE_EXIT ("*mold: %p", mold);
     return DISIR_STATUS_OK;
 }
 
