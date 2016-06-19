@@ -22,10 +22,14 @@ class MoldSectionTest : public testing::DisirTestWrapper
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+        DisirLogCurrentTest ("SetUp completed - TestBody:");
     }
 
     void TearDown()
     {
+        DisirLogCurrentTest ("TestBody completed - TearDown:");
+
         if (context)
         {
             status = dc_destroy (&context);
@@ -76,8 +80,61 @@ TEST_F (MoldSectionTest, finalizing_without_name_shall_fail)
     EXPECT_STREQ ("Missing name component for section.", dc_context_error (context_section));
 }
 
+TEST_F (MoldSectionTest, finalize_empty_with_name_shall_succeed)
+{
+    status = dc_set_name (context_section, "test_name", strlen ("test_name"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_finalize (&context_section);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+}
+
 TEST_F (MoldSectionTest, set_name_on_mold)
 {
     status = dc_set_name (context_section, "test_name", strlen ("test_name"));
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 }
+
+TEST_F (MoldSectionTest, begin_keyval_shall_succeed)
+{
+    status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
+TEST_F (MoldSectionTest, begin_section_shall_succeed)
+{
+    status = dc_begin (context_section, DISIR_CONTEXT_SECTION, &context);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
+TEST_F (MoldSectionTest, begin_default_shall_fail)
+{
+    status = dc_begin (context_section, DISIR_CONTEXT_DEFAULT, &context);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+}
+
+TEST_F (MoldSectionTest, begin_free_text_shall_fail)
+{
+    status = dc_begin (context_section, DISIR_CONTEXT_FREE_TEXT, &context);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+}
+
+TEST_F (MoldSectionTest, begin_mold_shall_fail)
+{
+    status = dc_begin (context_section, DISIR_CONTEXT_MOLD, &context);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+}
+
+TEST_F (MoldSectionTest, begin_config_shall_fail)
+{
+    status = dc_begin (context_section, DISIR_CONTEXT_CONFIG, &context);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+}
+
+
+TEST_F (MoldSectionTest, add_keyval)
+{
+    status = dc_add_keyval_string (context_section, "test_key", "test val", "doc st", NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
