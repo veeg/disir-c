@@ -106,6 +106,7 @@ TEST_F (ContextMoldTest, finalize_shall_succeed)
     status = dc_mold_finalize (&context_mold, &mold);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
     EXPECT_EQ (NULL, context_mold);
+    EXPECT_TRUE (mold != NULL);
 }
 
 TEST_F (ContextMoldTest, getcontext_invalid_argument_shall_fail)
