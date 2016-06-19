@@ -201,6 +201,8 @@ dc_finalize (struct disir_context **context)
 {
     enum disir_status status;
 
+    TRACE_ENTER ("context: %p", context);
+
     // Check arguments
     status = CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
@@ -248,6 +250,7 @@ dc_finalize (struct disir_context **context)
     // No default case - let compiler warn us about unhandled cases.
     }
 
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
 }
 
@@ -332,6 +335,8 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
     enum disir_status status;
     struct disir_value *value;
 
+    TRACE_ENTER ("context: %p, name: %p, name_size: %d", context, name, name_size);
+
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
@@ -373,6 +378,7 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
 
     log_debug_context (context, "retrieved name: %s\n", *name);
 
+    TRACE_EXIT ("");
     return DISIR_STATUS_OK;
 }
 
@@ -389,6 +395,8 @@ enum disir_status
 dc_set_value_string (struct disir_context *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
+
+    TRACE_ENTER ("context: %p, value: %s, value_size: %d", context, value, value_size);
 
     // Check arguments
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
@@ -448,6 +456,7 @@ dc_set_value_string (struct disir_context *context, const char *value, int32_t v
     // No default case - let compiler warn us of unhandled context
     }
 
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
 }
 
@@ -507,6 +516,8 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
 {
     enum disir_status status;
     enum disir_value_type type;
+
+    TRACE_ENTER ("contexT: %p, output: %p, size: %p", context, output, size);
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
@@ -575,6 +586,7 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
     }
     }
 
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
 }
 
