@@ -436,11 +436,17 @@ dc_set_value_string (struct disir_context *context, const char *value, int32_t v
         }
         if (context->cx_keyval->kv_mold_equiv == NULL)
         {
-            dx_log_context (context, "cannot set value on KEYVAL not associated with a mold.");
-            return DISIR_STATUS_INVALID_CONTEXT;
+            dx_log_context (context, "cannot set value on context without a MOLD");
+            return DISIR_STATUS_MOLD_MISSING;
         }
         // TODO: Validate input against mold
         status = dx_value_set_string (&context->cx_keyval->kv_value, value, value_size);
+        if (status != DISIR_STATUS_OK)
+        {
+            dx_context_error_set (context,
+                                  "cannot set string value on context whose value type is %s",
+                                  dc_value_type_string (context));
+        }
         break;
     }
     case DISIR_CONTEXT_CONFIG:
