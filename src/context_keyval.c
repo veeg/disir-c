@@ -232,6 +232,23 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         }
         break;
     }
+    case DISIR_VALUE_TYPE_BOOLEAN:
+    {
+        status = dc_set_value_type (keyval, DISIR_VALUE_TYPE_BOOLEAN);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+
+        status = dc_add_default_boolean (keyval, boolean_input, semver);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+        break;
+    }
     default:
         dx_crash_and_burn ("%s: called with invalid/unhandled type: %s",
                            __FUNCTION__, dx_value_type_string (type));
@@ -292,8 +309,6 @@ enum disir_status
 dc_add_keyval_boolean (struct disir_context *parent, const char *name, uint8_t def,
                        const char* doc, struct semantic_version *semver)
 {
-    dx_crash_and_burn ("%s invoked - not implemented yet");
-    return DISIR_STATUS_INTERNAL_ERROR;
     return add_keyval_generic (parent, name, doc, semver,
                                DISIR_VALUE_TYPE_BOOLEAN,
                                NULL,
