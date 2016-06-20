@@ -539,10 +539,17 @@ enum disir_status dc_get_value_string (struct disir_context *context,
 
 //! \brief Retrieve the integer value stored on the context.
 //!
-//! TODO: Implement dc_get_value_integer
+//! Supported contexts:
+//!     * DISIR_CONTEXT_KEYVAL whose top-level is CONFIG.
 //!
-//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
-//! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
+//! \param[in] context The context to get integer from.
+//! \param[out] value The output variable to populate.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if `context` or `value` is NULL.
+//! \return DISIR_STATUS_MOLD_MIDDING if MOLD is not associated with `context`.
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context` is not of supported type.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not DISIR_VALUE_TYPE_INTEGER.
+//! \return DISIR_STATUS_OK on success
 //!
 enum disir_status dc_get_value_integer (struct disir_context *context, int64_t *value);
 
@@ -557,17 +564,24 @@ enum disir_status dc_get_value_integer (struct disir_context *context, int64_t *
 //! \return DISIR_STATUS_INVALID_ARGUMENT if `context` or `value` is NULL.
 //! \return DISIR_STATUS_MOLD_MIDDING if MOLD is not associated with `context`.
 //! \return DISIR_STATUS_WRONG_CONTEXT if `context` is not of supported type.
-//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not DISIR_VALUE_TYPE_FLOAT.
 //! \return DISIR_STATUS_OK on success
 //!
 enum disir_status dc_get_value_float (struct disir_context *context, double *value);
 
 //! \brief Retrieve the boolean value stored on the context.
 //!
-//! TODO: Implement dc_get_value_boolean
+//! Supported contexts:
+//!     * DISIR_CONTEXT_KEYVAL whose top-level is CONFIG.
 //!
-//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
-//! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
+//! \param[in] context The context to get boolean from.
+//! \param[out] value The output variable to populate.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if `context` or `value` is NULL.
+//! \return DISIR_STATUS_MOLD_MIDDING if MOLD is not associated with `context`.
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context` is not of supported type.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not DISIR_VALUE_TYPE_BOOLEAN.
+//! \return DISIR_STATUS_OK on success
 //!
 enum disir_status dc_get_value_boolean (struct disir_context *context, uint8_t *value);
 
