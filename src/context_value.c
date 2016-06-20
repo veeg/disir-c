@@ -16,6 +16,52 @@
 #include "log.h"
 #include "mold.h"
 
+static enum disir_status
+get_value_input_check (struct disir_context *context, const char *type,
+                       struct disir_value **storage)
+{
+    enum disir_status status;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged ?
+        return status;
+    }
+
+    if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
+    {
+        if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
+        {
+            dx_context_error_set (context,
+                              "cannot get %s value on KEYVAL whose top-level is MOLD", type);
+            return DISIR_STATUS_WRONG_CONTEXT;
+        }
+        if (context->cx_keyval->kv_mold_equiv == NULL)
+        {
+            dx_context_error_set (context,
+                                  "cannot get value on context without a MOLD");
+            return DISIR_STATUS_MOLD_MISSING;
+        }
+
+        *storage = &context->cx_keyval->kv_value;
+    }
+    else
+    {
+        dx_context_error_set (context, "Context %s slipped through guard. Not handled.",
+                              dc_context_type_string (context));
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    return DISIR_STATUS_OK;
+}
 
 static enum disir_status
 set_value_input_check (struct disir_context *context, const char *type,
