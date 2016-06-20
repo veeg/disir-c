@@ -121,7 +121,14 @@ TEST_F (ConfigKeyvalTest, set_string_value_before_name_shall_fail)
     ASSERT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
     ASSERT_STREQ ("cannot set value on context without a MOLD",
                   dc_context_error (context_keyval));
+}
 
+TEST_F (ConfigKeyvalTest, set_float_value_before_name_shall_fail)
+{
+    status = dc_set_value_float (context_keyval, 3.12);
+    ASSERT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
+    ASSERT_STREQ ("cannot set value on context without a MOLD",
+                  dc_context_error (context_keyval));
 }
 
 TEST_F (ConfigKeyvalIntegerTest, set_value_integer_shall_succeed)
