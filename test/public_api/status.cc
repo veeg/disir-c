@@ -132,6 +132,13 @@ TEST_F (StatusTest, mold_missing)
     ASSERT_STREQ (status_string, "MOLD MISSING");
 }
 
+TEST_F (StatusTest, wrong_value_type)
+{
+    status =  DISIR_STATUS_WRONG_VALUE_TYPE;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "WRONG VALUE TYPE");
+}
+
 TEST_F (StatusTest, unknown)
 {
     status = DISIR_STATUS_UNKNOWN;
