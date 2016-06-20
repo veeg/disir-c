@@ -448,8 +448,8 @@ enum disir_status dc_set_value (struct disir_context *context,
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if context or value are NULL,
 //!     or if value_size is less or equal to zero.
-//! \return DISIR_STATUS_NO_CAN_DO if one cannot add a value string to this context.
 //! \return DISIR_STATUS_WRONG_CONTEXT if root context is not CONFIG.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a mold equivalent.
 //! \return DISIR_STATUS_OK on success.
 //!
@@ -463,6 +463,7 @@ enum disir_status dc_set_value_string (struct disir_context *context,
 //!     * DISIR_CONTEXT_DEFAULT
 //!
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_set_value_integer (struct disir_context *context, int64_t value);
@@ -474,6 +475,7 @@ enum disir_status dc_set_value_integer (struct disir_context *context, int64_t v
 //!     * DISIR_CONTEXT_DEFAULT
 //!
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_set_value_float (struct disir_context *context, double value);
@@ -485,6 +487,7 @@ enum disir_status dc_set_value_float (struct disir_context *context, double valu
 //!     * DISIR_CONTEXT_DEFAULT
 //!
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_set_value_boolean (struct disir_context *context, uint8_t value);
@@ -526,7 +529,7 @@ enum disir_status dc_get_value (struct disir_context *context, int32_t output_bu
 //! \param[out] size Optional. Populated with the size of the output string.
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if context or output are NULL
-//! \return DISIR_STATUS_INVALID_ARGUMENT if value type in context is not string.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_WRONG_CONTEXT if the context is of wrong type.
 //! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs root context is not CONFIG.
 //! \return DISIR_STATUS_OK on success.
@@ -538,6 +541,7 @@ enum disir_status dc_get_value_string (struct disir_context *context,
 //!
 //! TODO: Implement dc_get_value_integer
 //!
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
 //!
 enum disir_status dc_get_value_integer (struct disir_context *context, int64_t *value);
@@ -546,6 +550,7 @@ enum disir_status dc_get_value_integer (struct disir_context *context, int64_t *
 //!
 //! TODO: Implement dc_get_value_float
 //!
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
 //!
 enum disir_status dc_get_value_float (struct disir_context *conttext, double *value);
@@ -554,6 +559,7 @@ enum disir_status dc_get_value_float (struct disir_context *conttext, double *va
 //!
 //! TODO: Implement dc_get_value_boolean
 //!
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
 //!
 enum disir_status dc_get_value_boolean (struct disir_context *context, uint8_t *value);
