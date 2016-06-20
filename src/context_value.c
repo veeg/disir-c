@@ -344,7 +344,30 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
 enum disir_status
 dc_get_value_integer (struct disir_context *context, int64_t *value)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    struct disir_value *storage;
+
+    status = get_value_input_check (context, "integer", &storage);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    status = dx_value_get_integer (storage, value);
+    if (status == DISIR_STATUS_INVALID_ARGUMENT)
+    {
+        dx_context_error_set (context,
+                              "cannot get integer with value NULL pointer");
+    }
+    if (status == DISIR_STATUS_WRONG_VALUE_TYPE)
+    {
+        dx_context_error_set (context,
+                              "cannot get integer value on context whose value type is %s",
+                              dc_value_type_string (context));
+    }
+
+    return status;
 }
 
 //! PUBLIC API
