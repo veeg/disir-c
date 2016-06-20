@@ -302,9 +302,9 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
 
     if (type != DISIR_VALUE_TYPE_STRING)
     {
-        dx_log_context (context, "cannot retrieve value from context whose value is of type: %s",
+        dx_log_context (context, "cannot get string value on context whose value type is %s",
                         dx_value_type_string (type));
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     switch (dc_context_type (context))
