@@ -467,6 +467,29 @@ enum disir_status dc_set_value_string (struct disir_context *context,
 //!
 enum disir_status dc_set_value_integer (struct disir_context *context, int64_t value);
 
+//! \brief Set a float value to the context.
+//!
+//! Applicable contexts are:
+//!     * DISIR_CONTEXT_KEYVAL whose top-level is CONFIG
+//!     * DISIR_CONTEXT_DEFAULT
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_set_value_float (struct disir_context *context, double value);
+
+//! \brief Set a boolean value to the context.
+//!
+//! Applicable contexts are:
+//!     * DISIR_CONTEXT_KEYVAL whose top-level is CONFIG
+//!     * DISIR_CONTEXT_DEFAULT
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_set_value_boolean (struct disir_context *context, uint8_t value);
+
+
 //! \brief Get the value stored in context in a string representation
 //!
 //! The value, regardless of type, is stringified in the output buffer provided.
@@ -526,6 +549,14 @@ enum disir_status dc_get_value_integer (struct disir_context *context, int64_t *
 //! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
 //!
 enum disir_status dc_get_value_float (struct disir_context *conttext, double *value);
+
+//! \brief Retrieve the boolean value stored on the context.
+//!
+//! TODO: Implement dc_get_value_boolean
+//!
+//! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
+//!
+enum disir_status dc_get_value_boolean (struct disir_context *context, uint8_t *value);
 
 //! Query the context for its intrduced member.
 //! If no such member exists on the context,
