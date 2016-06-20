@@ -261,7 +261,7 @@ dx_value_set_integer (struct disir_value *value, int64_t integer)
     {
         log_debug ("invoked with non-integer value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     value->dv_integer = integer;
@@ -286,7 +286,7 @@ dx_value_get_integer (struct disir_value *value, int64_t *integer)
     {
         log_debug ("invoked with non-integer value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     *integer = value->dv_integer;
@@ -306,7 +306,7 @@ dx_value_set_boolean (struct disir_value *value, uint8_t boolean)
     {
         log_debug ("invoked with non-boolean value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     value->dv_boolean = boolean;
@@ -331,7 +331,7 @@ dx_value_get_boolean (struct disir_value *value, uint8_t *boolean)
     {
         log_debug ("invoked with non-boolean value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     *boolean = value->dv_boolean;
@@ -351,7 +351,7 @@ dx_value_set_float (struct disir_value *value, double input_double)
     {
         log_debug ("invoked with non-float value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     value->dv_float = input_double;
@@ -376,7 +376,7 @@ dx_value_get_float (struct disir_value *value, double *output_double)
     {
         log_debug ("invoked with non-float value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     *output_double = value->dv_float;
@@ -396,7 +396,7 @@ dx_value_set_string (struct disir_value *value, const char *input, int32_t size)
     {
         log_debug ("invoked with non-string value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
     if (input == NULL)
     {
@@ -458,7 +458,7 @@ dx_value_get_string (struct disir_value *value, const char **output, int32_t *si
     if (value->dv_type != DISIR_VALUE_TYPE_STRING)
     {
         log_debug ("invoked with non-string value type (%d)", value->dv_type);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     if (size)

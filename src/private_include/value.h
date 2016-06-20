@@ -89,8 +89,8 @@ enum disir_status dx_value_copy (struct disir_value *destination, struct disir_v
 //! \param size Length of the input string. Only 'size' number of bytes
 //!     are copied into the 'value' object.
 //!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer
-//!     or that the value type of 'value' is not DISIR_VALUE_TYPE_STRING.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if `value` is not DISIR_VALUE_TYPE_STRING.
 //! \return DISIR_STATUS_NO_MEMORY if an allocation failed for the value object.
 //! \return DISIR_STATUS_OK if 'value' is successfully populated with the contents of 'input'
 //!
@@ -103,9 +103,9 @@ dx_value_set_string (struct disir_value *value, const char *input, int32_t size)
 //! \param[out] output Pointer is to redirect to the stored string in 'value'
 //! \param[out] size Populated with the size of the output string size if not NULL.
 //!
-//! \return DISIR_STATUS_OK if the 'output' input pointer is pointed to the stored string.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'output' are NULL pointers,
-//!     or the value type of 'value' is not DISIR_VALUE_TYPE_STRING
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if `value` is not DISIR_VALUE_TYPE_STRING.
+//! \return DISIR_STATUS_OK if the 'output' input pointer is pointed to the stored string.
 //!
 enum disir_status
 dx_value_get_string (struct disir_value *value, const char **output, int32_t *size);
@@ -116,8 +116,8 @@ dx_value_get_string (struct disir_value *value, const char **output, int32_t *si
 //! \param value Value object to store a value type.
 //! \param integer Input integer value which shall be stored in the 'value' object.
 //!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer
-//!     or that the value type of 'value' is not DISIR_VALUE_TYPE_INTEGER.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if `value` is not DISIR_VALUE_TYPE_INTEGER.
 //! \return DISIR_STATUS_OK if 'value' is successfully populated with the contents of 'integer'
 //!
 enum disir_status
@@ -128,9 +128,9 @@ dx_value_set_integer (struct disir_value *value, int64_t integer);
 //! \param[in] value Value object to retrieve the integer value from.
 //! \param[out] integer Populated with the integer value of 'value' object.
 //!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'integer' are NULL pointers.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if `value` is not DISIR_VALUE_TYPE_INTEGER.
 //! \return DISIR_STATUS_OK if the 'integer' input pointer is populated with stored value.
-//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'integer' are NULL pointers,
-//!     or the value type of 'value' is not DISIR_VALUE_TYPE_INTEGER.
 //!
 enum disir_status
 dx_value_get_integer (struct disir_value *value, int64_t *integer);
@@ -140,8 +140,8 @@ dx_value_get_integer (struct disir_value *value, int64_t *integer);
 //! \param value Value object to store a value type.
 //! \param boolean Input booleanvalue which shall be stored in the 'value' object.
 //!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer
-//!     or that the value type of 'value' is not DISIR_VALUE_TYPE_INTEGER.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if `value` is not DISIR_VALUE_TYPE_BOOLEAN.
 //! \return DISIR_STATUS_OK if 'value' is successfully populated with the contents of 'boolean'
 //!
 enum disir_status
@@ -152,9 +152,9 @@ dx_value_set_boolean (struct disir_value *value, uint8_t boolean);
 //! \param[in] value Value object to retrieve the boolean value from.
 //! \param[out] boolean Populated with the integer value of 'value' object.
 //!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'boolean' are NULL pointers.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if `value` is not DISIR_VALUE_TYPE_BOOLEAN.
 //! \return DISIR_STATUS_OK if the 'boolean' input pointer is populated with stored value.
-//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'boolean' are NULL pointers,
-//!     or the value type of 'value' is not DISIR_VALUE_TYPE_INTEGER.
 //!
 enum disir_status
 dx_value_get_boolean (struct disir_value *value, uint8_t *boolean);
@@ -164,8 +164,8 @@ dx_value_get_boolean (struct disir_value *value, uint8_t *boolean);
 //! \param value Value object to store a value type.
 //! \param input_double Input double value which shall be stored in the 'value' object.
 //!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer
-//!     or that the value type of 'value' is not DISIR_VALUE_TYPE_FLOAT.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if `value` is not DISIR_VALUE_TYPE_FLOAT.
 //! \return DISIR_STATUS_OK if 'value' is successfully populated
 //!     with the contents of 'input_double'
 //!
@@ -178,9 +178,9 @@ dx_value_set_float (struct disir_value *value, double input_double);
 //! \param[in] value Value object to retrieve the float value from.
 //! \param[out] output_double Populated with the float  value of 'value' object.
 //!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'output_double' are NULL pointers.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if `value` is not DISIR_VALUE_TYPE_FLOAT.
 //! \return DISIR_STATUS_OK if the 'output_double' input pointer is populated with stored value
-//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'output_double' are NULL pointers,
-//!     or the value type of 'value' is not DISIR_VALUE_TYPE_FLOAT.
 //!
 enum disir_status
 dx_value_get_float (struct disir_value *value, double *output_double);
