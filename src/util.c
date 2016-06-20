@@ -183,7 +183,8 @@ dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
         *output_size = size;
         if (size >= output_buffer_size)
         {
-            // Set size to be output_buffer_size - 1,  so we can signal that the supplied buffer is insufficient.
+            // Set size to be output_buffer_size - 1,
+            // so we can signal that the supplied buffer is insufficient.
             size = output_buffer_size - 1;
             log_debug ("Insufficient buffer provided - decrementing output size by one");
         }
