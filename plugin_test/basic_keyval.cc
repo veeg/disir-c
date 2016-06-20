@@ -26,6 +26,10 @@ basic_keyval(struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
+    status = dc_add_keyval_boolean (context, "key_boolean", 1, "key boolean doc", NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
     status = dc_mold_finalize (&context, mold);
     if (status != DISIR_STATUS_OK)
         goto error;
