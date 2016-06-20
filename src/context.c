@@ -363,6 +363,8 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
         break;
     }
     case DISIR_CONTEXT_SECTION:
+        value = &context->cx_section->se_name;
+        break;
     default:
     {
         dx_crash_and_burn ("%s: %s invoked unhandled",
@@ -1045,6 +1047,8 @@ dc_get_elements (struct disir_context *context, struct disir_collection **collec
         break;
     }
     case DISIR_CONTEXT_SECTION:
+        status = dx_element_storage_get_all (context->cx_section->se_elements, collection);
+        break;
     default:
     {
         dx_crash_and_burn ("%s: %s not handled/implemented/supported",
