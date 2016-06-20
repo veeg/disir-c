@@ -548,12 +548,19 @@ enum disir_status dc_get_value_integer (struct disir_context *context, int64_t *
 
 //! \brief Retrieve the float value stored on the context.
 //!
-//! TODO: Implement dc_get_value_float
+//! Supported contexts:
+//!     * DISIR_CONTEXT_KEYVAL whose top-level is CONFIG.
 //!
+//! \param[in] context The context to get float from.
+//! \param[out] value The output variable to populate.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if `context` or `value` is NULL.
+//! \return DISIR_STATUS_MOLD_MIDDING if MOLD is not associated with `context`.
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context` is not of supported type.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
-//! \return DISIR_STATUS_INTERNAL_ERROR - not implemented
+//! \return DISIR_STATUS_OK on success
 //!
-enum disir_status dc_get_value_float (struct disir_context *conttext, double *value);
+enum disir_status dc_get_value_float (struct disir_context *context, double *value);
 
 //! \brief Retrieve the boolean value stored on the context.
 //!

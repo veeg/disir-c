@@ -397,9 +397,32 @@ dc_set_value_integer (struct disir_context *context, int64_t value)
 
 //! PUBLIC API
 enum disir_status
-dc_get_value_float (struct disir_context *conttext, double *value)
+dc_get_value_float (struct disir_context *context, double *value)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    struct disir_value *storage;
+
+    status = get_value_input_check (context, "float", &storage);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    status = dx_value_get_float(storage, value);
+    if (status == DISIR_STATUS_INVALID_ARGUMENT)
+    {
+        dx_context_error_set (context,
+                              "cannot get float with value NULL pointer");
+    }
+    if (status == DISIR_STATUS_WRONG_VALUE_TYPE)
+    {
+        dx_context_error_set (context,
+                              "cannot get float value on context whose value type is %s",
+                              dc_value_type_string (context));
+    }
+
+    return status;
 }
 
 //! PUBLIC API
