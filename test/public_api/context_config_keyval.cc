@@ -131,7 +131,7 @@ TEST_F (ConfigKeyvalIntegerTest, set_value_integer_shall_succeed)
 TEST_F (ConfigKeyvalIntegerTest, set_value_string_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "mys", strlen ("mys"));
-    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
     ASSERT_STREQ ("cannot set string value on context whose value type is INTEGER",
                   dc_context_error (context_keyval));
 }
@@ -145,7 +145,7 @@ TEST_F (ConfigKeyvalStringTest, set_value_string_shall_succeed)
 TEST_F (ConfigKeyvalStringTest, set_value_integer_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 74);
-    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
     ASSERT_STREQ ("cannot set integer value on context whose value type is STRING",
                   dc_context_error (context_keyval));
 }

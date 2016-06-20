@@ -127,7 +127,7 @@ TEST_F (DisirValueStringTest, set_string_invalid_value_type_shall_fail)
     value.dv_type = DISIR_VALUE_TYPE_UNKNOWN;
 
     status = dx_value_set_string (&value, sample, strlen (sample));
-    EXPECT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+    EXPECT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 }
 
 
