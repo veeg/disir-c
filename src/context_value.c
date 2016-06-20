@@ -44,7 +44,7 @@ set_value_input_check (struct disir_context *context, const char *type,
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
         {
             dx_context_error_set (context,
-                              "cannot set %s value on context whose toplevel is MOLD", type);
+                              "cannot set %s value on KEYVAL whose top-level is MOLD", type);
             return DISIR_STATUS_WRONG_CONTEXT;
         }
         if (context->cx_keyval->kv_mold_equiv == NULL)
@@ -172,7 +172,8 @@ dc_set_value_string (struct disir_context *context, const char *value, int32_t v
     {
         if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
         {
-            dx_log_context (context, "cannot set value on KEYVAL whose root is not CONFIG.");
+            dx_log_context (context,
+                            "cannot set string value on KEYVAL whose top-level is MOLD");
             return DISIR_STATUS_WRONG_CONTEXT;
         }
         if (context->cx_keyval->kv_mold_equiv == NULL)
