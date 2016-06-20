@@ -301,7 +301,7 @@ dc_add_default_string (struct disir_context *parent, const char *value,
         goto error;
     }
 
-    status = dx_value_set_string (&def->cx_default->de_value, value, value_size);
+    status = dc_set_value_string (def, value, value_size);
     if (status != DISIR_STATUS_OK)
     {
         // not logged to context
@@ -318,7 +318,7 @@ dc_add_default_string (struct disir_context *parent, const char *value,
         }
     }
 
-    status = dx_default_finalize (&def);
+    status = dc_finalize (&def);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged to context
@@ -369,7 +369,7 @@ dc_add_default_integer (struct disir_context *parent, int64_t value,
         }
     }
 
-    status = dx_default_finalize (&def);
+    status = dc_finalize (&def);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged to context
@@ -396,14 +396,14 @@ dc_add_default_float (struct disir_context *parent, double value, struct semanti
 
     def = NULL;
 
-    status = dx_default_begin (parent, &def);
+    status = dc_begin (parent, DISIR_CONTEXT_DEFAULT, &def);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
         goto error;
     }
 
-    status = dx_value_set_float (&def->cx_default->de_value, value);
+    status = dc_set_value_float (def, value);
     if (status != DISIR_STATUS_OK)
     {
         // not logged to context
@@ -420,7 +420,7 @@ dc_add_default_float (struct disir_context *parent, double value, struct semanti
         }
     }
 
-    status = dx_default_finalize (&def);
+    status = dc_finalize (&def);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged to context
@@ -448,7 +448,7 @@ dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
 
     def = NULL;
 
-    status = dx_default_begin (parent, &def);
+    status = dc_begin (parent, DISIR_CONTEXT_DEFAULT, &def);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
@@ -459,7 +459,7 @@ dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
     {
         boolean = 1;
     }
-    status = dx_value_set_integer (&def->cx_default->de_value, boolean);
+    status = dc_set_value_boolean (def, boolean);
     if (status != DISIR_STATUS_OK)
     {
         // not logged to context
@@ -476,7 +476,7 @@ dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
         }
     }
 
-    status = dx_default_finalize (&def);
+    status = dc_finalize (&def);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged to context
