@@ -277,7 +277,7 @@ TEST_F (ConfigKeyvalBooleanTest, set_value_boolean_shall_succeed)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (ConfigKeyvalFloatTest, get_value_boolean_shall_succeed)
+TEST_F (ConfigKeyvalBooleanTest, get_value_boolean_shall_succeed)
 {
     uint8_t value = 8;
 
@@ -336,7 +336,7 @@ TEST_F (ConfigKeyvalBooleanTest, get_value_float_shall_fail)
     double value = LONG_MAX;
 
     status = dc_get_value_float (context_keyval, &value);
-    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
     ASSERT_STREQ ("cannot get float value on context whose value type is BOOLEAN",
                   dc_context_error (context_keyval));
 }
