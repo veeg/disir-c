@@ -50,6 +50,8 @@ enum disir_status
     DISIR_STATUS_EXHAUSTED,
     //! Input to operation on a top-level CONFIG is missing its MOLD equivalent.
     DISIR_STATUS_MOLD_MISSING,
+    //! Wrong Value type.
+    DISIR_STATUS_WRONG_VALUE_TYPE,
 
     //! Sentinel status - not returned by any API
     DISIR_STATUS_UNKNOWN // Must be the last status in enumeration

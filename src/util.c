@@ -31,6 +31,7 @@ const char *disir_status_strings[] = {
     "CONFLICT",
     "EXHAUSTED",
     "MOLD MISSING",
+    "WRONG VALUE TYPE",
     "UNKNOWN",
 };
 
