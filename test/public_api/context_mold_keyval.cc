@@ -45,6 +45,13 @@ protected:
         DisirLogCurrentTestExit ();
     }
 
+    void set_name (struct disir_context *c)
+    {
+        const char rname[] = "test_keyval_name";
+        status = dc_set_name (c, rname, strlen (rname));
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+    }
+
 public:
     enum disir_status status;
     struct disir_context *context;
@@ -62,9 +69,33 @@ class MoldKeyvalStringTest : public MoldKeyvalTest
         status = dc_set_value_type (context_keyval, DISIR_VALUE_TYPE_STRING);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
 
-        const char rname[] = "test_keyval_name";
-        status = dc_set_name (context_keyval, rname, strlen (rname));
+        set_name (context_keyval);
+    }
+};
+
+class MoldKeyvalIntegerTest : public MoldKeyvalTest
+{
+    void SetUp ()
+    {
+        MoldKeyvalTest::SetUp ();
+
+        status = dc_set_value_type (context_keyval, DISIR_VALUE_TYPE_INTEGER);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+        set_name (context_keyval);
+    }
+};
+
+class MoldKeyvalBooleanTest : public MoldKeyvalTest
+{
+    void SetUp ()
+    {
+        MoldKeyvalTest::SetUp ();
+
+        status = dc_set_value_type (context_keyval, DISIR_VALUE_TYPE_BOOLEAN);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+        set_name (context_keyval);
     }
 };
 
@@ -158,6 +189,44 @@ TEST_F (MoldKeyvalTest, set_type_boolean)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
+TEST_F (MoldKeyvalTest, set_value_string_shall_fail)
+{
+    const char testval[] = "test string value";
+
+    status = dc_set_value_string (context_keyval, testval, strlen (testval));
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+
+    ASSERT_STREQ ("cannot set string value on KEYVAL whose top-level is MOLD",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalTest, set_value_integer_shall_fail)
+{
+    status = dc_set_value_integer (context_keyval, 132);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+
+    ASSERT_STREQ ("cannot set integer value on KEYVAL whose top-level is MOLD",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalTest, set_value_float_shall_fail)
+{
+    status = dc_set_value_float (context_keyval, 9823.41);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+
+    ASSERT_STREQ ("cannot set float value on KEYVAL whose top-level is MOLD",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalTest, set_value_boolean_shall_fail)
+{
+    status = dc_set_value_boolean (context_keyval, 1);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+
+    ASSERT_STREQ ("cannot set boolean value on KEYVAL whose top-level is MOLD",
+                  dc_context_error (context_keyval));
+}
+
 TEST_F (MoldKeyvalStringTest, add_string_default_shall_succeed)
 {
     const char testval[] = "test string value";
@@ -166,14 +235,100 @@ TEST_F (MoldKeyvalStringTest, add_string_default_shall_succeed)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (MoldKeyvalStringTest, add_int_default_shall_fail)
+TEST_F (MoldKeyvalStringTest, add_integer_default_shall_fail)
 {
-    status = dc_add_default_integer (context_keyval, 42, NULL);
-    // XXX TODO: This should probably return a more descriptive error?
+    status = dc_add_default_integer (context_keyval, 52, NULL);
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
 
     ASSERT_STREQ ("cannot set integer value on context whose value type is STRING",
                   dc_context_error (context_keyval));
 }
 
+TEST_F (MoldKeyvalStringTest, add_float_default_shall_fail)
+{
+    status = dc_add_default_float (context_keyval, 42.61, NULL);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("cannot set float value on context whose value type is STRING",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalStringTest, add_boolean_default_shall_fail)
+{
+    status = dc_add_default_boolean (context_keyval, 0, NULL);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("cannot set boolean value on context whose value type is STRING",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalIntegerTest, add_integer_default_shall_succeed)
+{
+    status = dc_add_default_integer (context_keyval, 42, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
+TEST_F (MoldKeyvalIntegerTest, add_string_default_shall_fail)
+{
+    const char testval[] = "test string value";
+
+    status = dc_add_default_string (context_keyval, testval, strlen (testval), NULL);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("cannot set string value on context whose value type is INTEGER",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalIntegerTest, add_boolean_default_shall_fail)
+{
+    status = dc_add_default_boolean (context_keyval, 1, NULL);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("cannot set boolean value on context whose value type is INTEGER",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalIntegerTest, add_float_default_shall_fail)
+{
+    status = dc_add_default_float (context_keyval, 13.2, NULL);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("cannot set float value on context whose value type is INTEGER",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalBooleanTest, add_boolean_default_shall_succeed)
+{
+    status = dc_add_default_boolean (context_keyval, 1, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
+TEST_F (MoldKeyvalBooleanTest, add_integer_default_shall_fail)
+{
+    status = dc_add_default_integer (context_keyval, 42, NULL);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("cannot set integer value on context whose value type is BOOLEAN",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalBooleanTest, add_string_default_shall_fail)
+{
+    const char testval[] = "test string value";
+
+    status = dc_add_default_string (context_keyval, testval, strlen (testval), NULL);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("cannot set string value on context whose value type is BOOLEAN",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (MoldKeyvalBooleanTest, add_float_default_shall_fail)
+{
+    status = dc_add_default_float (context_keyval, 42.15, NULL);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("cannot set float value on context whose value type is BOOLEAN",
+                  dc_context_error (context_keyval));
+}
 
