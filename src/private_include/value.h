@@ -135,6 +135,30 @@ dx_value_set_integer (struct disir_value *value, int64_t integer);
 enum disir_status
 dx_value_get_integer (struct disir_value *value, int64_t *integer);
 
+//! \brief Set the input 'value' with the contents of the input 'boolean'
+//!
+//! \param value Value object to store a value type.
+//! \param boolean Input booleanvalue which shall be stored in the 'value' object.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if 'value' are NULL pointer
+//!     or that the value type of 'value' is not DISIR_VALUE_TYPE_INTEGER.
+//! \return DISIR_STATUS_OK if 'value' is successfully populated with the contents of 'boolean'
+//!
+enum disir_status
+dx_value_set_boolean (struct disir_value *value, uint8_t boolean);
+
+//! \brief Reterieve the boolean type stored in value
+//!
+//! \param[in] value Value object to retrieve the boolean value from.
+//! \param[out] boolean Populated with the integer value of 'value' object.
+//!
+//! \return DISIR_STATUS_OK if the 'boolean' input pointer is populated with stored value.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input 'value' or 'boolean' are NULL pointers,
+//!     or the value type of 'value' is not DISIR_VALUE_TYPE_INTEGER.
+//!
+enum disir_status
+dx_value_get_boolean (struct disir_value *value, uint8_t *boolean);
+
 //! \brief Set the input 'value' with the contents of the input 'output_double'
 //!
 //! \param value Value object to store a value type.

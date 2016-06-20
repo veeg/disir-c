@@ -294,6 +294,51 @@ dx_value_get_integer (struct disir_value *value, int64_t *integer)
 
 // INTERNAL API
 enum disir_status
+dx_value_set_boolean (struct disir_value *value, uint8_t boolean)
+{
+    if (value == NULL)
+    {
+        log_debug ("invoked with NULL value pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (value->dv_type != DISIR_VALUE_TYPE_BOOLEAN)
+    {
+        log_debug ("invoked with non-boolean value type %s (%d)",
+                   dx_value_type_string (value->dv_type), value->dv_type);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    value->dv_boolean = boolean;
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_value_get_boolean (struct disir_value *value, uint8_t *boolean)
+{
+    if (value == NULL)
+    {
+        log_debug ("invoked with NULL value pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (boolean == NULL)
+    {
+        log_debug ("invoked with NULL boolean pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (value->dv_type != DISIR_VALUE_TYPE_BOOLEAN)
+    {
+        log_debug ("invoked with non-boolean value type %s (%d)",
+                   dx_value_type_string (value->dv_type), value->dv_type);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    *boolean = value->dv_boolean;
+    return DISIR_STATUS_OK;
+}
+
+// INTERNAL API
+enum disir_status
 dx_value_set_float (struct disir_value *value, double input_double)
 {
     if (value == NULL)
