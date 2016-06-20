@@ -1,3 +1,5 @@
+#include <climits>
+
 // PUBLIC API
 #include <disir/disir.h>
 
@@ -128,11 +130,31 @@ TEST_F (ConfigKeyvalIntegerTest, set_value_integer_shall_succeed)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
+TEST_F (ConfigKeyvalIntegerTest, get_value_integer_shall_succeed)
+{
+    int64_t value = LLONG_MAX;
+    status = dc_get_value_integer (context_keyval, &value);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ASSERT_EQ (0, value);
+}
+
 TEST_F (ConfigKeyvalIntegerTest, set_value_string_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "mys", strlen ("mys"));
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
     ASSERT_STREQ ("cannot set string value on context whose value type is INTEGER",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (ConfigKeyvalIntegerTest, get_value_string_shall_fail)
+{
+    const char *output;
+    int32_t size;
+
+    status = dc_get_value_string (context_keyval, &output, &size);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+    ASSERT_STREQ ("cannot get string value on context whose value type is INTEGER",
                   dc_context_error (context_keyval));
 }
 
@@ -142,10 +164,26 @@ TEST_F (ConfigKeyvalStringTest, set_value_string_shall_succeed)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
+TEST_F (ConfigKeyvalStringTest, get_value_string_shall_succeed)
+{
+    const char *output;
+    int32_t size;
+
+    status = dc_get_value_string (context_keyval, &output, &size);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
 TEST_F (ConfigKeyvalStringTest, set_value_integer_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 74);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
     ASSERT_STREQ ("cannot set integer value on context whose value type is STRING",
                   dc_context_error (context_keyval));
+}
+
+TEST_F (ConfigKeyvalStringTest, get_value_integer_shall_fail)
+{
+    int64_t value = LLONG_MAX;
+    status = dc_get_value_integer (context_keyval, &value);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 }
