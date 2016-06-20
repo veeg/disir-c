@@ -100,6 +100,17 @@ protected:
     }
 };
 
+class ConfigKeyvalBooleanTest : public ConfigKeyvalTest
+{
+protected:
+    void SetUp()
+    {
+        ConfigKeyvalTest::SetUp ();
+
+        status = dc_set_name (context_keyval, "key_boolean", strlen ("key_boolean"));
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+    }
+};
 
 TEST_F (ConfigKeyvalTest, set_name_doesnt_exist_shall_fail)
 {
@@ -256,5 +267,76 @@ TEST_F (ConfigKeyvalFloatTest, get_value_integer_shall_fail)
     status = dc_get_value_integer (context_keyval, &value);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
     ASSERT_STREQ ("cannot get integer value on context whose value type is FLOAT",
+                  dc_context_error (context_keyval));
+}
+
+// XX
+TEST_F (ConfigKeyvalBooleanTest, set_value_boolean_shall_succeed)
+{
+    status = dc_set_value_boolean (context_keyval, 1);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
+TEST_F (ConfigKeyvalFloatTest, get_value_boolean_shall_succeed)
+{
+    uint8_t value = 8;
+
+    status = dc_get_value_boolean (context_keyval, &value);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ASSERT_EQ (0, value);
+}
+
+TEST_F (ConfigKeyvalBooleanTest, set_value_string_shall_fail)
+{
+    status = dc_set_value_string (context_keyval, "hooray", strlen ("hooray"));
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+    ASSERT_STREQ ("cannot set string value on context whose value type is BOOLEAN",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (ConfigKeyvalBooleanTest, get_value_string_shall_fail)
+{
+    const char *output;
+    int32_t size;
+
+    status = dc_get_value_string (context_keyval, &output, &size);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+    ASSERT_STREQ ("cannot get string value on context whose value type is BOOLEAN",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (ConfigKeyvalBooleanTest, set_value_integer_shall_fail)
+{
+    status = dc_set_value_integer (context_keyval, 74);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+    ASSERT_STREQ ("cannot set integer value on context whose value type is BOOLEAN",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (ConfigKeyvalBooleanTest, get_value_integer_shall_fail)
+{
+    int64_t value = LLONG_MAX;
+    status = dc_get_value_integer (context_keyval, &value);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+    ASSERT_STREQ ("cannot get integer value on context whose value type is BOOLEAN",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (ConfigKeyvalBooleanTest, set_value_float_shall_fail)
+{
+    status = dc_set_value_float (context_keyval, 42.123);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+    ASSERT_STREQ ("cannot set float value on context whose value type is BOOLEAN",
+                  dc_context_error (context_keyval));
+}
+
+TEST_F (ConfigKeyvalBooleanTest, get_value_float_shall_fail)
+{
+    double value = LONG_MAX;
+
+    status = dc_get_value_float (context_keyval, &value);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_STREQ ("cannot get float value on context whose value type is BOOLEAN",
                   dc_context_error (context_keyval));
 }

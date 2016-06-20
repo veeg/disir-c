@@ -454,7 +454,30 @@ dc_set_value_float (struct disir_context *context, double value)
 enum disir_status
 dc_get_value_boolean (struct disir_context *context, uint8_t *value)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    struct disir_value *storage;
+
+    status = get_value_input_check (context, "boolean", &storage);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    status = dx_value_get_boolean (storage, value);
+    if (status == DISIR_STATUS_INVALID_ARGUMENT)
+    {
+        dx_context_error_set (context,
+                              "cannot get boolean with value NULL pointer");
+    }
+    if (status == DISIR_STATUS_WRONG_VALUE_TYPE)
+    {
+        dx_context_error_set (context,
+                              "cannot get boolean value on context whose value type is %s",
+                              dc_value_type_string (context));
+    }
+
+    return status;
 }
 
 //! PUBLIC API
