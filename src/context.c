@@ -425,8 +425,16 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
         // XXX revise return status
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    context->cx_keyval->kv_mold_equiv = queried;
-    context->cx_keyval->kv_value.dv_type = queried->cx_keyval->kv_value.dv_type;
+
+    if (dc_context_type (context) == DISIR_CONTEXT_SECTION)
+    {
+        context->cx_section->se_mold_equiv = queried;
+    }
+    else if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
+    {
+        context->cx_keyval->kv_mold_equiv = queried;
+        context->cx_keyval->kv_value.dv_type = queried->cx_keyval->kv_value.dv_type;
+    }
 
     dx_context_incref (queried);
 
