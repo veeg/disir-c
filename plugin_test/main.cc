@@ -35,7 +35,10 @@ struct cmp_str
 };
 
 //! Internal static map to store test molds by id
-static std::map<const char *, output_mold, cmp_str> *molds;
+static std::map<const char *, output_mold, cmp_str> molds = {
+    std::make_pair ("basic_keyval", basic_keyval),
+    std::make_pair ("basic_section", basic_section),
+};
 
 enum disir_status
 dio_test_config_read (struct disir_instance *disir, const char *id,
@@ -44,7 +47,7 @@ dio_test_config_read (struct disir_instance *disir, const char *id,
     enum disir_status status;
     output_mold func_mold;
 
-    func_mold = (*molds)[id];
+    func_mold = molds[id];
     if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
@@ -74,7 +77,7 @@ dio_test_config_version (struct disir_instance *disir,
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    func_mold = (*molds)[id];
+    func_mold = molds[id];
     if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
@@ -91,7 +94,7 @@ dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_m
     enum disir_status status;
     output_mold func_mold;
 
-    func_mold = (*molds)[id];
+    func_mold = molds[id];
     if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
@@ -114,7 +117,7 @@ dio_test_mold_list (struct disir_instance *disir, struct disir_collection **coll
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    for (auto i = molds->begin(); i != molds->end(); ++i)
+    for (auto i = molds.begin(); i != molds.end(); ++i)
     {
         dc_free_text_create (i->first, &context);
         dc_collection_push_context (col, context);
@@ -129,29 +132,6 @@ extern "C" enum disir_status
 dio_register_plugin (struct disir_instance *disir)
 {
     struct disir_input_plugin input;
-
-    if (molds == NULL)
-    {
-        // allocate molds
-        std::pair<const char *, output_mold> p;
-        molds = new std::map<const char *, output_mold, cmp_str> ();
-
-        std::pair <const char *, output_mold> pairs[] = {
-            std::make_pair ("basic_keyval", basic_keyval),
-            std::make_pair ("basic_section", basic_section),
-        };
-
-        int count = sizeof (pairs) / sizeof (std::pair<const char *, output_mold>);
-
-        for (int i = 0; i < count; i++)
-        {
-            p = pairs[i];
-            if (p.first != NULL)
-            {
-                molds->insert (p);
-            }
-        }
-    }
 
     input.in_struct_size = sizeof (struct disir_input_plugin);
     input.in_config_read = dio_test_config_read;
