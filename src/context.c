@@ -776,3 +776,63 @@ dc_get_elements (struct disir_context *context, struct disir_collection **collec
 
     return status;
 }
+
+//! PUBLIC API
+enum disir_status
+dc_find_elements (struct disir_context *context,
+                  const char *name, struct disir_collection **collection)
+{
+    enum disir_status status;
+
+    TRACE_ENTER ("context: %p, name: %s, collection: %p", context, name, collection);
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_SECTION,
+                                          DISIR_CONTEXT_MOLD,
+                                          DISIR_CONTEXT_CONFIG);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+    if (collection == NULL)
+    {
+        log_debug ("invoked with NULL collection pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = DISIR_STATUS_OK;
+    switch (dc_context_type (context))
+    {
+    case DISIR_CONTEXT_MOLD:
+    {
+        status = dx_element_storage_get (context->cx_mold->mo_elements, name, collection);
+        break;
+    }
+    case DISIR_CONTEXT_CONFIG:
+    {
+        status = dx_element_storage_get (context->cx_config->cf_elements, name, collection);
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+    {
+        status = dx_element_storage_get (context->cx_section->se_elements, name, collection);
+        break;
+    }
+    default:
+    {
+        status = DISIR_STATUS_INTERNAL_ERROR;
+        dx_context_error_set (context, "Invalid operation for context '%s'"
+                                       " (slipped through internal guard)",
+                                       dc_context_type_string (context));
+    }
+    }
+
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
+}
+
