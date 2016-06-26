@@ -139,6 +139,13 @@ TEST_F (StatusTest, wrong_value_type)
     ASSERT_STREQ (status_string, "WRONG VALUE TYPE");
 }
 
+TEST_F (StatusTest, not_exist)
+{
+    status =  DISIR_STATUS_NOT_EXIST;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "NOT EXIST");
+}
+
 TEST_F (StatusTest, unknown)
 {
     status = DISIR_STATUS_UNKNOWN;
