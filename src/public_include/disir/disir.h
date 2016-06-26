@@ -52,6 +52,8 @@ enum disir_status
     DISIR_STATUS_MOLD_MISSING,
     //! Wrong Value type.
     DISIR_STATUS_WRONG_VALUE_TYPE,
+    //! Requested resource does not exist.
+    DISIR_STATUS_NOT_EXIST,
 
     //! Sentinel status - not returned by any API
     DISIR_STATUS_UNKNOWN // Must be the last status in enumeration

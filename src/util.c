@@ -32,6 +32,7 @@ const char *disir_status_strings[] = {
     "EXHAUSTED",
     "MOLD MISSING",
     "WRONG VALUE TYPE",
+    "NOT EXIST",
     "UNKNOWN",
 };
 
