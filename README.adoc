@@ -22,8 +22,6 @@ Because its **manual**. It does not aid you in resolving conflict between the sa
 [horizontal]
 Restrictions:: No restritions are implemented on neither section nor keyval.
 
-Sections:: Sections are not implemented on neither mold nor config.
-
 Update:: Allow update procedure to generate a collection of conflicts, instead of
 resolving them immediately
 
@@ -44,7 +42,8 @@ If so, this checksum MUST be take the order of operations into account.
 verify:: Add some method to verify the state of the context. Should pinpoint an error message
 to the invalid state characteristic.
 
-value type:: Support more than just string keyvals. (experimental support now?)
+value type:: Missing support for enums. These should be implemented as int64 and restrictions
+should map their enum value to string representation.
 
 Deprecrated:: Implement a deprecrated notion. KEYVALS and sections can be deprecrated
 
