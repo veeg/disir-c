@@ -243,7 +243,7 @@ dx_element_storage_get (struct disir_element_storage *storage,
     iter = multimap_fetch (storage->es_map, (void *) name);
     if (iter == NULL)
     {
-        return DISIR_STATUS_NO_MEMORY;
+        return DISIR_STATUS_NOT_EXIST;
     }
     col = dc_collection_create ();
     if (collection == NULL)
@@ -355,7 +355,7 @@ dx_element_storage_get_first(struct disir_element_storage *storage,
     keyval = multimap_get_first (storage->es_map, (void *) name);
     if (keyval == NULL)
     {
-        return DISIR_STATUS_EXHAUSTED;
+        return DISIR_STATUS_NOT_EXIST;
     }
 
     *context = keyval;

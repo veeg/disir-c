@@ -70,7 +70,7 @@ dx_element_storage_remove (struct disir_element_storage *storage,
 //! \param name String name of the element(s) to retrieve
 //! \param[out] collection output of the matching entries, if any.
 //!
-//! \return DISIR_STATUS_EXHAUSTED if no entries were found.
+//! \return DISIR_STATUS_NOT_EXIST if no entries were found.
 //! \return DISIR_STATUS_OK on success
 //!
 enum disir_status
@@ -103,7 +103,7 @@ dx_element_storage_get_all (struct disir_element_storage *storage,
 //! \param[in] name Query parameter to locate context by in storage
 //! \param[out] Populated context on success (if found in storage)
 //!
-//! \return DISIR_STATUS_EXHAUSTED if no entries were found.
+//! \return DISIR_STATUS_NOT_EXIST if no entries were found.
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
