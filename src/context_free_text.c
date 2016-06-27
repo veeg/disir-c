@@ -20,6 +20,11 @@ dc_free_text_create (const char *text, struct disir_context **free_text)
     enum disir_status status;
     struct disir_context *context;
 
+    if (text == NULL)
+    {
+        log_debug ("invoked with text NULL pointer");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
     if (free_text == NULL)
     {
         log_debug ("invoked with free_text NULL pointer");
