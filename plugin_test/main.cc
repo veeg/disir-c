@@ -119,7 +119,11 @@ dio_test_mold_list (struct disir_instance *disir, struct disir_collection **coll
 
     for (auto i = molds.begin(); i != molds.end(); ++i)
     {
-        dc_free_text_create (i->first, &context);
+        status = dc_free_text_create (i->first, &context);
+        if (status != DISIR_STATUS_OK)
+        {
+            continue;
+        }
         dc_collection_push_context (col, context);
         dc_putcontext (&context);
     }
