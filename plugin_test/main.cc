@@ -108,6 +108,7 @@ dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_m
 enum disir_status
 dio_test_mold_list (struct disir_instance *disir, struct disir_collection **collection)
 {
+    enum disir_status status;
     struct disir_collection *col;
     struct disir_context *context;
 
