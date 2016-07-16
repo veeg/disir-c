@@ -15,20 +15,35 @@
 //! Hardcode default for now.
 enum disir_log_level runtime_loglevel = DISIR_LOG_LEVEL_TRACE_EXIT;
 
-//! String representation of the different disir_log_level
-static const char * disir_log_level_string[] = {
-    "UNUSED",
-    "NONE ",
-    "FATAL",
-    "ERROR",
-    "WARN ",
-    "TEST ",
-    "INFO ",
-    "USER ",
-    "DEBUG",
-    "TRACE",
-    "TRACE",
-};
+//! STATIC USAGE
+static const char *
+map_dll_to_string (enum disir_log_level dll)
+{
+    switch (dll)
+    {
+    case DISIR_LOG_LEVEL_NONE:
+        return "NONE ";
+    case DISIR_LOG_LEVEL_FATAL:
+        return "FATAL";
+    case DISIR_LOG_LEVEL_ERROR:
+        return "ERROR";
+    case DISIR_LOG_LEVEL_WARNING:
+        return "WARN ";
+    case DISIR_LOG_LEVEL_TEST:
+        return "TEST ";
+    case DISIR_LOG_LEVEL_INFO:
+        return "INFO ";
+    case DISIR_LOG_LEVEL_USER:
+        return "USER ";
+    case DISIR_LOG_LEVEL_DEBUG:
+        return "DEBUG";
+    case DISIR_LOG_LEVEL_TRACE_ENTER:
+    case DISIR_LOG_LEVEL_TRACE_EXIT:
+        return "TRACE";
+    default:
+        return "UNHANDLED";
+    }
+}
 
 //! INTERNAL API
 void
@@ -47,7 +62,7 @@ dx_crash_and_burn (const char* message, ...)
 //! prefix is injected between the fmt message and the timestamp/loglevel
 //! Ignored if null
 static void
-dx_log_format (enum disir_log_level dll, const char *prefix,
+dx_log_format (enum disir_log_level dll, int severity, const char *prefix,
                const char *suffix, const char* fmt_message, va_list args)
 {
     char buffer[512];
@@ -57,18 +72,55 @@ dx_log_format (enum disir_log_level dll, const char *prefix,
     FILE *stream;
     time_t now;
     struct tm *utctime;
+    char dll_prefix[10];
 
     buffer_size = 512;
+
+    // Normalize debug level
+    if (dll == DISIR_LOG_LEVEL_DEBUG)
+    {
+        switch (severity)
+        {
+        case 0:
+            dll = DISIR_LOG_LEVEL_DEBUG;
+            break;
+        case 1:
+            dll = DISIR_LOG_LEVEL_DEBUG_01;
+            break;
+        case 2:
+            dll = DISIR_LOG_LEVEL_DEBUG_02;
+            break;
+        case 3:
+            dll = DISIR_LOG_LEVEL_DEBUG_03;
+            break;
+        case 4:
+            dll = DISIR_LOG_LEVEL_DEBUG_04;
+            break;
+        case 5:
+            dll = DISIR_LOG_LEVEL_DEBUG_05;
+            break;
+        case 6:
+            dll = DISIR_LOG_LEVEL_DEBUG_06;
+            break;
+        case 7:
+            dll = DISIR_LOG_LEVEL_DEBUG_07;
+            break;
+        case 8:
+            dll = DISIR_LOG_LEVEL_DEBUG_08;
+            break;
+        case 9:
+            dll = DISIR_LOG_LEVEL_DEBUG_09;
+            break;
+        case 10:
+            dll = DISIR_LOG_LEVEL_DEBUG_10;
+            break;
+        }
+    }
 
     // Dont log anything if loglevel doesnt match
     if (dll > runtime_loglevel)
     {
         return;
-    }
-
-    if (dll <= DISIR_LOG_LEVEL_NONE || dll > DISIR_LOG_LEVEL_TRACE_EXIT)
-    {
-        dx_crash_and_burn ("Passed log level is of the charts!: %d", dll);
     }
 
     // Get UTC time
@@ -82,9 +134,29 @@ dx_log_format (enum disir_log_level dll, const char *prefix,
             time_written, buffer_size);
     }
 
+    // Prepare the log level prefix string
+    if (dll >= DISIR_LOG_LEVEL_DEBUG &&
+        dll != DISIR_LOG_LEVEL_TRACE_ENTER &&
+        dll != DISIR_LOG_LEVEL_TRACE_EXIT)
+    {
+        if (severity < 0)
+        {
+            severity = 0;
+        }
+        if (severity > 10)
+        {
+            severity = 10;
+        }
+        snprintf (dll_prefix, 6, "DB %02d", severity);
+    }
+    else
+    {
+        snprintf (dll_prefix, 6, map_dll_to_string (dll));
+    }
+
     res = snprintf (buffer + time_written, buffer_size - time_written,
             "-[%s] %s%s",
-            disir_log_level_string[dll],
+            dll_prefix,
             (prefix != NULL ? prefix : ""),
             (prefix != NULL ? " " : "")
             );
@@ -187,6 +259,7 @@ dx_context_error_set (struct disir_context *context, const char *fmt_message, ..
 
 void
 dx_log_disir_va (enum disir_log_level dll,
+            int severity,
             struct disir_context *context,
             struct disir_instance *disir,
             int32_t log_context,
@@ -199,13 +272,14 @@ dx_log_disir_va (enum disir_log_level dll,
 {
     va_list args;
     va_start (args, fmt_message);
-    dx_log_disir (dll, context, disir, log_context,
+    dx_log_disir (dll, severity, context, disir, log_context,
                   file, function, line, message_prefix, fmt_message, args);
     va_end (args);
 }
 
 void
 dx_log_disir (enum disir_log_level dll,
+            int severity,
             struct disir_context *context,
             struct disir_instance *disir,
             int32_t log_context,
@@ -287,6 +361,7 @@ dx_log_disir (enum disir_log_level dll,
     }
 
     dx_log_format (dll,
+            severity,
             (prefix != NULL ? prefix : message_prefix),
             (suffix != NULL ? suffix : ""),
             fmt_message,
