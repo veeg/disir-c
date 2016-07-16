@@ -65,8 +65,7 @@ TEST_F (ConfigSectionTest, set_name_doesnt_exist_shall_fail)
     const char name[] = "this_name_doesnt_exist";
 
     status = dc_set_name (context_section, name, strlen (name));
-    // XXX: Should be a better return status
-    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+    ASSERT_STATUS (DISIR_STATUS_NOT_EXIST, status);
 
     // XXX Assert error message
 
