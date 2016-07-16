@@ -459,6 +459,20 @@ error:
 
 //! PUBLIC API
 void
+disir_log_user (struct disir_instance *disir, const char *message, ...)
+{
+    va_list args;
+
+    if (disir == NULL || message == NULL)
+        return;
+
+    va_start (args, message);
+    dx_log_disir (DISIR_LOG_LEVEL_USER, NULL, NULL, 0, NULL, NULL, 0, NULL, message, args);
+    va_end (args);
+}
+
+//! PUBLIC API
+void
 disir_error_set (struct disir_instance *disir, const char *message, ...)
 {
     va_list args;

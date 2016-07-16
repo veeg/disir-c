@@ -160,6 +160,10 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 enum disir_status
 disir_instance_destroy (struct disir_instance **disir);
 
+//! \brief Log a USER level log entry to the disir log.
+//!
+void disir_log_user (struct disir_instance *disir, const char *message, ...);
+
 //! \brief Set an error message to the disir instance.
 //!
 //! This will also issue a ERROR level log event to the log stream.

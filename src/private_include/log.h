@@ -19,6 +19,8 @@ enum disir_log_level {
     DISIR_LOG_LEVEL_TEST,
     //! Informational entries prints will be logged.
     DISIR_LOG_LEVEL_INFO,
+    //! User level - users of library may log to this log level through disir_log_user ()
+    DISIR_LOG_LEVEL_USER,
     //! Everything will be logged, i mean, really.
     DISIR_LOG_LEVEL_DEBUG,
     //! Trace input/output of library API calls
