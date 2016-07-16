@@ -422,15 +422,13 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
         return DISIR_STATUS_INTERNAL_ERROR;
     }
 
-
     status = dx_element_storage_get_first (storage, value, &queried);
     if (status != DISIR_STATUS_OK)
     {
         // Did not find the element with that name
         log_debug ("failed to find name %s in parent mold equiv elements: %s",
                    value, disir_status_string (status));
-        // XXX revise return status
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        return status;
     }
 
     if (dc_context_type (context) == DISIR_CONTEXT_SECTION)
