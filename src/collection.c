@@ -57,6 +57,7 @@ dc_collection_next (struct disir_collection *collection, struct disir_context **
 
     // Grab the iterator index item, increment index.
     *context = collection->cc_collection[collection->cc_iterator_index];
+    dx_context_incref (*context);
 
     log_debug ("Next context( %p ) at index( %d )", *context, collection->cc_iterator_index);
 
