@@ -15,6 +15,11 @@
 //! Hardcode default for now.
 enum disir_log_level runtime_loglevel = DISIR_LOG_LEVEL_TRACE_EXIT;
 
+//! Variable to control whether or not to forcefully output TRACE log messages
+//! regardless of loglevel setting
+//! Hardcode default for now.
+int force_enable_trace = 0;
+
 //! STATIC USAGE
 static const char *
 map_dll_to_string (enum disir_log_level dll)
@@ -118,7 +123,13 @@ dx_log_format (enum disir_log_level dll, int severity, const char *prefix,
     }
 
     // Dont log anything if loglevel doesnt match
-    if (dll > runtime_loglevel)
+    // Let TRACE messages through if force_enable_trace is set
+    if (dll != DISIR_LOG_LEVEL_TRACE_ENTER && dll != DISIR_LOG_LEVEL_TRACE_EXIT)
+    {
+        if (dll > runtime_loglevel)
+            return;
+    }
+    else if (dll > runtime_loglevel && !force_enable_trace)
     {
         return;
     }
