@@ -328,10 +328,20 @@ disir_mold_finished (struct disir_mold **mold)
     enum disir_status status;
     struct disir_context *context;
 
+    if (mold == NULL || *mold == NULL)
+    {
+        log_debug ("invoked with NULL mold pointer");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    TRACE_ENTER ("mold: %p", *mold);
+
     context = (*mold)->mo_context;
     status = dc_destroy (&context);
     if (status == DISIR_STATUS_OK)
         *mold = NULL;
+
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
 }
 
