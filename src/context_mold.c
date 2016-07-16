@@ -163,6 +163,7 @@ dx_mold_destroy (struct disir_mold **mold)
         while (dc_collection_next (collection, &context) != DISIR_STATUS_EXHAUSTED)
         {
             dx_context_decref (&context);
+            dc_putcontext (&context);
         }
         dc_collection_finished (&collection);
     }
