@@ -25,7 +25,7 @@ struct disir_default
 enum disir_status dx_default_begin (struct disir_context *parent, struct disir_context **def);
 
 //! Finalize the construction of a DISIR_CONTEXT_DEFAULT
-enum disir_status dx_default_finalize (struct disir_context **def);
+enum disir_status dx_default_finalize (struct disir_context *def);
 
 //! Allocate a disir_default structure
 struct disir_default *dx_default_create (struct disir_context *parent);

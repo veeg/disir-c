@@ -71,12 +71,12 @@ dx_keyval_begin (struct disir_context *parent, struct disir_context **keyval)
 
 //! INTERNAL API
 enum disir_status
-dx_keyval_finalize (struct disir_context **keyval)
+dx_keyval_finalize (struct disir_context *keyval)
 {
     enum disir_status status;
     struct disir_element_storage *storage;
 
-    status = CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK (keyval);
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (keyval);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
@@ -84,52 +84,52 @@ dx_keyval_finalize (struct disir_context **keyval)
     }
 
     // Get parent element storage
-    switch (dc_context_type ((*keyval)->cx_parent_context))
+    switch (dc_context_type (keyval->cx_parent_context))
     {
     case DISIR_CONTEXT_CONFIG:
     {
-        storage = (*keyval)->cx_parent_context->cx_config->cf_elements;
+        storage = keyval->cx_parent_context->cx_config->cf_elements;
         break;
     }
     case DISIR_CONTEXT_SECTION:
     {
-        storage = (*keyval)->cx_parent_context->cx_section->se_elements;
+        storage = keyval->cx_parent_context->cx_section->se_elements;
         break;
     }
     case DISIR_CONTEXT_MOLD:
     {
-        storage = (*keyval)->cx_parent_context->cx_mold->mo_elements;
+        storage = keyval->cx_parent_context->cx_mold->mo_elements;
         break;
     }
     default:
     {
         dx_crash_and_burn ("%s: %s not supported - Impossible", __FUNCTION__,
-                           dc_context_type_string ((*keyval)->cx_parent_context));
+                           dc_context_type_string (keyval->cx_parent_context));
     }
     }
 
     // Cannot add keyval without a name
-    if ((*keyval)->cx_keyval->kv_name.dv_string == NULL)
+    if (keyval->cx_keyval->kv_name.dv_string == NULL)
     {
-        dx_context_error_set (*keyval, "Missing name component for keyval.");
+        dx_context_error_set (keyval, "Missing name component for keyval.");
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     // Cannot add without known type.
-    if (dx_value_type_sanify((*keyval)->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN)
+    if (dx_value_type_sanify(keyval->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN)
     {
-        dx_context_error_set (*keyval, "Missing type component for keyval.");
+        dx_context_error_set (keyval, "Missing type component for keyval.");
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
 
     // Additional restrictions apply for keyvals added to a root mold
-    if (dc_context_type ((*keyval)->cx_root_context) == DISIR_CONTEXT_MOLD)
+    if (dc_context_type (keyval->cx_root_context) == DISIR_CONTEXT_MOLD)
     {
         // Cannot add without atleast one default entry.
-        if ((*keyval)->cx_keyval->kv_default_queue == NULL)
+        if (keyval->cx_keyval->kv_default_queue == NULL)
         {
-            dx_context_error_set (*keyval, "Missing default entry for keyval.");
+            dx_context_error_set (keyval, "Missing default entry for keyval.");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
     }
@@ -139,14 +139,12 @@ dx_keyval_finalize (struct disir_context **keyval)
     // We should probably allow to insert invalid entries, but mark them
     // as an invalid state and return a special status code indicating such.
 
-    status = dx_element_storage_add (storage, (*keyval)->cx_keyval->kv_name.dv_string, *keyval);
+    status = dx_element_storage_add (storage, keyval->cx_keyval->kv_name.dv_string, keyval);
     if (status != DISIR_STATUS_OK)
     {
-        dx_log_context(*keyval, "Unable to insert into element storage - Interesting...");
+        dx_log_context(keyval, "Unable to insert into element storage - Interesting...");
         return status;
     }
-
-    *keyval = NULL;
 
     return DISIR_STATUS_OK;
 }

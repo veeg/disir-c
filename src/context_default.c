@@ -85,7 +85,7 @@ dx_default_begin (struct disir_context *parent, struct disir_context **def)
 
 //! INTERNAL API
 enum disir_status
-dx_default_finalize (struct disir_context **default_context)
+dx_default_finalize (struct disir_context *default_context)
 {
     enum disir_status status;
     struct disir_default *def;
@@ -93,14 +93,14 @@ dx_default_finalize (struct disir_context **default_context)
     int exists;
     char buffer[32];
 
-    status = CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK (default_context);
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (default_context);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
         return status;
     }
-    def = (*default_context)->cx_default;
-    queue = &(*default_context)->cx_parent_context->cx_keyval->kv_default_queue;
+    def = default_context->cx_default;
+    queue = &default_context->cx_parent_context->cx_keyval->kv_default_queue;
 
     // TODO: Verify that the default respect the restrictions on the parent keyval
 
@@ -108,7 +108,7 @@ dx_default_finalize (struct disir_context **default_context)
             (dc_semantic_version_compare (&entry->de_introduced, &def->de_introduced) == 0));
     if (exists)
     {
-        dx_log_context (*default_context,
+        dx_log_context (default_context,
                         "already contains a default entry with semantic version: %s",
                         dc_semantic_version_string (buffer, 32, &def->de_introduced));
         status = DISIR_STATUS_CONFLICTING_SEMVER;

@@ -223,7 +223,7 @@ dc_finalize (struct disir_context **context)
     switch (dx_context_type_sanify ((*context)->cx_type))
     {
     case DISIR_CONTEXT_DOCUMENTATION:
-        status = dx_documentation_finalize (context);
+        status = dx_documentation_finalize (*context);
         break;
     case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_CONFIG:
@@ -232,13 +232,13 @@ dc_finalize (struct disir_context **context)
                 dc_context_type_string (*context));
         break;
     case DISIR_CONTEXT_KEYVAL:
-        status = dx_keyval_finalize (context);
+        status = dx_keyval_finalize (*context);
         break;
     case DISIR_CONTEXT_DEFAULT:
-        status = dx_default_finalize (context);
+        status = dx_default_finalize (*context);
         break;
     case DISIR_CONTEXT_SECTION:
-        status = dx_section_finalize (context);
+        status = dx_section_finalize (*context);
         break;
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
@@ -248,6 +248,13 @@ dc_finalize (struct disir_context **context)
         log_warn ("Malwormed context object: Type value( %d )", (*context)->cx_type);
         break;
     // No default case - let compiler warn us about unhandled cases.
+    }
+
+    // Mark the context as active and deprive the user of his reference.
+    if (status == DISIR_STATUS_OK)
+    {
+        (*context)->cx_state = CONTEXT_STATE_ACTIVE;
+        *context = NULL;
     }
 
     TRACE_EXIT ("status: %s", disir_status_string (status));

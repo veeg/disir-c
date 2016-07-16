@@ -31,7 +31,7 @@ struct disir_section
 enum disir_status dx_section_begin (struct disir_context *parent, struct disir_context **section);
 
 //! Finalize the construction of a DISIR_CONTEXT_SECTION
-enum disir_status dx_section_finalize (struct disir_context **section);
+enum disir_status dx_section_finalize (struct disir_context *section);
 
 //! Allocate a disir_section structure
 struct disir_section *dx_section_create (struct disir_context *parent);

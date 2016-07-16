@@ -24,7 +24,7 @@ enum disir_status dx_documentation_begin (struct disir_context *parent,
                                           struct disir_context **doc);
 
 //! Finalize the construction of a DISIR_CONTEXT_DOCUMENTATION
-enum disir_status dx_documentation_finalize (struct disir_context **doc);
+enum disir_status dx_documentation_finalize (struct disir_context *doc);
 
 //! Allocate a disir_documentation structure
 struct disir_documentation *dx_documentation_create (struct disir_context *parent);

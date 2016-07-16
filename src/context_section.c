@@ -67,12 +67,12 @@ dx_section_begin (struct disir_context *parent, struct disir_context **section)
 
 //! INTERNAL API
 enum disir_status
-dx_section_finalize (struct disir_context **section)
+dx_section_finalize (struct disir_context *section)
 {
     enum disir_status status;
     struct disir_element_storage *storage;
 
-    status = CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK (section);
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (section);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
@@ -80,45 +80,43 @@ dx_section_finalize (struct disir_context **section)
     }
 
     // Get parent element storage
-    switch (dc_context_type ((*section)->cx_parent_context))
+    switch (dc_context_type (section->cx_parent_context))
     {
     case DISIR_CONTEXT_CONFIG:
     {
-        storage = (*section)->cx_parent_context->cx_config->cf_elements;
+        storage = section->cx_parent_context->cx_config->cf_elements;
         break;
     }
     case DISIR_CONTEXT_SECTION:
     {
-        storage = (*section)->cx_parent_context->cx_section->se_elements;
+        storage = section->cx_parent_context->cx_section->se_elements;
         break;
     }
     case DISIR_CONTEXT_MOLD:
     {
-        storage = (*section)->cx_parent_context->cx_mold->mo_elements;
+        storage = section->cx_parent_context->cx_mold->mo_elements;
         break;
     }
     default:
     {
         dx_crash_and_burn ("%s: %s not supported - Impossible", __FUNCTION__,
-                           dc_context_type_string ((*section)->cx_parent_context));
+                           dc_context_type_string (section->cx_parent_context));
     }
     }
 
     // Cannot add section without a name
-    if ((*section)->cx_section->se_name.dv_string == NULL)
+    if (section->cx_section->se_name.dv_string == NULL)
     {
-        dx_context_error_set (*section, "Missing name component for section.");
+        dx_context_error_set (section, "Missing name component for section.");
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
-    status = dx_element_storage_add (storage, (*section)->cx_section->se_name.dv_string, *section);
+    status = dx_element_storage_add (storage, section->cx_section->se_name.dv_string, section);
     if (status != DISIR_STATUS_OK)
     {
-        dx_log_context(*section, "Unable to insert into element storage - Interesting...");
+        dx_log_context(section, "Unable to insert into element storage - Interesting...");
         return status;
     }
-
-    *section = NULL;
 
     return DISIR_STATUS_OK;
 }

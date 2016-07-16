@@ -175,7 +175,7 @@ dc_add_documentation (struct disir_context *parent, const char *doc, int32_t doc
         return status;
     }
 
-    status = dx_documentation_finalize (&context);
+    status = dx_documentation_finalize (context);
     if (status != DISIR_STATUS_OK)
     {
         dx_context_transfer_logwarn (parent, context);
@@ -329,29 +329,17 @@ dx_documentation_begin (struct disir_context *parent, struct disir_context **doc
 
 //! INTERNAL API
 enum disir_status
-dx_documentation_finalize (struct disir_context **doc)
+dx_documentation_finalize (struct disir_context *doc)
 {
-    enum disir_status status;
-
-    status = DISIR_STATUS_OK;
-
     // Check argument
-    if (doc == NULL || *doc == NULL)
+    if (doc == NULL)
     {
         // LOGWARN
-        log_debug ("invoked with null parameters");
+        log_debug ("invoked with NULL doc argument");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    status = dx_documentation_add ((*doc)->cx_parent_context, (*doc)->cx_documentation);
-
-    if (status == DISIR_STATUS_OK)
-    {
-        // Finalize shall not decrement
-        *doc = NULL;
-    }
-
-    return status;
+    return dx_documentation_add (doc->cx_parent_context, doc->cx_documentation);
 }
 
 //! INTERNAL API

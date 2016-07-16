@@ -44,7 +44,7 @@ struct disir_keyval
 enum disir_status dx_keyval_begin (struct disir_context *parent, struct disir_context **doc);
 
 //! Finalize the construction of a DISIR_CONTEXT_KEYVAL
-enum disir_status dx_keyval_finalize (struct disir_context **doc);
+enum disir_status dx_keyval_finalize (struct disir_context *keyval);
 
 //! Allocate a disir_keyval structure
 struct disir_keyval *dx_keyval_create (struct disir_context *parent);
