@@ -168,6 +168,9 @@ TEST_F (QueryTest, get_config_keyval_contexts)
     status = dc_get_value_string (context_keyval, &out, &size);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     ASSERT_STREQ ("1", out);
+
+    // Put back keyval context
+    dc_putcontext (&context_keyval);
 }
 
 TEST_F (QueryTest, get_section_and_keyval_contexts)
@@ -209,6 +212,9 @@ TEST_F (QueryTest, get_section_and_keyval_contexts)
     status = dc_get_value_string (context_keyval, &out, &size);
 
     ASSERT_STREQ ("k1value", out);
+
+    // cleanup collection_next
+    dc_putcontext (&context_keyval);
 
     status = dc_finalize (&context_section);
     ASSERT_STATUS (DISIR_STATUS_OK, status);

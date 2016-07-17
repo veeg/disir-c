@@ -151,6 +151,8 @@ TEST_F (CollectionTest, next)
         status = dc_collection_next (collection, &current);
         EXPECT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (current == contexts[i]);
+
+        dc_putcontext (&current);
     }
 
     // Iterator should be exhausted now
@@ -169,6 +171,8 @@ TEST_F (CollectionTest, next)
         status = dc_collection_next (collection, &current);
         EXPECT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (current == contexts[i]);
+
+        dc_putcontext (&current);
     }
     for (i = 0; i <= 20; i += 2)
     {
@@ -189,6 +193,8 @@ TEST_F (CollectionTest, next)
         status = dc_collection_next (collection, &current);
         EXPECT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (current == contexts[i]);
+
+        dc_putcontext (&current);
     }
 
 
