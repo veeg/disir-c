@@ -134,6 +134,8 @@ const char * disir_status_string (enum disir_status status);
 //!
 //! \param[in] config Valid configuration entry based on the libdisir_mold.
 //!     Takes precedense over the `config_filepath` argument.
+//!     Instance takes ownership of input config and associated mold.
+//!     They will be destroyed by disir_instance_destroy.
 //!     May be NULL.
 //! \param[in] config_filepath Location on disk to read libdisir configuration file from.
 //!     May be NULL, in case the internal defaults will be used.

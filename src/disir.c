@@ -231,7 +231,6 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
         // Use user-provided config
         libconf = config;
         libmold = config->cf_context_mold->cx_mold;
-        dx_context_incref (libmold->mo_context);
     }
     else if (config_filepath)
     {
