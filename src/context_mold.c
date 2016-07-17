@@ -20,7 +20,7 @@ dc_mold_getcontext (struct disir_mold *mold)
 {
     if (mold == NULL)
     {
-        log_debug ("invoked with NULL mold pointer.");
+        log_debug (0, "invoked with NULL mold pointer.");
         return NULL;
     }
 
@@ -37,7 +37,7 @@ dc_mold_begin (struct disir_context **mold)
 
     if (mold == NULL)
     {
-        log_debug ("invoked with NULL mold pointer.");
+        log_debug (0, "invoked with NULL mold pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -79,7 +79,7 @@ dc_mold_finalize (struct disir_context **context, struct disir_mold **mold)
     }
     if (mold == NULL)
     {
-        log_debug ("invoked with NULL mold pointer.");
+        log_debug (0, "invoked with NULL mold pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -152,7 +152,7 @@ dx_mold_destroy (struct disir_mold **mold)
 
     if (mold == NULL || *mold == NULL)
     {
-        log_debug ("invoked with NULL mold pointer.");
+        log_debug (0, "invoked with NULL mold pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -227,7 +227,7 @@ dx_mold_update_version (struct disir_mold *mold, struct semantic_version *semver
     mold->mo_version.sv_minor = fact.sv_minor;
     mold->mo_version.sv_patch = fact.sv_patch;
 
-    log_debug ("mold (%p) version sat to: %s",
+    log_debug (6, "mold (%p) version sat to: %s",
                mold, dc_semantic_version_string (buffer, 32, &fact));
 
     return DISIR_STATUS_OK;
@@ -239,7 +239,7 @@ dc_mold_get_version (struct disir_mold *mold, struct semantic_version *semver)
 {
     if (mold == NULL || semver == NULL)
     {
-        log_debug ("invoked with NULL pointer(s)");
+        log_debug (0, "invoked with NULL pointer(s)");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 

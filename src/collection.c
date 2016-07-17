@@ -28,12 +28,12 @@ dc_collection_next (struct disir_collection *collection, struct disir_context **
 
     if (collection == NULL)
     {
-        log_debug ("Invoked with NULL collection pointer.");
+        log_debug (0, "invoked with NULL collection pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (context == NULL)
     {
-        log_debug ("invoked with NULL context pointer.");
+        log_debug (0, "invoked with NULL context pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -50,7 +50,7 @@ dc_collection_next (struct disir_collection *collection, struct disir_context **
     // Exausted?
     if (collection->cc_iterator_index > collection->cc_numentries - 1)
     {
-        log_debug ("Collection iterator( %d ) exhausted (numentires: %d)",
+        log_debug (9, "Collection iterator( %d ) exhausted (numentires: %d)",
                 collection->cc_iterator_index, collection->cc_numentries - 1);
         return DISIR_STATUS_EXHAUSTED;
     }
@@ -59,7 +59,7 @@ dc_collection_next (struct disir_collection *collection, struct disir_context **
     *context = collection->cc_collection[collection->cc_iterator_index];
     dx_context_incref (*context);
 
-    log_debug ("Next context( %p ) at index( %d )", *context, collection->cc_iterator_index);
+    log_debug (9, "Next context( %p ) at index( %d )", *context, collection->cc_iterator_index);
 
     collection->cc_iterator_index++;
 
@@ -72,7 +72,7 @@ dc_collection_reset (struct disir_collection *collection)
 {
     if (collection == NULL)
     {
-        log_debug ("invoked with collection NULL pointer.");
+        log_debug (0, "invoked with collection NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -94,7 +94,7 @@ dx_collection_coalesce(struct disir_collection *collection)
 
     if (collection == NULL)
     {
-        log_debug ("invoked with collection NULL pointer.");
+        log_debug (0, "invoked with collection NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -186,7 +186,7 @@ dc_collection_finished (struct disir_collection **collection)
 
     if (collection == NULL || *collection == NULL)
     {
-        log_debug("invoked with collection NULL pointer");
+        log_debug(0, "invoked with collection NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -220,12 +220,12 @@ dc_collection_push_context (struct disir_collection *collection, struct disir_co
 
     if (collection == NULL)
     {
-        log_debug ("Invoked with NULL collection pointer.");
+        log_debug (0, "invoked with NULL collection pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (context == NULL)
     {
-        log_debug ("invoked with NULL context pointer.");
+        log_debug (0, "invoked with NULL context pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -241,7 +241,7 @@ dc_collection_push_context (struct disir_collection *collection, struct disir_co
     {
         reallocated_capacity = collection->cc_capacity + 10;
         reallocated_size = reallocated_capacity * sizeof (struct disir_context*);
-        log_debug ("Reallocating collection to new size( %d )", reallocated_size);
+        log_debug (8, "Reallocating collection to new size( %d )", reallocated_size);
         reallocated_collection = realloc (collection->cc_collection, reallocated_size);
         if (reallocated_collection == NULL)
         {

@@ -192,7 +192,7 @@ dc_set_value_string (struct disir_context *context, const char *value, int32_t v
     if (value == NULL || value_size <= 0)
     {
         dx_log_context (context, "value must be non-null and of positive length.");
-        log_debug ("value: %p, value_size: %d", value_size);
+        log_debug (6, "value: %p, value_size: %d", value_size);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -288,7 +288,7 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
 
     if (output == NULL)
     {
-        log_debug ("invoked with output NULL pointer");
+        log_debug (0, "invoked with output NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 

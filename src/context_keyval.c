@@ -25,7 +25,7 @@ dx_keyval_begin (struct disir_context *parent, struct disir_context **keyval)
 
     if (keyval == NULL)
     {
-        log_debug ("invoked with keyval NULL pointer.");
+        log_debug (0, "invoked with keyval NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (parent);
@@ -50,7 +50,7 @@ dx_keyval_begin (struct disir_context *parent, struct disir_context **keyval)
     context = dx_context_create (DISIR_CONTEXT_KEYVAL);
     if (context == NULL)
     {
-        log_debug_context (parent, "failed to allocate new keyval context.");
+        log_debug_context (1, parent, "failed to allocate new keyval context.");
         return DISIR_STATUS_NO_MEMORY;
     }
 
@@ -62,7 +62,7 @@ dx_keyval_begin (struct disir_context *parent, struct disir_context **keyval)
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    log_debug_context (parent, "allocated new keyval instance: %p", context->cx_keyval);
+    log_debug_context (8, parent, "allocated new keyval instance: %p", context->cx_keyval);
 
     dx_context_attach (parent, context);
     *keyval = context;

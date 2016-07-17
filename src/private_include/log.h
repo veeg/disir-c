@@ -22,7 +22,7 @@ enum disir_log_level {
     //! User level - users of library may log to this log level through disir_log_user ()
     DISIR_LOG_LEVEL_USER,
     //! Everything will be logged, i mean, really.
-    DISIR_LOG_LEVEL_DEBUG = 10,
+    DISIR_LOG_LEVEL_DEBUG = 9,
     DISIR_LOG_LEVEL_DEBUG_01 = 10,
     DISIR_LOG_LEVEL_DEBUG_02 = 20,
     DISIR_LOG_LEVEL_DEBUG_03 = 30,
@@ -80,7 +80,7 @@ void dx_log_disir_va (enum disir_log_level dll,
 #define _log_disir_level(level, message, ...) \
     _log_disir_full (level, 0, NULL, NULL, 0, NULL, message, ##__VA_ARGS__)
 #define _log_disir_level_context(level, severity, context, message, ...) \
-    _log_disir_full (level, 0, context, NULL, 0, NULL, message, ##__VA_ARGS__)
+    _log_disir_full (level, severity, context, NULL, 0, NULL, message, ##__VA_ARGS__)
 #define _log_disir_level_debug(severity, message, ...) \
     _log_disir_full (DISIR_LOG_LEVEL_DEBUG, severity, NULL, NULL, 0, NULL, message, ##__VA_ARGS__)
 

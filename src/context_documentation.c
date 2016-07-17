@@ -71,7 +71,7 @@ dx_documentation_add (struct disir_context *parent, struct disir_documentation *
     if (doc_queue == NULL)
     {
         // LOGWARN
-        log_debug_context (parent, "parent_doc is NULL - we cannot add doc entry");
+        log_debug_context (0, parent, "parent_doc is NULL - we cannot add doc entry");
         status = DISIR_STATUS_WRONG_CONTEXT;
     }
 
@@ -151,14 +151,14 @@ dc_add_documentation (struct disir_context *parent, const char *doc, int32_t doc
     if (doc == NULL || doc_size <= 0)
     {
         dx_log_context (parent, "Documentation string must be non-null, of possitive length.");
-        log_debug ("(doc: %p\tdoc_size: %d)", doc, doc_size);
+        log_debug (6, "(doc: %p\tdoc_size: %d)", doc, doc_size);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
     // Construct a simple document context with default values.
     // The SemVer version will be default.
     // Any invalid state building operation is reported to parent context
-    log_debug ("Arguments ok - begining doc");
+    log_debug (6, "Arguments ok - begining doc");
 
     status = dc_begin (parent, DISIR_CONTEXT_DOCUMENTATION, &context);
     if (status != DISIR_STATUS_OK)
@@ -284,12 +284,12 @@ dx_documentation_begin (struct disir_context *parent, struct disir_context **doc
         return DISIR_STATUS_NO_CAN_DO;
     }
 
-    log_debug_context (parent, "capable of adding single documentataion.");
+    log_debug_context (6, parent, "capable of adding single documentataion.");
 
     // Check if we can add multiple documentation entries
     if (dx_documentation_numentries(parent) > 0)
     {
-        log_debug ("documentation exists");
+        log_debug (6, "documentation exists");
         if ((parent->cx_capabilities & CC_ADD_MULTIPLE_DOCUMENTATION) == 0)
         {
             // LOGWARN
@@ -299,17 +299,17 @@ dx_documentation_begin (struct disir_context *parent, struct disir_context **doc
         }
     }
 
-    log_debug_context (parent, "capable of adding documentation context");
+    log_debug_context (6, parent, "capable of adding documentation context");
 
     context = dx_context_create (DISIR_CONTEXT_DOCUMENTATION);
     if (context == NULL)
     {
         // LOGWARN
-        log_debug_context (parent, "failed to allocate new document context");
+        log_debug_context (1, parent, "failed to allocate new document context");
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    log_debug_context (parent, "created context: %p", context);
+    log_debug_context (8, parent, "created context: %p", context);
 
     context->cx_documentation = dx_documentation_create(context);
     if (context->cx_documentation == NULL)
@@ -320,7 +320,8 @@ dx_documentation_begin (struct disir_context *parent, struct disir_context **doc
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    log_debug_context (parent, "allocated documentation instance: %p", context->cx_documentation);
+    log_debug_context (8, parent,
+                       "allocated documentation instance: %p", context->cx_documentation);
 
     dx_context_attach(parent, context);
     *doc = context;
@@ -335,7 +336,7 @@ dx_documentation_finalize (struct disir_context *doc)
     if (doc == NULL)
     {
         // LOGWARN
-        log_debug ("invoked with NULL doc argument");
+        log_debug (0, "invoked with NULL doc argument");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -348,7 +349,7 @@ dx_documentation_add_value_string (struct disir_documentation *doc,
                                    const char *value,
                                    int32_t value_size)
 {
-    log_debug ("setting documentation (%p) with value (%p) of size (%d)",
+    log_debug (6, "setting documentation (%p) with value (%p) of size (%d)",
                doc, value, value_size);
     return dx_value_set_string (&doc->dd_value, value, value_size);
 }

@@ -22,12 +22,12 @@ dc_free_text_create (const char *text, struct disir_context **free_text)
 
     if (text == NULL)
     {
-        log_debug ("invoked with text NULL pointer");
+        log_debug (0, "invoked with text NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (free_text == NULL)
     {
-        log_debug ("invoked with free_text NULL pointer");
+        log_debug (0, "invoked with free_text NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 

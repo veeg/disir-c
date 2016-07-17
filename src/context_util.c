@@ -180,7 +180,8 @@ void
 dx_context_incref (struct disir_context *context)
 {
     context->cx_refcount++;
-    log_debug_context (context, "(%p) increased refcount to: %d", context, context->cx_refcount);
+    log_debug_context (9, context,
+                       "(%p) increased refcount to: %d", context, context->cx_refcount);
 }
 
 //! INTERNAL API
@@ -203,7 +204,7 @@ dx_context_decref (struct disir_context **context)
     }
     else
     {
-        log_debug_context (*context, "(%p) reduced refcount to: %d",
+        log_debug_context (9, *context, "(%p) reduced refcount to: %d",
                            *context, (*context)->cx_refcount);
     }
 }
@@ -218,11 +219,11 @@ dx_context_create (enum disir_context_type type)
 
     if (dx_context_type_sanify (type) == DISIR_CONTEXT_UNKNOWN)
     {
-        log_debug ("invoked with unknown context type( %d )", type);
+        log_debug (0, "invoked with unknown context type( %d )", type);
         return NULL;
     }
 
-    log_debug ("Allocating disir_context for %s", dx_context_type_string (type));
+    log_debug (8, "Allocating disir_context for %s", dx_context_type_string (type));
 
     context = calloc (1, sizeof (struct disir_context));
     if (context == NULL)
@@ -305,7 +306,7 @@ dx_context_destroy  (struct disir_context **context)
         free ((*context)->cx_error_message);
     }
 
-    log_debug_context (*context, " (%p) reached refcount zero. Freeing.", *context);
+    log_debug_context (9, *context, " (%p) reached refcount zero. Freeing.", *context);
 
     free(*context);
     *context = NULL;
@@ -350,7 +351,7 @@ dx_context_sp_full_check_log_error (struct disir_context *context, const char *f
     // Check argument
     if (context == NULL)
     {
-        log_debug ("%s() invoked with context NULL pointer", function_name);
+        log_debug (0, "%s() invoked with context NULL pointer", function_name);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -377,7 +378,7 @@ dx_context_dp_full_check_log_error (struct disir_context **context, const char *
     // Check argument
     if (context == NULL)
     {
-        log_debug ("%s() invoked with context double NULL pointer", function_name);
+        log_debug (0, "%s() invoked with context double NULL pointer", function_name);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -541,7 +542,7 @@ dc_set_value_type (struct disir_context *context, enum disir_value_type type)
     }
     if (dx_value_type_sanify (type) == DISIR_VALUE_TYPE_UNKNOWN)
     {
-        log_debug_context (context, "invoked with invalid/unknown value type (%d)", type);
+        log_debug_context (0, context, "invoked with invalid/unknown value type (%d)", type);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -570,7 +571,7 @@ dc_set_value_type (struct disir_context *context, enum disir_value_type type)
 
     if (status == DISIR_STATUS_OK)
     {
-        log_debug_context (context, "sat value type to %s", dx_value_type_string (type));
+        log_debug_context (6, context, "sat value type to %s", dx_value_type_string (type));
     }
 
     return status;
@@ -585,7 +586,7 @@ dc_get_value_type (struct disir_context *context, enum disir_value_type *type)
 
     if (type == NULL)
     {
-        log_debug ("invoked with type NULL pointer.");
+        log_debug (0, "invoked with type NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     *type = DISIR_VALUE_TYPE_UNKNOWN;
@@ -610,7 +611,7 @@ dc_get_value_type (struct disir_context *context, enum disir_value_type *type)
         *type = context->cx_value->dv_type;
         break;
     default:
-        log_debug_context (context, "invoked but does not contain/handle type");
+        log_debug_context (0, context, "invoked but does not contain/handle type");
         status = DISIR_STATUS_WRONG_CONTEXT;
     }
 

@@ -32,7 +32,7 @@ dx_default_begin (struct disir_context *parent, struct disir_context **def)
     }
     if (def == NULL)
     {
-        log_debug ("invoked with NULL def context pointer.");
+        log_debug (0, "invoked with NULL def context pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -60,10 +60,10 @@ dx_default_begin (struct disir_context *parent, struct disir_context **def)
     context = dx_context_create (DISIR_CONTEXT_DEFAULT);
     if (context == NULL)
     {
-        log_debug_context (parent, "failed to allocate new default context");
+        log_debug_context (1, parent, "failed to allocate new default context");
         return DISIR_STATUS_NO_MEMORY;
     }
-    log_debug_context (parent, "created context: %p", context);
+    log_debug_context (8, parent, "created context: %p", context);
 
     context->cx_default = dx_default_create (context);
     if (context->cx_default == NULL)
@@ -72,7 +72,7 @@ dx_default_begin (struct disir_context *parent, struct disir_context **def)
         dx_log_context (parent, "cannot allocate new default instance");
         return DISIR_STATUS_NO_MEMORY;
     }
-    log_debug_context (parent, "allocated new default instance: %p", context->cx_default);
+    log_debug_context (8, parent, "allocated new default instance: %p", context->cx_default);
 
     // Inherrit keyval's value type to the newly allocated default's value type.
     context->cx_default->de_value.dv_type = parent->cx_keyval->kv_value.dv_type;
@@ -513,13 +513,13 @@ dc_get_default (struct disir_context *context, struct semantic_version *semver,
     }
     if (output_buffer_size <= 0 || output == NULL)
     {
-        log_debug ("invoked with insufficient buffer size or buffer NULL pointer.");
+        log_debug (0, "invoked with insufficient buffer size or buffer NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_DEFAULT, DISIR_CONTEXT_KEYVAL);
     if (status != DISIR_STATUS_OK)
     {
-        log_debug_context (context, "invoked with wrong context");
+        log_debug_context (0, context, "invoked with wrong context");
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 
@@ -580,7 +580,7 @@ dc_get_default_contexts (struct disir_context *context, struct disir_collection 
     col = dc_collection_create ();
     if (col == NULL)
     {
-        log_debug ("failed to allocate sufficient meory for output collection");
+        log_debug (2, "failed to allocate sufficient meory for output collection");
         return DISIR_STATUS_NO_MEMORY;
     }
 

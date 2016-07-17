@@ -25,7 +25,7 @@ disir_update_config (struct disir_config *config,
 
     if (config == NULL || update == NULL)
     {
-        log_debug ("invoked with NULL pointer(s) (config: %p, update: %p)",
+        log_debug (0, "invoked with NULL pointer(s) (config: %p, update: %p)",
                    config, update);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -34,7 +34,7 @@ disir_update_config (struct disir_config *config,
     {
         // TODO: Check mold context is still valid.
         target = &config->cf_context_mold->cx_mold->mo_version;
-        log_debug ("using highest version from mold: %s\n",
+        log_debug (4, "using highest version from mold: %s\n",
                    dc_semantic_version_string (buffer, 512, target));
     }
 
@@ -49,7 +49,7 @@ disir_update_config (struct disir_config *config,
     if (res == 0)
     {
         // Nothing to be done - the config is already up-to-date
-        log_debug ("Config and Schema are of equal version (%s)- nothing to be done",
+        log_debug (4, "Config and Schema are of equal version (%s)- nothing to be done",
                    dc_semantic_version_string (buffer, 512, &config->cf_version));
         return DISIR_STATUS_NO_CAN_DO;
     }

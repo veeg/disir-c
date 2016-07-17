@@ -103,7 +103,7 @@ dx_element_storage_destroy (struct disir_element_storage **storage)
 
     if (storage == NULL || *storage == NULL)
     {
-        log_debug ("invoked with storage NULL pointer.");
+        log_debug (0, "invoked with storage NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -163,7 +163,7 @@ dx_element_storage_add (struct disir_element_storage *storage,
 
     if (storage == NULL || name == NULL || context == NULL)
     {
-        log_debug ("invoked with NULL pointer(s) (storage %p, name %p, context %p)",
+        log_debug (0, "invoked with NULL pointer(s) (storage %p, name %p, context %p)",
                    storage, name, context);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -294,12 +294,12 @@ dx_element_storage_get_all (struct disir_element_storage *storage,
 
     if (storage == NULL)
     {
-        log_debug ("invoked with storage NULL pointer.");
+        log_debug (0, "invoked with storage NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (collection == NULL)
     {
-        log_debug ("invoked with collection NULL pointer.");
+        log_debug (0, "invoked with collection NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 

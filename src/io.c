@@ -22,7 +22,7 @@ disir_register_input (struct disir_instance *disir, const char *type,
 
     if (type == NULL || description == NULL || plugin == NULL)
     {
-        log_debug ("invoked with NULL pointer(s). (%p %p %p)",
+        log_debug (0, "invoked with NULL pointer(s). (%p %p %p)",
                    type, description, plugin);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -82,7 +82,7 @@ disir_register_output (struct disir_instance *disir, const char *type, const cha
 
     if (type == NULL || description == NULL || plugin == NULL)
     {
-        log_debug ("invoked with NULL pointer(s). (%p %p %p)",
+        log_debug (0, "invoked with NULL pointer(s). (%p %p %p)",
                    type, description, plugin);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -162,7 +162,7 @@ disir_mold_input (struct disir_instance *instance, const char *type, const char 
 
     if (instance == NULL || type == NULL || id == NULL || mold == NULL)
     {
-        log_debug ("called with NULL pointer(s) (%p %p %p %p)", instance, type, id, mold);
+        log_debug (0, "invoked with NULL pointer(s) (%p %p %p %p)", instance, type, id, mold);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -190,7 +190,7 @@ disir_config_output (struct disir_instance *disir, const char *type, const char 
 
     if (disir == NULL || type == NULL || config == NULL || id == NULL)
     {
-        log_debug ("invoked with NULL parameters (%p %p %p %p)",
+        log_debug (0, "invoked with NULL parameters (%p %p %p %p)",
                    disir, type, id, config);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -219,7 +219,7 @@ disir_mold_output (struct disir_instance *disir, const char *type, const char *i
 
     if (disir == NULL || type == NULL || mold == NULL || id == NULL)
     {
-        log_debug ("invoked with NULL parameters (%p %p %p %p)",
+        log_debug (0, "invoked with NULL parameters (%p %p %p %p)",
                    disir, type, id, mold);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -248,7 +248,7 @@ disir_config_list (struct disir_instance *disir, const char *type,
 
     if (disir == NULL || type == NULL || collection == NULL)
     {
-        log_debug ("invoked with NULL parameters (%p %p %p)",
+        log_debug (0, "invoked with NULL parameters (%p %p %p)",
                    disir, type, collection);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -280,7 +280,7 @@ disir_input_plugin_list (struct disir_instance *disir, struct disir_collection *
 
     if (disir == NULL || collection == NULL)
     {
-        log_debug ("invoked with NULL pointers (%p %p)", disir, collection);
+        log_debug (0, "invoked with NULL pointers (%p %p)", disir, collection);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -330,7 +330,7 @@ disir_mold_finished (struct disir_mold **mold)
 
     if (mold == NULL || *mold == NULL)
     {
-        log_debug ("invoked with NULL mold pointer");
+        log_debug (0, "invoked with NULL mold pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 

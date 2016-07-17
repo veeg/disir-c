@@ -22,7 +22,7 @@ dc_config_getcontext (struct disir_config *config)
     if (config == NULL)
     {
         // LOGWARN
-        log_debug ("invoked with NULL pointer");
+        log_debug (0, "invoked with NULL pointer");
         return NULL;
     }
 
@@ -43,7 +43,7 @@ dc_config_begin (struct disir_mold *mold, struct disir_context **config)
     if (config == NULL || mold == NULL)
     {
         // LOGWARN
-        log_debug ("invoked with NULL pointer(s) (%p %p)", context, mold);
+        log_debug (0, "invoked with NULL pointer(s) (%p %p)", context, mold);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -92,7 +92,7 @@ dc_config_finalize (struct disir_context **context, struct disir_config **config
     }
     if (config == NULL)
     {
-        log_debug ("invoked with NULL config pointer.");
+        log_debug (0, "invoked with NULL config pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -194,7 +194,7 @@ dc_config_get_version (struct disir_config *config, struct semantic_version *sem
 {
     if (config == NULL || semver == NULL)
     {
-        log_debug ("invoked with NULL pointer(s)");
+        log_debug (0, "invoked with NULL pointer(s)");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 

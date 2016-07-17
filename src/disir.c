@@ -204,7 +204,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 
     if (instance == NULL)
     {
-        log_debug ("invoked with disir NULL pointer.");
+        log_debug (0, "invoked with disir NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -352,7 +352,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
 
     if (mold == NULL)
     {
-        log_debug ("invoked with mold NULL pointer");
+        log_debug (0, "invoked with mold NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -384,7 +384,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
         status = dc_get_name (parent, &name, &size);
         if (status != DISIR_STATUS_OK)
         {
-            log_debug ("failed to get name (%s). output size: %d\n",
+            log_debug (2, "failed to get name (%s). output size: %d\n",
                        disir_status_string (status), size);
             goto error;
         }
@@ -392,14 +392,14 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
         status = dc_set_name (context, name, size);
         if (status != DISIR_STATUS_OK)
         {
-            log_debug ("failed to add name: %s", disir_status_string (status));
+            log_debug (2, "failed to add name: %s", disir_status_string (status));
             goto error;
         }
 
         status = dc_get_default (parent, semver, 512, buffer, &size);
         if (status != DISIR_STATUS_OK || size >= 512)
         {
-            log_debug ("failed to get default (%s). output size: %d",
+            log_debug (2, "failed to get default (%s). output size: %d",
                        disir_status_string (status), size);
             goto error;
         }
@@ -407,7 +407,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
         status = dc_set_value_string (context, buffer, size);
         if (status != DISIR_STATUS_OK)
         {
-            log_debug ("failed to add default: %s", disir_status_string (status));
+            log_debug (2, "failed to add default: %s", disir_status_string (status));
             goto error;
         }
 
@@ -433,7 +433,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
     {
         dc_semantic_version_set (&(*config)->cf_version, &mold->mo_version);
     }
-    log_debug ("sat config version to: %s",
+    log_debug (6, "sat config version to: %s",
                dc_semantic_version_string (buffer, 32, &(*config)->cf_version));
 
     dc_collection_finished (&collection);
@@ -467,7 +467,7 @@ disir_log_user (struct disir_instance *disir, const char *message, ...)
         return;
 
     va_start (args, message);
-    dx_log_disir (DISIR_LOG_LEVEL_USER, NULL, NULL, 0, NULL, NULL, 0, NULL, message, args);
+    dx_log_disir (DISIR_LOG_LEVEL_USER, 0, NULL, NULL, 0, NULL, NULL, 0, NULL, message, args);
     va_end (args);
 }
 
@@ -481,7 +481,7 @@ disir_error_set (struct disir_instance *disir, const char *message, ...)
         return;
 
     va_start (args, message);
-    dx_log_disir (DISIR_LOG_LEVEL_ERROR, NULL, disir, 0, NULL, NULL, 0, NULL, message, args);
+    dx_log_disir (DISIR_LOG_LEVEL_ERROR, 0, NULL, disir, 0, NULL, NULL, 0, NULL, message, args);
     va_end (args);
 }
 

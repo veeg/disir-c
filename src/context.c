@@ -71,13 +71,13 @@ dc_destroy (struct disir_context **context)
     // If context is destroyed, decrement and get-out-of-town
     if ((*context)->cx_state == CONTEXT_STATE_DESTROYED)
     {
-        log_debug ("destroying destroyed-context( %p )", *context);
+        log_debug (3, "destroying destroyed-context( %p )", *context);
         dx_context_decref (context);
         *context = NULL;
         return DISIR_STATUS_OK;
     }
 
-    log_debug_context (*context, "destroying (context: %p - *context: %p", context, *context);
+    log_debug_context (6, *context, "destroying (context: %p - *context: %p", context, *context);
 
     // Call destroy on the object pointed to by context.
     // This shall destroy the element, and every single child.
@@ -146,7 +146,7 @@ dc_begin (struct disir_context *parent, enum disir_context_type context_type,
     }
     if (child == NULL)
     {
-        log_debug ("invoked with child NULL pointer");
+        log_debug (0, "invoked with child NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -358,7 +358,7 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
     }
     if (name == NULL)
     {
-        log_debug ("invoked with name NULL pointer.");
+        log_debug (0, "invoked with name NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -385,7 +385,7 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
         *name_size = value->dv_size;
     }
 
-    log_debug_context (context, "retrieved name: %s\n", *name);
+    log_debug_context (6, context, "retrieved name: %s\n", *name);
 
     TRACE_EXIT ("");
     return DISIR_STATUS_OK;
@@ -426,7 +426,7 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
     if (status != DISIR_STATUS_OK)
     {
         // Did not find the element with that name
-        log_debug ("failed to find name %s in parent mold equiv elements: %s",
+        log_debug (3, "failed to find name %s in parent mold equiv elements: %s",
                    value, disir_status_string (status));
         return status;
     }
@@ -476,7 +476,7 @@ dc_add_introduced (struct disir_context *context, struct semantic_version semver
         return status;
     }
 
-    log_debug_context (context, "adding introduced to root(%s): %s",
+    log_debug_context (6, context, "adding introduced to root(%s): %s",
                        dc_context_type_string (context->cx_root_context),
                        dc_semantic_version_string (buffer, 32, &semver));
 
@@ -553,7 +553,7 @@ dc_get_version (struct disir_context *context, struct semantic_version *semver)
 
     if (semver == NULL)
     {
-        log_debug ("invoked with semver NULL pointer.");
+        log_debug (0, "invoked with semver NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -599,7 +599,7 @@ dc_set_version (struct disir_context *context, struct semantic_version *semver)
 
     if (semver == NULL)
     {
-        log_debug ("invoked with semver NULL pointer.");
+        log_debug (0, "invoked with semver NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -651,7 +651,7 @@ dc_get_introduced (struct disir_context *context, struct semantic_version *semve
     }
     if (semver == NULL)
     {
-        log_debug ("invoked with semver NULL pointer");
+        log_debug (0, "invoked with semver NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -744,7 +744,7 @@ dc_get_elements (struct disir_context *context, struct disir_collection **collec
     }
     if (collection == NULL)
     {
-        log_debug ("invoked with NULL collection pointer.");
+        log_debug (0, "invoked with NULL collection pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -806,7 +806,7 @@ dc_find_elements (struct disir_context *context,
     }
     if (collection == NULL)
     {
-        log_debug ("invoked with NULL collection pointer.");
+        log_debug (0, "invoked with NULL collection pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 

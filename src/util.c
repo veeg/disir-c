@@ -99,7 +99,7 @@ dc_semantic_version_set (struct semantic_version *destination, struct semantic_v
         return;
     }
 
-    log_debug ("setting semver (%p) to %d.%d.%d from source (%p)",
+    log_debug (5, "setting semver (%p) to %d.%d.%d from source (%p)",
                destination,
                source->sv_major, source->sv_minor, source->sv_patch,
                source);
@@ -119,23 +119,23 @@ dc_semantic_version_convert (const char *input, struct semantic_version *semver)
 
     if (input == NULL || semver == NULL)
     {
-        log_debug ("invoked with NULL pointer(s). input: %p, semver: %p", input, semver);
+        log_debug (0, "invoked with NULL pointer(s). input: %p, semver: %p", input, semver);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    log_debug ("Converting semver input: %s", input);
+    log_debug (3, "Converting semver input: %s", input);
 
     // Get Major version
     start = input;
     parsed_integer = strtol (start, &endptr, 10);
     if (start == endptr)
     {
-        log_debug ("no int parsed");
+        log_debug (6, "no int parsed");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (*endptr != '.')
     {
-        log_debug ("missing period seperator after major");
+        log_debug (6, "missing period seperator after major");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     semver->sv_major = parsed_integer;
@@ -146,12 +146,12 @@ dc_semantic_version_convert (const char *input, struct semantic_version *semver)
     parsed_integer = strtol (start, &endptr, 10);
     if (start == endptr)
     {
-        log_debug ("no int parsed");
+        log_debug (6, "no int parsed");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (*endptr != '.')
     {
-        log_debug ("missing period seperator after minor");
+        log_debug (6, "missing period seperator after minor");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     semver->sv_minor = parsed_integer;
@@ -162,7 +162,7 @@ dc_semantic_version_convert (const char *input, struct semantic_version *semver)
     parsed_integer = strtol (start, &endptr, 10);
     if (start == endptr)
     {
-        log_debug ("no int parsed");
+        log_debug (6, "no int parsed");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     semver->sv_patch = parsed_integer;
@@ -188,7 +188,7 @@ dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
             // Set size to be output_buffer_size - 1,
             // so we can signal that the supplied buffer is insufficient.
             size = output_buffer_size - 1;
-            log_debug ("Insufficient buffer provided - decrementing output size by one");
+            log_debug (3, "Insufficient buffer provided - decrementing output size by one");
         }
 
         memcpy (output, value->dv_string, size);
@@ -255,12 +255,12 @@ dx_value_set_integer (struct disir_value *value, int64_t integer)
 {
     if (value == NULL)
     {
-        log_debug ("invoked with NULL value pointer.");
+        log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (value->dv_type != DISIR_VALUE_TYPE_INTEGER)
     {
-        log_debug ("invoked with non-integer value type %s (%d)",
+        log_debug (0, "invoked with non-integer value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
@@ -275,17 +275,17 @@ dx_value_get_integer (struct disir_value *value, int64_t *integer)
 {
     if (value == NULL)
     {
-        log_debug ("invoked with NULL value pointer.");
+        log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (integer == NULL)
     {
-        log_debug ("invoked with NULL integer pointer.");
+        log_debug (0, "invoked with NULL integer pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (value->dv_type != DISIR_VALUE_TYPE_INTEGER)
     {
-        log_debug ("invoked with non-integer value type %s (%d)",
+        log_debug (0, "invoked with non-integer value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
@@ -300,12 +300,12 @@ dx_value_set_boolean (struct disir_value *value, uint8_t boolean)
 {
     if (value == NULL)
     {
-        log_debug ("invoked with NULL value pointer.");
+        log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (value->dv_type != DISIR_VALUE_TYPE_BOOLEAN)
     {
-        log_debug ("invoked with non-boolean value type %s (%d)",
+        log_debug (0, "invoked with non-boolean value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
@@ -320,17 +320,17 @@ dx_value_get_boolean (struct disir_value *value, uint8_t *boolean)
 {
     if (value == NULL)
     {
-        log_debug ("invoked with NULL value pointer.");
+        log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (boolean == NULL)
     {
-        log_debug ("invoked with NULL boolean pointer.");
+        log_debug (0, "invoked with NULL boolean pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (value->dv_type != DISIR_VALUE_TYPE_BOOLEAN)
     {
-        log_debug ("invoked with non-boolean value type %s (%d)",
+        log_debug (0, "invoked with non-boolean value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
@@ -345,12 +345,12 @@ dx_value_set_float (struct disir_value *value, double input_double)
 {
     if (value == NULL)
     {
-        log_debug ("invoked with NULL value pointer.");
+        log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (value->dv_type != DISIR_VALUE_TYPE_FLOAT)
     {
-        log_debug ("invoked with non-float value type %s (%d)",
+        log_debug (0, "invoked with non-float value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
@@ -365,17 +365,17 @@ dx_value_get_float (struct disir_value *value, double *output_double)
 {
     if (value == NULL)
     {
-        log_debug ("invoked with NULL value pointer.");
+        log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (output_double == NULL)
     {
-        log_debug ("invoked with NULL output_double pointer.");
+        log_debug (0, "invoked with NULL output_double pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (value->dv_type != DISIR_VALUE_TYPE_FLOAT)
     {
-        log_debug ("invoked with non-float value type %s (%d)",
+        log_debug (0, "invoked with non-float value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
@@ -390,12 +390,12 @@ dx_value_set_string (struct disir_value *value, const char *input, int32_t size)
 {
     if (value == NULL)
     {
-        log_debug ("invoked with NULL value pointer.");
+        log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (value->dv_type != DISIR_VALUE_TYPE_STRING)
     {
-        log_debug ("invoked with non-string value type %s (%d)",
+        log_debug (0, "invoked with non-string value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
@@ -436,7 +436,7 @@ dx_value_set_string (struct disir_value *value, const char *input, int32_t size)
     // Terminate it with a zero terminator. Just to be safe.
     value->dv_string[size] = '\0';
 
-    log_debug ("stored string in disir_value (%p) of size (%d): %s\n",
+    log_debug (5, "stored string in disir_value (%p) of size (%d): %s\n",
                value, value->dv_size, value->dv_string);
 
     return DISIR_STATUS_OK;
@@ -448,17 +448,17 @@ dx_value_get_string (struct disir_value *value, const char **output, int32_t *si
 {
     if (value == NULL)
     {
-        log_debug ("invoked with NULL value pointer.");
+        log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (output == NULL)
     {
-        log_debug ("invoked with NULL string pointer.");
+        log_debug (0, "invoked with NULL string pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     if (value->dv_type != DISIR_VALUE_TYPE_STRING)
     {
-        log_debug ("invoked with non-string value type (%d)", value->dv_type);
+        log_debug (0, "invoked with non-string value type (%d)", value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 

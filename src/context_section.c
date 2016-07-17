@@ -25,7 +25,7 @@ dx_section_begin (struct disir_context *parent, struct disir_context **section)
 
     if (section == NULL)
     {
-        log_debug ("invoked with section NULL pointer.");
+        log_debug (0, "invoked with section NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (parent);
@@ -46,7 +46,7 @@ dx_section_begin (struct disir_context *parent, struct disir_context **section)
     context = dx_context_create (DISIR_CONTEXT_SECTION);
     if (context == NULL)
     {
-        log_debug_context (parent, "failed to allocate new section context.");
+        log_debug_context (1, parent, "failed to allocate new section context.");
         return DISIR_STATUS_NO_MEMORY;
     }
 
@@ -58,7 +58,7 @@ dx_section_begin (struct disir_context *parent, struct disir_context **section)
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    log_debug_context (parent, "allocated new section instance: %p", context->cx_section);
+    log_debug_context (8, parent, "allocated new section instance: %p", context->cx_section);
 
     dx_context_attach (parent, context);
     *section = context;
