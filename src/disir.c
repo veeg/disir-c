@@ -123,6 +123,8 @@ load_plugins_from_config (struct disir_instance *disir, struct disir_config *con
         {
             load_plugin (disir, value);
         }
+
+        dc_putcontext (&element);
     }
 
     dc_putcontext (&context);
@@ -416,6 +418,8 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
         {
             goto error;
         }
+
+        dc_putcontext (&parent);
     }
 
     status = dc_config_finalize (&config_context, config);
@@ -448,6 +452,10 @@ error:
     if (context)
     {
         dc_destroy (&context);
+    }
+    if (parent)
+    {
+        dc_putcontext (&parent);
     }
     if (collection)
     {
