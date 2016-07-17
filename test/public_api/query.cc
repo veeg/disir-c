@@ -210,12 +210,10 @@ TEST_F (QueryTest, get_section_and_keyval_contexts)
 
     status = dc_collection_next (collection, &context_keyval);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-
     ASSERT_TRUE (dc_context_type (context_keyval) == DISIR_CONTEXT_KEYVAL);
     ASSERT_TRUE (dc_value_type (context_keyval) == DISIR_VALUE_TYPE_STRING);
 
     status = dc_get_value_string (context_keyval, &out, &size);
-
     ASSERT_STREQ ("k1value", out);
 
     // cleanup collection_next
