@@ -6,16 +6,19 @@
 #include "test_helper.h"
 
 
-class DisirInstanceTest : public testing::Test
+class DisirInstanceTest : public testing::DisirTestWrapper
 {
     void SetUp()
     {
         status = DISIR_STATUS_OK;
         disir = NULL;
+
+        DisirLogTestBodyEnter ();
     }
 
     void TearDown()
     {
+        DisirLogTestBodyExit ();
     }
 
 public:

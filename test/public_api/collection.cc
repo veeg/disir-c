@@ -19,10 +19,14 @@ class CollectionTest : public testing::DisirTestWrapper
 
         status = DISIR_STATUS_OK;
         collection = dc_collection_create();
+
+        DisirLogTestBodyEnter ();
     }
 
     void TearDown()
     {
+        DisirLogTestBodyExit ();
+
         if (collection != NULL)
         {
             dc_collection_finished (&collection);

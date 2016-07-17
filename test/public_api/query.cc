@@ -32,10 +32,14 @@ class QueryTest : public testing::DisirTestTestPlugin
 
         context_mold = dc_mold_getcontext (mold);
         ASSERT_TRUE (context_mold != NULL);
+
+        DisirLogTestBodyEnter ();
     }
 
     void TearDown()
     {
+        DisirLogTestBodyExit ();
+
         if (mold)
         {
             status = disir_mold_finished (&mold);

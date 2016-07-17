@@ -24,13 +24,25 @@ testing::DisirTestWrapper::DisirLogCurrentTest (const char *prefix)
 void
 testing::DisirTestWrapper::DisirLogCurrentTestEnter ()
 {
-   DisirLogCurrentTest ("ENTERING TEST");
+   DisirLogCurrentTest ("ENTERING TEST SETUP");
 }
 
 void
 testing::DisirTestWrapper::DisirLogCurrentTestExit ()
 {
-    DisirLogCurrentTest ("EXITING TEST");
+    DisirLogCurrentTest ("EXITING TEST SETUP");
+}
+
+void
+testing::DisirTestWrapper::DisirLogTestBodyEnter ()
+{
+    DisirLogCurrentTest ("ENTERING TEST BODY");
+}
+
+void
+testing::DisirTestWrapper::DisirLogTestBodyExit ()
+{
+    DisirLogCurrentTest ("EXITING TEST BODY");
 }
 
 void

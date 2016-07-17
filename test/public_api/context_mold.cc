@@ -22,10 +22,14 @@ class ContextMoldTest : public testing::DisirTestWrapper
         status = dc_mold_begin (&context_mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (context_mold != NULL);
+
+        DisirLogTestBodyEnter ();
     }
 
     void TearDown()
     {
+        DisirLogTestBodyExit ();
+
         if (context_keyval)
         {
             status = dc_destroy (&context_keyval);
