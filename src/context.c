@@ -386,6 +386,54 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
 
 //! INTERNAL API
 enum disir_status
+dx_get_mold_equiv_type (struct disir_context *parent,
+                        const char *name, enum disir_context_type *type)
+{
+    enum disir_status status;
+    struct disir_context *queried;
+    struct disir_element_storage *storage;
+
+    if (parent == NULL || name == NULL || type == NULL)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    if (dc_context_type (parent->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    {
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    if (dc_context_type (parent) == DISIR_CONTEXT_CONFIG)
+    {
+        storage = parent->cx_config->cf_context_mold->cx_mold->mo_elements;
+    }
+    else if (dc_context_type (parent) == DISIR_CONTEXT_SECTION)
+    {
+        storage = parent->cx_section->se_mold_equiv->cx_section->se_elements;
+    }
+    else
+    {
+        dx_context_error_set (parent, "attempted to set mold_equiv on wrong context type: %s",
+                              dc_context_type_string (parent));
+        return DISIR_STATUS_WRONG_CONTEXT;;
+    }
+
+    status = dx_element_storage_get_first (storage, name, &queried);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Did not find the element with that name
+        log_debug ("failed to find name %s in parent mold equiv elements: %s",
+                   name, disir_status_string (status));
+        return DISIR_STATUS_NOT_EXIST;
+    }
+
+    *type = dc_context_type (queried);
+
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
 dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
