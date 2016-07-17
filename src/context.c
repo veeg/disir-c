@@ -276,13 +276,6 @@ dc_putcontext (struct disir_context **context)
         return status;
     }
 
-    if ((*context)->cx_state == CONTEXT_STATE_CONSTRUCTING)
-    {
-        dx_log_context (*context, "You cannot put back a context in contructing mode."
-                " You can either destroy it or finalize it.");
-        return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;
-    }
-
     dx_context_decref (context);
     *context = NULL;
     return DISIR_STATUS_OK;
