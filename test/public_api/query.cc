@@ -45,6 +45,11 @@ class QueryTest : public testing::DisirTestTestPlugin
             status = disir_mold_finished (&mold);
             EXPECT_STATUS (DISIR_STATUS_OK, status);
         }
+        if (section_mold)
+        {
+            status = disir_mold_finished (&section_mold);
+            EXPECT_STATUS (DISIR_STATUS_OK, status);
+        }
         if (context_mold)
         {
             dc_putcontext (&context_mold);
