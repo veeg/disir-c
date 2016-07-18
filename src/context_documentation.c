@@ -16,6 +16,7 @@
 #include "mold.h"
 #include "keyval.h"
 #include "documentation.h"
+#include "section.h"
 #include "mqueue.h"
 #include "log.h"
 
@@ -221,6 +222,9 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
         break;
     case DISIR_CONTEXT_MOLD:
         doc_parent = &context->cx_mold->mo_documentation_queue;
+        break;
+    case DISIR_CONTEXT_SECTION:
+        doc_parent = &context->cx_section->se_documentation_queue;
         break;
     default:
     {
