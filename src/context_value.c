@@ -29,7 +29,7 @@ get_value_input_check (struct disir_context *context, const char *type,
         return status;
     }
 
-    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_DEFAULT);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged ?
@@ -52,6 +52,10 @@ get_value_input_check (struct disir_context *context, const char *type,
         }
 
         *storage = &context->cx_keyval->kv_value;
+    }
+    else if (dc_context_type (context) == DISIR_CONTEXT_DEFAULT)
+    {
+        *storage = &context->cx_default->de_value;
     }
     else
     {
