@@ -397,6 +397,8 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
             goto error;
         }
 
+        // TODO: Should really get value based on type instead of stringify
+        // XXX: value stored in default. This buffer is also hardcoded - get rid of it.
         status = dc_get_default (parent, semver, 512, buffer, &size);
         if (status != DISIR_STATUS_OK || size >= 512)
         {
@@ -405,7 +407,8 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
             goto error;
         }
 
-        status = dc_set_value_string (context, buffer, size);
+        // XXX: Input value based on type - (see above)
+        status = dc_set_value (context, buffer, size);
         if (status != DISIR_STATUS_OK)
         {
             log_debug (2, "failed to add default: %s", disir_status_string (status));
