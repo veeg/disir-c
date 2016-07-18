@@ -195,7 +195,23 @@ dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
         output[size] = '\0';
         break;
     }
-    // TODO: Implement other DISIR_VALUE_TYPE_*
+    case DISIR_VALUE_TYPE_INTEGER:
+    {
+        snprintf (output, output_buffer_size, "%ld", value->dv_integer);
+        break;
+    }
+    case DISIR_VALUE_TYPE_FLOAT:
+    {
+        snprintf (output, output_buffer_size, "%lf", value->dv_float);
+        break;
+    }
+    case DISIR_VALUE_TYPE_BOOLEAN:
+    {
+        snprintf(output, output_buffer_size, "%s",
+                (value->dv_boolean ? "True" : "False"));
+        break;
+    }
+    case DISIR_VALUE_TYPE_ENUM:
     default:
     {
         dx_crash_and_burn ("%s: %s not handled",
