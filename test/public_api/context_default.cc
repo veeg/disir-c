@@ -246,3 +246,37 @@ TEST_F (ContextDefaultEmptyTest, add_default_generic_on_float_valid_input_shall_
     status = dc_add_default (context_keyval, "3.14", 0, NULL);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 }
+
+TEST_F (ContextDefaultTest, set_and_get_value_string)
+{
+    char val[] = "testval";
+    const char *output;
+    int32_t size;
+
+    status = dc_set_value_string (context_default, val, strlen (val));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_get_value_string (context_default, &output, &size);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    EXPECT_EQ (strlen (val), size);
+}
+
+TEST_F (ContextDefaultTest, set_value_int_on_type_string_shall_fail)
+{
+    status = dc_set_value_integer (context_default, 42);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+}
+
+TEST_F (ContextDefaultTest, set_value_boolean_on_type_string_shall_fail)
+{
+    status = dc_set_value_boolean (context_default, 1);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+}
+
+TEST_F (ContextDefaultTest, set_value_float_on_type_string_shall_fail)
+{
+    status = dc_set_value_float (context_default, 3.14);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
+}
+
+
