@@ -697,6 +697,7 @@ dc_get_introduced (struct disir_context *context, struct semantic_version *semve
     }
 
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
+                                          DISIR_CONTEXT_SECTION,
                                           DISIR_CONTEXT_DEFAULT,
                                           DISIR_CONTEXT_MOLD,
                                           DISIR_CONTEXT_CONFIG,
@@ -741,6 +742,10 @@ dc_get_introduced (struct disir_context *context, struct semantic_version *semve
         break;
     }
     case DISIR_CONTEXT_SECTION:
+    {
+        introduced = &context->cx_section->se_introduced;
+        break;
+    }
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_context_type_string (context));
