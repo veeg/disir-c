@@ -179,6 +179,26 @@ void dx_context_destroy (struct disir_context **context);
 enum disir_status dx_set_mold_equiv (struct disir_context *context,
                                      const char *value, int32_t value_size);
 
+//! \brief Identify context type of a child context matching name
+//!
+//! The input context must have root CONFIG context, where valid contexts are:
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!
+//! \param context The input context whose root is CONFIG
+//! \param name The value used to locate the mathcing child mold equivalent
+//! \param type The given context type of the queried context
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or value are NULL, if value_size is
+//!     less or equal to zero, or if the input value is not associated in the mold.
+//! \return DISIR_STATUS_NOT_EXIST if a mold equivalent does not exist
+//! \return DISIR_STATUS_WRONG_CONTEXT if either root context is not CONFIG
+//! or parent context is neither section nor config.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dx_get_mold_equiv_type (struct disir_context *parent,
+                                          const char *name, enum disir_context_type *type);
+
 //! \brief Set the input message to the error string of context
 void dx_context_error_set (struct disir_context *context, const char *fmt_message, ...);
 
