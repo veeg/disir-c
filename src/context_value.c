@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 // Public disir interface
 #include <disir/disir.h>
@@ -125,7 +126,113 @@ set_value_input_check (struct disir_context *context, const char *type,
 enum disir_status
 dc_set_value (struct disir_context *context, const char *value, int32_t value_size)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    uint8_t parsed_boolean;
+    long int parsed_integer;
+    double parsed_float;
+    char *endptr;
+    char c;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged;
+        return status;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_context_error_set (context, "Cannot set string value to %s.",
+                                       dc_context_type_string (context));
+        return status;
+    }
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    {
+        dx_context_error_set (context, "Cannot set string value to %s whose top-level is %s.",
+                                       dc_context_type_string (context),
+                                       dc_context_type_string (context->cx_root_context));
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    switch (dc_value_type (context))
+    {
+    case DISIR_VALUE_TYPE_STRING:
+    {
+        status = dc_set_value_string (context, value, value_size);
+        break;
+    }
+    case DISIR_VALUE_TYPE_BOOLEAN:
+    {
+        // Handles single character input 1/0, t/f and T/F.
+        // XXX: Falsely identifies input fLOL as false and tROFL as true.
+        c = *value;
+        parsed_boolean = 2;
+        if (c == '0')
+        {
+            parsed_boolean = 0;
+        }
+        else if (c == '1')
+        {
+            parsed_boolean = 1;
+        }
+        else if (tolower(c) == 't')
+        {
+            parsed_boolean = 1;
+        }
+        else if (tolower(c) == 'f')
+        {
+            parsed_boolean = 0;
+        }
+
+        if (parsed_boolean == 2)
+        {
+            status = DISIR_STATUS_INVALID_ARGUMENT;
+        }
+        else
+        {
+            status = dc_set_value_boolean (context, parsed_boolean);
+        }
+        break;
+    }
+    case DISIR_VALUE_TYPE_INTEGER:
+    {
+        parsed_integer = strtol (value, &endptr, 10);
+        if (value == endptr)
+        {
+            status = DISIR_STATUS_INVALID_ARGUMENT;
+        }
+        else
+        {
+            status = dc_set_value_integer (context, parsed_integer);
+        }
+        break;
+    }
+    case DISIR_VALUE_TYPE_FLOAT:
+    {
+        parsed_float = strtod (value, &endptr);
+        if (value == endptr)
+        {
+            status = DISIR_STATUS_INVALID_ARGUMENT;
+        }
+        else
+        {
+            status = dc_set_value_float (context, parsed_float);
+        }
+        break;
+    }
+    case DISIR_VALUE_TYPE_ENUM:
+    {
+        dx_crash_and_burn ("dc_set_value ENUM NOT HANDLED!");
+    }
+    case DISIR_VALUE_TYPE_UNKNOWN:
+    {
+        log_fatal_context (context, "value type unknown.");
+        status = DISIR_STATUS_INTERNAL_ERROR;
+    }
+    }
+
+    return status;
 }
 
 //! PUBLIC API

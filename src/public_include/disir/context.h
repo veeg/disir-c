@@ -433,9 +433,16 @@ enum disir_status dc_get_default_contexts (struct disir_context *context,
 
 //! \brief Set a value to the context. Type is extracted from string where applicable
 //!
-//! TODO: implement me
+//! Parses the input string and extract the type specific value from it.
+//! Boolean will only take the fist character in input value buffer into consideration.
+//! Boolean false values accepted: '0', 'f', 'F'
+//! Boolean true values accepted:  '1', 't', 'T'
 //!
-//! \return DISIR_STATUS_INTERNAL_ERROR - Not Implemeneted
+//! Only applicable to DISIR_CONTEXT_KEYVAL whose top-level is CONFIG.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input value cannot be properly extracted.
+//! \return DISIR_STATUS_WRONG_CONTEXT if context is of unsupported type.
+//! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_set_value (struct disir_context *context,
                                 const char *value, int32_t value_size);
