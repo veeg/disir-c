@@ -545,6 +545,8 @@ dc_add_introduced (struct disir_context *context, struct semantic_version semver
         break;
     }
     case DISIR_CONTEXT_SECTION:
+        introduced = &context->cx_section->se_introduced;
+        break;
     case DISIR_CONTEXT_RESTRICTION:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_context_type_string (context));
