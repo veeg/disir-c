@@ -507,6 +507,7 @@ dc_add_introduced (struct disir_context *context, struct semantic_version semver
     }
 
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
+                                          DISIR_CONTEXT_SECTION,
                                           DISIR_CONTEXT_DEFAULT,
                                           DISIR_CONTEXT_DOCUMENTATION);
     if (status != DISIR_STATUS_OK)
@@ -516,16 +517,20 @@ dc_add_introduced (struct disir_context *context, struct semantic_version semver
                               dc_context_type_string (context));
         return status;
     }
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
+    {
+        dx_context_error_set (context, "Cannot add introduced to %s whose top-level is %s.",
+                                       dc_context_type_string (context),
+                                       dc_context_type_string (context->cx_root_context));
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
 
     log_debug_context (6, context, "adding introduced to root(%s): %s",
                        dc_context_type_string (context->cx_root_context),
                        dc_semantic_version_string (buffer, 32, &semver));
 
     // Update mold with highest version if root context is DISIR_CONTEXT_MOLD
-    if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
-    {
-        dx_mold_update_version (context->cx_root_context->cx_mold, &semver);
-    }
+    dx_mold_update_version (context->cx_root_context->cx_mold, &semver);
 
     switch (dc_context_type (context))
     {
@@ -711,7 +716,13 @@ dc_get_introduced (struct disir_context *context, struct semantic_version *semve
                               dc_context_type_string (context));
         return status;
     }
-
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
+    {
+        dx_context_error_set (context, "Cannot get introduced from %s whose top-level is %s.",
+                                        dc_context_type_string (context),
+                                        dc_context_type_string (context->cx_root_context));
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
 
     introduced = NULL;
     status = DISIR_STATUS_OK;
