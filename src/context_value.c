@@ -283,7 +283,8 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
     status = CONTEXT_TYPE_CHECK (context,
                                  DISIR_CONTEXT_KEYVAL,
                                  DISIR_CONTEXT_DOCUMENTATION,
-                                 DISIR_CONTEXT_FREE_TEXT);
+                                 DISIR_CONTEXT_FREE_TEXT,
+                                 DISIR_CONTEXT_DEFAULT);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged ?
@@ -333,6 +334,9 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
         status = dx_value_get_string (context->cx_value, output, size);
         break;
     }
+    case DISIR_CONTEXT_DEFAULT:
+        status = dx_value_get_string (&context->cx_default->de_value, output, size);
+        break;
     default:
     {
         log_fatal_context (context, "slipped through guard - unsupported.");
