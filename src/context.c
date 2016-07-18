@@ -422,7 +422,7 @@ dx_get_mold_equiv_type (struct disir_context *parent,
     if (status != DISIR_STATUS_OK)
     {
         // Did not find the element with that name
-        log_debug ("failed to find name %s in parent mold equiv elements: %s",
+        log_debug (3, "failed to find name %s in parent mold equiv elements: %s",
                    name, disir_status_string (status));
         return DISIR_STATUS_NOT_EXIST;
     }
