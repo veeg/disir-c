@@ -131,10 +131,27 @@ TEST_F (MoldSectionTest, begin_config_shall_fail)
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
 }
 
-
 TEST_F (MoldSectionTest, add_keyval)
 {
     status = dc_add_keyval_string (context_section, "test_key", "test val", "doc st", NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
+TEST_F (MoldSectionTest, introduced)
+{
+    struct semantic_version input;
+    struct semantic_version output;
+
+    input.sv_patch = 1;
+    input.sv_minor = 1;
+    input.sv_major = 1;
+
+    status = dc_add_introduced (context_section, input);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_get_introduced (context_section, &output);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ASSERT_EQ (0, dc_semantic_version_compare (&input, &output));
 }
 

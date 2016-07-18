@@ -71,3 +71,28 @@ TEST_F (ConfigSectionTest, set_name_doesnt_exist_shall_fail)
 
 }
 
+TEST_F (ConfigSectionTest, add_introduced_shall_fail)
+{
+    struct semantic_version input;
+
+    input.sv_major = 1;
+    input.sv_minor = 1;
+    input.sv_patch = 2;
+
+    status = dc_add_introduced (context_section, input);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+
+    ASSERT_STREQ ("Cannot add introduced to SECTION whose top-level is CONFIG.",
+                  dc_context_error (context_section));
+}
+
+TEST_F (ConfigSectionTest, get_introduced_shall_fail)
+{
+    struct semantic_version semver;
+
+    status = dc_get_introduced (context_section, &semver);
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+
+    ASSERT_STREQ ("Cannot get introduced from SECTION whose top-level is CONFIG.",
+                  dc_context_error (context_section));
+}
