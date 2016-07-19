@@ -510,6 +510,8 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
         // Did not find the element with that name
         log_debug (3, "failed to find name %s in parent mold equiv elements: %s",
                    value, disir_status_string (status));
+        dx_context_error_set (context, "%s missing mold equivalent entry for name '%s'.",
+                                        dc_context_type_string (context), value);
         return status;
     }
 
