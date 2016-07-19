@@ -150,6 +150,13 @@ enum disir_status dc_finalize (struct disir_context **context);
 //!
 enum disir_status dc_putcontext (struct disir_context **context);
 
+//! \brief Query the context whether or not it is valid
+//!
+//! \return DISIR_STATUS_OK if valid
+//! \return DISIR_STATUS_INVALID_CONTEXT if invalid
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input is NULL
+//!
+enum disir_status dc_context_valid (struct disir_context *context);
 
 //
 // Documentation context API

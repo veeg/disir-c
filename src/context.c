@@ -283,16 +283,35 @@ dc_putcontext (struct disir_context **context)
 
 //! PUBLIC API
 enum disir_status
-dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
+dc_context_valid (struct disir_context *context)
 {
     enum disir_status status;
+
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
         return status;
     }
-    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_SECTION);
+
+    status = DISIR_STATUS_OK;
+    if (context->cx_state == CONTEXT_STATE_INVALID)
+    {
+        status = DISIR_STATUS_INVALID_CONTEXT;
+    }
+
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
+{
+    enum disir_status status;
+
+    TRACE_ENTER ("context (%p), name (%s), name_size (%d)", context, name, name_size);
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
