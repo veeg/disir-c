@@ -323,17 +323,11 @@ dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
         // Already logged
         return status;
     }
-
-    if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_SECTION);
+    if (status != DISIR_STATUS_OK)
     {
-        // Find the name in the mold
-        // TODO: Should be sufficient to query the mold equiv of parent
-        // That will solve querying sections aswell
-        status = dx_set_mold_equiv (context, name, name_size);
-        if (status != DISIR_STATUS_OK)
-        {
-            return status;
-        }
+        // Already logged
+        return status;
     }
 
     if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
@@ -350,6 +344,28 @@ dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
         return DISIR_STATUS_INTERNAL_ERROR;
     }
 
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    // Find the name in the mold
+    if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+    {
+        // If NOT EXIST, let it through and set name but mark context as invalid
+        status = dx_set_mold_equiv (context, name, name_size);
+        if (status == DISIR_STATUS_NOT_EXIST)
+        {
+            context->cx_state = CONTEXT_STATE_INVALID;
+            return status;
+        }
+    }
+
+    // TODO:  if context is not in constructing mode (it has been finalized once)
+    // remove old name from parent storage and add it under the new name.
+
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
 }
 
