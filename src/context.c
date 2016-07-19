@@ -256,6 +256,12 @@ dc_finalize (struct disir_context **context)
         (*context)->cx_state = CONTEXT_STATE_ACTIVE;
         *context = NULL;
     }
+    else if (status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+        (*context)->cx_state = CONTEXT_STATE_INVALID;
+        // Let caller handle the context since it is still invalid.
+        dx_context_incref (*context);
+    }
 
     TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
