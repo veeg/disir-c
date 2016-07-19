@@ -74,7 +74,11 @@ enum disir_status
 dx_keyval_finalize (struct disir_context *keyval)
 {
     enum disir_status status;
+    enum disir_status invalid;
     struct disir_element_storage *storage;
+
+    invalid = (keyval->cx_state == CONTEXT_STATE_INVALID ? DISIR_STATUS_INVALID_CONTEXT
+                                                         : DISIR_STATUS_OK);
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (keyval);
     if (status != DISIR_STATUS_OK)
@@ -109,22 +113,29 @@ dx_keyval_finalize (struct disir_context *keyval)
     }
 
     // Cannot add keyval without a name
+    // Cannot even add it to to storage (NO NAME!
     if (keyval->cx_keyval->kv_name.dv_string == NULL)
     {
         dx_context_error_set (keyval, "Missing name component for keyval.");
+        // XXX: Find a new return code - INVALID_CONTEXT reveres to contexts that
+        // are not valid but can be added to parent - without a name this cannot.
+        // XXX: Or can it? Add it to element storage with NULL name should still
+        // add it to sequential list - just not the hashmap. Hmm..
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     // Cannot add without known type.
-    if (dx_value_type_sanify(keyval->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN)
+    if (dx_value_type_sanify(keyval->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN &&
+        invalid == DISIR_STATUS_OK)
     {
         dx_context_error_set (keyval, "Missing type component for keyval.");
-        return DISIR_STATUS_INVALID_CONTEXT;
+        invalid = DISIR_STATUS_INVALID_CONTEXT;
     }
 
-
     // Additional restrictions apply for keyvals added to a root mold
-    if (dc_context_type (keyval->cx_root_context) == DISIR_CONTEXT_MOLD)
+    // Only check if we are not already in erroneous state
+    if (dc_context_type (keyval->cx_root_context) == DISIR_CONTEXT_MOLD &&
+        invalid == DISIR_STATUS_OK)
     {
         // Cannot add without atleast one default entry.
         if (keyval->cx_keyval->kv_default_queue == NULL)
@@ -143,10 +154,9 @@ dx_keyval_finalize (struct disir_context *keyval)
     if (status != DISIR_STATUS_OK)
     {
         dx_log_context(keyval, "Unable to insert into element storage - Interesting...");
-        return status;
     }
 
-    return DISIR_STATUS_OK;
+    return (status == DISIR_STATUS_OK ? invalid : status);
 }
 
 static enum disir_status
@@ -170,8 +180,9 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         goto error;
     }
 
+    // Let DISIR_STATUS_NOT_FOUND through - mold equiv not set. context invalid.
     status = dc_set_name (keyval, name, strlen (name));
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_NOT_EXIST)
     {
         // Already logged
         goto error;
@@ -270,7 +281,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
     }
 
     status = dc_finalize (&keyval);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
         goto error;
