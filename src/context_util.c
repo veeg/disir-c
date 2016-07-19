@@ -534,6 +534,8 @@ dc_set_value_type (struct disir_context *context, enum disir_value_type type)
 {
     enum disir_status status;
 
+    TRACE_ENTER ("context (%p) type (%s)", context, dx_value_type_string (type));
+
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
@@ -574,6 +576,7 @@ dc_set_value_type (struct disir_context *context, enum disir_value_type type)
         log_debug_context (6, context, "sat value type to %s", dx_value_type_string (type));
     }
 
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
 }
 
