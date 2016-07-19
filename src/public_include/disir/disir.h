@@ -217,6 +217,20 @@ enum disir_status
 disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
                                    struct disir_config **config);
 
+//! \brief Validate the config, checking for any contexts that are invalid.
+//!
+//! \param[in] config Input config to validate
+//! \param[out] collection Populated collection of invalid contexts, if any.
+//!                        This parameter is optional. If NULL, no collection is returned.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if config is NULL.
+//! \return DISIR_STATUS_INVALID_CONTEXT if config contains invalid contexts. Collection is
+//!         (optionally) populated.
+//!
+enum disir_status
+disir_config_valid (struct disir_config *config, struct disir_collection **collection);
+
 //! \brief Update the config 0bject to a new target version
 //!
 //! Update a config to a new semver version. The update state and progress is
