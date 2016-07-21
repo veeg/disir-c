@@ -13,11 +13,16 @@ extern "C" {
 
 
 // Test mold API with empty mold.
-class ContextDefaultTest : public testing::DisirTestWrapper
+class ContextDocumentationTest : public testing::DisirTestWrapper
 {
     void SetUp()
     {
         DisirLogCurrentTestEnter();
+
+        context_section = NULL;
+        context_keyval = NULL;
+        context_mold = NULL;
+        context_documentation = NULL;
 
         status = dc_mold_begin (&context_mold);
         ASSERT_STATUS (status, DISIR_STATUS_OK);
@@ -25,8 +30,8 @@ class ContextDefaultTest : public testing::DisirTestWrapper
         status = dc_begin (context_mold, DISIR_CONTEXT_KEYVAL, &context_keyval);
         ASSERT_STATUS (status, DISIR_STATUS_OK);
 
-        status = dc_begin (context_keyval, DISIR_CONTEXT_DEFAULT, &context_default);
-        ASSERT_STATUS (status, DISIR_STATUS_OK);
+        status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 
     void TearDown()
@@ -43,6 +48,14 @@ class ContextDefaultTest : public testing::DisirTestWrapper
         {
             dc_destroy (&context_mold);
         }
+        if (context_documentation)
+        {
+            dc_destroy (&context_documentation);
+        }
+        if (context_section)
+        {
+            dc_destroy (&context_section);
+        }
 
         DisirLogCurrentTestExit ();
     }
@@ -54,7 +67,24 @@ public:
     struct disir_context *context_default;
     struct disir_context *context_mold;
     struct disir_context *context_keyval;
+    struct disir_context *context_section;
+    struct disir_context *context_documentation;
     struct disir_default *def;
 };
 
+TEST_F (ContextDocumentationTest, section_documentation)
+{
+    const char doc[] = "documentation string";
+
+    status = dc_begin (context_section, DISIR_CONTEXT_DOCUMENTATION, &context_documentation);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_set_value_string (context_documentation, doc, strlen (doc));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_finalize (&context_documentation);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ASSERT_EQ (1, dx_documentation_numentries (context_section));
+}
 
