@@ -50,8 +50,7 @@ dx_documentation_add (struct disir_context *parent, struct disir_documentation *
     }
     case DISIR_CONTEXT_SECTION:
     {
-        dx_crash_and_burn ("%s: %s unhandled not implemented",
-                           __FUNCTION__, dc_context_type_string (parent));
+        doc_queue = &(parent->cx_section->se_documentation_queue);
         break;
     }
     case DISIR_CONTEXT_CONFIG:
@@ -115,8 +114,7 @@ dx_documentation_numentries (struct disir_context *context)
     }
     case DISIR_CONTEXT_SECTION:
     {
-        dx_crash_and_burn ("%s: %s unhandled not implemented",
-                           __FUNCTION__, dc_context_type_string (context));
+        queue = context->cx_section->se_documentation_queue;
         break;
     }
     case DISIR_CONTEXT_CONFIG:
@@ -409,8 +407,7 @@ dx_documentation_destroy (struct disir_documentation **documentation)
         }
         case DISIR_CONTEXT_SECTION:
         {
-            dx_crash_and_burn ("%s: %s unhandled not implemented",
-                           __FUNCTION__, dc_context_type_string (context));
+            queue = &(context->cx_section->se_documentation_queue);
             break;
         }
         case DISIR_CONTEXT_CONFIG:
