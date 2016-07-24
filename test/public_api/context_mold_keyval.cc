@@ -196,7 +196,7 @@ TEST_F (MoldKeyvalTest, set_value_string_shall_fail)
     status = dc_set_value_string (context_keyval, testval, strlen (testval));
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
 
-    ASSERT_STREQ ("cannot set string value on KEYVAL whose top-level is MOLD",
+    ASSERT_STREQ ("cannot set STRING value on KEYVAL whose top-level is MOLD",
                   dc_context_error (context_keyval));
 }
 
@@ -205,7 +205,7 @@ TEST_F (MoldKeyvalTest, set_value_integer_shall_fail)
     status = dc_set_value_integer (context_keyval, 132);
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
 
-    ASSERT_STREQ ("cannot set integer value on KEYVAL whose top-level is MOLD",
+    ASSERT_STREQ ("cannot set INTEGER value on KEYVAL whose top-level is MOLD",
                   dc_context_error (context_keyval));
 }
 
@@ -214,7 +214,7 @@ TEST_F (MoldKeyvalTest, set_value_float_shall_fail)
     status = dc_set_value_float (context_keyval, 9823.41);
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
 
-    ASSERT_STREQ ("cannot set float value on KEYVAL whose top-level is MOLD",
+    ASSERT_STREQ ("cannot set FLOAT value on KEYVAL whose top-level is MOLD",
                   dc_context_error (context_keyval));
 }
 
@@ -223,7 +223,7 @@ TEST_F (MoldKeyvalTest, set_value_boolean_shall_fail)
     status = dc_set_value_boolean (context_keyval, 1);
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
 
-    ASSERT_STREQ ("cannot set boolean value on KEYVAL whose top-level is MOLD",
+    ASSERT_STREQ ("cannot set BOOLEAN value on KEYVAL whose top-level is MOLD",
                   dc_context_error (context_keyval));
 }
 
@@ -240,7 +240,7 @@ TEST_F (MoldKeyvalStringTest, add_integer_default_shall_fail)
     status = dc_add_default_integer (context_keyval, 52, NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set integer value on context whose value type is STRING",
+    ASSERT_STREQ ("cannot set INTEGER value on context whose value type is STRING.",
                   dc_context_error (context_keyval));
 }
 
@@ -249,7 +249,7 @@ TEST_F (MoldKeyvalStringTest, add_float_default_shall_fail)
     status = dc_add_default_float (context_keyval, 42.61, NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set float value on context whose value type is STRING",
+    ASSERT_STREQ ("cannot set FLOAT value on context whose value type is STRING.",
                   dc_context_error (context_keyval));
 }
 
@@ -258,7 +258,7 @@ TEST_F (MoldKeyvalStringTest, add_boolean_default_shall_fail)
     status = dc_add_default_boolean (context_keyval, 0, NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set boolean value on context whose value type is STRING",
+    ASSERT_STREQ ("cannot set BOOLEAN value on context whose value type is STRING.",
                   dc_context_error (context_keyval));
 }
 
@@ -275,7 +275,7 @@ TEST_F (MoldKeyvalIntegerTest, add_string_default_shall_fail)
     status = dc_add_default_string (context_keyval, testval, strlen (testval), NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set string value on context whose value type is INTEGER",
+    ASSERT_STREQ ("cannot set STRING value on context whose value type is INTEGER.",
                   dc_context_error (context_keyval));
 }
 
@@ -284,7 +284,7 @@ TEST_F (MoldKeyvalIntegerTest, add_boolean_default_shall_fail)
     status = dc_add_default_boolean (context_keyval, 1, NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set boolean value on context whose value type is INTEGER",
+    ASSERT_STREQ ("cannot set BOOLEAN value on context whose value type is INTEGER.",
                   dc_context_error (context_keyval));
 }
 
@@ -293,7 +293,7 @@ TEST_F (MoldKeyvalIntegerTest, add_float_default_shall_fail)
     status = dc_add_default_float (context_keyval, 13.2, NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set float value on context whose value type is INTEGER",
+    ASSERT_STREQ ("cannot set FLOAT value on context whose value type is INTEGER.",
                   dc_context_error (context_keyval));
 }
 
@@ -308,7 +308,7 @@ TEST_F (MoldKeyvalBooleanTest, add_integer_default_shall_fail)
     status = dc_add_default_integer (context_keyval, 42, NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set integer value on context whose value type is BOOLEAN",
+    ASSERT_STREQ ("cannot set INTEGER value on context whose value type is BOOLEAN.",
                   dc_context_error (context_keyval));
 }
 
@@ -319,7 +319,7 @@ TEST_F (MoldKeyvalBooleanTest, add_string_default_shall_fail)
     status = dc_add_default_string (context_keyval, testval, strlen (testval), NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set string value on context whose value type is BOOLEAN",
+    ASSERT_STREQ ("cannot set STRING value on context whose value type is BOOLEAN.",
                   dc_context_error (context_keyval));
 }
 
@@ -328,7 +328,7 @@ TEST_F (MoldKeyvalBooleanTest, add_float_default_shall_fail)
     status = dc_add_default_float (context_keyval, 42.15, NULL);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 
-    ASSERT_STREQ ("cannot set float value on context whose value type is BOOLEAN",
+    ASSERT_STREQ ("cannot set FLOAT value on context whose value type is BOOLEAN.",
                   dc_context_error (context_keyval));
 }
 

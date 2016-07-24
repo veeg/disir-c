@@ -171,8 +171,8 @@ TEST_F (ConfigKeyvalIntegerTest, get_value_integer_shall_succeed)
 TEST_F (ConfigKeyvalIntegerTest, set_value_string_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "mys", strlen ("mys"));
-    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
-    ASSERT_STREQ ("cannot set string value on context whose value type is INTEGER",
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STREQ ("Assigned value type STRING, expecting INTEGER",
                   dc_context_error (context_keyval));
 }
 
@@ -205,8 +205,8 @@ TEST_F (ConfigKeyvalStringTest, get_value_string_shall_succeed)
 TEST_F (ConfigKeyvalStringTest, set_value_integer_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 74);
-    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
-    ASSERT_STREQ ("cannot set integer value on context whose value type is STRING",
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STREQ ("Assigned value type INTEGER, expecting STRING",
                   dc_context_error (context_keyval));
 }
 
@@ -236,8 +236,8 @@ TEST_F (ConfigKeyvalFloatTest, get_value_float_shall_succeed)
 TEST_F (ConfigKeyvalFloatTest, set_value_string_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "hooray", strlen ("hooray"));
-    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
-    ASSERT_STREQ ("cannot set string value on context whose value type is FLOAT",
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STREQ ("Assigned value type STRING, expecting FLOAT",
                   dc_context_error (context_keyval));
 }
 
@@ -255,8 +255,8 @@ TEST_F (ConfigKeyvalFloatTest, get_value_string_shall_fail)
 TEST_F (ConfigKeyvalFloatTest, set_value_integer_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 74);
-    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
-    ASSERT_STREQ ("cannot set integer value on context whose value type is FLOAT",
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STREQ ("Assigned value type INTEGER, expecting FLOAT",
                   dc_context_error (context_keyval));
 }
 
@@ -289,8 +289,8 @@ TEST_F (ConfigKeyvalBooleanTest, get_value_boolean_shall_succeed)
 TEST_F (ConfigKeyvalBooleanTest, set_value_string_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "hooray", strlen ("hooray"));
-    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
-    ASSERT_STREQ ("cannot set string value on context whose value type is BOOLEAN",
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STREQ ("Assigned value type STRING, expecting BOOLEAN",
                   dc_context_error (context_keyval));
 }
 
@@ -308,8 +308,8 @@ TEST_F (ConfigKeyvalBooleanTest, get_value_string_shall_fail)
 TEST_F (ConfigKeyvalBooleanTest, set_value_integer_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 74);
-    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
-    ASSERT_STREQ ("cannot set integer value on context whose value type is BOOLEAN",
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STREQ ("Assigned value type INTEGER, expecting BOOLEAN",
                   dc_context_error (context_keyval));
 }
 
@@ -325,8 +325,8 @@ TEST_F (ConfigKeyvalBooleanTest, get_value_integer_shall_fail)
 TEST_F (ConfigKeyvalBooleanTest, set_value_float_shall_fail)
 {
     status = dc_set_value_float (context_keyval, 42.123);
-    ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
-    ASSERT_STREQ ("cannot set float value on context whose value type is BOOLEAN",
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STREQ ("Assigned value type FLOAT, expecting BOOLEAN",
                   dc_context_error (context_keyval));
 }
 
