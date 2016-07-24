@@ -33,11 +33,6 @@ struct disir_documentation *dx_documentation_create (struct disir_context *paren
 //! memory and unhooking from linked list storage.
 enum disir_status dx_documentation_destroy (struct disir_documentation **documentation);
 
-//! Allocate and populate the documentation string entry
-enum disir_status dx_documentation_add_value_string (struct disir_documentation *doc,
-                                                     const char *value,
-                                                     int32_t value_size);
-
 //! Return the number of documentation contexts associated with the passed context.
 //! \return -1 if invalid context
 int32_t dx_documentation_numentries (struct disir_context *context);

@@ -346,17 +346,6 @@ dx_documentation_finalize (struct disir_context *doc)
 }
 
 //! INTERNAL API
-enum disir_status
-dx_documentation_add_value_string (struct disir_documentation *doc,
-                                   const char *value,
-                                   int32_t value_size)
-{
-    log_debug (6, "setting documentation (%p) with value (%p) of size (%d)",
-               doc, value, value_size);
-    return dx_value_set_string (&doc->dd_value, value, value_size);
-}
-
-//! INTERNAL API
 struct disir_documentation *
 dx_documentation_create (struct disir_context *context)
 {
