@@ -251,9 +251,8 @@ dx_value_copy (struct disir_value *destination, struct disir_value *source)
         return dx_value_set_float (destination, source->dv_float);
         break;
     case DISIR_VALUE_TYPE_BOOLEAN:
-        //! TODO: Implement boolean type for value_copy
-        //return dx_value_set_boolean (destination, source->dv_boolean);
-        //break;
+        return dx_value_set_boolean (destination, source->dv_boolean);
+        break;
     case DISIR_VALUE_TYPE_ENUM:
         //! TODO: Implement enum type for value_copy
     case DISIR_VALUE_TYPE_UNKNOWN:
