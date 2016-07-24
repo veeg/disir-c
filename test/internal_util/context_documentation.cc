@@ -19,11 +19,6 @@ class ContextDocumentationTest : public testing::DisirTestWrapper
     {
         DisirLogCurrentTestEnter();
 
-        context_section = NULL;
-        context_keyval = NULL;
-        context_mold = NULL;
-        context_documentation = NULL;
-
         status = dc_mold_begin (&context_mold);
         ASSERT_STATUS (status, DISIR_STATUS_OK);
 
@@ -62,14 +57,14 @@ class ContextDocumentationTest : public testing::DisirTestWrapper
 
 public:
     enum disir_status status;
-    struct disir_context *context;
-    struct disir_context *invalid;
-    struct disir_context *context_default;
-    struct disir_context *context_mold;
-    struct disir_context *context_keyval;
-    struct disir_context *context_section;
-    struct disir_context *context_documentation;
-    struct disir_default *def;
+    struct disir_context *context = NULL;
+    struct disir_context *invalid = NULL;
+    struct disir_context *context_default = NULL;
+    struct disir_context *context_mold = NULL;
+    struct disir_context *context_keyval = NULL;
+    struct disir_context *context_section = NULL;
+    struct disir_context *context_documentation = NULL;
+    struct disir_default *def = NULL;
 };
 
 TEST_F (ContextDocumentationTest, section_documentation)

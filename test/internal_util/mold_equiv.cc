@@ -15,10 +15,10 @@ class MoldEquivTest : public testing::DisirTestTestPlugin
     void SetUp()
     {
         DisirTestTestPlugin::SetUp ();
+
         status = disir_mold_input (instance, "test", "basic_section", &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (mold != NULL);
-
     }
 
     void TearDown()
@@ -43,10 +43,10 @@ class MoldEquivTest : public testing::DisirTestTestPlugin
     }
 public:
     enum disir_status status;
-    struct disir_mold *mold;
-    struct disir_context *context_mold;
-    struct disir_context *context_config;
-    struct disir_context *context_section;
+    struct disir_mold *mold = NULL;
+    struct disir_context *context_mold = NULL;
+    struct disir_context *context_config = NULL;
+    struct disir_context *context_section = NULL;
 };
 
 TEST_F (MoldEquivTest, test_get_correct_mold_equiv_type)

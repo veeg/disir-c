@@ -37,8 +37,8 @@ protected:
     }
 
 public:
-    enum disir_status status;
-    enum disir_value_type type;
+    enum disir_status status    = DISIR_STATUS_OK;;
+    enum disir_value_type type  = DISIR_VALUE_TYPE_UNKNOWN;
     struct disir_value value;
 };
 
