@@ -69,7 +69,7 @@ dc_destroy (struct disir_context **context)
     }
 
     // If context is destroyed, decrement and get-out-of-town
-    if ((*context)->cx_state == CONTEXT_STATE_DESTROYED)
+    if ((*context)->CONTEXT_STATE_DESTROYED)
     {
         log_debug (3, "destroying destroyed-context( %p )", *context);
         dx_context_decref (context);
@@ -112,7 +112,7 @@ dc_destroy (struct disir_context **context)
     }
 
     // Set the context to destroyed
-    (*context)->cx_state = CONTEXT_STATE_DESTROYED;
+    (*context)->CONTEXT_STATE_DESTROYED = 1;
 
     // Decref the parent ref count attained in dx_context_attach
     // Guard against decrefing ourselves (top-level contexts)
@@ -253,12 +253,13 @@ dc_finalize (struct disir_context **context)
     // Mark the context as active and deprive the user of his reference.
     if (status == DISIR_STATUS_OK)
     {
-        (*context)->cx_state = CONTEXT_STATE_ACTIVE;
+        (*context)->CONTEXT_STATE_FINALIZED = 1;
+        (*context)->CONTEXT_STATE_CONSTRUCTING = 0;
         *context = NULL;
     }
     else if (status == DISIR_STATUS_INVALID_CONTEXT)
     {
-        (*context)->cx_state = CONTEXT_STATE_INVALID;
+        (*context)->CONTEXT_STATE_INVALID = 1;
         // Let caller handle the context since it is still invalid.
         dx_context_incref (*context);
     }
@@ -301,7 +302,7 @@ dc_context_valid (struct disir_context *context)
     }
 
     status = DISIR_STATUS_OK;
-    if (context->cx_state == CONTEXT_STATE_INVALID)
+    if (context->CONTEXT_STATE_INVALID)
     {
         status = DISIR_STATUS_INVALID_CONTEXT;
     }
@@ -357,7 +358,7 @@ dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
         status = dx_set_mold_equiv (context, name, name_size);
         if (status == DISIR_STATUS_NOT_EXIST)
         {
-            context->cx_state = CONTEXT_STATE_INVALID;
+            context->CONTEXT_STATE_INVALID = 1;
             return status;
         }
     }

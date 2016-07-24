@@ -93,7 +93,7 @@ dc_mold_finalize (struct disir_context **context, struct disir_mold **mold)
     // TODO: Perform some validation?
 
     *mold = (*context)->cx_mold;
-    (*context)->cx_state = CONTEXT_STATE_ACTIVE;
+    (*context)->CONTEXT_STATE_FINALIZED = 1;
     *context = NULL;
     // We do not decref context refcount on finalize
 

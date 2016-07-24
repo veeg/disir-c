@@ -77,8 +77,8 @@ dx_keyval_finalize (struct disir_context *keyval)
     enum disir_status invalid;
     struct disir_element_storage *storage;
 
-    invalid = (keyval->cx_state == CONTEXT_STATE_INVALID ? DISIR_STATUS_INVALID_CONTEXT
-                                                         : DISIR_STATUS_OK);
+    invalid = (keyval->CONTEXT_STATE_INVALID ? DISIR_STATUS_INVALID_CONTEXT
+                                             : DISIR_STATUS_OK);
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (keyval);
     if (status != DISIR_STATUS_OK)

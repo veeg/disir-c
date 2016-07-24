@@ -108,7 +108,7 @@ dx_collection_coalesce(struct disir_collection *collection)
         context = collection->cc_collection[index];
         index++;
 
-        if (context == NULL || context->cx_state == CONTEXT_STATE_DESTROYED)
+        if (context == NULL || context->CONTEXT_STATE_DESTROYED)
         {
             if (context != NULL)
             {
@@ -123,7 +123,7 @@ dx_collection_coalesce(struct disir_collection *collection)
             // Find next non-valid entry in the collection, move it here.
             while (probe < collection->cc_numentries)
             {
-                if (collection->cc_collection[probe]->cx_state != CONTEXT_STATE_DESTROYED)
+                if (collection->cc_collection[probe]->CONTEXT_STATE_DESTROYED == 0)
                 {
                     context = collection->cc_collection[probe];
                     collection->cc_collection[probe] = NULL;

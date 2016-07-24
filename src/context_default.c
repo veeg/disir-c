@@ -166,7 +166,7 @@ dx_default_destroy (struct disir_default **def)
     if (context && context->cx_parent_context)
     {
         // Don't access parent context type if context is destoyed
-        if (context->cx_parent_context->cx_state != CONTEXT_STATE_DESTROYED)
+        if (context->cx_parent_context->CONTEXT_STATE_DESTROYED != 0)
         {
             switch (dc_context_type (context->cx_parent_context))
             {

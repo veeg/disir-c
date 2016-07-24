@@ -106,7 +106,7 @@ dc_config_finalize (struct disir_context **context, struct disir_config **config
     // TODO: Perform some validation?
 
     *config = (*context)->cx_config;
-    (*context)->cx_state = CONTEXT_STATE_ACTIVE;
+    (*context)->CONTEXT_STATE_FINALIZED = 1;
     *context = NULL;
     // We do not decref context refcount on finalize
 

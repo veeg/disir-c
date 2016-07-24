@@ -20,15 +20,6 @@ enum disir_context_capabilities
     CC_DEPRECRATED                      = 1ull << 7,
 };
 
-//! Enumeration of the different states a disir context may be in.
-enum context_state
-{
-    CONTEXT_STATE_CONSTRUCTING  = 1,
-    CONTEXT_STATE_ACTIVE        = 2,
-    CONTEXT_STATE_DISABLED      = 3,
-    CONTEXT_STATE_INVALID       = 4,
-    CONTEXT_STATE_DESTROYED     = 5,
-};
 
 //! The almighty disir_context
 //! This is the unifying element between every object within libdisir
@@ -55,7 +46,16 @@ struct disir_context
     };
 
     //! States this context can be in.
-    enum context_state  cx_state;
+    union {
+        uint64_t        cx_state;
+        struct {
+            uint64_t    CONTEXT_STATE_CONSTRUCTING              : 1,
+                        CONTEXT_STATE_FINALIZED                 : 2,
+                        CONTEXT_STATE_INVALID                   : 3,
+                        CONTEXT_STATE_DESTROYED                 : 4,
+                                                                : 0;
+        };
+    };
 
     //! The actual object pointed to by this context.
     union
