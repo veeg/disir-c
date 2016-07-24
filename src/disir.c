@@ -394,6 +394,90 @@ disir_instance_destroy (struct disir_instance **disir)
     return DISIR_STATUS_OK;
 }
 
+static enum disir_status
+generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
+                                          struct disir_context *config_parent,
+                                          struct semantic_version *semver)
+{
+    enum disir_status status;
+    struct disir_collection *collection;
+    struct disir_context *equiv;
+    struct disir_context *context;
+    struct disir_default *def;
+    const char *name;
+    int32_t size;
+
+    // Get each element from the element storage of mold_parent
+    status = dc_get_elements (mold_parent, &collection);
+    if (status != DISIR_STATUS_OK)
+    {
+        goto error;
+    }
+
+    while (dc_collection_next (collection, &equiv) != DISIR_STATUS_EXHAUSTED)
+    {
+        status = dc_begin (config_parent, dc_context_type (equiv), &context);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+
+        status = dc_get_name (equiv, &name, &size);
+        if (status != DISIR_STATUS_OK)
+        {
+            log_debug (2, "failed to get name (%s). output size: %d\n",
+                       disir_status_string (status), size);
+            goto error;
+        }
+
+        status = dc_set_name (context, name, size);
+        if (status != DISIR_STATUS_OK)
+        {
+            log_debug (2, "failed to add name: %s", disir_status_string (status));
+            goto error;
+        }
+
+        if (dc_context_type (equiv) == DISIR_CONTEXT_KEYVAL)
+        {
+            // Get default entry matching semver
+            //
+
+            dx_default_get_active (equiv, semver, &def);
+
+            status = dx_value_copy (&context->cx_keyval->kv_value, &def->de_value);
+            if (status != DISIR_STATUS_OK)
+            {
+                log_debug (2, "failed to copy value: %s", disir_status_string (status));
+                goto error;
+            }
+        }
+        else if (dc_context_type (equiv) == DISIR_CONTEXT_SECTION)
+        {
+            // Send down parent and context -
+            generate_config_from_mold_recursive_step (equiv, context, semver);
+        }
+
+        status = dc_finalize (&context);
+        if (status != DISIR_STATUS_OK)
+        {
+            goto error;
+        }
+
+        dc_putcontext (&equiv);
+    }
+
+    status = DISIR_STATUS_OK;
+error:
+    if (collection)
+    {
+        dc_collection_finished (&collection);
+    }
+
+    return status;
+
+}
+
 //! PUBLIC API
 enum disir_status
 disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
@@ -405,8 +489,6 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
     struct disir_context *parent;
     struct disir_collection *collection;
     char buffer[512];
-    const char *name;
-    int32_t size;
 
     TRACE_ENTER ("mold: %p, semver: %p", mold, semver);
 
@@ -425,63 +507,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
         return status;
     }
 
-    // Get each element from the element storage. add it
-    status = dc_get_elements (mold->mo_context, &collection);
-    if (status != DISIR_STATUS_OK)
-    {
-        goto error;
-    }
-
-    while (dc_collection_next (collection, &parent) != DISIR_STATUS_EXHAUSTED)
-    {
-        status = dc_begin (config_context, dc_context_type (parent), &context);
-        if (status != DISIR_STATUS_OK)
-        {
-            // Already logged
-            goto error;
-        }
-
-        status = dc_get_name (parent, &name, &size);
-        if (status != DISIR_STATUS_OK)
-        {
-            log_debug (2, "failed to get name (%s). output size: %d\n",
-                       disir_status_string (status), size);
-            goto error;
-        }
-
-        status = dc_set_name (context, name, size);
-        if (status != DISIR_STATUS_OK)
-        {
-            log_debug (2, "failed to add name: %s", disir_status_string (status));
-            goto error;
-        }
-
-        // TODO: Should really get value based on type instead of stringify
-        // XXX: value stored in default. This buffer is also hardcoded - get rid of it.
-        status = dc_get_default (parent, semver, 512, buffer, &size);
-        if (status != DISIR_STATUS_OK || size >= 512)
-        {
-            log_debug (2, "failed to get default (%s). output size: %d",
-                       disir_status_string (status), size);
-            goto error;
-        }
-
-        // XXX: Input value based on type - (see above)
-        status = dc_set_value (context, buffer, size);
-        if (status != DISIR_STATUS_OK)
-        {
-            log_debug (2, "failed to add default: %s", disir_status_string (status));
-            goto error;
-        }
-
-        status = dc_finalize (&context);
-        if (status != DISIR_STATUS_OK)
-        {
-            goto error;
-        }
-
-        dc_putcontext (&parent);
-    }
+    generate_config_from_mold_recursive_step (mold->mo_context, config_context, semver);
 
     status = dc_config_finalize (&config_context, config);
     if (status != DISIR_STATUS_OK)
@@ -500,8 +526,6 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
     }
     log_debug (6, "sat config version to: %s",
                dc_semantic_version_string (buffer, 32, &(*config)->cf_version));
-
-    dc_collection_finished (&collection);
 
     TRACE_EXIT ("config: %p", *config);
     return DISIR_STATUS_OK;
