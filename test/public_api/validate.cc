@@ -31,6 +31,11 @@ class ValidateTest : public testing::DisirTestTestPlugin
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (bkeyval_mold != NULL);
 
+        status = disir_mold_input (instance, "test", "basic_section", &bsection_mold);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_TRUE (bkeyval_mold != NULL);
+
+
         status = dc_config_begin (bkeyval_mold, &context_config);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
 
@@ -71,7 +76,7 @@ public:
     struct disir_context *context_config;
     struct disir_context *context_keyval;
     struct disir_mold   *bkeyval_mold;
-    struct disir_mold   *bsection_mold;
+    struct disir_mold   *bsection_mold = NULL;
     struct disir_config *bkeyval_config;
     struct disir_config *config;
     struct disir_collection *collection;
@@ -119,3 +124,24 @@ TEST_F (ValidateTest, config_keyval_set_invalid_name)
     dc_putcontext (&context);
 }
 
+TEST_F (ValidateTest, generate_config_basic_keyval)
+{
+    struct disir_config *config;
+
+    status = disir_generate_config_from_mold (bkeyval_mold, NULL, &config);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    // cleanup
+    disir_config_finished (&config);
+}
+
+TEST_F (ValidateTest, generate_config_basic_section)
+{
+    struct disir_config *config;
+
+    status = disir_generate_config_from_mold (bsection_mold, NULL, &config);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    // cleanup
+    disir_config_finished (&config);
+}
