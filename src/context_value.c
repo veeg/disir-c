@@ -16,6 +16,7 @@
 #include "keyval.h"
 #include "log.h"
 #include "mold.h"
+#include "value.h"
 
 static enum disir_status
 get_value_input_check (struct disir_context *context, const char *type,
@@ -69,7 +70,7 @@ get_value_input_check (struct disir_context *context, const char *type,
 }
 
 static enum disir_status
-set_value_input_check (struct disir_context *context, const char *type,
+set_value_input_check (struct disir_context *context, enum disir_value_type type,
                        struct disir_value **storage)
 {
     enum disir_status status;
@@ -83,6 +84,8 @@ set_value_input_check (struct disir_context *context, const char *type,
 
     status = CONTEXT_TYPE_CHECK (context,
                                  DISIR_CONTEXT_DEFAULT,
+                                 DISIR_CONTEXT_DOCUMENTATION,
+                                 DISIR_CONTEXT_FREE_TEXT,
                                  DISIR_CONTEXT_KEYVAL);
     if (status != DISIR_STATUS_OK)
     {
@@ -95,21 +98,32 @@ set_value_input_check (struct disir_context *context, const char *type,
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
         {
             dx_context_error_set (context,
-                              "cannot set %s value on KEYVAL whose top-level is MOLD", type);
+                              "cannot set %s value on KEYVAL whose top-level is MOLD",
+                              dx_value_type_string (type));
             return DISIR_STATUS_WRONG_CONTEXT;
-        }
-        if (context->cx_keyval->kv_mold_equiv == NULL)
-        {
-            dx_context_error_set (context,
-                                  "cannot set value on context without a MOLD");
-            return DISIR_STATUS_MOLD_MISSING;
         }
 
         *storage = &context->cx_keyval->kv_value;
+
+        // Assign keyval to its mold equiv type
+        // (Makes a correction in the type previously sat wrongfully (on purpose) below.)
+        if (context->cx_keyval->kv_mold_equiv)
+        {
+            context->cx_keyval->kv_value.dv_type
+                = context->cx_keyval->kv_mold_equiv->cx_keyval->kv_value.dv_type;
+        }
     }
     else if (dc_context_type (context) == DISIR_CONTEXT_DEFAULT)
     {
         *storage = &context->cx_default->de_value;
+    }
+    else if (dc_context_type (context) == DISIR_CONTEXT_DOCUMENTATION)
+    {
+        *storage = &context->cx_documentation->dd_value;
+    }
+    else if (dc_context_type (context) == DISIR_CONTEXT_FREE_TEXT)
+    {
+        *storage = context->cx_value;
     }
     else
     {
@@ -118,7 +132,75 @@ set_value_input_check (struct disir_context *context, const char *type,
         return DISIR_STATUS_INTERNAL_ERROR;
     }
 
-    return DISIR_STATUS_OK;
+
+
+    // Use cases this function shall handle:
+    // 1: Config Keyval in construction state with no mold equivalent
+    //      (no set_name has been invoked)
+    //      solution: Store input value in FFA value storage. set INVALID state.
+    //                Construct error message.
+    //      return: DISIR_STATUS_MOLD_MISSING
+    // 2: Config Keyval in construction state with invalid context
+    //      (set_name has been attempted - still no mold equivalent)
+    //      solution: Store input value in FFA value storage.
+    //      return: DISIR_STATUS_INVALID_CONTEXT
+    // 3: Config Keyval in construction state with mold equivalent but wrong input type.
+    //      solution: Change config keyval storage type to input type and set invalid context
+    //      return: DISIR_STATUS_INVALID_CONTEXT
+    // 4: Config Keyval in finalized state with with no mold equivalent
+    //      (By extension, also invalid state)
+    //      solution: store input value in FFA value storage.
+    // 5: Config Keyval in finalized state with mold equivalent
+    //      Nominal use case.
+
+
+    if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
+    {
+        // Use-case 1, 2 & 3
+        if (context->CONTEXT_STATE_CONSTRUCTING)
+        {
+            // Use-case 1
+            // set_name has never been called - therefore we do not have a mold equivalent.
+            if (context->cx_keyval->kv_name.dv_size == 0)
+            {
+                dx_context_error_set (context, "cannot set value on context without a MOLD");
+                status = DISIR_STATUS_MOLD_MISSING;
+
+            }
+            // Use-case 2
+            // set_name has been called and failed - therefore we do not have a mold equivalent
+            else if (context->cx_keyval->kv_mold_equiv == NULL)
+            {
+                // context error message already set by set_name
+                status = DISIR_STATUS_INVALID_CONTEXT;
+                // Set storage type to mirror input
+                (*storage)->dv_type = type;
+
+            }
+            // Use-case 3
+            // set_name has been called and succeed, but wrong type assigned.
+            else if (dc_value_type (context->cx_keyval->kv_mold_equiv) != type)
+            {
+                // We should allow this through - set invalid value
+                status = DISIR_STATUS_INVALID_CONTEXT;
+                dx_context_error_set (context, "Assigned value type %s, expecting %s",
+                                      dx_value_type_string (type),
+                                      dx_value_type_string ((*storage)->dv_type));
+                // Set storage type to mirror input
+                (*storage)->dv_type = type;
+            }
+        }
+        // Use-case 4
+        else if (context->CONTEXT_STATE_FINALIZED &&
+                 context->CONTEXT_STATE_INVALID)
+        {
+            // Set storage type to mirror input
+            (*storage)->dv_type = type;
+            status = DISIR_STATUS_INVALID_CONTEXT;
+        }
+    }
+
+    return status;
 }
 
 
@@ -143,13 +225,13 @@ dc_set_value (struct disir_context *context, const char *value, int32_t value_si
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
     if (status != DISIR_STATUS_OK)
     {
-        dx_context_error_set (context, "Cannot set string value to %s.",
+        dx_context_error_set (context, "Cannot set value to %s.",
                                        dc_context_type_string (context));
         return status;
     }
     if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
     {
-        dx_context_error_set (context, "Cannot set string value to %s whose top-level is %s.",
+        dx_context_error_set (context, "Cannot set value to %s whose top-level is %s.",
                                        dc_context_type_string (context),
                                        dc_context_type_string (context->cx_root_context));
         return DISIR_STATUS_WRONG_CONTEXT;
@@ -290,82 +372,28 @@ enum disir_status
 dc_set_value_string (struct disir_context *context, const char *value, int32_t value_size)
 {
     enum disir_status status;
+    enum disir_status invalid;
+    struct disir_value *value_storage;
 
     TRACE_ENTER ("context: %p, value: %s, value_size: %d", context, value, value_size);
 
-    // Check arguments
-    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
-    if (status != DISIR_STATUS_OK)
+    invalid = set_value_input_check (context, DISIR_VALUE_TYPE_STRING, &value_storage);
+    if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
-        // Already logged.
-        return status;
-    }
-    if (value == NULL || value_size <= 0)
-    {
-        dx_log_context (context, "value must be non-null and of positive length.");
-        log_debug (6, "value: %p, value_size: %d", value_size);
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        // Already logged
+        return invalid;
     }
 
-     status = CONTEXT_TYPE_CHECK (context,
-                                 DISIR_CONTEXT_KEYVAL,
-                                 DISIR_CONTEXT_DEFAULT,
-                                 DISIR_CONTEXT_DOCUMENTATION,
-                                 DISIR_CONTEXT_FREE_TEXT);
-    if (status != DISIR_STATUS_OK)
-    {
-        // Already logged ?
-        return status;
-    }
-
-    switch (dc_context_type (context))
-    {
-    case DISIR_CONTEXT_DOCUMENTATION:
-    {
-        status = dx_documentation_add_value_string (context->cx_documentation, value, value_size);
-        break;
-    }
-    case DISIR_CONTEXT_KEYVAL:
-    {
-        if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
-        {
-            dx_log_context (context,
-                            "cannot set string value on KEYVAL whose top-level is MOLD");
-            return DISIR_STATUS_WRONG_CONTEXT;
-        }
-        if (context->cx_keyval->kv_mold_equiv == NULL)
-        {
-            dx_log_context (context, "cannot set value on context without a MOLD");
-            return DISIR_STATUS_MOLD_MISSING;
-        }
-        // TODO: Validate input against mold
-        status = dx_value_set_string (&context->cx_keyval->kv_value, value, value_size);
-        break;
-    }
-    case DISIR_CONTEXT_DEFAULT:
-    {
-        // TODO: Validate against default restrictions
-        status = dx_value_set_string (&context->cx_default->de_value, value, value_size);
-        break;
-    }
-    case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_MOLD:
-    case DISIR_CONTEXT_SECTION:
-    case DISIR_CONTEXT_FREE_TEXT:
-    case DISIR_CONTEXT_RESTRICTION:
-        dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dc_context_type_string (context));
-    case DISIR_CONTEXT_UNKNOWN:
-        status = DISIR_STATUS_BAD_CONTEXT_OBJECT;
-    // No default case - let compiler warn us of unhandled context
-    }
-
+    status = dx_value_set_string (value_storage, value, value_size);
     if (status != DISIR_STATUS_OK)
     {
         dx_context_error_set (context,
-                              "cannot set string value on context whose value type is %s",
+                              "cannot set %s value on context whose value type is %s.",
+                              dx_value_type_string (DISIR_VALUE_TYPE_STRING),
                               dc_value_type_string (context));
     }
+    else
+        status = invalid;
 
     TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
@@ -490,22 +518,26 @@ enum disir_status
 dc_set_value_integer (struct disir_context *context, int64_t value)
 {
     enum disir_status status;
+    enum disir_status invalid;
     struct disir_value *value_storage;
 
-    status = set_value_input_check (context, "integer", &value_storage);
-    if (status != DISIR_STATUS_OK)
+    invalid = set_value_input_check (context, DISIR_VALUE_TYPE_INTEGER, &value_storage);
+    if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
-        return status;
+        return invalid;
     }
 
     status = dx_value_set_integer (value_storage, value);
     if (status != DISIR_STATUS_OK)
     {
         dx_context_error_set (context,
-                              "cannot set integer value on context whose value type is %s",
+                              "cannot set %s value on context whose value type is %s.",
+                              dx_value_type_string (DISIR_VALUE_TYPE_INTEGER),
                               dc_value_type_string (context));
     }
+    else
+        status = invalid;
 
     return status;
 }
@@ -545,22 +577,26 @@ enum disir_status
 dc_set_value_float (struct disir_context *context, double value)
 {
     enum disir_status status;
+    enum disir_status invalid;
     struct disir_value *value_storage;
 
-    status = set_value_input_check (context, "float", &value_storage);
-    if (status != DISIR_STATUS_OK)
+    invalid = set_value_input_check (context, DISIR_VALUE_TYPE_FLOAT, &value_storage);
+    if (invalid != DISIR_STATUS_OK && DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
-        return status;
+        return invalid;
     }
 
     status = dx_value_set_float (value_storage, value);
     if (status != DISIR_STATUS_OK)
     {
         dx_context_error_set (context,
-                              "cannot set float value on context whose value type is %s",
+                              "cannot set %s value on context whose value type is %s.",
+                              dx_value_type_string (DISIR_VALUE_TYPE_FLOAT),
                               dc_value_type_string (context));
     }
+    else
+        status = invalid;
 
     return status;
 }
@@ -600,22 +636,26 @@ enum disir_status
 dc_set_value_boolean (struct disir_context *context, uint8_t value)
 {
     enum disir_status status;
+    enum disir_status invalid;
     struct disir_value *value_storage;
 
-    status = set_value_input_check (context, "boolean", &value_storage);
-    if (status != DISIR_STATUS_OK)
+    invalid = set_value_input_check (context, DISIR_VALUE_TYPE_BOOLEAN, &value_storage);
+    if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
-        return status;
+        return invalid;
     }
 
     status = dx_value_set_boolean (value_storage, value);
     if (status != DISIR_STATUS_OK)
     {
         dx_context_error_set (context,
-                              "cannot set boolean value on context whose value type is %s",
+                              "cannot set %s value on context whose value type is %s.",
+                              dx_value_type_string (DISIR_VALUE_TYPE_BOOLEAN),
                               dc_value_type_string (context));
     }
+    else
+        status = invalid;
 
     return status;
 }
