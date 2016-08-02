@@ -183,6 +183,7 @@ set_value_input_check (struct disir_context *context, enum disir_value_type type
             {
                 // We should allow this through - set invalid value
                 status = DISIR_STATUS_INVALID_CONTEXT;
+                context->CONTEXT_STATE_INVALID = 1;
                 dx_context_error_set (context, "Assigned value type %s, expecting %s",
                                       dx_value_type_string (type),
                                       dx_value_type_string ((*storage)->dv_type));
