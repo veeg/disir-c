@@ -487,9 +487,14 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    // TODO: Check that context->cx_parent_context is valid. Handle accordingly
+    // If parent is invalid, it does not have a mold equiv
+    if (context->cx_parent_context->CONTEXT_STATE_INVALID)
+    {
+        dx_context_error_set (context, "%s missing mold equivalent entry for name '%s'.",
+                                       dc_context_type_string (context), value);
+        return DISIR_STATUS_NOT_EXIST;
+    }
 
-    // TODO: add mold_equiv checks
     if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_CONFIG)
     {
         storage = context->cx_parent_context->cx_config->cf_context_mold->cx_mold->mo_elements;
