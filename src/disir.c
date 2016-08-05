@@ -167,7 +167,10 @@ recurse_elements_valid (struct disir_context *context,
         status = dc_context_valid (element);
         if (status == DISIR_STATUS_INVALID_CONTEXT)
         {
-            dc_collection_push_context (collection, element);
+            if (collection)
+            {
+                dc_collection_push_context (collection, element);
+            }
             invalid = status;
         }
 
