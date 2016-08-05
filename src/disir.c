@@ -560,6 +560,8 @@ disir_config_valid (struct disir_config *config, struct disir_collection **colle
     enum disir_status status;
     struct disir_collection *col;
 
+    col = NULL;
+
     if (config == NULL)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
