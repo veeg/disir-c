@@ -70,7 +70,11 @@ enum disir_status
 dx_section_finalize (struct disir_context *section)
 {
     enum disir_status status;
+    enum disir_status invalid;
     struct disir_element_storage *storage;
+
+    invalid = (section->CONTEXT_STATE_INVALID ? DISIR_STATUS_INVALID_CONTEXT
+                                              : DISIR_STATUS_OK);
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (section);
     if (status != DISIR_STATUS_OK)
@@ -115,10 +119,9 @@ dx_section_finalize (struct disir_context *section)
     if (status != DISIR_STATUS_OK)
     {
         dx_log_context(section, "Unable to insert into element storage - Interesting...");
-        return status;
     }
 
-    return DISIR_STATUS_OK;
+    return (status == DISIR_STATUS_OK ? invalid : status);
 }
 
 //! INTERNAL API

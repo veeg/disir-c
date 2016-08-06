@@ -167,7 +167,10 @@ recurse_elements_valid (struct disir_context *context,
         status = dc_context_valid (element);
         if (status == DISIR_STATUS_INVALID_CONTEXT)
         {
-            dc_collection_push_context (collection, element);
+            if (collection)
+            {
+                dc_collection_push_context (collection, element);
+            }
             invalid = status;
         }
 
@@ -556,6 +559,8 @@ disir_config_valid (struct disir_config *config, struct disir_collection **colle
 {
     enum disir_status status;
     struct disir_collection *col;
+
+    col = NULL;
 
     if (config == NULL)
     {
