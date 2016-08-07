@@ -16,6 +16,7 @@
 #include "keyval.h"
 #include "log.h"
 #include "mold.h"
+#include "restriction.h"
 
 //! PUBLIC API
 enum disir_status
@@ -101,8 +102,10 @@ dc_destroy (struct disir_context **context)
     case DISIR_CONTEXT_SECTION:
         status = dx_section_destroy (&((*context)->cx_section));
         break;
-    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_RESTRICTION:
+        status = dx_restriction_destroy (&((*context)->cx_restriction));
+        break;
+    case DISIR_CONTEXT_FREE_TEXT:
         dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
                 __FUNCTION__, dc_context_type_string (*context));
     case DISIR_CONTEXT_UNKNOWN:
@@ -174,8 +177,8 @@ dc_begin (struct disir_context *parent, enum disir_context_type context_type,
         status = dx_section_begin (parent, child);
         break;
     case DISIR_CONTEXT_RESTRICTION:
-        dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dx_context_type_string (context_type));
+        status = dx_restriction_begin (parent, child);
+        break;
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_FREE_TEXT:
@@ -241,8 +244,8 @@ dc_finalize (struct disir_context **context)
         status = dx_section_finalize (*context);
         break;
     case DISIR_CONTEXT_RESTRICTION:
-        dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dc_context_type_string (*context));
+        status = dx_restriction_finalize (*context);
+        break;
     case DISIR_CONTEXT_UNKNOWN:
         status = DISIR_STATUS_BAD_CONTEXT_OBJECT;
         log_warn ("Malwormed context object: Type value( %d )", (*context)->cx_type);

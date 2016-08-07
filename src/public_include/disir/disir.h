@@ -85,11 +85,31 @@ enum disir_value_type
 };
 
 //! The different restrictions that can be held by a DISIR_CONTEXT_RESTRICTION
-//! TODO: Implement restrictions
-enum disir_restriction
+//! Restrictions are catagorized into two classes:
+//!     Inclusive: All inclusive restrictions must be fufilled for the context to be valid.
+//!     Exclusive: One of the restrictions must be fufilled for the context ot be valid.
+enum disir_restriction_type
 {
-    DISIR_RESTRICTION_VALUE = 1,
-    DISIR_RESTRICTION_RANGE,
+    //    INCLUSIVE Restrictions
+    //! Minimum number of elements of the same key that must be present.
+    DISIR_RESTRICTION_INC_ENTRY_MIN = 1,
+    //! Maximum number of elements of the same key that must be present.
+    DISIR_RESTRICTION_INC_ENTRY_MAX,
+
+    //    EXCLUSIVE Restrictions
+    //! Value of key must match one of multiple string enum restrictions.
+    //! Applicable to value type ENUM
+    DISIR_RESTRICTION_EXC_VALUE_ENUM,
+    //! Value of key must be within the floating point range.
+    //! Applicable to value tye INTEGER and FLOAT
+    DISIR_RESTRICTION_EXC_VALUE_RANGE,
+    //! Value of key must be exact numeric value.
+    //! Applicable to value type INTEGER and FLOAT
+    DISIR_RESTRICTION_EXC_VALUE_NUMERIC,
+    //! TODO: Support REGEX
+    //DISIR_RESTRICTION_EXC_VALUE_REGEX,
+
+    DISIR_RESTRICTION_UNKNOWN // Sentinel value - do not add any entries below this.
 };
 
 
