@@ -67,7 +67,6 @@ dc_config_begin (struct disir_mold *mold, struct disir_context **config)
 
     dx_context_incref (mold->mo_context);
     context->cx_config->cf_context_mold = mold->mo_context;
-    context->CONTEXT_CAPABILITY_ADD_ENTRY = 1;
 
     // Set root context to self (such that children can inherit)
     context->cx_root_context = context;

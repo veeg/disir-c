@@ -38,13 +38,6 @@ const char *disir_value_type_string[] = {
     "UNKNOWN",
 };
 
-//! Array of string representations of the context capabilities
-const char *disir_capability_string[] = {
-    "add documentation",
-    "add multiple documentation",
-    "add string value"
-};
-
 //! PUBLIC API
 enum disir_context_type
 dc_context_type (struct disir_context *context)
@@ -60,23 +53,6 @@ const char *
 dc_context_type_string (struct disir_context *context)
 {
     return disir_context_type_string[dc_context_type (context)];
-}
-
-//! INTERNAL API
-const char *
-dx_context_capability_string (uint64_t capability)
-{
-    switch(capability)
-    {
-    case CC_ADD_DOCUMENTATION:
-        return disir_capability_string[0];
-    case CC_ADD_MULTIPLE_DOCUMENTATION:
-        return disir_capability_string[1];
-    case CC_ADD_VALUE_STRING:
-        return disir_capability_string[2];
-    default:
-        return "<unknown capability>";
-    }
 }
 
 //! INTERNAL API
@@ -236,59 +212,6 @@ dx_context_create (enum disir_context_type type)
 
     // Set refcount to 1 - object is owned by creator.
     context->cx_refcount = 1;
-
-    // Set capabilities on context
-    switch (type)
-    {
-    case DISIR_CONTEXT_CONFIG:
-    {
-        // By default, the top-level config capabilities
-        // are limited until a mold is attached
-        context->CONTEXT_CAPABILITY_ADD_DOCUMENTATION = 1;
-        break;
-    }
-    case DISIR_CONTEXT_DOCUMENTATION:
-    {
-        context->CONTEXT_CAPABILITY_ADD_VALUE_STRING = 1;
-        context->CONTEXT_CAPABILITY_INTRODUCED = 1;
-        break;
-    }
-    case DISIR_CONTEXT_MOLD:
-    {
-        // XXX: What capabilitties?
-        context->CONTEXT_CAPABILITY_ADD_DOCUMENTATION = 1;
-        break;
-    }
-    case DISIR_CONTEXT_SECTION:
-    case DISIR_CONTEXT_KEYVAL:
-    {
-        // XXX: What capabilitites?
-        context->CONTEXT_CAPABILITY_ADD_DOCUMENTATION = 1;
-        context->CONTEXT_CAPABILITY_ADD_VALUE_STRING = 1;
-        context->CONTEXT_CAPABILITY_INTRODUCED = 1;
-        break;
-    }
-    case DISIR_CONTEXT_DEFAULT:
-    {
-        // XXX: What capabilities?
-        context->CONTEXT_CAPABILITY_INTRODUCED = 1;
-        break;
-    }
-    case DISIR_CONTEXT_FREE_TEXT:
-    {
-        context->CONTEXT_CAPABILITY_ADD_VALUE_STRING = 1;
-        break;
-    }
-    case DISIR_CONTEXT_RESTRICTION:
-        dx_crash_and_burn ("%s UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__,
-                dx_context_type_string (type));
-        break;
-    case DISIR_CONTEXT_UNKNOWN:
-        // Already handled
-        break;
-    // No default handler - let compiler warn us of unhandled context
-    }
 
     return context;
 }

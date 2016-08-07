@@ -266,23 +266,32 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
 enum disir_status
 dx_documentation_begin (struct disir_context *parent, struct disir_context **doc)
 {
+    enum disir_status status;
     struct disir_context *context;
 
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (parent);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
     // Check arguments
-    if (parent == NULL || doc == NULL)
+    if (doc == NULL)
     {
         // LOGWARN
-        log_warn ("%s: parent and/or doc invoked with NULL pointers. (parent: %p, doc: %p)",
-                __FUNCTION__, parent, doc);
+        log_debug (0, "invoked with doc NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    // Check if we can add single entry
-    if ((parent->cx_capabilities & CC_ADD_DOCUMENTATION) == 0)
+    status = CONTEXT_TYPE_CHECK (parent, DISIR_CONTEXT_MOLD,
+                                         DISIR_CONTEXT_KEYVAL,
+                                         DISIR_CONTEXT_SECTION,
+                                         DISIR_CONTEXT_RESTRICTION);
+    if (status != DISIR_STATUS_OK)
     {
         // LOGWARN
-        dx_log_context (parent, "No capability: %s",
-                dx_context_capability_string (CC_ADD_DOCUMENTATION));
+        dx_log_context (parent, "cannot add documentation to %s.",
+                                dc_context_type_string (parent));
         return DISIR_STATUS_NO_CAN_DO;
     }
 
@@ -291,14 +300,10 @@ dx_documentation_begin (struct disir_context *parent, struct disir_context **doc
     // Check if we can add multiple documentation entries
     if (dx_documentation_numentries(parent) > 0)
     {
-        log_debug (6, "documentation exists");
-        if ((parent->cx_capabilities & CC_ADD_MULTIPLE_DOCUMENTATION) == 0)
-        {
-            // LOGWARN
-            dx_log_context (parent, "Contains one documentation entry. It has no capability: %s",
-                    dx_context_capability_string (CC_ADD_MULTIPLE_DOCUMENTATION));
-            return DISIR_STATUS_EXISTS;
-        }
+        // LOGWARN
+        dx_log_context (parent, "cannot add multiple documentations to %s.",
+                                dc_context_type_string (parent));
+        return DISIR_STATUS_EXISTS;
     }
 
     log_debug_context (6, parent, "capable of adding documentation context");

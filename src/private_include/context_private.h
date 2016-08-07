@@ -7,19 +7,6 @@
 // Definitions
 //
 
-//! Enumeration of the dedicated context capabilitiy bits.
-enum disir_context_capabilities
-{
-    CC_ADD_ENTRY                        = 1ull << 0,
-    CC_ADD_MULTIPLE_ENTRY               = 1ull << 1,
-    CC_ADD_DOCUMENTATION                = 1ull << 2,
-    CC_ADD_MULTIPLE_DOCUMENTATION       = 1ull << 3,
-    CC_ADD_NAME                         = 1ull << 4,
-    CC_ADD_VALUE_STRING                 = 1ull << 5,
-    CC_INTRODUCED                       = 1ull << 6,
-    CC_DEPRECRATED                      = 1ull << 7,
-};
-
 
 //! The almighty disir_context
 //! This is the unifying element between every object within libdisir
@@ -27,23 +14,6 @@ struct disir_context
 {
     //! Type of object this context describes.
     enum disir_context_type     cx_type;
-
-    //! Capabilities determine what operation
-    //! is allowed on this context.
-    union {
-        uint64_t        cx_capabilities;
-        struct {
-            uint64_t    CONTEXT_CAPABILITY_ADD_ENTRY                : 1,
-                        CONTEXT_CAPABILITY_ADD_MULTIPLE_ENTRY       : 1,
-                        CONTEXT_CAPABILITY_ADD_DOCUMENTATION        : 1,
-                        CONTEXT_CAPABILITY_ADD_MULTIPLE_DOCUMENTATION : 1,
-                        CONTEXT_CAPABILITY_ADD_NAME                 : 1,
-                        CONTEXT_CAPABILITY_ADD_VALUE_STRING         : 1,
-                        CONTEXT_CAPABILITY_INTRODUCED               : 1,
-                        CONTEXT_CAPABILITY_DEPRECRATED              : 1,
-                                                                    : 0;
-        };
-    };
 
     //! States this context can be in.
     union {
