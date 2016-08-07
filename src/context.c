@@ -250,18 +250,26 @@ dc_finalize (struct disir_context **context)
     // No default case - let compiler warn us about unhandled cases.
     }
 
-    // Mark the context as active and deprive the user of his reference.
-    if (status == DISIR_STATUS_OK)
+
+    // Handle context state
+    if (status == DISIR_STATUS_OK ||
+        status == DISIR_STATUS_INVALID_CONTEXT ||
+        (*context)->CONTEXT_STATE_INVALID)
     {
         (*context)->CONTEXT_STATE_FINALIZED = 1;
         (*context)->CONTEXT_STATE_CONSTRUCTING = 0;
-        *context = NULL;
-    }
-    else if (status == DISIR_STATUS_INVALID_CONTEXT)
-    {
-        (*context)->CONTEXT_STATE_INVALID = 1;
-        // Let caller handle the context since it is still invalid.
-        dx_context_incref (*context);
+
+        if (status == DISIR_STATUS_OK)
+        {
+            // Deprive the user of his reference.
+            *context = NULL;
+        }
+        else
+        {
+            // Contect invalid - Mark it as so and let user handle it.
+            (*context)->CONTEXT_STATE_INVALID = 1;
+            dx_context_incref (*context);
+        }
     }
 
     TRACE_EXIT ("status: %s", disir_status_string (status));
