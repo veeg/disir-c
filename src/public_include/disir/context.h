@@ -628,6 +628,25 @@ enum disir_status dc_get_deprecrated (struct disir_context *context,
 enum disir_status dc_get_elements (struct disir_context *context,
                                    struct disir_collection **collection);
 
+//! \brief Collect all children of the passed context matching name.
+//!
+//! \param[in] parent Parent context to collect child elements from.
+//!     Must be of context type
+//!         * DISIR_CONTEXT_CONFIG
+//!         * DISIR_CONTEXT_MOLD
+//!         * DISIR_CONTEXT_SECTION
+//! \param[in] name Name of key to match wanted keyval contexts
+//! \param[in] index Index of the keyval if multiple entries. Use 0 if only one entry.
+//! \param[out] output Context to retrieve. Caller must use dc_putcontext when finished.
+//!
+//! \return DISIR_STATUS_OK if the output collection contains all
+//!     child elements of a valid input context.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if input parameters are NULL
+//! \return DISIR_STATUS_WRONG_CONTEXT if the input context is not of correct type.
+//!
+enum disir_status
+dc_find_element (struct disir_context *parent, const char *name, unsigned int index,
+                 struct disir_context **output);
 
 //! \brief Collect all children of the passed context matching name.
 //!

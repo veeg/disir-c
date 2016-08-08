@@ -910,6 +910,66 @@ dc_get_elements (struct disir_context *context, struct disir_collection **collec
 }
 
 //! PUBLIC API
+//! TODO: Missing test
+enum disir_status
+dc_find_element (struct disir_context *parent, const char *name, unsigned int index,
+                 struct disir_context **output)
+{
+    enum disir_status status;
+    struct disir_collection *collection;
+    uint32_t size;
+
+    if (output == NULL)
+    {
+        log_debug (0, "invoked with output NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = dc_find_elements (parent, name, &collection);
+    if (status != DISIR_STATUS_OK)
+    {
+        goto error;
+    }
+
+    // collection size is guaranteed to be atleast 1
+    size = dc_collection_size (collection);
+    if ((size - 1) < index)
+    {
+        log_debug (5, "requeste index (%d) out-of-bounds (size %d)", size, index);
+        status = DISIR_STATUS_EXHAUSTED;
+        goto error;
+    }
+
+    unsigned int i = 0;
+    do
+    {
+        status = dc_collection_next (collection, output);
+        if (status == DISIR_STATUS_EXHAUSTED || i == index)
+        {
+            status = DISIR_STATUS_OK;
+            break;
+        }
+        if (status != DISIR_STATUS_OK)
+        {
+            // Uhmm, something bad happend
+            log_error ("collection returned erroneous condition: %s",
+                       disir_status_string (status));
+        }
+        dc_putcontext (output);
+
+    } while (1);
+
+    // status is OK, output is populated, or status is not OK and output is not populated.
+error:
+    if (collection)
+    {
+        dc_collection_finished (&collection);
+    }
+
+    return status;
+}
+
+//! PUBLIC API
 enum disir_status
 dc_find_elements (struct disir_context *context,
                   const char *name, struct disir_collection **collection)
