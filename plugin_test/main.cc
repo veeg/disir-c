@@ -11,6 +11,7 @@ typedef enum disir_status (*output_mold)(struct disir_mold **);
 #include "basic_keyval.cc"
 #include "basic_section.cc"
 #include "json_test_mold.cc"
+#include "restriction_keyval_numeric_types.cc"
 
 // Forward declaration
 enum disir_status
@@ -39,6 +40,7 @@ static std::map<const char *, output_mold, cmp_str> molds = {
     std::make_pair ("basic_keyval", basic_keyval),
     std::make_pair ("basic_section", basic_section),
     std::make_pair ("json_test_mold", json_test_mold),
+    std::make_pair ("restriction_keyval_numeric_types", restriction_keyval_numeric_types),
 };
 
 enum disir_status
