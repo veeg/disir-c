@@ -658,6 +658,10 @@ dc_find_elements (struct disir_context *context, const char *name,
 //! simple function call. If you require special restrictions and additional defaults,
 //! you will need to go the long route through beginning and finalizing a context.
 //!
+//! \param[out] output Optional output context storage. If address is passed,
+//!             the output KEYVAL context is populated and reference increased.
+//!             Caller must take care to use dc_putcontext () when he is done.
+//!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
 //!     the input semver 'semver'.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
@@ -667,7 +671,8 @@ enum disir_status dc_add_keyval_string (struct disir_context *parent,
                                         const char *name,
                                         const char *def,
                                         const char *doc,
-                                        struct semantic_version *semver);
+                                        struct semantic_version *semver,
+                                        struct disir_context **output);
 
 //! \brief Shortcut to add a KEYVAL integer entry to a parent context.
 //!
@@ -675,6 +680,10 @@ enum disir_status dc_add_keyval_string (struct disir_context *parent,
 //! default, documentation fields, this function wraps all that logic into one
 //! simple function call. If you require special restrictions and additional defaults,
 //! you will need to go the long route through beginning and finalizing a context.
+//!
+//! \param[out] output Optional output context storage. If address is passed,
+//!             the output KEYVAL context is populated and reference increased.
+//!             Caller must take care to use dc_putcontext () when he is done.
 //!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
 //!     the input semver 'semver'.
@@ -685,7 +694,8 @@ enum disir_status dc_add_keyval_integer (struct disir_context *parent,
                                          const char *name,
                                          int64_t def,
                                          const char *doc,
-                                         struct semantic_version *semver);
+                                         struct semantic_version *semver,
+                                         struct disir_context **output);
 
 //! \brief Shortcut to add a KEYVAL float entry to a parent context.
 //!
@@ -693,6 +703,10 @@ enum disir_status dc_add_keyval_integer (struct disir_context *parent,
 //! default, documentation fields, this function wraps all that logic into one
 //! simple function call. If you require special restrictions and additional defaults,
 //! you will need to go the long route through beginning and finalizing a context.
+//!
+//! \param[out] output Optional output context storage. If address is passed,
+//!             the output KEYVAL context is populated and reference increased.
+//!             Caller must take care to use dc_putcontext () when he is done.
 //!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
 //!     the input semver 'semver'.
@@ -703,7 +717,8 @@ enum disir_status dc_add_keyval_float (struct disir_context *parent,
                                        const char *name,
                                        double def,
                                        const char *doc,
-                                       struct semantic_version *semver);
+                                       struct semantic_version *semver,
+                                       struct disir_context **output);
 
 //! \brief Shortcut to add a KEYVAL boolean entry to a parent context.
 //!
@@ -711,6 +726,10 @@ enum disir_status dc_add_keyval_float (struct disir_context *parent,
 //! default, documentation fields, this function wraps all that logic into one
 //! simple function call. If you require special restrictions and additional defaults,
 //! you will need to go the long route through beginning and finalizing a context.
+//!
+//! \param[out] output Optional output context storage. If address is passed,
+//!             the output KEYVAL context is populated and reference increased.
+//!             Caller must take care to use dc_putcontext () when he is done.
 //!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
 //!     the input semver 'semver'.
@@ -721,7 +740,8 @@ enum disir_status dc_add_keyval_boolean (struct disir_context *parent,
                                          const char *name,
                                          uint8_t def,
                                          const char *doc,
-                                         struct semantic_version *semver);
+                                         struct semantic_version *semver,
+                                         struct disir_context **output);
 
 //! \brief Return a string representation of the restriction enumeration type.
 const char * dc_restriction_enum_string (enum disir_restriction_type restriction);

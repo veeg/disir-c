@@ -165,7 +165,8 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
                     const char *string_input,
                     double float_input,
                     int64_t integer_input,
-                    uint8_t boolean_input
+                    uint8_t boolean_input,
+                    struct disir_context **output
                     )
 {
     enum disir_status status;
@@ -280,10 +281,21 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         goto error;
     }
 
+    if (output)
+    {
+        dx_context_incref (keyval);
+        *output = keyval;
+    }
+
     status = dc_finalize (&keyval);
     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
+        if (output)
+        {
+            dx_context_decref (&keyval);
+            *output = NULL;
+        }
         goto error;
     }
 
@@ -302,56 +314,64 @@ error:
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_string (struct disir_context *parent, const char *name, const char *def,
-                      const char *doc, struct semantic_version *semver)
+                      const char *doc, struct semantic_version *semver,
+                      struct disir_context **output)
 {
     return add_keyval_generic (parent, name, doc, semver,
                                DISIR_VALUE_TYPE_STRING,
                                def,
                                0,
                                0,
-                               0
+                               0,
+                               output
                                );
 }
 
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_boolean (struct disir_context *parent, const char *name, uint8_t def,
-                       const char* doc, struct semantic_version *semver)
+                       const char* doc, struct semantic_version *semver,
+                       struct disir_context **output)
 {
     return add_keyval_generic (parent, name, doc, semver,
                                DISIR_VALUE_TYPE_BOOLEAN,
                                NULL,
                                0,
                                0,
-                               def
+                               def,
+                               output
                                );
 }
 
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_float (struct disir_context *parent, const char *name, double def,
-                     const char *doc, struct semantic_version *semver)
+                     const char *doc, struct semantic_version *semver,
+                     struct disir_context **output)
 {
     return add_keyval_generic (parent, name, doc, semver,
                                DISIR_VALUE_TYPE_FLOAT,
                                NULL,
                                def,
                                0,
-                               0
+                               0,
+                               output
                                );
 }
 
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_integer (struct disir_context *parent, const char *name, int64_t def,
-                     const char *doc, struct semantic_version *semver)
+                       const char *doc, struct semantic_version *semver,
+                       struct disir_context **output)
 {
     return add_keyval_generic (parent, name, doc, semver,
                                DISIR_VALUE_TYPE_INTEGER,
                                NULL,
                                0,
                                def,
-                               0
+                               0,
+                               output
                                );
 }
 

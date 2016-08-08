@@ -212,17 +212,17 @@ disir_libdisir_mold (struct disir_mold **mold)
         goto error;
 
     status = dc_add_keyval_string (context, "log_filepath", "/var/log/disir.log",
-                                   "Log filepath for the internal disir log", NULL);
+                                   "Log filepath for the internal disir log", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
     status = dc_add_keyval_string (context, "mold_dirpath", "/etc/disir/molds",
-                                   "Root directory to resolve mold lookups from.", NULL);
+                                   "Root directory to resolve mold lookups from.", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
     status = dc_add_keyval_string (context, "plugin_filepath", "/usr/lib/disir/plugins/",
-                                   "Load specified I/O plugin", NULL);
+                                   "Load specified I/O plugin", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 

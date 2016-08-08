@@ -12,23 +12,24 @@ json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_mold, "test1", "1", "test keyval", NULL);
+    status = dc_add_keyval_string (context_mold, "test1", "1", "test keyval", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_mold, "test2", "1", "test keyval", NULL);
+    status = dc_add_keyval_string (context_mold, "test2", "1", "test keyval", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_integer (context_mold, "integer", (uint64_t)123, "integer doc", NULL);
+    status = dc_add_keyval_integer (context_mold, "integer", (uint64_t)123, "integer doc",
+                                    NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_float (context_mold, "float", (double)12.123, "floatdoc", NULL);
+    status = dc_add_keyval_float (context_mold, "float", (double)12.123, "floatdoc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_boolean (context_mold, "boolean", (uint8_t)8, "doc", NULL);
+    status = dc_add_keyval_boolean (context_mold, "boolean", (uint8_t)8, "doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
@@ -40,27 +41,28 @@ json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_section, "k1", "k1value", "k1value doc", NULL);
+    status = dc_add_keyval_string (context_section, "k1", "k1value", "k1value doc", NULL, NULL);
      if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_boolean (context_section, "bool", 1, "boolvalue doc", NULL);
+    status = dc_add_keyval_boolean (context_section, "bool", 1, "boolvalue doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_float (context_section, "float", 1.12, "floatvalue doc", NULL);
+    status = dc_add_keyval_float (context_section, "float", 1.12, "floatvalue doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_integer (context_section, "integer", 123123, "intvalue doc", NULL);
+    status = dc_add_keyval_integer (context_section, "integer", 123123, "intvalue doc",
+                                    NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_section, "k2", "k2value", "k2value doc", NULL);
+    status = dc_add_keyval_string (context_section, "k2", "k2value", "k2value doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_section, "k3", "k3value", "k3value doc", NULL);
+    status = dc_add_keyval_string (context_section, "k3", "k3value", "k3value doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
@@ -72,7 +74,8 @@ json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_section_nested, "k3", "k3value", "k1value doc", NULL);
+    status = dc_add_keyval_string (context_section_nested, "k3", "k3value", "k1value doc",
+                                   NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 

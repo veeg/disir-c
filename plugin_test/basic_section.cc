@@ -24,15 +24,15 @@ basic_section(struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_section, "k1", "k1value", "k1value doc", NULL);
+    status = dc_add_keyval_string (context_section, "k1", "k1value", "k1value doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_section, "k2", "k2value", "k2value doc", NULL);
+    status = dc_add_keyval_string (context_section, "k2", "k2value", "k2value doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_section, "k3", "k3value", "k3value doc", NULL);
+    status = dc_add_keyval_string (context_section, "k3", "k3value", "k3value doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
