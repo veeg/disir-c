@@ -308,7 +308,6 @@ error:
     }
 
     return status;
-
 }
 
 //! PUBLIC API
