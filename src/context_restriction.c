@@ -724,6 +724,10 @@ dc_add_restriction_value_range (struct disir_context *parent, double min, double
     enum disir_status status;
     struct disir_context *context_restriction;
 
+    TRACE_ENTER ("parent (%p), min (%f), max (%f) doc (%s), semver (%p), output (%p)",
+                 parent, min, max, doc, semver, output);
+
+
     status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
     if (status != DISIR_STATUS_OK)
     {
@@ -781,6 +785,7 @@ dc_add_restriction_value_range (struct disir_context *parent, double min, double
         goto error;
     }
 
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return DISIR_STATUS_OK;
 error:
     dx_context_transfer_logwarn (parent, context_restriction);
@@ -797,6 +802,9 @@ dc_add_restriction_value_numeric (struct disir_context *parent, double value, co
 {
     enum disir_status status;
     struct disir_context *context_restriction;
+
+    TRACE_ENTER ("parent (%p), value (%f), doc (%s), semver (%p), output (%p)",
+                 parent, value, doc, semver, output);
 
     status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
     if (status != DISIR_STATUS_OK)
@@ -855,6 +863,7 @@ dc_add_restriction_value_numeric (struct disir_context *parent, double value, co
         goto error;
     }
 
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return DISIR_STATUS_OK;
 error:
     dx_context_transfer_logwarn (parent, context_restriction);
