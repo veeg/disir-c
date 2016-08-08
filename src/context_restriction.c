@@ -715,3 +715,151 @@ dc_restriction_get_numeric (struct disir_context *context, double *value)
     return DISIR_STATUS_OK;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_add_restriction_value_range (struct disir_context *parent, double min, double max,
+                                const char *doc, struct semantic_version *semver,
+                                struct disir_context **output)
+{
+    enum disir_status status;
+    struct disir_context *context_restriction;
+
+    status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged ?
+        return status;
+    }
+
+    status = dc_set_restriction_type (context_restriction, DISIR_RESTRICTION_EXC_VALUE_RANGE);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto error;
+    }
+
+    status = dc_restriction_set_range (context_restriction, min, max);
+    if (status != DISIR_STATUS_OK)
+    {
+        // This should not happen....
+        goto error;
+    }
+
+    if (semver)
+    {
+        status = dc_add_introduced (context_restriction, *semver);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+    }
+    if (doc)
+    {
+        status = dc_add_documentation (context_restriction, doc, strlen (doc));
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+    }
+
+    if (output)
+    {
+        dx_context_incref (context_restriction);
+        *output = context_restriction;
+    }
+
+    status = dc_finalize (&context_restriction);
+    if (status != DISIR_STATUS_OK)
+    {
+        if (output)
+        {
+            dx_context_decref (&context_restriction);
+            *output = NULL;
+        }
+        goto error;
+    }
+
+    return DISIR_STATUS_OK;
+error:
+    dx_context_transfer_logwarn (parent, context_restriction);
+    dc_destroy (&context_restriction);
+
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_add_restriction_value_numeric (struct disir_context *parent, double value, const char *doc,
+                                  struct semantic_version *semver,
+                                  struct disir_context **output)
+{
+    enum disir_status status;
+    struct disir_context *context_restriction;
+
+    status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged ?
+        return status;
+    }
+
+    status = dc_set_restriction_type (context_restriction, DISIR_RESTRICTION_EXC_VALUE_NUMERIC);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto error;
+    }
+
+    status = dc_restriction_set_numeric (context_restriction, value);
+    if (status != DISIR_STATUS_OK)
+    {
+        // This should not happen....
+        goto error;
+    }
+
+    if (semver)
+    {
+        status = dc_add_introduced (context_restriction, *semver);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+    }
+    if (doc)
+    {
+        status = dc_add_documentation (context_restriction, doc, strlen (doc));
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+    }
+
+    if (output)
+    {
+        dx_context_incref (context_restriction);
+        *output = context_restriction;
+    }
+
+    status = dc_finalize (&context_restriction);
+    if (status != DISIR_STATUS_OK)
+    {
+        if (output)
+        {
+            dx_context_decref (&context_restriction);
+            *output = NULL;
+        }
+        goto error;
+    }
+
+    return DISIR_STATUS_OK;
+error:
+    dx_context_transfer_logwarn (parent, context_restriction);
+    dc_destroy (&context_restriction);
+
+    return status;
+}
+

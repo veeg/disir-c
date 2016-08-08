@@ -875,6 +875,46 @@ enum disir_status dc_restriction_get_numeric (struct disir_context *context, dou
 //!
 enum disir_status dc_restriction_set_numeric (struct disir_context *context, double value);
 
+//! \brief Add a DISIR_RESTRICTION_EXC_VALUE_NUMERIC restriction to parent.
+//!
+//! Only applicable to the following `parent` contexts whose top-level is MOLD:
+//!     * DISIR_CONTET_KEYVAL
+//
+//! This is a shortcut  method instead of running through dc_begin, dc_set_restriction_type,
+//! dc_restriction_set_numeric and dc_finalize, with optional dc_add_documenation and
+//! dc_add_introduced.
+//!
+//! \param[out] output Optional output context storage. If address is passed,
+//!             the output RESTRICTION context is populated and reference increased.
+//!             Caller must take care to use dc_putcontext () when he is done.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_add_restriction_value_numeric (struct disir_context *parent, double value, const char *doc,
+                                  struct semantic_version *semver,
+                                  struct disir_context **output);
+
+//! \brief Add a DISIR_RESTRICTION_EXC_VALUE_RANGE restriction to parent.
+//!
+//! Only applicable to the following `parent` contexts whose top-level is MOLD:
+//!     * DISIR_CONTET_KEYVAL
+//
+//! This is a shortcut  method instead of running through dc_begin, dc_set_restriction_type,
+//! dc_restriction_set_numeric and dc_finalize, with optional dc_add_documenation and
+//! dc_add_introduced.
+//!
+//! \param[out] output Optional output context storage. If address is passed,
+//!             the output RESTRICTION context is populated and reference increased.
+//!             Caller must take care to use dc_putcontext () when he is done.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_add_restriction_value_range (struct disir_context *parent, double min, double max,
+                                const char * doc, struct semantic_version *semver,
+                                struct disir_context **output);
+
 //! \brief Retrieve the version number of the input context.
 //!
 //! Supported contexts are:
