@@ -19,6 +19,7 @@
 #include "section.h"
 #include "mqueue.h"
 #include "log.h"
+#include "restriction.h"
 
 //! INTERNAL API
 enum disir_status
@@ -53,14 +54,20 @@ dx_documentation_add (struct disir_context *parent, struct disir_documentation *
         doc_queue = &(parent->cx_section->se_documentation_queue);
         break;
     }
+    case DISIR_CONTEXT_RESTRICTION:
+    {
+        doc_queue = &(parent->cx_restriction->re_documentation_queue);
+        break;
+    }
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_DEFAULT:
-    case DISIR_CONTEXT_RESTRICTION:
     case DISIR_CONTEXT_DOCUMENTATION:
     case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:
     {
         // These types do not accept a documentation entry
+        log_fatal_context (parent, "reached clause to retrieve doc_queue - not handled.");
+        return DISIR_STATUS_INTERNAL_ERROR;
         break;
     }
     // No default - let compiler  detect unhandled type
