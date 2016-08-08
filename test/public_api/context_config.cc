@@ -88,7 +88,7 @@ TEST_F (ContextConfigTest, add_introduced_shall_fail)
 {
     struct semantic_version semver;
 
-    status = dc_add_introduced (context_config, semver);
+    status = dc_add_introduced (context_config, &semver);
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
 }
 

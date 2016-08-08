@@ -79,7 +79,7 @@ TEST_F (ConfigSectionTest, add_introduced_shall_fail)
     input.sv_minor = 1;
     input.sv_patch = 2;
 
-    status = dc_add_introduced (context_section, input);
+    status = dc_add_introduced (context_section, &input);
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
 
     ASSERT_STREQ ("Cannot add introduced to SECTION whose top-level is CONFIG.",

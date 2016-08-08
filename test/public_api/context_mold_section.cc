@@ -146,7 +146,7 @@ TEST_F (MoldSectionTest, introduced)
     input.sv_minor = 1;
     input.sv_major = 1;
 
-    status = dc_add_introduced (context_section, input);
+    status = dc_add_introduced (context_section, &input);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_get_introduced (context_section, &output);

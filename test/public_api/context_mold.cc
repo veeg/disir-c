@@ -263,7 +263,7 @@ TEST_F (ContextMoldTest, add_introduced_shall_fail)
     struct semantic_version input;
 
     // Expect mold to have default version
-    status = dc_add_introduced (context_mold, input);
+    status = dc_add_introduced (context_mold, &input);
     EXPECT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
     EXPECT_STREQ ("Cannot add introduced version to MOLD", dc_context_error (context_mold));
 }
