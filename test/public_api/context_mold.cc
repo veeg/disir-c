@@ -279,7 +279,8 @@ TEST_F (ContextMoldTest, get_version_greater_than_default)
     input.sv_patch = 1;
 
     // Setup mold with keyval whose semver is non-default
-    status = dc_add_keyval_string (context_mold, "test_keyval", "defval", "keyval_doc", &input);
+    status = dc_add_keyval_string (context_mold, "test_keyval", "defval", "keyval_doc",
+                                   &input, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_mold_finalize (&context_mold, &mold);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
@@ -301,7 +302,8 @@ TEST_F (ContextMoldTest, get_introduced_higher_than_default)
     input.sv_patch = 1;
 
     // Setup mold with keyval whose semver is non-default
-    status = dc_add_keyval_string (context_mold, "test_keyval", "defval", "keyval_doc", &input);
+    status = dc_add_keyval_string (context_mold, "test_keyval", "defval", "keyval_doc",
+                                   &input, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     // Expect mold to have version of added keyval
@@ -315,16 +317,16 @@ TEST_F (ContextMoldTest, get_elements)
     // TODO: Use existig test MOLD instead of adding to this myself
 
     status = dc_add_keyval_string (context_mold, "keyval1",
-                                   "keyval1_value", "keyval1_doc", NULL);
+                                   "keyval1_value", "keyval1_doc", NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_add_keyval_string (context_mold, "keyval2", "keyval2_value",
-                                   "keyval2_doc", NULL);
+                                   "keyval2_doc", NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_add_keyval_string (context_mold, "keyval3", "keyval3_value",
-                                   "keyval3_doc", NULL);
+                                   "keyval3_doc", NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_add_keyval_string (context_mold, "keyval4", "keyval4_value",
-                                   "keyval4_doc", NULL);
+                                   "keyval4_doc", NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_mold_finalize (&context_mold, &mold);
     ASSERT_STATUS (DISIR_STATUS_OK, status);

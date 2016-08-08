@@ -133,7 +133,7 @@ TEST_F (MoldSectionTest, begin_config_shall_fail)
 
 TEST_F (MoldSectionTest, add_keyval)
 {
-    status = dc_add_keyval_string (context_section, "test_key", "test val", "doc st", NULL);
+    status = dc_add_keyval_string (context_section, "test_key", "test val", "doc st", NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
