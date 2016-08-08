@@ -36,12 +36,12 @@ restriction_keyval_numeric_types (struct disir_mold **mold)
 
 
     // Float
-    status = dc_add_keyval_float (context_mold, "float_phi", 3.14, "kfloat doc", NULL,
+    status = dc_add_keyval_float (context_mold, "float_phi", 3.14, "float_phi doc", NULL,
                                   &context_float);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_restriction_value_range (context_complex, 2.66, 4.56, NULL, NULL, NULL);
+    status = dc_add_restriction_value_range (context_float, 2.66, 4.56, NULL, NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
@@ -51,8 +51,8 @@ restriction_keyval_numeric_types (struct disir_mold **mold)
     semver.sv_major = 1;
     semver.sv_minor = 1;
     semver.sv_patch = 0;
-    status = dc_add_keyval_float (context_mold, "float_complex", 5.66, "kfloat doc", NULL,
-                                  &context_float);
+    status = dc_add_keyval_float (context_mold, "float_complex", 5.66, "float_complex doc", NULL,
+                                  &context_complex);
     if (status != DISIR_STATUS_OK)
         goto error;
 
