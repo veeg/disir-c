@@ -258,7 +258,7 @@ enum disir_status dc_get_name (struct disir_context *context,
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_add_introduced (struct disir_context *context,
-                                     struct semantic_version semver);
+                                     struct semantic_version *semver);
 
 //! \brief Add a deprecrated semantic version number to a context.
 //!
@@ -268,7 +268,7 @@ enum disir_status dc_add_introduced (struct disir_context *context,
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_add_deprecrated (struct disir_context *context,
-                                      struct semantic_version smever);
+                                      struct semantic_version *semver);
 
 
 //! \brief Set the value type associated with input context

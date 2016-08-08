@@ -266,7 +266,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
 
     if (semver)
     {
-        status = dc_add_introduced (keyval, *semver);
+        status = dc_add_introduced (keyval, semver);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged

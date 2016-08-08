@@ -747,7 +747,7 @@ dc_add_restriction_value_range (struct disir_context *parent, double min, double
 
     if (semver)
     {
-        status = dc_add_introduced (context_restriction, *semver);
+        status = dc_add_introduced (context_restriction, semver);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -821,7 +821,7 @@ dc_add_restriction_value_numeric (struct disir_context *parent, double value, co
 
     if (semver)
     {
-        status = dc_add_introduced (context_restriction, *semver);
+        status = dc_add_introduced (context_restriction, semver);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged

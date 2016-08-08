@@ -549,7 +549,7 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
 
 //! PUBLIC API
 enum disir_status
-dc_add_introduced (struct disir_context *context, struct semantic_version semver)
+dc_add_introduced (struct disir_context *context, struct semantic_version *semver)
 {
     struct semantic_version *introduced;
     enum disir_status status;
@@ -564,6 +564,11 @@ dc_add_introduced (struct disir_context *context, struct semantic_version semver
     {
         // Already logged
         return status;
+    }
+    if (semver == NULL)
+    {
+        log_debug (0, "invoked with semver NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
@@ -587,10 +592,10 @@ dc_add_introduced (struct disir_context *context, struct semantic_version semver
 
     log_debug_context (6, context, "adding introduced to root(%s): %s",
                        dc_context_type_string (context->cx_root_context),
-                       dc_semantic_version_string (buffer, 32, &semver));
+                       dc_semantic_version_string (buffer, 32, semver));
 
     // Update mold with highest version if root context is DISIR_CONTEXT_MOLD
-    dx_mold_update_version (context->cx_root_context->cx_mold, &semver);
+    dx_mold_update_version (context->cx_root_context->cx_mold, semver);
 
     switch (dc_context_type (context))
     {
@@ -629,9 +634,9 @@ dc_add_introduced (struct disir_context *context, struct semantic_version semver
 
     if (introduced)
     {
-        introduced->sv_major = semver.sv_major;
-        introduced->sv_minor = semver.sv_minor;
-        introduced->sv_patch = semver.sv_patch;
+        introduced->sv_major = semver->sv_major;
+        introduced->sv_minor = semver->sv_minor;
+        introduced->sv_patch = semver->sv_patch;
     }
 
     return status;
@@ -639,7 +644,7 @@ dc_add_introduced (struct disir_context *context, struct semantic_version semver
 
 //! PUBLIC API
 enum disir_status
-dc_add_deprecrated (struct disir_context *context, struct semantic_version smever)
+dc_add_deprecrated (struct disir_context *context, struct semantic_version *semver)
 {
     return DISIR_STATUS_INTERNAL_ERROR;
 }

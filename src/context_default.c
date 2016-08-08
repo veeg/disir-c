@@ -310,7 +310,7 @@ dc_add_default_string (struct disir_context *parent, const char *value,
 
     if (semver)
     {
-        status = dc_add_introduced(def, *semver);
+        status = dc_add_introduced(def, semver);
         if (status != DISIR_STATUS_OK)
         {
             // already logged
@@ -361,7 +361,7 @@ dc_add_default_integer (struct disir_context *parent, int64_t value,
 
     if (semver)
     {
-        status = dc_add_introduced(def, *semver);
+        status = dc_add_introduced(def, semver);
         if (status != DISIR_STATUS_OK)
         {
             // already logged
@@ -412,7 +412,7 @@ dc_add_default_float (struct disir_context *parent, double value, struct semanti
 
     if (semver)
     {
-        status = dc_add_introduced(def, *semver);
+        status = dc_add_introduced(def, semver);
         if (status != DISIR_STATUS_OK)
         {
             // already logged
@@ -468,7 +468,7 @@ dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
 
     if (semver)
     {
-        status = dc_add_introduced(def, *semver);
+        status = dc_add_introduced(def, semver);
         if (status != DISIR_STATUS_OK)
         {
             // already logged
