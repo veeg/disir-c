@@ -503,7 +503,7 @@ dx_get_mold_equiv_type (struct disir_context *parent,
 
     if (dc_context_type (parent) == DISIR_CONTEXT_CONFIG)
     {
-        storage = parent->cx_config->cf_context_mold->cx_mold->mo_elements;
+        storage = parent->cx_config->cf_mold->mo_elements;
     }
     else if (dc_context_type (parent) == DISIR_CONTEXT_SECTION)
     {
@@ -553,7 +553,7 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
 
     if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_CONFIG)
     {
-        storage = context->cx_parent_context->cx_config->cf_context_mold->cx_mold->mo_elements;
+        storage = context->cx_parent_context->cx_config->cf_mold->mo_elements;
     }
     else if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_SECTION)
     {
@@ -775,7 +775,7 @@ dc_set_version (struct disir_context *context, struct semantic_version *semver)
     {
         // TODO: Verify that the mold context is still valid. Extract into variable
         if (dc_semantic_version_compare (
-                &context->cx_config->cf_context_mold->cx_mold->mo_version, semver) < 0)
+                &context->cx_config->cf_mold->mo_version, semver) < 0)
         {
             dx_log_context (context, "Cannot set version to CONFIG whose MOLD is lower.");
             return DISIR_STATUS_CONFLICTING_SEMVER;

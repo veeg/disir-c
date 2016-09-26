@@ -11,6 +11,9 @@ struct disir_mold
     //! Context object for this mold
     struct disir_context                            *mo_context;
 
+    //! Count of how many ADT structure pointers the user posesses.
+    int                             mo_reference_count;
+
     //! Semantic version of this mold.
     //! This value is determined by the highest semantic version number found
     //! in any of the child contexts contained within the mold.

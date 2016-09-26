@@ -114,7 +114,7 @@ dx_mold_create (struct disir_context *context)
         goto error;
     }
 
-
+    mold->mo_reference_count = 1;
     mold->mo_context = context;
     mold->mo_elements = dx_element_storage_create ();
     if (mold->mo_elements == NULL)

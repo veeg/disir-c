@@ -328,6 +328,8 @@ disir_mold_finished (struct disir_mold **mold)
     enum disir_status status;
     struct disir_context *context;
 
+    status = DISIR_STATUS_OK;
+
     if (mold == NULL || *mold == NULL)
     {
         log_debug (0, "invoked with NULL mold pointer");
@@ -336,8 +338,14 @@ disir_mold_finished (struct disir_mold **mold)
 
     TRACE_ENTER ("mold: %p", *mold);
 
-    context = (*mold)->mo_context;
-    status = dc_destroy (&context);
+    (*mold)->mo_reference_count--;
+    if ((*mold)->mo_reference_count == 0)
+    {
+        log_debug (6, "Mold reached reference count 0 - destroying context.");
+        context = (*mold)->mo_context;
+        status = dc_destroy (&context);
+    }
+
     if (status == DISIR_STATUS_OK)
         *mold = NULL;
 
