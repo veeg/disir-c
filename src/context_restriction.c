@@ -881,3 +881,81 @@ error:
     return status;
 }
 
+//! STATIC API
+static enum disir_status
+add_restriction_entries_min_max (struct disir_context *parent, int64_t value,
+                                    struct semantic_version *semver,
+                                    enum disir_restriction_type type)
+
+{
+    enum disir_status status;
+    struct disir_context *context_restriction;
+
+    TRACE_ENTER ("parent (%p), value (%d), semver (%p), type (%s)",
+                 parent, value, semver, dc_restriction_enum_string (type));
+
+    status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged ?
+        return status;
+    }
+
+    status = dc_set_restriction_type (context_restriction, type);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto error;
+    }
+
+    status = dc_restriction_set_numeric (context_restriction, value);
+    if (status != DISIR_STATUS_OK)
+    {
+        // This should not happen....
+        goto error;
+    }
+
+    if (semver)
+    {
+        status = dc_add_introduced (context_restriction, semver);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+    }
+
+    status = dc_finalize (&context_restriction);
+    if (status != DISIR_STATUS_OK)
+    {
+        goto error;
+    }
+
+    // FALL-THROUGH
+error:
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_context_transfer_logwarn (parent, context_restriction);
+        dc_destroy (&context_restriction);
+    }
+
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_add_restriction_entries_min (struct disir_context *parent, int64_t min,
+                                struct semantic_version *semver)
+{
+    return add_restriction_entries_min_max (parent, min, semver, DISIR_RESTRICTION_INC_ENTRY_MIN);
+}
+
+//! PUBLIC API
+enum disir_status
+dc_add_restriction_entries_max (struct disir_context *parent, int64_t max,
+                                struct semantic_version *semver)
+{
+    return add_restriction_entries_min_max (parent, max, semver, DISIR_RESTRICTION_INC_ENTRY_MAX);
+}
+

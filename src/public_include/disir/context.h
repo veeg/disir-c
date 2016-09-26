@@ -934,6 +934,30 @@ dc_add_restriction_value_range (struct disir_context *parent, double min, double
                                 const char * doc, struct semantic_version *semver,
                                 struct disir_context **output);
 
+//! \brief Add a DISIR_RESTRICTION_INC_ENTRY_MIN restriction to parent.
+//!
+//! The input parent much have root context MOLD, and must be of type:
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_add_restriction_entries_min (struct disir_context *parent, int64_t min,
+                                struct semantic_version *semver);
+
+//! \brief Add a DISIR_RESTRICTION_INC_ENTRY_MIN restriction to parent.
+//!
+//! The input parent much have root context MOLD, and must be of type:
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_add_restriction_entries_max (struct disir_context *parent, int64_t max,
+                                struct semantic_version *semver);
+
 //! \brief Retrieve the version number of the input context.
 //!
 //! Supported contexts are:
