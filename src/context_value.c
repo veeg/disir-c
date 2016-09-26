@@ -560,10 +560,8 @@ dc_set_value_integer (struct disir_context *context, int64_t value)
                               dx_value_type_string (DISIR_VALUE_TYPE_INTEGER),
                               dc_value_type_string (context));
     }
-    else
-        status = invalid;
 
-    return status;
+    return (status == DISIR_STATUS_OK ? invalid : status);
 }
 
 //! PUBLIC API
