@@ -149,6 +149,7 @@ disir_config_input (struct disir_instance *disir, const char *type, const char *
     {
         status = input->di_input.in_config_read (disir, id, mold, config);
     }
+
     return status;
 }
 
