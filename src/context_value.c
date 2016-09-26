@@ -17,6 +17,7 @@
 #include "log.h"
 #include "mold.h"
 #include "value.h"
+#include "restriction.h"
 
 static enum disir_status
 get_value_input_check (struct disir_context *context, const char *type,
@@ -529,6 +530,28 @@ dc_set_value_integer (struct disir_context *context, int64_t value)
         return invalid;
     }
 
+    // Restriction check
+    // Can only be applied if input context is valid.
+    // Can only be applied to top-level CONFIG
+    // We only permit setting an unfulfilled value in constructing mode.
+
+    if (invalid != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        invalid = dx_restriction_exclusive_value_check (context, value, 0);
+    }
+
+    // Do not allow finalized context to change value
+    if (context->CONTEXT_STATE_FINALIZED && invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
+    {
+        return invalid;
+    }
+
+    // Mark unfulfilled value sat in constructing mode as invalid context
+    if (invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
+    {
+        context->CONTEXT_STATE_INVALID = 1;
+    }
+
     status = dx_value_set_integer (value_storage, value);
     if (status != DISIR_STATUS_OK)
     {
@@ -586,6 +609,23 @@ dc_set_value_float (struct disir_context *context, double value)
     {
         // Already logged
         return invalid;
+    }
+
+    if (invalid != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        invalid = dx_restriction_exclusive_value_check (context, 0, value);
+    }
+
+    // Do not allow finalized context to change value
+    if (context->CONTEXT_STATE_FINALIZED && invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
+    {
+        return invalid;
+    }
+
+    // Mark unfulfilled value sat in constructing mode as invalid context
+    if (invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
+    {
+        context->CONTEXT_STATE_INVALID = 1;
     }
 
     status = dx_value_set_float (value_storage, value);
