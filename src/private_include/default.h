@@ -8,7 +8,7 @@
 struct disir_default
 {
     //! Context element this default element belongs to.
-    struct disir_context                        *de_context;
+    struct disir_context        *de_context;
 
     //! Version this default entry was introduced.
     struct semantic_version     de_introduced;
