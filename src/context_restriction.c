@@ -261,6 +261,7 @@ dx_restriction_destroy (struct disir_restriction **restriction)
     struct disir_restriction *tmp;
     struct disir_context *context;
     struct disir_restriction **queue;
+    struct disir_documentation *doc;
     const char *group;
 
     queue = NULL;
@@ -315,6 +316,13 @@ dx_restriction_destroy (struct disir_restriction **restriction)
                 log_warn_context (context, "unknown restriction group type: %s", group);
             }
         }
+    }
+
+    // Remove documentation entries.
+    while ((doc = MQ_POP((*restriction)->re_documentation_queue)))
+    {
+        context = doc->dd_context;
+        dc_destroy (&context);
     }
 
     free (tmp);
