@@ -18,6 +18,51 @@
 #include "mold.h"
 #include "restriction.h"
 
+static enum disir_status
+context_get_introduced_structure (struct disir_context *context,
+                                  struct semantic_version **introduced)
+{
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
+    {
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    switch (dc_context_type (context))
+    {
+    case DISIR_CONTEXT_DOCUMENTATION:
+    {
+        *introduced = &context->cx_documentation->dd_introduced;
+        break;
+    }
+    case DISIR_CONTEXT_DEFAULT:
+    {
+        *introduced = &context->cx_default->de_introduced;
+        break;
+    }
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        *introduced = &context->cx_keyval->kv_introduced;
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+        *introduced = &context->cx_section->se_introduced;
+        break;
+    case DISIR_CONTEXT_RESTRICTION:
+    {
+        *introduced = &context->cx_restriction->re_introduced;
+        break;
+    }
+    case DISIR_CONTEXT_CONFIG:
+    case DISIR_CONTEXT_MOLD:
+    case DISIR_CONTEXT_FREE_TEXT:
+    case DISIR_CONTEXT_UNKNOWN:
+        return DISIR_STATUS_INTERNAL_ERROR;
+    // No default handler - let compiler warn us of  unhandled context
+    }
+
+    return DISIR_STATUS_OK;
+}
+
 //! PUBLIC API
 enum disir_status
 dc_printerror (struct disir_context *context, char *buffer,
