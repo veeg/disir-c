@@ -15,6 +15,7 @@
 #include "section.h"
 #include "log.h"
 #include "mqueue.h"
+#include "restriction.h"
 
 //! INTERNAL API
 enum disir_status
@@ -175,6 +176,7 @@ dx_section_destroy (struct disir_section **section)
     struct disir_context *context;
     struct disir_documentation *doc;
     struct disir_collection *collection;
+    struct disir_restriction *restriction;
 
     if (section == NULL || *section == NULL)
     {
@@ -219,6 +221,18 @@ dx_section_destroy (struct disir_section **section)
     }
 
     dx_element_storage_destroy (&(*section)->se_elements);
+
+    // Destroy all restrictions
+    while ((restriction = MQ_POP ((*section)->se_restrictions_inclusive_queue)))
+    {
+        context = restriction->re_context;
+        dc_destroy (&context);
+    }
+    while ((restriction = MQ_POP ((*section)->se_restrictions_exclusive_queue)))
+    {
+        context = restriction->re_context;
+        dc_destroy (&context);
+    }
 
     free (*section);
     *section = NULL;
