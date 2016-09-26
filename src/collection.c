@@ -20,6 +20,44 @@ dc_collection_size (struct disir_collection *collection)
     return collection->cc_numentries;
 }
 
+//! INTERNAL API
+enum disir_status
+dx_collection_next_noncoalesce (struct disir_collection *collection,
+                                struct disir_context **context)
+{
+    if (collection == NULL)
+    {
+        log_debug (0, "invoked with NULL collection pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (context == NULL)
+    {
+        log_debug (0, "invoked with NULL context pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    // Initialize the output with NULL
+    *context = NULL;
+
+    // Exausted?
+    if (collection->cc_iterator_index > collection->cc_numentries - 1)
+    {
+        log_debug (9, "Collection iterator( %d ) exhausted (numentires: %d)",
+                collection->cc_iterator_index, collection->cc_numentries - 1);
+        return DISIR_STATUS_EXHAUSTED;
+    }
+
+    // Grab the iterator index item, increment index.
+    *context = collection->cc_collection[collection->cc_iterator_index];
+    dx_context_incref (*context);
+
+    log_debug (9, "Next context( %p ) at index( %d )", *context, collection->cc_iterator_index);
+
+    collection->cc_iterator_index++;
+
+    return DISIR_STATUS_OK;
+}
+
 //! PUBLIC API
 enum disir_status
 dc_collection_next (struct disir_collection *collection, struct disir_context **context)

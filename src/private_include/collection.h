@@ -33,6 +33,19 @@ struct disir_collection
 //! Decref and lose invalid context pointers.
 enum disir_status dx_collection_coalesce (struct disir_collection *collection);
 
+//! \brief Return the next entry in the collection without coalescing.
+//!
+//! This function is used to potentially retrieve destroyed contexts
+//! from a collection. This is used when destroying an element storage, to
+//! avoid accessing and freeing contexts in the wrong order.
+//!
+//! \return DISIR_STATUS_EXHAUSTED when iterator is exhausted.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dx_collection_next_noncoalesce (struct disir_collection *collection,
+                                struct disir_context **context);
+
 
 #endif // _LIBDISIR_PRIVATE_CONTEXT_COLLECTION_H
 
