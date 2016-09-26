@@ -11,6 +11,7 @@ struct disir_default
     struct disir_context        *de_context;
 
     //! Version this default entry was introduced.
+    //! NOTE: A default entry may not be deprecated, only superseeded by another default.
     struct semantic_version     de_introduced;
 
     //! The value associated with this default entry.
