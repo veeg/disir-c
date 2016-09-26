@@ -604,11 +604,14 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    // If parent is invalid, it does not have a mold equiv
-    if (context->cx_parent_context->CONTEXT_STATE_INVALID)
+    // Parent section may be invalid with no mold equivalent
+    // Parent config will always have a mold equivalent.
+    if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_SECTION &&
+        context->cx_parent_context->cx_section->se_mold_equiv == NULL)
     {
-        dx_context_error_set (context, "%s missing mold equivalent entry for name '%s'.",
-                                       dc_context_type_string (context), value);
+        const char *name;
+        dx_value_get_string (&context->cx_parent_context->cx_section->se_name, &name, NULL);
+        dx_context_error_set (context, "Parent SECTION '%s' missing mold equivalent.", name);
         return DISIR_STATUS_NOT_EXIST;
     }
 
@@ -636,6 +639,12 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
         dx_context_error_set (context, "%s missing mold equivalent entry for name '%s'.",
                                         dc_context_type_string (context), value);
         return status;
+    }
+
+    // Matching entry was not of same type.
+    if (dc_context_type (context) != dc_context_type (queried))
+    {
+        return DISIR_STATUS_WRONG_CONTEXT;
     }
 
     if (dc_context_type (context) == DISIR_CONTEXT_SECTION)
