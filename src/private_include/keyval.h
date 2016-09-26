@@ -10,11 +10,11 @@
 struct disir_keyval
 {
     //! Context element this keyval element belongs to.
-    struct disir_context                        *kv_context;
+    struct disir_context        *kv_context;
 
     //! Context mold element this keyval element represents
     //! Only applicable to parent toplevel context DISIR_CONTEXT_CONFIG
-    struct disir_context                        *kv_mold_equiv;
+    struct disir_context        *kv_mold_equiv;
 
     //! Version this keyval entry was introduced.
     struct semantic_version     kv_introduced;
