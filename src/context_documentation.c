@@ -30,6 +30,8 @@ dx_documentation_add (struct disir_context *parent, struct disir_documentation *
     int exists;
     char buffer[32];
 
+    TRACE_ENTER ("parent (%p), doc (%p)", parent, doc);
+
     status = DISIR_STATUS_INTERNAL_ERROR;
 
     if (parent == NULL || doc == NULL)
@@ -98,6 +100,7 @@ dx_documentation_add (struct disir_context *parent, struct disir_documentation *
         status = DISIR_STATUS_OK;
     }
 
+    TRACE_EXIT ("status: %s", disir_status_string (status));
     return status;
 }
 
