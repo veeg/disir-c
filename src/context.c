@@ -406,6 +406,14 @@ enum disir_status
 dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
 {
     enum disir_status status;
+    enum disir_status invalid;
+    int max;
+    int current_entries_count;
+    struct disir_collection *collection;
+
+    collection = NULL;
+    max = 0;
+    invalid = DISIR_STATUS_OK;
 
     TRACE_ENTER ("context (%p), name (%s), name_size (%d)", context, name, name_size);
 
@@ -422,6 +430,40 @@ dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
         return status;
     }
 
+    // Find the name in the mold
+    if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+    {
+        invalid = dx_set_mold_equiv (context, name, name_size);
+        if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_NOT_EXIST)
+        {
+            return invalid;
+        }
+        // If NOT EXIST, let it through and set name but mark context as invalid
+        if (invalid == DISIR_STATUS_NOT_EXIST)
+        {
+            context->CONTEXT_STATE_INVALID = 1;
+        }
+
+        // Restriction check: Dis-allow operation if parent is finalized and max restriction exceeded
+        if (invalid == DISIR_STATUS_OK && context->cx_parent_context->CONTEXT_STATE_FINALIZED)
+        {
+            // check if number of elements in parent exceed size of restriction
+            dx_restriction_entries_value (context, DISIR_RESTRICTION_INC_ENTRY_MAX, NULL, &max);
+            dc_find_elements (context->cx_parent_context, name, &collection);
+            current_entries_count = dc_collection_size (collection);
+            dc_collection_finished (&collection);
+
+            log_debug (4, "Maximum restriction for entry '%s' = %d (currently at %d",
+                          name, max, current_entries_count);
+            if (max != 0 && max <= current_entries_count)
+            {
+                return DISIR_STATUS_RESTRICTION_VIOLATED;
+            }
+        }
+    }
+
+    // QUESTION: Do not allow setting name on finalized context? Only if not invalid
+
     if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
     {
         status = dx_value_set_string (&context->cx_keyval->kv_name, name, name_size);
@@ -436,23 +478,7 @@ dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
         return DISIR_STATUS_INTERNAL_ERROR;
     }
 
-    if (status != DISIR_STATUS_OK)
-    {
-        // Already logged
-        return status;
-    }
-
-    // Find the name in the mold
-    if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
-    {
-        // If NOT EXIST, let it through and set name but mark context as invalid
-        status = dx_set_mold_equiv (context, name, name_size);
-        if (status == DISIR_STATUS_NOT_EXIST)
-        {
-            context->CONTEXT_STATE_INVALID = 1;
-            return status;
-        }
-    }
+    status = (status == DISIR_STATUS_OK ? invalid : status);
 
     // TODO:  if context is not in constructing mode (it has been finalized once)
     // remove old name from parent storage and add it under the new name.
