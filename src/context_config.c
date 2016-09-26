@@ -103,15 +103,35 @@ dc_config_finalize (struct disir_context **context, struct disir_config **config
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 
-    // TODO: Perform some validation?
+    // Perform full config validation.
+    status = dx_validate_context (*context);
+    if (status == DISIR_STATUS_OK ||
+        status == DISIR_STATUS_INVALID_CONTEXT ||
+        status == DISIR_STATUS_ELEMENTS_INVALID)
+    {
+        *config = (*context)->cx_config;
+        (*context)->CONTEXT_STATE_FINALIZED = 1;
+        (*context)->CONTEXT_STATE_CONSTRUCTING = 0;
 
-    *config = (*context)->cx_config;
-    (*context)->CONTEXT_STATE_FINALIZED = 1;
-    *context = NULL;
-    // We do not decref context refcount on finalize
+        // Only let API return INVALID_CONTEXT if anything is amiss
+        if (status == DISIR_STATUS_ELEMENTS_INVALID)
+        {
+            status = DISIR_STATUS_INVALID_CONTEXT;
+        }
 
-    TRACE_EXIT ("");
-    return DISIR_STATUS_OK;
+        // We do not decref context refcount on finalize
+        // Deprive the user of his context reference.
+        *context = NULL;
+    }
+    else
+    {
+        log_fatal_context (*context, "failed internally with status %s",
+                                     disir_status_string (status));
+        status = DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
 }
 
 //! INTERNAL API

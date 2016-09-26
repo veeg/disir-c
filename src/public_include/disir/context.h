@@ -134,6 +134,13 @@ enum disir_status dc_destroy (struct disir_context **context);
 //! in the context, an appropriate status code is returned.
 //! Upon success, the input context pointer is set to NULL.
 //!
+//! The return code depends on the state of the parent. If there is any problem with the input
+//! context, but enough state exists to submit an invalid context to parent, it will still
+//! be submitted to a parent who is still constructing (not finalized.)
+//! The return code will then be INVALID_CONTEXT.
+//! When the parent is finalized, such invalid context entries
+//! will be rejected and the appropriate status code is returned.
+//!
 //! \return DISIR_STATUS_OK on success, context pointer is invalidated and set to NULL.
 //!
 enum disir_status dc_finalize (struct disir_context **context);
