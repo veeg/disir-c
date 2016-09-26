@@ -193,7 +193,7 @@ dx_section_destroy (struct disir_section **section)
     status = dx_element_storage_get_all ((*section)->se_elements, &collection);
     if (status == DISIR_STATUS_OK)
     {
-        while (dc_collection_next (collection, &context) != DISIR_STATUS_EXHAUSTED)
+        while (dx_collection_next_noncoalesce (collection, &context) != DISIR_STATUS_EXHAUSTED)
         {
             dx_context_decref (&context);
             dc_putcontext (&context);
