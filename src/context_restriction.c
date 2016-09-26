@@ -549,8 +549,19 @@ dc_restriction_set_range (struct disir_context *context, double min, double max)
     {
     case DISIR_RESTRICTION_EXC_VALUE_RANGE:
     {
-        context->cx_restriction->re_value_min = min;
-        context->cx_restriction->re_value_max = max;
+        // Store restriction value based on keyval type (integer vs float)
+        if (dc_value_type (context->cx_parent_context) == DISIR_VALUE_TYPE_INTEGER)
+        {
+            context->cx_restriction->re_value_min = (int64_t) min;
+            context->cx_restriction->re_value_max = (int64_t) max;
+        }
+        else
+        {
+            context->cx_restriction->re_value_min = min;
+            context->cx_restriction->re_value_max = max;
+        }
+
+
         break;
     }
     default:
@@ -593,16 +604,8 @@ dc_restriction_get_range (struct disir_context *context, double *min, double *ma
     {
     case DISIR_RESTRICTION_EXC_VALUE_RANGE:
     {
-        if (context->cx_parent_context->cx_keyval->kv_value.dv_type == DISIR_VALUE_TYPE_INTEGER)
-        {
-            *min = (int) context->cx_restriction->re_value_min;
-            *max = (int) context->cx_restriction->re_value_max;
-        }
-        else
-        {
-            *min = context->cx_restriction->re_value_min;
-            *max = context->cx_restriction->re_value_max;
-        }
+        *min = context->cx_restriction->re_value_min;
+        *max = context->cx_restriction->re_value_max;
         break;
     }
     default:
@@ -633,6 +636,12 @@ dc_restriction_set_numeric (struct disir_context *context, double value)
     {
         // Already logged
         return status;
+    }
+
+    // XXX if set_numeric is used by entries_max/min, this doesnt make much sense....
+    if (dc_value_type (context->cx_parent_context) == DISIR_VALUE_TYPE_INTEGER)
+    {
+        value = (int64_t) value;
     }
 
     switch (context->cx_restriction->re_type)
@@ -691,27 +700,17 @@ dc_restriction_get_numeric (struct disir_context *context, double *value)
     {
     case DISIR_RESTRICTION_EXC_VALUE_NUMERIC:
     {
-        // Convert to integer if keyval type is integer.
-        if (context->cx_parent_context->cx_keyval->kv_value.dv_type == DISIR_VALUE_TYPE_INTEGER)
-        {
-            *value = (int) context->cx_restriction->re_value_numeric;
-        }
-        else
-        {
-            *value = context->cx_restriction->re_value_numeric;
-        }
+        *value = context->cx_restriction->re_value_numeric;
         break;
     }
     case DISIR_RESTRICTION_INC_ENTRY_MIN:
     {
-        // Always convert to integer
-        *value = (int) context->cx_restriction->re_value_min;
+        *value = context->cx_restriction->re_value_min;
         break;
     }
     case DISIR_RESTRICTION_INC_ENTRY_MAX:
     {
-        // Always convert to integer
-        *value = (int) context->cx_restriction->re_value_max;
+        *value = context->cx_restriction->re_value_max;
         break;
     }
     default:
