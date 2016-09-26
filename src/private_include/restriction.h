@@ -44,6 +44,18 @@ struct disir_restriction * dx_restriction_create (struct disir_context *parent);
 //! Free all resources belonging to disir_restriction structure (including itself)
 enum disir_status dx_restriction_destroy (struct disir_restriction **restriction);
 
+//! \brief Check KEYVAL context value type if within restriction bounds.
+//!
+//! \return DISIR_STATUS_OK if root context is not CONFIG.
+//! \return DISIR_STATUS_INTERNAL_ERROR if context' value type is not INTEGER or FLOAT
+//! \return DISIR_STATUS_RESTRICTION_VIOLATED if non of the exclusive restrictions
+//!         applied to VALUE_RANGE or VALUE_NUMERIC are fulfilled.
+//! \return DISIR_STATUS_OK if restrictions are fulfilled (if any).
+//!
+enum disir_status dx_restriction_exclusive_value_check (struct disir_context *context,
+                                                        int64_t integer_value,
+                                                        double float_value);
+
 
 #endif // _LIBDISIR_RESTRICTION_H
 

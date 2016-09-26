@@ -959,3 +959,114 @@ dc_add_restriction_entries_max (struct disir_context *parent, int64_t max,
     return add_restriction_entries_min_max (parent, max, semver, DISIR_RESTRICTION_INC_ENTRY_MAX);
 }
 
+//! INTERNAL API
+enum disir_status
+dx_restriction_exclusive_value_check (struct disir_context *context, int64_t integer_value,
+                                                                     double float_value)
+{
+    enum disir_status status;
+    struct disir_restriction **queue;
+    struct semantic_version *config_version;
+    int exclusive_fulfilled = 0;
+    int restriction_entries_oor = 0;
+    double value;
+
+    status = DISIR_STATUS_OK;
+
+    TRACE_ENTER ("%s(%p), int (%d) float (%f)", dc_context_type_string (context), context,
+                                                integer_value, float_value);
+
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    {
+        return status;
+    }
+
+    switch (dc_value_type (context))
+    {
+    case DISIR_VALUE_TYPE_INTEGER:
+    {
+        value = (double) integer_value;
+        break;
+    }
+    case DISIR_VALUE_TYPE_FLOAT:
+    {
+        value = float_value;
+        break;
+    }
+    default:
+    {
+        log_fatal_context (context, "restriction check value type not handled: %s",
+                                    dc_value_type_string (context));
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+    }
+
+    queue = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_exclusive_queue;
+    config_version = &context->cx_root_context->cx_config->cf_version;
+
+    MQ_FOREACH (*queue,
+    {
+        log_debug (10, "queue entry (%p), next (%p), prev (%p)", entry, entry->next, entry->prev);
+        // Is restriction valid for this version of the config
+        if (dc_semantic_version_compare (config_version, &entry->re_introduced) < 0)
+        {
+            restriction_entries_oor += 1;
+            // XXX MQ_FOREACH does not increment entry if continue is used
+            entry = entry->next;
+            continue;
+        }
+
+        // Restriction is atleast older or equal to config version
+        // TODO: Check deprecated.
+
+        switch (entry->re_type)
+        {
+        case DISIR_RESTRICTION_EXC_VALUE_RANGE:
+        {
+            log_debug (9, "value (%f), min (%f), max (%f)", value,
+                          entry->re_value_min, entry->re_value_max);
+            if (value >= entry->re_value_min && value <= entry->re_value_max)
+            {
+                log_debug (8, "Exclusive restriction %s(%p) fufilled. (Value (%f) == [%f, %f])",
+                              dc_restriction_enum_string (entry->re_type), entry,
+                              value, entry->re_value_min, entry->re_value_max);
+                exclusive_fulfilled = 1;
+            }
+            break;
+        }
+        case DISIR_RESTRICTION_EXC_VALUE_NUMERIC:
+        {
+            log_debug (9, "value (%f) numeric (%f)", value, entry->re_value_numeric);
+            if (value == entry->re_value_numeric)
+            {
+                log_debug (6, "Exclusive restriction %s(%p) fufilled. (Value (%f) == %f)",
+                              dc_restriction_enum_string (entry->re_type), entry,
+                              value, entry->re_value_numeric);
+
+                exclusive_fulfilled = 1;
+            }
+            break;
+        }
+        default:
+        {
+            log_warn_context (context, "unhandled exclusive restriction check: %s",
+                                        dc_restriction_enum_string (entry->re_type));
+        }
+        }
+
+    });
+
+    // Entry did not fulfill the exclusive restrictions. Get out' here!
+    if (exclusive_fulfilled == 0 && MQ_SIZE (*queue) > restriction_entries_oor)
+    {
+        log_debug (4, "Exclusive restriction(s) violated."
+                      " Out of range (%d) vs entires (%d)",
+                      restriction_entries_oor, MQ_SIZE (*queue));
+
+        status = DISIR_STATUS_RESTRICTION_VIOLATED;
+    }
+
+    TRACE_EXIT ("status (%s", disir_status_string (status));
+    return status;
+}
+
