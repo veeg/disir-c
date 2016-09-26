@@ -361,8 +361,21 @@ dc_putcontext (struct disir_context **context)
         return status;
     }
 
-    dx_context_decref (context);
+    TRACE_ENTER ("*context: %p", *context);
+
+    if ((*context)->cx_refcount == 1)
+    {
+        log_debug_context (4, *context, "Input context only at 1 reference."
+                                        " Destroying instead of reducing refcount.");
+        dc_destroy (context);
+    }
+    else
+    {
+        dx_context_decref (context);
+    }
     *context = NULL;
+
+    TRACE_EXIT ("");
     return DISIR_STATUS_OK;
 }
 
