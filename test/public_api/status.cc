@@ -146,6 +146,13 @@ TEST_F (StatusTest, not_exist)
     ASSERT_STREQ (status_string, "NOT EXIST");
 }
 
+TEST_F (StatusTest, restriction_violated)
+{
+    status = DISIR_STATUS_RESTRICTION_VIOLATED;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "RESTRICTION VIOLATED");
+}
+
 TEST_F (StatusTest, unknown)
 {
     status = DISIR_STATUS_UNKNOWN;
