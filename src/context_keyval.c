@@ -262,6 +262,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
 
     if (output)
     {
+        log_debug_context (9, keyval, "user provided output storage: incref context");
         dx_context_incref (keyval);
         *output = keyval;
     }
@@ -381,6 +382,7 @@ dx_keyval_destroy (struct disir_keyval **keyval)
 
     if (keyval == NULL || *keyval == NULL)
     {
+        log_debug (0, "invoked with NULL keyval argument. (%p)", keyval);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -400,6 +402,7 @@ dx_keyval_destroy (struct disir_keyval **keyval)
     // Decref mold_equiv if set
     if ((*keyval)->kv_mold_equiv)
     {
+        log_debug (5, "decrefing mold equivalent entry.");
         dx_context_decref (&(*keyval)->kv_mold_equiv);
         (*keyval)->kv_mold_equiv = NULL;
     }
