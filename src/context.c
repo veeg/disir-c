@@ -298,25 +298,47 @@ dc_finalize (struct disir_context **context)
     // No default case - let compiler warn us about unhandled cases.
     }
 
-
     // Handle context state
     if (status == DISIR_STATUS_OK ||
         status == DISIR_STATUS_INVALID_CONTEXT ||
-        (*context)->CONTEXT_STATE_INVALID)
+        status == DISIR_STATUS_ELEMENTS_INVALID)
     {
         (*context)->CONTEXT_STATE_FINALIZED = 1;
         (*context)->CONTEXT_STATE_CONSTRUCTING = 0;
 
-        if (status == DISIR_STATUS_OK)
-        {
-            // Deprive the user of his reference.
-            *context = NULL;
-        }
-        else
+        if (status == DISIR_STATUS_INVALID_CONTEXT)
         {
             // Contect invalid - Mark it as so and let user handle it.
             (*context)->CONTEXT_STATE_INVALID = 1;
+            // XXX: Handlse case where invalid context is not added to
+            // XXX: parent element storage  (empty name)
+            // XXX: Now it stands at two references with only one liable source (caller)
+            // XXX: Either allow empty name to be submitted to element_storage
+            // XXX: or handle it specially here.
             dx_context_incref (*context);
+        }
+        else
+        {
+            // Update mold reference, if applicable
+            // XXX: Handle versions much be done more elegantly
+            // XXX: Currently, we may still have dangling versions persistet to mold
+            // XXX: event though they may be deleted (finalized child, destroy constructing parent)
+            struct semantic_version *introduced;
+            if (context_get_introduced_structure (*context, &introduced) == DISIR_STATUS_OK)
+            {
+                dx_mold_update_version ((*context)->cx_root_context->cx_mold, introduced);
+            }
+            // TODO: Do same exercise with deprecated.
+            // TODO: Add similar test
+
+            // Deprive the user of his reference.
+            *context = NULL;
+
+            // Only let API return INVALID_CONTEXT if anything is amiss
+            if (status == DISIR_STATUS_ELEMENTS_INVALID)
+            {
+                status = DISIR_STATUS_INVALID_CONTEXT;
+            }
         }
     }
 
