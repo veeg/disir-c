@@ -117,44 +117,22 @@ dx_keyval_finalize (struct disir_context *keyval)
     // Cannot even add it to to storage (NO NAME!
     if (keyval->cx_keyval->kv_name.dv_string == NULL)
     {
-        dx_context_error_set (keyval, "Missing name component for keyval.");
-        // XXX: Find a new return code - INVALID_CONTEXT reveres to contexts that
-        // are not valid but can be added to parent - without a name this cannot.
-        // XXX: Or can it? Add it to element storage with NULL name should still
+        dx_log_context (keyval, "Missing name component for keyval.");
+        // XXX: Cannot add to parent - Or can it? Add it to element storage with NULL name should still
         // add it to sequential list - just not the hashmap. Hmm..
-        return DISIR_STATUS_INVALID_CONTEXT;
+        return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;
     }
 
-    // Cannot add without known type.
-    if (dx_value_type_sanify(keyval->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN &&
-        invalid == DISIR_STATUS_OK)
-    {
-        dx_context_error_set (keyval, "Missing type component for keyval.");
-        invalid = DISIR_STATUS_INVALID_CONTEXT;
-    }
+    invalid = dx_validate_context (keyval);
 
-    // Additional restrictions apply for keyvals added to a root mold
-    // Only check if we are not already in erroneous state
-    if (dc_context_type (keyval->cx_root_context) == DISIR_CONTEXT_MOLD &&
-        invalid == DISIR_STATUS_OK)
+    if (invalid == DISIR_STATUS_OK ||
+        invalid == DISIR_STATUS_INVALID_CONTEXT)
     {
-        // Cannot add without atleast one default entry.
-        if (keyval->cx_keyval->kv_default_queue == NULL)
+        status = dx_element_storage_add (storage, keyval->cx_keyval->kv_name.dv_string, keyval);
+        if (status != DISIR_STATUS_OK)
         {
-            dx_context_error_set (keyval, "Missing default entry for keyval.");
-            return DISIR_STATUS_INVALID_CONTEXT;
+            dx_log_context(keyval, "Unable to insert into element storage - Interesting...");
         }
-    }
-
-    // TODO: Verify that adding this entry does not conflict with the restrictions
-    // inplace for parent
-    // We should probably allow to insert invalid entries, but mark them
-    // as an invalid state and return a special status code indicating such.
-
-    status = dx_element_storage_add (storage, keyval->cx_keyval->kv_name.dv_string, keyval);
-    if (status != DISIR_STATUS_OK)
-    {
-        dx_log_context(keyval, "Unable to insert into element storage - Interesting...");
     }
 
     return (status == DISIR_STATUS_OK ? invalid : status);
