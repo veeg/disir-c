@@ -109,16 +109,28 @@ dx_section_finalize (struct disir_context *section)
     }
 
     // Cannot add section without a name
+    // Cannot even add it to to storage (NO NAME!
     if (section->cx_section->se_name.dv_string == NULL)
     {
-        dx_context_error_set (section, "Missing name component for section.");
-        return DISIR_STATUS_INVALID_CONTEXT;
+        dx_log_context (section, "Missing name component for section.");
+        // XXX: Cannot add to parent - Or can it? Add it to element storage with NULL name should still
+        // add it to sequential list - just not the hashmap. Hmm..
+        return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;
     }
 
-    status = dx_element_storage_add (storage, section->cx_section->se_name.dv_string, section);
-    if (status != DISIR_STATUS_OK)
+    invalid = dx_validate_context (section);
+
+    // Perform full config validation.
+    // Only add entries that are marked OK or INVALID
+    if (invalid == DISIR_STATUS_OK ||
+        invalid == DISIR_STATUS_ELEMENTS_INVALID ||
+        invalid == DISIR_STATUS_INVALID_CONTEXT)
     {
-        dx_log_context(section, "Unable to insert into element storage - Interesting...");
+        status = dx_element_storage_add (storage, section->cx_section->se_name.dv_string, section);
+        if (status != DISIR_STATUS_OK)
+        {
+            dx_log_context(section, "Unable to insert into element storage - Interesting...");
+        }
     }
 
     return (status == DISIR_STATUS_OK ? invalid : status);
