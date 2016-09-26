@@ -414,9 +414,13 @@ dx_documentation_destroy (struct disir_documentation **documentation)
             queue = &(context->cx_section->se_documentation_queue);
             break;
         }
+        case DISIR_CONTEXT_RESTRICTION:
+        {
+            queue = &(context->cx_restriction->re_documentation_queue);
+            break;
+        }
         case DISIR_CONTEXT_CONFIG:
         case DISIR_CONTEXT_DEFAULT:
-        case DISIR_CONTEXT_RESTRICTION:
         case DISIR_CONTEXT_DOCUMENTATION:
         case DISIR_CONTEXT_FREE_TEXT:
         case DISIR_CONTEXT_UNKNOWN:
