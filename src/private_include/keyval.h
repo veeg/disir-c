@@ -19,9 +19,9 @@ struct disir_keyval
     //! Version this keyval entry was introduced.
     struct semantic_version     kv_introduced;
 
-    //! Version this keyval entry was deprecrated  (0.0.0 means its NOT deprecrated)
-    //! XXX: Introduce a deprecrated context - to tie a message with semver together.?
-    struct semantic_version     kv_deprecrated;
+    //! Version this keyval entry was deprecated
+    //! Value of 0.0.0 means it is NOT deprecated.
+    struct semantic_version     kv_deprecated;
 
     //! Default entry queue
     struct disir_default        *kv_default_queue;
