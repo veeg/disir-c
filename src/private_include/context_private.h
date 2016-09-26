@@ -170,6 +170,33 @@ enum disir_status dx_set_mold_equiv (struct disir_context *context,
 enum disir_status dx_get_mold_equiv_type (struct disir_context *parent,
                                           const char *name, enum disir_context_type *type);
 
+//! \brief Validate the input context for any erroneous state
+//!
+//! TODO: Implement error report.
+//!
+//! This will clear the CONTEXT_STATE_INVALID state and re-calculate if
+//! the context is deemed invalid. If it contains any child contexts, they will
+//! also be recursively invoked.
+//!
+//! If the parent context is constructing, any invalid indicating error will result in
+//! status DISIR_STATUS_INVALID_CONTEXT instead of its descriptive status.
+//! (Reasoning: to ease implementation of code using this method. The return code of
+//! any method finaliznig or checking constructing elements shall be allowed, and
+//! the DISIR_STATUS_INVALID_CONTEXT shall indicate that the state was persistet, albeit
+//! not valid.)
+//!
+//! \return DISIR_STATUS_MOLD_MISSING if the input context is not
+//!         affiliated with a mold equivalent.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the wrong value type is assigned to keyval.
+//! \return DISIR_STATUS_RESTRICTION_VIOLATED if the context does not fulfill its restriction
+//!         requirements.
+//! \return DISIR_STATUS_INVALID_CONTEXT if this context is considered invalid.
+//!         If invoked on a top-level context, an updated error report is available.
+//! \return DISIR_STATUS_ELEMENTS_INVALID if any of its children are deemed invalid.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dx_validate_context (struct disir_context *context);
+
 //! \brief Set the input message to the error string of context
 void dx_context_error_set (struct disir_context *context, const char *fmt_message, ...);
 
