@@ -15,6 +15,7 @@
 #include "section.h"
 #include "log.h"
 #include "mqueue.h"
+#include "restriction.h"
 
 //! INTERNAL API
 enum disir_status
@@ -398,6 +399,7 @@ dx_keyval_destroy (struct disir_keyval **keyval)
     struct disir_context *context;
     struct disir_documentation *doc;
     struct disir_default *def;
+    struct disir_restriction *restriction;
 
     if (keyval == NULL || *keyval == NULL)
     {
@@ -435,6 +437,18 @@ dx_keyval_destroy (struct disir_keyval **keyval)
     while ((def = MQ_POP((*keyval)->kv_default_queue)))
     {
         context = def->de_context;
+        dc_destroy (&context);
+    }
+
+    // Destroy all restrictions
+    while ((restriction = MQ_POP ((*keyval)->kv_restrictions_inclusive_queue)))
+    {
+        context = restriction->re_context;
+        dc_destroy (&context);
+    }
+    while ((restriction = MQ_POP ((*keyval)->kv_restrictions_exclusive_queue)))
+    {
+        context = restriction->re_context;
         dc_destroy (&context);
     }
 
