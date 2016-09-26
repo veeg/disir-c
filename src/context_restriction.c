@@ -14,6 +14,8 @@
 #include "mqueue.h"
 #include "keyval.h"
 #include "section.h"
+#include "config.h"
+#include "mold.h"
 
 const char *disir_restriction_strings[] = {
     "INVALID",
@@ -1068,5 +1070,129 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
 
     TRACE_EXIT ("status (%s", disir_status_string (status));
     return status;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_restriction_entries_value (struct disir_context *context, enum disir_restriction_type type,
+                              struct semantic_version *semver, int *output)
+{
+    enum disir_status status;
+    struct disir_restriction **q;
+    int min = -1;
+    int max = -1;
+    int min_closes_match = INT_MIN;
+    int max_closes_match = INT_MIN;
+    int diff;
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_SECTION, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+        return status;
+
+    if (type != DISIR_RESTRICTION_INC_ENTRY_MAX && type != DISIR_RESTRICTION_INC_ENTRY_MIN)
+        return DISIR_STATUS_INTERNAL_ERROR;
+
+    // Get inclusive queue from context
+    switch (dc_context_type (context))
+    {
+    case DISIR_CONTEXT_SECTION:
+    {
+        if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+        {
+            q = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_inclusive_queue;
+        }
+        else
+        {
+            q = &context->cx_section->se_restrictions_inclusive_queue;
+        }
+        break;
+    }
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+        {
+            q = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_inclusive_queue;
+        }
+        else
+        {
+            q = &context->cx_keyval->kv_restrictions_inclusive_queue;
+        }
+        break;
+    }
+    default:
+    {
+        log_fatal ("Slipped through guard - unhandled %s", dc_context_type_string (context));
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+    }
+
+    // Find target version from config, if not supplied
+    if (semver == NULL)
+    {
+        if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+        {
+            semver = &context->cx_root_context->cx_config->cf_version;
+        }
+        else
+        {
+            semver = &context->cx_root_context->cx_mold->mo_version;
+        }
+    }
+
+    // Loop over each INCLUSIVE entry - finding max and min
+    MQ_FOREACH (*q,
+    {
+        if (entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MIN ||
+            entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MAX)
+        {
+            diff = dc_semantic_version_compare  (&entry->re_introduced, semver);
+            // entry is newer than target version
+            if (diff > 0)
+            {
+                entry = entry->next;
+                continue;
+            }
+
+            if (entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MIN && diff > min_closes_match)
+            {
+                min_closes_match = diff;
+                min = entry->re_value_min;
+            }
+            else if (entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MAX && diff > max_closes_match)
+            {
+                max_closes_match = diff;
+                min = entry->re_value_max;
+            }
+        }
+    });
+
+    // Set max.
+    // Maximum default is 1.
+    // if minimum is set, and the active maximum is lower, it will equal the minimum.
+    if (max != 0 && max < min)
+    {
+        max = min;
+    }
+    if (max == -1)
+    {
+        max = 1;
+    }
+
+    // Mimimum entries is 0.
+    if (min == -1)
+    {
+        min = 0;
+    }
+
+    if (type == DISIR_RESTRICTION_INC_ENTRY_MAX)
+    {
+        *output = max;
+    }
+    else if (type == DISIR_RESTRICTION_INC_ENTRY_MIN)
+    {
+        *output = min;
+    }
+
+    return DISIR_STATUS_OK;
 }
 
