@@ -153,6 +153,13 @@ TEST_F (StatusTest, restriction_violated)
     ASSERT_STREQ (status_string, "RESTRICTION VIOLATED");
 }
 
+TEST_F (StatusTest, elements_invalid)
+{
+    status = DISIR_STATUS_ELEMENTS_INVALID;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "ELEMENTS INVALID");
+}
+
 TEST_F (StatusTest, unknown)
 {
     status = DISIR_STATUS_UNKNOWN;
