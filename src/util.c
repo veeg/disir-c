@@ -34,6 +34,7 @@ const char *disir_status_strings[] = {
     "WRONG VALUE TYPE",
     "NOT EXIST",
     "RESTRICTION VIOLATED",
+    "ELEMENTS INVALID",
     "UNKNOWN",
 };
 
