@@ -33,6 +33,7 @@ const char *disir_status_strings[] = {
     "MOLD MISSING",
     "WRONG VALUE TYPE",
     "NOT EXIST",
+    "RESTRICTION VIOLATED",
     "UNKNOWN",
 };
 
