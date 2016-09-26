@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <limits.h>
 
 // Public disir interface
 #include <disir/disir.h>
@@ -247,6 +248,7 @@ dx_restriction_create (struct disir_context *context)
 
     restriction->re_context = context;
     restriction->re_introduced.sv_major = 1;
+    restriction->re_deprecated.sv_major = UINT_MAX;
     restriction->re_type = DISIR_RESTRICTION_UNKNOWN;
 
     return restriction;
