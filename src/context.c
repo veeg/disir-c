@@ -67,6 +67,38 @@ context_get_introduced_structure (struct disir_context *context,
     return DISIR_STATUS_OK;
 }
 
+//! STATIC API
+static enum disir_status
+context_get_deprecated_structure (struct disir_context *context,
+                                  struct semantic_version **deprecated)
+{
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
+    {
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    switch (dc_context_type (context))
+    {
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        *deprecated = &context->cx_keyval->kv_deprecated;
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+        *deprecated = &context->cx_section->se_deprecated;
+        break;
+    case DISIR_CONTEXT_RESTRICTION:
+    {
+        *deprecated = &context->cx_restriction->re_deprecated;
+        break;
+    }
+    default:
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    return DISIR_STATUS_OK;
+}
+
 //! PUBLIC API
 enum disir_status
 dc_printerror (struct disir_context *context, char *buffer,
@@ -702,63 +734,28 @@ dc_add_introduced (struct disir_context *context, struct semantic_version *semve
                               dc_context_type_string (context));
         return status;
     }
-    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
-    {
-        dx_context_error_set (context, "Cannot add introduced to %s whose top-level is %s.",
-                                       dc_context_type_string (context),
-                                       dc_context_type_string (context->cx_root_context));
-        return DISIR_STATUS_WRONG_CONTEXT;
-    }
 
-    log_debug_context (6, context, "adding introduced to root(%s): %s",
-                       dc_context_type_string (context->cx_root_context),
-                       dc_semantic_version_string (buffer, 32, semver));
+    // QUESTION: Should we add a collision check here? If there already exists
+    // an entry in parent of same context type with equal semantic version,
+    // it should perhaps be deined (or permiteted with INVALID CONTEXT
+    // if parent is constructing)
 
-    // Update mold with highest version if root context is DISIR_CONTEXT_MOLD
-    dx_mold_update_version (context->cx_root_context->cx_mold, semver);
-
-    switch (dc_context_type (context))
-    {
-    case DISIR_CONTEXT_DOCUMENTATION:
-    {
-        introduced = &context->cx_documentation->dd_introduced;
-        break;
-    }
-    case DISIR_CONTEXT_DEFAULT:
-    {
-        introduced = &context->cx_default->de_introduced;
-        break;
-    }
-    case DISIR_CONTEXT_KEYVAL:
-    {
-        introduced = &context->cx_keyval->kv_introduced;
-        break;
-    }
-    case DISIR_CONTEXT_SECTION:
-        introduced = &context->cx_section->se_introduced;
-        break;
-    case DISIR_CONTEXT_RESTRICTION:
-    {
-        introduced = &context->cx_restriction->re_introduced;
-        break;
-    }
-    case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_MOLD:
-    case DISIR_CONTEXT_FREE_TEXT:
-        dx_log_context (context, "invoked %s() with capability it should not have.", __FUNCTION__);
-        status = DISIR_STATUS_INTERNAL_ERROR;
-        break;
-    case DISIR_CONTEXT_UNKNOWN:
-        status = DISIR_STATUS_BAD_CONTEXT_OBJECT;
-        break;
-    // No default handler - let compiler warn us of  unhandled context
-    }
-
-    if (introduced)
+    status = context_get_introduced_structure (context, &introduced);
+    if (status == DISIR_STATUS_OK)
     {
         introduced->sv_major = semver->sv_major;
         introduced->sv_minor = semver->sv_minor;
         introduced->sv_patch = semver->sv_patch;
+
+        log_debug_context (6, context, "adding introduced to root(%s): %s",
+                                       dc_context_type_string (context->cx_root_context),
+                                       dc_semantic_version_string (buffer, 32, semver));
+    }
+    else if (status == DISIR_STATUS_WRONG_CONTEXT)
+    {
+        dx_context_error_set (context, "Cannot add introduced to %s whose top-level is %s.",
+                                       dc_context_type_string (context),
+                                       dc_context_type_string (context->cx_root_context));
     }
 
     return status;
@@ -766,9 +763,62 @@ dc_add_introduced (struct disir_context *context, struct semantic_version *semve
 
 //! PUBLIC API
 enum disir_status
-dc_add_deprecrated (struct disir_context *context, struct semantic_version *semver)
+dc_add_deprecated (struct disir_context *context, struct semantic_version *semver)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    struct semantic_version *deprecated;
+    char buffer[32];
+
+    TRACE_ENTER ("context (%p) semver (%p)", context, semver);
+
+    deprecated = NULL;
+    status = DISIR_STATUS_OK;
+
+    // check arguments
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    if (semver == NULL)
+    {
+        log_debug (0, "invoked with semver NULL pointer.");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
+                                          DISIR_CONTEXT_SECTION,
+                                          DISIR_CONTEXT_DEFAULT,
+                                          DISIR_CONTEXT_RESTRICTION);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Set more context-related error message
+        dx_context_error_set (context, "Cannot add deprecated version to %s",
+                              dc_context_type_string (context));
+        return status;
+    }
+
+    status = context_get_deprecated_structure (context, &deprecated);
+    if (status == DISIR_STATUS_OK)
+    {
+        deprecated->sv_major = semver->sv_major;
+        deprecated->sv_minor = semver->sv_minor;
+        deprecated->sv_patch = semver->sv_patch;
+
+        log_debug_context (6, context, "adding deprecated to root(%s): %s",
+                                       dc_context_type_string (context->cx_root_context),
+                                       dc_semantic_version_string (buffer, 32, semver));
+    }
+    else if (status == DISIR_STATUS_WRONG_CONTEXT)
+    {
+        dx_context_error_set (context, "Cannot add deprecated to %s whose top-level is %s.",
+                                       dc_context_type_string (context),
+                                       dc_context_type_string (context->cx_root_context));
+    }
+
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
 }
 
 //! PUBLIC API

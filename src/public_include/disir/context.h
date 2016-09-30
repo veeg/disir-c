@@ -269,13 +269,19 @@ enum disir_status dc_add_introduced (struct disir_context *context,
 
 //! \brief Add a deprecrated semantic version number to a context.
 //!
-//! TODO: Implement me
+//! Supported input contexts are:
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!     * DISIR_CONTEXT_DEFAULT
+//!     * DISIR_CONTEXT_RESTRICTION
 //!
-//! \return DISIR_STATUS_EXISTS is returned if an deprecrated entry already exists.
+//! \return DISIR_STATUS_INVALID_ARGUMENT `context` and `semver` is NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if context is not of supported type.
+//! \return DISIR_STATUS_WRONG_CONTEXT if top-level is not MOLD.
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_add_deprecrated (struct disir_context *context,
-                                      struct semantic_version *semver);
+enum disir_status dc_add_deprecated (struct disir_context *context,
+                                     struct semantic_version *semver);
 
 
 //! \brief Set the value type associated with input context
