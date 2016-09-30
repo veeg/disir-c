@@ -140,7 +140,8 @@ recurse_elements_valid (struct disir_context *context,
     struct disir_collection *col;
     struct disir_context *element;
 
-    invalid = DISIR_STATUS_OK;
+    invalid = (context->CONTEXT_STATE_INVALID == 1 ? DISIR_STATUS_INVALID_CONTEXT
+                                                   : DISIR_STATUS_OK);
 
     status = dc_get_elements (context, &col);
     if (status != DISIR_STATUS_OK)
