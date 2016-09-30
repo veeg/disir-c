@@ -346,3 +346,36 @@ TEST_F (ContextMoldTest, get_elements)
 }
 
 
+TEST_F (ContextMoldTest, destroying_constructing_element_shall_not_update_mold_version)
+{
+    struct semantic_version semver;
+    struct semantic_version queried;
+    int res;
+    struct disir_context *context_section;
+
+    semver.sv_major = 2;
+    semver.sv_minor = 2;
+    semver.sv_patch = 0;
+
+     status = dc_add_keyval_string (context_mold, "keyval1",
+                                   "keyval1_value", "keyval1_doc", &semver, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    semver.sv_major = 3;
+    status = dc_add_introduced (context_section, &semver);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_destroy (&context_section);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_get_version (context_mold, &queried);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Query version from mold - should be 2.2.0
+    semver.sv_major = 2;
+    res = dc_semantic_version_compare (&semver, &queried);
+    ASSERT_EQ (res, 0);
+}
