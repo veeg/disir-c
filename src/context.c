@@ -360,12 +360,17 @@ dc_finalize (struct disir_context **context)
             // XXX: Currently, we may still have dangling versions persistet to mold
             // XXX: event though they may be deleted (finalized child, destroy constructing parent)
             struct semantic_version *introduced;
+            struct semantic_version *deprecated;
             if (context_get_introduced_structure (*context, &introduced) == DISIR_STATUS_OK)
             {
                 dx_mold_update_version ((*context)->cx_root_context->cx_mold, introduced);
             }
-            // TODO: Do same exercise with deprecated.
-            // TODO: Add similar test
+            if (context_get_deprecated_structure (*context, &deprecated) == DISIR_STATUS_OK)
+            {
+                if (deprecated->sv_major != -1)
+                    dx_mold_update_version ((*context)->cx_root_context->cx_mold, deprecated);
+            }
+            // TODO: Add similar test to deprecated as is done for introduced
 
             // Deprive the user of his reference.
             *context = NULL;
