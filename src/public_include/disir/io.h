@@ -8,6 +8,9 @@ extern "C"{
 
 //! \brief Function signature for inputting disir_config from external source.
 //!
+//! It is the callers responsibility to invoke disir_mold_finished() if he
+//! allocates one and it is not provided by the callee.
+//!
 //! \param[in] id String identifier for the config file to read.
 //! \param[in] mold Optional mold to validate config against. If not provided, function
 //!     is responsible to locate and create the mold associated with id.
