@@ -52,8 +52,12 @@ context_get_introduced_structure (struct disir_context *context,
         *introduced = &context->cx_restriction->re_introduced;
         break;
     }
-    case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_MOLD:
+    {
+        *introduced = &context->cx_mold->mo_version;
+        break;
+    }
+    case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:
         return DISIR_STATUS_INTERNAL_ERROR;
