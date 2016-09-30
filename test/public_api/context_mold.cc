@@ -139,7 +139,7 @@ TEST_F (ContextMoldTest, add_keyval_without_name_shall_fail)
 
     // Missing name
     status = dc_finalize (&context_keyval);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    EXPECT_STATUS (DISIR_STATUS_CONTEXT_IN_WRONG_STATE, status);
     EXPECT_STREQ ("Missing name component for keyval.", dc_context_error (context_keyval));
 }
 
