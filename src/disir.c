@@ -286,6 +286,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
         status = disir_libdisir_mold (&libmold);
         if (status != DISIR_STATUS_OK)
         {
+            log_debug (0, "failed do generate mold: %s", disir_status_string (status));
             goto error;
         }
     }
