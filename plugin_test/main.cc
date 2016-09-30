@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <disir/disir.h>
+#include <disir/util.h>
 
 
 typedef enum disir_status (*output_mold)(struct disir_mold **);
@@ -12,6 +13,12 @@ typedef enum disir_status (*output_mold)(struct disir_mold **);
 #include "basic_section.cc"
 #include "json_test_mold.cc"
 #include "restriction_keyval_numeric_types.cc"
+#include "restriction_entries.cc"
+#include "restriction_config_parent_keyval_min_entry.cc"
+#include "restriction_config_parent_keyval_max_entry.cc"
+#include "restriction_config_parent_section_max_entry.cc"
+#include "restriction_section_parent_keyval_max_entry.cc"
+#include "basic_version_difference.cc"
 
 // Forward declaration
 enum disir_status
@@ -41,6 +48,16 @@ static std::map<const char *, output_mold, cmp_str> molds = {
     std::make_pair ("basic_section", basic_section),
     std::make_pair ("json_test_mold", json_test_mold),
     std::make_pair ("restriction_keyval_numeric_types", restriction_keyval_numeric_types),
+    std::make_pair ("restriction_entries", restriction_entries),
+    std::make_pair ("restriction_config_parent_keyval_min_entry",
+                    restriction_config_parent_keyval_min_entry),
+    std::make_pair ("restriction_config_parent_keyval_max_entry",
+                    restriction_config_parent_keyval_max_entry),
+    std::make_pair ("restriction_config_parent_section_max_entry",
+                    restriction_config_parent_section_max_entry),
+    std::make_pair ("restriction_section_parent_keyval_max_entry",
+                    restriction_section_parent_keyval_max_entry),
+    std::make_pair ("basic_version_difference", basic_version_difference),
 };
 
 enum disir_status
@@ -58,7 +75,10 @@ dio_test_config_read (struct disir_instance *disir, const char *id,
     if (status != DISIR_STATUS_OK)
         return status;
 
-    return disir_generate_config_from_mold (mold, NULL, config);
+    status = disir_generate_config_from_mold (mold, NULL, config);
+    // We are finished with our allocated mold
+    disir_mold_finished (&mold);
+    return status;
 }
 
 enum disir_status

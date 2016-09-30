@@ -33,7 +33,9 @@ restriction_keyval_numeric_types (struct disir_mold **mold)
                                                NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
-
+    status = dc_putcontext (&context_integer);
+    if (status != DISIR_STATUS_OK)
+        goto error;
 
     // Float
     status = dc_add_keyval_float (context_mold, "float_phi", 3.14, "float_phi doc", NULL,
@@ -42,6 +44,9 @@ restriction_keyval_numeric_types (struct disir_mold **mold)
         goto error;
 
     status = dc_add_restriction_value_range (context_float, 2.66, 4.56, NULL, NULL, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+    status = dc_putcontext (&context_float);
     if (status != DISIR_STATUS_OK)
         goto error;
 
@@ -56,7 +61,7 @@ restriction_keyval_numeric_types (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_restriction_value_range (context_complex, 5.0, 10.0,
+    status = dc_add_restriction_value_range (context_complex, 5.55, 10.14,
                                              NULL, NULL, NULL);
                                              //&context_restriction);
     if (status != DISIR_STATUS_OK)
@@ -75,7 +80,9 @@ restriction_keyval_numeric_types (struct disir_mold **mold)
     status = dc_add_restriction_value_range (context_complex, 60.0, 100.0, NULL, &semver, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
-
+    status = dc_putcontext (&context_complex);
+    if (status != DISIR_STATUS_OK)
+        goto error;
 
     status = dc_mold_finalize (&context_mold, mold);
     if (status != DISIR_STATUS_OK)
