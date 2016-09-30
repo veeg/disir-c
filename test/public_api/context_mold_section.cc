@@ -76,7 +76,7 @@ TEST_F (MoldSectionTest, context_type_string)
 TEST_F (MoldSectionTest, finalizing_without_name_shall_fail)
 {
     status = dc_finalize (&context_section);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    EXPECT_STATUS (DISIR_STATUS_CONTEXT_IN_WRONG_STATE, status);
     EXPECT_STREQ ("Missing name component for section.", dc_context_error (context_section));
 }
 
