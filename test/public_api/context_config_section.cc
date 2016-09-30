@@ -96,3 +96,22 @@ TEST_F (ConfigSectionTest, get_introduced_shall_fail)
     ASSERT_STREQ ("Cannot get introduced from SECTION whose top-level is CONFIG.",
                   dc_context_error (context_section));
 }
+
+
+TEST_F (ConfigSectionTest, set_keyval_name_on_section_shall_fail)
+{
+    struct disir_context *context_mold;
+    // Add keyval_name to mold
+    context_mold = dc_mold_getcontext (mold);
+    ASSERT_TRUE (context_mold != NULL);
+    status = dc_add_keyval_integer (context_mold, "keyval_name", 1, "doc", NULL, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_putcontext (&context_mold);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Test - setting a matching section name is not valid.
+    status = dc_set_name (context_section, "keyval_name", strlen ("keyval_name"));
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+    // XXX: Use DISIR_STATUS_WRONG_TYPE?
+}
+
