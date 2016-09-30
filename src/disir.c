@@ -510,6 +510,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
     enum disir_status status;
     struct disir_context *config_context;
     char buffer[512];
+    struct semantic_version version;
 
     TRACE_ENTER ("mold: %p, semver: %p", mold, semver);
 
@@ -522,6 +523,32 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
     // TODO: Validate integrity of mold first?
 
     status = dc_config_begin (mold, &config_context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    // Set version to config.
+    if (semver == NULL)
+    {
+        status = dc_get_version (mold->mo_context, &version);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            return status;
+        }
+    }
+    else
+    {
+        dc_semantic_version_set (&version, semver);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged ?
+            return status;
+        }
+    }
+    status = dc_set_version (config_context, &version);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
