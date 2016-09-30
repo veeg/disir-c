@@ -37,6 +37,7 @@ set (_LIBDISIR_SOURCES
     "io.c"
     "io/ini.c"
     "update.c"
+    "validate.c"
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
 )
 
