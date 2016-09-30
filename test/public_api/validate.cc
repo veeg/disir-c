@@ -67,19 +67,46 @@ class ValidateTest : public testing::DisirTestTestPlugin
             EXPECT_STATUS (DISIR_STATUS_OK, status);
         }
 
+        if (mold)
+        {
+            status = disir_mold_finished (&mold);
+            EXPECT_STATUS (DISIR_STATUS_OK, status);
+        }
+
+        if (config)
+        {
+            status = disir_config_finished (&config);
+            EXPECT_STATUS (DISIR_STATUS_OK, status);
+        }
+
+        if (context_config)
+        {
+            status = dc_putcontext (&context_config);
+            EXPECT_STATUS (DISIR_STATUS_OK, status);
+        }
+
         DisirTestTestPlugin::TearDown ();
+    }
+
+public:
+
+    void setup_testmold (const char *name)
+    {
+        status = disir_mold_input (instance, "test", name, &mold);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 
 public:
     enum disir_status status;
     struct disir_context *context;
-    struct disir_context *context_config;
-    struct disir_context *context_keyval;
-    struct disir_mold   *bkeyval_mold;
+    struct disir_context *context_config = NULL;
+    struct disir_context *context_keyval = NULL;
+    struct disir_mold   *mold = NULL;
+    struct disir_mold   *bkeyval_mold = NULL;
     struct disir_mold   *bsection_mold = NULL;
-    struct disir_config *bkeyval_config;
-    struct disir_config *config;
-    struct disir_collection *collection;
+    struct disir_config *bkeyval_config = NULL;
+    struct disir_config *config = NULL;
+    struct disir_collection *collection = NULL;
 };
 
 TEST_F (ValidateTest, disir_config_valid_test_basic_keyval_shall_succeed)
@@ -104,9 +131,9 @@ TEST_F (ValidateTest, config_keyval_set_invalid_name)
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
     ASSERT_TRUE (context_keyval != NULL);
 
-    // Finalize config
+    // Finalize config - it is invalid because it contains an invalid child.
     status = dc_config_finalize (&context_config, &config);
-    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     // Assert that config is not valid.
     status = disir_config_valid (config, &collection);
@@ -131,6 +158,10 @@ TEST_F (ValidateTest, generate_config_basic_keyval)
     status = disir_generate_config_from_mold (bkeyval_mold, NULL, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
+     // Assert config is valid
+    status = disir_config_valid (config, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
     // cleanup
     disir_config_finished (&config);
 }
@@ -140,8 +171,97 @@ TEST_F (ValidateTest, generate_config_basic_section)
     struct disir_config *config;
 
     status = disir_generate_config_from_mold (bsection_mold, NULL, &config);
-    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Assert config is valid
+    status = disir_config_valid (config, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     // cleanup
     disir_config_finished (&config);
 }
+
+// Assert that disir_generate_config_from_mold respects min entries restriction
+TEST_F (ValidateTest, generate_config_restriction_min_entries)
+{
+    struct disir_config *config;
+    struct disir_context *context;
+    int size;
+
+    setup_testmold ("restriction_config_parent_keyval_min_entry");
+
+    // Version 2.0.0 - 4 min entries
+    status = disir_generate_config_from_mold (mold, NULL, &config);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Assert that size of entries generated in config is 4.
+    context = dc_config_getcontext (config);
+    ASSERT_TRUE (context != NULL);
+    status = dc_get_elements (context , &collection);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    size = dc_collection_size (collection);
+    ASSERT_EQ (4, size);
+
+    // Assert config is valid
+    status = disir_config_valid (config, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // cleanup
+    status = dc_putcontext (&context);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = disir_config_finished (&config);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+}
+
+
+TEST_F (ValidateTest, generate_config_version_is_sat_correctly)
+{
+    struct disir_config *config;
+    struct semantic_version semver;
+    struct semantic_version queried;
+    int diff;
+
+    setup_testmold ("basic_version_difference");
+    semver.sv_major = 3;
+    semver.sv_minor = 0;
+    semver.sv_patch = 0;
+    queried.sv_major = 0;
+    queried.sv_minor = 0;
+    queried.sv_patch = 0;
+    // TODO: Create a mold that contains simple keyvals that only differ in introduced version.
+
+    // This should generate a config with version 3.0.0
+    status = disir_generate_config_from_mold (mold, NULL, &config);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_config_get_version (config, &queried);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    diff = dc_semantic_version_compare (&semver, &queried);
+    EXPECT_EQ (0, diff);
+    // cleanup
+    disir_config_finished (&config);
+
+    // This should generate a config with version 2.0.0
+    semver.sv_major = 2;
+    status = disir_generate_config_from_mold (mold, &semver, &config);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_config_get_version (config, &queried);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    diff = dc_semantic_version_compare (&semver, &queried);
+    EXPECT_EQ (0, diff);
+    // cleanup
+    disir_config_finished (&config);
+
+    // This should generate a config with version 2.5.0
+    semver.sv_major = 2;
+    semver.sv_minor = 5;
+    status = disir_generate_config_from_mold (mold, &semver, &config);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_config_get_version (config, &queried);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    diff = dc_semantic_version_compare (&semver, &queried);
+    EXPECT_EQ (0, diff);
+     // cleanup
+    disir_config_finished (&config);
+}
+
