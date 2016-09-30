@@ -18,6 +18,7 @@
 #include "keyval.h"
 #include "log.h"
 #include "mqueue.h"
+#include "restriction.h"
 
 #define INTERNAL_MOLD_DOCSTRING "The Disir Schema for the internal libdisir configuration."
 #define LOG_FILEPATH_DOCSTRING "The full filepath to the logfile libdisir will output to."
@@ -410,6 +411,8 @@ generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
     struct disir_default *def;
     const char *name;
     int32_t size;
+    int min_entries;
+    int i;
 
     // Get each element from the element storage of mold_parent
     status = dc_get_elements (mold_parent, &collection);
@@ -420,52 +423,69 @@ generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
 
     while (dc_collection_next (collection, &equiv) != DISIR_STATUS_EXHAUSTED)
     {
-        status = dc_begin (config_parent, dc_context_type (equiv), &context);
+
+        status = dx_restriction_entries_value (equiv, DISIR_RESTRICTION_INC_ENTRY_MIN,
+                                               semver, &min_entries);
         if (status != DISIR_STATUS_OK)
         {
-            // Already logged
+            // XXX
             goto error;
         }
-
-        status = dc_get_name (equiv, &name, &size);
-        if (status != DISIR_STATUS_OK)
+        if (min_entries == 0)
         {
-            log_debug (2, "failed to get name (%s). output size: %d\n",
-                       disir_status_string (status), size);
-            goto error;
+            min_entries = 1;
         }
 
-        status = dc_set_name (context, name, size);
-        if (status != DISIR_STATUS_OK)
+        // Generate min_entries entries of this element.
+        for (i = 0; i < min_entries; i++)
         {
-            log_debug (2, "failed to add name: %s", disir_status_string (status));
-            goto error;
-        }
-
-        if (dc_context_type (equiv) == DISIR_CONTEXT_KEYVAL)
-        {
-            // Get default entry matching semver
-            //
-
-            dx_default_get_active (equiv, semver, &def);
-
-            status = dx_value_copy (&context->cx_keyval->kv_value, &def->de_value);
+            status = dc_begin (config_parent, dc_context_type (equiv), &context);
             if (status != DISIR_STATUS_OK)
             {
-                log_debug (2, "failed to copy value: %s", disir_status_string (status));
+                // Already logged
                 goto error;
             }
-        }
-        else if (dc_context_type (equiv) == DISIR_CONTEXT_SECTION)
-        {
-            // Send down parent and context -
-            generate_config_from_mold_recursive_step (equiv, context, semver);
-        }
 
-        status = dc_finalize (&context);
-        if (status != DISIR_STATUS_OK)
-        {
-            goto error;
+            status = dc_get_name (equiv, &name, &size);
+            if (status != DISIR_STATUS_OK)
+            {
+                log_debug (2, "failed to get name (%s). output size: %d\n",
+                           disir_status_string (status), size);
+                goto error;
+            }
+
+            status = dc_set_name (context, name, size);
+            if (status != DISIR_STATUS_OK)
+            {
+                log_debug (2, "failed to add name: %s", disir_status_string (status));
+                goto error;
+            }
+
+            if (dc_context_type (equiv) == DISIR_CONTEXT_KEYVAL)
+            {
+                // Get default entry matching semver
+                //
+
+                dx_default_get_active (equiv, semver, &def);
+
+                status = dx_value_copy (&context->cx_keyval->kv_value, &def->de_value);
+                if (status != DISIR_STATUS_OK)
+                {
+                    log_debug (2, "failed to copy value: %s", disir_status_string (status));
+                    goto error;
+                }
+            }
+            else if (dc_context_type (equiv) == DISIR_CONTEXT_SECTION)
+            {
+                // Send down parent and context -
+                generate_config_from_mold_recursive_step (equiv, context, semver);
+            }
+
+            status = dc_finalize (&context);
+            if (status != DISIR_STATUS_OK)
+            {
+                goto error;
+            }
         }
 
         dc_putcontext (&equiv);
@@ -489,9 +509,6 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
 {
     enum disir_status status;
     struct disir_context *config_context;
-    struct disir_context *context;
-    struct disir_context *parent;
-    struct disir_collection *collection;
     char buffer[512];
 
     TRACE_ENTER ("mold: %p, semver: %p", mold, semver);
@@ -537,18 +554,6 @@ error:
     if (config_context)
     {
         dc_destroy (&config_context);
-    }
-    if (context)
-    {
-        dc_destroy (&context);
-    }
-    if (parent)
-    {
-        dc_putcontext (&parent);
-    }
-    if (collection)
-    {
-        dc_collection_finished (&collection);
     }
 
     return status;
