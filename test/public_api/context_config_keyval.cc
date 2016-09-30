@@ -153,6 +153,30 @@ TEST_F (ConfigKeyvalTest, set_float_value_before_name_shall_fail)
                   dc_context_error (context_keyval));
 }
 
+TEST_F (ConfigKeyvalTest, set_section_name_on_keyval_shall_fail)
+{
+    struct disir_context *context_mold;
+    struct disir_context *context_section;
+    // Add section_name to mold
+    context_mold = dc_mold_getcontext (mold);
+    ASSERT_TRUE (context_mold != NULL);
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_section, "section_name", strlen ("section_name"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_add_documentation (context_section, "doc", strlen ("doc"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_section);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_putcontext (&context_mold);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Test - setting a matching section name is not valid.
+    status = dc_set_name (context_keyval, "section_name", strlen ("section_name"));
+    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
+    // XXX: Use DISIR_STATUS_WRONG_TYPE?
+}
+
 TEST_F (ConfigKeyvalIntegerTest, set_value_integer_shall_succeed)
 {
     status = dc_set_value_integer (context_keyval, 74);
