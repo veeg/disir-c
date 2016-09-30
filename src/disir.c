@@ -506,7 +506,7 @@ error:
 //! PUBLIC API
 enum disir_status
 disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
-                                   struct disir_config **config)
+                                 struct disir_config **config)
 {
     enum disir_status status;
     struct disir_context *config_context;
@@ -595,7 +595,6 @@ disir_config_valid (struct disir_config *config, struct disir_collection **colle
     struct disir_collection *col;
 
     col = NULL;
-
     if (config == NULL)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
