@@ -612,17 +612,44 @@ enum disir_status dc_get_value_float (struct disir_context *context, double *val
 //!
 enum disir_status dc_get_value_boolean (struct disir_context *context, uint8_t *value);
 
-//! Query the context for its intrduced member.
-//! If no such member exists on the context,
-//! DISIR_STATUS_NO_CAN_DO is returned.
+//! \brief Query the context for the introduced version it holds (if any)
+//!
+//! Supported input contexts are:
+//!     * DISIR_CONTEXT_DEFAULT
+//!     * DISIR_CONTEXT_DOCUMENTATION
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!     * DISIR_CONTEXT_RESTRICTION
+//!     * DISIR_CONTEXT_MOLD
+//!
+//! \param[in] context Input contect of supported type.
+//! \param[out] semver Semantic version structure to populate with the output value on success.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if `context` or `semver` are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context` is of unsupported type.
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context` whose top-level is not MOLD.
+//! \return DISIR_STATUS_OK on success.
+//!
 enum disir_status dc_get_introduced (struct disir_context *context,
                                      struct semantic_version *semver);
 
-//! Query the context for its deprecrated member.
-//! If no such member exists on the context,
-//! DISIR_STATUS_NO_CAN_DO is returned.
-enum disir_status dc_get_deprecrated (struct disir_context *context,
-                                      struct semantic_version *semver);
+//! \brief Query the context for the deprecated version it holds (if any)
+//!
+//! Supported input contexts are:
+//!     * DISIR_CONTEXT_KEYVAL
+//!     * DISIR_CONTEXT_SECTION
+//!     * DISIR_CONTEXT_RESTRICTION
+//!
+//! \param[in] context Input contect of supported type.
+//! \param[out] semver Semantic version structure to populate with the output value on success.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if `context` or `semver` are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context` is of unsupported type.
+//! \return DISIR_STATUS_WRONG_CONTEXT if `context` whose top-level is not MOLD.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_get_deprecated (struct disir_context *context,
+                                     struct semantic_version *semver);
 
 //!  \brief Collect all direct child elements of the passed context.
 //!
