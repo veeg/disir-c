@@ -89,6 +89,10 @@ dc_semantic_version_compare (struct semantic_version *s1, struct semantic_versio
     if (res == 0)
         res = s1->sv_patch - s2->sv_patch;
 
+    log_debug (8, "s1 (%d.%d.%d) vs s2 (%d.%d.%d) res (%d)",
+                    s1->sv_major, s1->sv_minor, s1->sv_patch,
+                    s2->sv_major, s2->sv_minor, s2->sv_patch, res);
+
     return res;
 }
 
