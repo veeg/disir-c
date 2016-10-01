@@ -168,21 +168,17 @@ dx_default_destroy (struct disir_default **def)
         // Don't access parent context type if context is destoyed
         if (context->cx_parent_context->CONTEXT_STATE_DESTROYED != 0)
         {
-            switch (dc_context_type (context->cx_parent_context))
-            {
-            case DISIR_CONTEXT_KEYVAL:
+            if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_KEYVAL)
             {
                 queue = &(context->cx_parent_context->cx_keyval->kv_default_queue);
-                break;
+                MQ_REMOVE_SAFE (*queue, tmp);
             }
-            default:
+            else
             {
-                dx_crash_and_burn ("invoked on invalid context type (%s) - impossible",
-                                   dc_context_type_string (context));
+                log_fatal ("%s - default context (%p) has parent context (%p) type %s. Impossible",
+                            __FUNCTION__, context, context->cx_parent_context,
+                            dc_context_type_string (context->cx_parent_context));
             }
-            }
-
-            MQ_REMOVE_SAFE (*queue, tmp);
         }
     }
 
