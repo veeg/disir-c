@@ -603,7 +603,7 @@ dc_set_value_float (struct disir_context *context, double value)
     struct disir_value *value_storage;
 
     invalid = set_value_input_check (context, DISIR_VALUE_TYPE_FLOAT, &value_storage);
-    if (invalid != DISIR_STATUS_OK && DISIR_STATUS_INVALID_CONTEXT)
+    if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
         return invalid;
