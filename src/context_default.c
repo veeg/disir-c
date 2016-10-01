@@ -544,6 +544,12 @@ dc_get_default (struct disir_context *context, struct semantic_version *semver,
     {
         def = context->cx_default;
     }
+    else
+    {
+        log_fatal ("%s - context type '%s' slipped through guard.",
+                   __FUNCTION__, dc_context_type_string (context));
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
 
     value = &def->de_value;
     return dx_value_stringify (value, output_buffer_size, output, output_string_size);
