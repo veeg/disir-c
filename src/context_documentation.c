@@ -388,6 +388,7 @@ dx_documentation_destroy (struct disir_documentation **documentation)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
     tmp = *documentation;
+    queue = NULL;
 
     if (tmp->dd_value.dv_size > 0)
         free(tmp->dd_value.dv_string);
@@ -419,22 +420,20 @@ dx_documentation_destroy (struct disir_documentation **documentation)
             queue = &(context->cx_restriction->re_documentation_queue);
             break;
         }
-        case DISIR_CONTEXT_CONFIG:
-        case DISIR_CONTEXT_DEFAULT:
-        case DISIR_CONTEXT_DOCUMENTATION:
-        case DISIR_CONTEXT_FREE_TEXT:
-        case DISIR_CONTEXT_UNKNOWN:
+        default:
         {
-            // These types do not accept a documentation entry
-            // No default - let compiler handle unreferenced context type
-            dx_crash_and_burn ("invoked on invalid context type (%s)",
-                               dc_context_type_string (context));
+            log_fatal ("%s - context (%p) parent (%p) type '%s' not handled.",
+                       __FUNCTION__, context, context->cx_parent_context,
+                       dc_context_type_string (context->cx_parent_context));
         }
         }
 
         // Must remove safely - cannot guarantee that the instance we are destroying
         // is in its parents queue
-        MQ_REMOVE_SAFE (*queue, tmp);
+        if (queue != NULL)
+        {
+            MQ_REMOVE_SAFE (*queue, tmp);
+        }
     }
 
     free(tmp);
