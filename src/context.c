@@ -537,6 +537,8 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
 
     TRACE_ENTER ("context: %p, name: %p, name_size: %d", context, name, name_size);
 
+    value = NULL;
+
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
@@ -563,25 +565,31 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
         break;
     }
     case DISIR_CONTEXT_SECTION:
+    {
         value = &context->cx_section->se_name;
         break;
+    }
     default:
     {
-        dx_crash_and_burn ("%s: %s invoked unhandled",
-                           __FUNCTION__, dc_context_type_string (context));
+        log_fatal ("%s context %s slipped through guard.",
+                   __FUNCTION__, dc_context_type_string (context));
+        status = DISIR_STATUS_WRONG_CONTEXT;
     }
     }
 
-    *name = value->dv_string;
-    if (name_size)
+    if (status == DISIR_STATUS_OK)
     {
-        *name_size = value->dv_size;
+        *name = value->dv_string;
+        if (name_size)
+        {
+            *name_size = value->dv_size;
+        }
+
+        log_debug_context (6, context, "retrieved name: %s\n", *name);
     }
 
-    log_debug_context (6, context, "retrieved name: %s\n", *name);
-
-    TRACE_EXIT ("");
-    return DISIR_STATUS_OK;
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
 }
 
 //! INTERNAL API
