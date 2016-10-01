@@ -42,7 +42,7 @@ const char *disir_status_strings[] = {
 const char *
 disir_status_string (enum disir_status status)
 {
-    if (status < 0 || status > DISIR_STATUS_UNKNOWN)
+    if (status > DISIR_STATUS_UNKNOWN)
     {
         status = DISIR_STATUS_UNKNOWN;
     }
