@@ -15,6 +15,17 @@ add_custom_target (configure_version ALL
   COMMENT "Configuring version.c"
 )
 
+set (PROJECT_3PARTY_LIBDIR ${CMAKE_SOURCE_DIR}/lib)
+set (_LIBDISIR_3PARTY_LIB_SOURCES
+  "${PROJECT_3PARTY_LIBDIR}/void-multimap/multimap.c"
+  "${PROJECT_3PARTY_LIBDIR}/void-list/list.c"
+  "${PROJECT_3PARTY_LIBDIR}/void-list/list_iterator.c"
+)
+
+set (_LIBDISIR_3PARTY_LIB_INCLUDEDIR
+  ${PROJECT_3PARTY_LIBDIR}/void-multimap
+  ${PROJECT_3PARTY_LIBDIR}/void-list/include
+)
 
 # Define all libdisir source files
 set (_LIBDISIR_SOURCES
@@ -39,6 +50,7 @@ set (_LIBDISIR_SOURCES
     "update.c"
     "validate.c"
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
+    ${_LIBDISIR_3PARTY_LIB_SOURCES}
 )
 
 set (PROJECT_SO_LIBRARY disir
@@ -49,8 +61,7 @@ add_dependencies (${PROJECT_SO_LIBRARY} configure_version)
 
 target_include_directories (${PROJECT_SO_LIBRARY} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/private_include/
-  ${VOID-MULTIMAP_PUBLIC_INCLUDE_DIR}
-  ${VOID-LIST_PUBLIC_INCLUDE_DIR}
+  ${_LIBDISIR_3PARTY_LIB_INCLUDEDIR}
 )
 
 target_include_directories (${PROJECT_SO_LIBRARY} PUBLIC
@@ -74,12 +85,6 @@ add_definitions ("-Werror")
 
 # We require DL_LIBS for your loading plugin functionality.
 target_link_libraries (${PROJECT_SO_LIBRARY} ${CMAKE_DL_LIBS})
-# TODO: Do we need to export these library dependencies?
-# Research if we can simply link them private so they are not exported.
-target_link_libraries (${PROJECT_SO_LIBRARY} void-multimap)
-target_link_libraries (${PROJECT_SO_LIBRARY} void-list)
-# TODO: Find a dynamic way to detect existance of library
-# Do we need to link this for release mode? Only add definitions and lib to debug builds?
 # TODO: Add check for gcc > 4.9
 #target_link_libraries (${PROJECT_SO_LIBRARY} ubsan)
 

@@ -22,7 +22,7 @@ struct mapnode
 
 //! \brief Data structure containing the internals of the hash map implementation.
 //!
-struct multimap 
+struct multimap
 {
   struct mapnode **buckets; //!< Hash map array.
   int nbuckets;             //!< Number of slots in array.
@@ -52,11 +52,11 @@ static struct mapnode *
 new_node (void *key, void *value)
 {
   struct mapnode *node;
-  
+
   node = malloc (sizeof (struct mapnode));
   if (node == NULL)
     goto cleanup;
-  
+
   node->value_capacity = INIT_VALUE_LIST_CAPACITY;
   node->value_size = 1;
   node->key = key;
@@ -66,7 +66,7 @@ new_node (void *key, void *value)
   if (node->value_list == NULL)
       goto cleanup;
   node->value_list[0] = value;
-  
+
   return node;
 
 cleanup:
@@ -91,14 +91,14 @@ delete_buckets (struct mapnode **buckets, int nbuckets,
   int i;
   int j;
   struct mapnode *node, *tmp;
-  
+
   for (i = 0; i < nbuckets; i++)
   {
     node = buckets[i];
     while (node)
     {
       tmp = node->next;
-     
+
       for (j = 0; j < node->value_size; j++)
       {
         if (free_val)
@@ -107,13 +107,13 @@ delete_buckets (struct mapnode **buckets, int nbuckets,
 
       if (free_key)
         free_key (node->key);
-     
+
       free (node->value_list);
       free (node);
       node = tmp;
     }
   }
-  
+
   free (buckets);
 }
 
@@ -127,11 +127,11 @@ resize_map (struct multimap *map)
   int j;
   int idx, old_nbuckets;
   struct mapnode *node, **old_buckets;
-  
+
   // Save old values
   old_buckets = map->buckets;
   old_nbuckets = map->nbuckets;
-  
+
   // Initialize a new, empty hashmap with twice the number of buckets!
   map->nbuckets <<= 1;
   map->buckets = calloc (map->nbuckets, sizeof (struct mapnode *));
@@ -142,9 +142,9 @@ resize_map (struct multimap *map)
     map->nbuckets = old_nbuckets;
     return;
   }
-  
+
   map->size = 0;
-  
+
   // Populate new hashmap with old (key, value) tuples
   for (idx = 0; idx < old_nbuckets; idx++)
   {
@@ -156,7 +156,7 @@ resize_map (struct multimap *map)
       }
     }
   }
-  
+
   // Finally, delete old buckets
   delete_buckets (old_buckets, old_nbuckets, NULL, NULL);
 }
@@ -166,21 +166,21 @@ multimap_create (int (*cmpfunc) (const void *, const void *),
             unsigned long (*hashfunc) (const void *))
 {
   struct multimap *map;
-  
+
   map = calloc (1, sizeof (struct multimap));
   if (!map)
     goto error_alloc;
-  
+
   map->cmpfunc = cmpfunc;
   map->hashfunc = hashfunc;
   map->nbuckets = INIT_NUM_BUCKETS;
-  
+
   map->buckets = calloc (map->nbuckets, sizeof (struct mapnode *));
   if (!map->buckets)
     goto error_buckets;
-  
+
   return map;
-  
+
 error_buckets:
   free (map);
 error_alloc:
@@ -204,16 +204,16 @@ multimap_push_value (struct multimap *map, void *key, void *value)
   struct mapnode **node;
   void *tmp;
   int i;
-  
+
   hash = map->hashfunc (key);
   idx = hash % map->nbuckets;
   node = &map->buckets[idx];
-  
+
   while (*node && map->cmpfunc (key, (*node)->key))
     node = &(*node)->next;
-    
+
   if (*node)
-  { 
+  {
     // Check if value already exists
     for (i = 0; i < (*node)->value_size; i++)
     {
@@ -239,18 +239,18 @@ multimap_push_value (struct multimap *map, void *key, void *value)
     map->size++; /* Increase size */
     return 0;
   }
-  
-  // Create a new node 
+
+  // Create a new node
   *node = new_node (key, value);
   if (!(*node))
     return -ENOMEM;
-  
+
   map->size++; /* Increase size */
-  
+
   // And resize hash map if we have many elements
   if (map->size >= map->nbuckets / 2)
     resize_map (map);
-  
+
   return 0;
 }
 
@@ -262,17 +262,17 @@ multimap_get_first (struct multimap *map, void *key)
 
   if (map == NULL)
       return NULL;
-  
+
   hash = map->hashfunc (key);
   idx = hash % map->nbuckets;
   node = &map->buckets[idx];
-  
+
   while (*node && map->cmpfunc (key, (*node)->key))
     node = &(*node)->next;
-  
+
   if (!(*node))
     return NULL;
-  
+
   return (*node)->value_list[0];
 }
 
@@ -285,11 +285,11 @@ multimap_fetch (struct multimap *map, void *key)
 
   if (map == NULL)
       return NULL;
-  
+
   hash = map->hashfunc (key);
   idx = hash % map->nbuckets;
   node = &map->buckets[idx];
-  
+
   while (*node && map->cmpfunc (key, (*node)->key))
     node = &(*node)->next;
 
@@ -320,14 +320,15 @@ multimap_remove_value(struct multimap *map, void *key, void (*free_key) (void *)
   void *map_value;
   unsigned long hash, idx;
   struct mapnode *tmp, **node;
-  
+
+  map_value = NULL;
   hash = map->hashfunc (key);
   idx = hash % map->nbuckets;
   node = &map->buckets[idx];
-  
+
   while (*node && map->cmpfunc (key, (*node)->key))
     node = &(*node)->next;
-  
+
   if ((*node)  == NULL)
     return NULL;
 
@@ -335,7 +336,7 @@ multimap_remove_value(struct multimap *map, void *key, void (*free_key) (void *)
   {
     if ((*node)->value_list[i] == value)
     {
-      map_value = value; 
+      map_value = value;
 
       break;
     }
@@ -345,7 +346,7 @@ multimap_remove_value(struct multimap *map, void *key, void (*free_key) (void *)
   {
     for ( k = i + 1; k < (*node)->value_size; k++, i++)
     {
-      (*node)->value_list[i] = (*node)->value_list[k]; 
+      (*node)->value_list[i] = (*node)->value_list[k];
     }
     (*node)->value_size -= 1;
   }
@@ -368,7 +369,7 @@ multimap_remove_value(struct multimap *map, void *key, void (*free_key) (void *)
   }
 
   map->size--;
-  
+
   return map_value;
 }
 
@@ -383,14 +384,14 @@ multimap_contains_key (struct multimap *map, void *key)
 {
   unsigned long hash, idx;
   struct mapnode **node;
-  
+
   hash = map->hashfunc (key);
   idx = hash % map->nbuckets;
   node = &map->buckets[idx];
-  
+
   while (*node && map->cmpfunc (key, (*node)->key))
     node = &(*node)->next;
-  
+
   return (*node) ? 1 : 0;
 }
 
