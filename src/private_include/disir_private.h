@@ -1,5 +1,5 @@
 #ifndef _LIBDISIR_DISIR_PRIVATE_H
-#define _LIBDISRI_DISIR_PRIVATE_H
+#define _LIBDISIR_DISIR_PRIVATE_H
 
 #include <disir/disir.h>
 #include <disir/io.h>
