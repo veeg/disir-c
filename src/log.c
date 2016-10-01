@@ -162,7 +162,7 @@ dx_log_format (enum disir_log_level dll, int severity, const char *prefix,
     }
     else
     {
-        snprintf (dll_prefix, 6, map_dll_to_string (dll));
+        snprintf (dll_prefix, 6, "%s", map_dll_to_string (dll));
     }
 
     res = snprintf (buffer + time_written, buffer_size - time_written,
