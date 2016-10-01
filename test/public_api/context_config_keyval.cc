@@ -6,7 +6,7 @@
 #include "test_helper.h"
 
 
-class ConfigKeyvalTest : public testing::DisirTestTestPlugin
+class ConfigKeyvalConstructingTest : public testing::DisirTestTestPlugin
 {
 protected:
     void SetUp()
@@ -64,55 +64,55 @@ public:
     struct disir_context *context_keyval;
 };
 
-class ConfigKeyvalIntegerTest : public ConfigKeyvalTest
+class ConfigKeyvalConstructingIntegerTest : public ConfigKeyvalConstructingTest
 {
 protected:
     void SetUp()
     {
-        ConfigKeyvalTest::SetUp ();
+        ConfigKeyvalConstructingTest::SetUp ();
 
         status = dc_set_name (context_keyval, "key_integer", strlen ("key_integer"));
         ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 };
 
-class ConfigKeyvalStringTest : public ConfigKeyvalTest
+class ConfigKeyvalConstructingStringTest : public ConfigKeyvalConstructingTest
 {
 protected:
     void SetUp()
     {
-        ConfigKeyvalTest::SetUp ();
+        ConfigKeyvalConstructingTest::SetUp ();
 
         status = dc_set_name (context_keyval, "key_string", strlen ("key_string"));
         ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 };
 
-class ConfigKeyvalFloatTest : public ConfigKeyvalTest
+class ConfigKeyvalConstructingFloatTest : public ConfigKeyvalConstructingTest
 {
 protected:
     void SetUp()
     {
-        ConfigKeyvalTest::SetUp ();
+        ConfigKeyvalConstructingTest::SetUp ();
 
         status = dc_set_name (context_keyval, "key_float", strlen ("key_float"));
         ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 };
 
-class ConfigKeyvalBooleanTest : public ConfigKeyvalTest
+class ConfigKeyvalConstructingBooleanTest : public ConfigKeyvalConstructingTest
 {
 protected:
     void SetUp()
     {
-        ConfigKeyvalTest::SetUp ();
+        ConfigKeyvalConstructingTest::SetUp ();
 
         status = dc_set_name (context_keyval, "key_boolean", strlen ("key_boolean"));
         ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 };
 
-TEST_F (ConfigKeyvalTest, set_name_doesnt_exist_shall_fail)
+TEST_F (ConfigKeyvalConstructingTest, set_name_doesnt_exist_shall_fail)
 {
     const char name[] = "this_name_doesnt_exist";
 
@@ -122,14 +122,14 @@ TEST_F (ConfigKeyvalTest, set_name_doesnt_exist_shall_fail)
     // XXX Assert error message
 }
 
-TEST_F (ConfigKeyvalTest, set_name_that_exists_shall_succeed)
+TEST_F (ConfigKeyvalConstructingTest, set_name_that_exists_shall_succeed)
 {
     status = dc_set_name (context_keyval, "key_string", strlen ("key_string"));
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
 
-TEST_F (ConfigKeyvalTest, set_integer_value_before_name_shall_fail)
+TEST_F (ConfigKeyvalConstructingTest, set_integer_value_before_name_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 72);
     ASSERT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
@@ -137,7 +137,7 @@ TEST_F (ConfigKeyvalTest, set_integer_value_before_name_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalTest, set_string_value_before_name_shall_fail)
+TEST_F (ConfigKeyvalConstructingTest, set_string_value_before_name_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "mys", strlen ("mys"));
     ASSERT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
@@ -145,7 +145,7 @@ TEST_F (ConfigKeyvalTest, set_string_value_before_name_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalTest, set_float_value_before_name_shall_fail)
+TEST_F (ConfigKeyvalConstructingTest, set_float_value_before_name_shall_fail)
 {
     status = dc_set_value_float (context_keyval, 3.12);
     ASSERT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
@@ -153,7 +153,7 @@ TEST_F (ConfigKeyvalTest, set_float_value_before_name_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalTest, set_section_name_on_keyval_shall_fail)
+TEST_F (ConfigKeyvalConstructingTest, set_section_name_on_keyval_shall_fail)
 {
     struct disir_context *context_mold;
     struct disir_context *context_section;
@@ -177,13 +177,13 @@ TEST_F (ConfigKeyvalTest, set_section_name_on_keyval_shall_fail)
     // XXX: Use DISIR_STATUS_WRONG_TYPE?
 }
 
-TEST_F (ConfigKeyvalIntegerTest, set_value_integer_shall_succeed)
+TEST_F (ConfigKeyvalConstructingIntegerTest, set_value_integer_shall_succeed)
 {
     status = dc_set_value_integer (context_keyval, 74);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (ConfigKeyvalIntegerTest, get_value_integer_shall_succeed)
+TEST_F (ConfigKeyvalConstructingIntegerTest, get_value_integer_shall_succeed)
 {
     int64_t value = LLONG_MAX;
     status = dc_get_value_integer (context_keyval, &value);
@@ -192,7 +192,7 @@ TEST_F (ConfigKeyvalIntegerTest, get_value_integer_shall_succeed)
     ASSERT_EQ (0, value);
 }
 
-TEST_F (ConfigKeyvalIntegerTest, set_value_string_shall_fail)
+TEST_F (ConfigKeyvalConstructingIntegerTest, set_value_string_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "mys", strlen ("mys"));
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
@@ -200,7 +200,7 @@ TEST_F (ConfigKeyvalIntegerTest, set_value_string_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalIntegerTest, get_value_string_shall_fail)
+TEST_F (ConfigKeyvalConstructingIntegerTest, get_value_string_shall_fail)
 {
     const char *output;
     int32_t size;
@@ -211,13 +211,28 @@ TEST_F (ConfigKeyvalIntegerTest, get_value_string_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalStringTest, set_value_string_shall_succeed)
+TEST_F (ConfigKeyvalConstructingIntegerTest, set_value_float_fails_keep_float_value)
+{
+    double value;
+    enum disir_value_type type;
+
+    status = dc_set_value_float (context_keyval, 42.123);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    type = dc_value_type (context_keyval);
+    EXPECT_EQ (DISIR_VALUE_TYPE_FLOAT, type);
+    status = dc_get_value_float (context_keyval, &value);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_EQ (42.123, value);
+}
+
+TEST_F (ConfigKeyvalConstructingStringTest, set_value_string_shall_succeed)
 {
     status = dc_set_value_string (context_keyval, "hooray", strlen ("hooray"));
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (ConfigKeyvalStringTest, get_value_string_shall_succeed)
+TEST_F (ConfigKeyvalConstructingStringTest, get_value_string_shall_succeed)
 {
     const char *output;
     int32_t size;
@@ -226,7 +241,7 @@ TEST_F (ConfigKeyvalStringTest, get_value_string_shall_succeed)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (ConfigKeyvalStringTest, set_value_integer_shall_fail)
+TEST_F (ConfigKeyvalConstructingStringTest, set_value_integer_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 74);
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
@@ -234,20 +249,35 @@ TEST_F (ConfigKeyvalStringTest, set_value_integer_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalStringTest, get_value_integer_shall_fail)
+TEST_F (ConfigKeyvalConstructingStringTest, get_value_integer_shall_fail)
 {
     int64_t value = LLONG_MAX;
     status = dc_get_value_integer (context_keyval, &value);
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 }
 
-TEST_F (ConfigKeyvalFloatTest, set_value_float_shall_succeed)
+TEST_F (ConfigKeyvalConstructingStringTest, set_value_float_fails_keep_float_value)
+{
+    double value;
+    enum disir_value_type type;
+
+    status = dc_set_value_float (context_keyval, 42.123);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    type = dc_value_type (context_keyval);
+    EXPECT_EQ (DISIR_VALUE_TYPE_FLOAT, type);
+    status = dc_get_value_float (context_keyval, &value);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_EQ (42.123, value);
+}
+
+TEST_F (ConfigKeyvalConstructingFloatTest, set_value_float_shall_succeed)
 {
     status = dc_set_value_float (context_keyval, 42.123);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (ConfigKeyvalFloatTest, get_value_float_shall_succeed)
+TEST_F (ConfigKeyvalConstructingFloatTest, get_value_float_shall_succeed)
 {
     double value = LONG_MAX;
 
@@ -257,7 +287,7 @@ TEST_F (ConfigKeyvalFloatTest, get_value_float_shall_succeed)
     ASSERT_EQ (0.0, value);
 }
 
-TEST_F (ConfigKeyvalFloatTest, set_value_string_shall_fail)
+TEST_F (ConfigKeyvalConstructingFloatTest, set_value_string_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "hooray", strlen ("hooray"));
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
@@ -265,7 +295,7 @@ TEST_F (ConfigKeyvalFloatTest, set_value_string_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalFloatTest, get_value_string_shall_fail)
+TEST_F (ConfigKeyvalConstructingFloatTest, get_value_string_shall_fail)
 {
     const char *output;
     int32_t size;
@@ -276,7 +306,7 @@ TEST_F (ConfigKeyvalFloatTest, get_value_string_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalFloatTest, set_value_integer_shall_fail)
+TEST_F (ConfigKeyvalConstructingFloatTest, set_value_integer_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 74);
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
@@ -284,7 +314,7 @@ TEST_F (ConfigKeyvalFloatTest, set_value_integer_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalFloatTest, get_value_integer_shall_fail)
+TEST_F (ConfigKeyvalConstructingFloatTest, get_value_integer_shall_fail)
 {
     int64_t value = LLONG_MAX;
     status = dc_get_value_integer (context_keyval, &value);
@@ -294,13 +324,13 @@ TEST_F (ConfigKeyvalFloatTest, get_value_integer_shall_fail)
 }
 
 // XX
-TEST_F (ConfigKeyvalBooleanTest, set_value_boolean_shall_succeed)
+TEST_F (ConfigKeyvalConstructingBooleanTest, set_value_boolean_shall_succeed)
 {
     status = dc_set_value_boolean (context_keyval, 1);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (ConfigKeyvalBooleanTest, get_value_boolean_shall_succeed)
+TEST_F (ConfigKeyvalConstructingBooleanTest, get_value_boolean_shall_succeed)
 {
     uint8_t value = 8;
 
@@ -310,7 +340,7 @@ TEST_F (ConfigKeyvalBooleanTest, get_value_boolean_shall_succeed)
     ASSERT_EQ (0, value);
 }
 
-TEST_F (ConfigKeyvalBooleanTest, set_value_string_shall_fail)
+TEST_F (ConfigKeyvalConstructingBooleanTest, set_value_string_shall_fail)
 {
     status = dc_set_value_string (context_keyval, "hooray", strlen ("hooray"));
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
@@ -318,7 +348,7 @@ TEST_F (ConfigKeyvalBooleanTest, set_value_string_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalBooleanTest, get_value_string_shall_fail)
+TEST_F (ConfigKeyvalConstructingBooleanTest, get_value_string_shall_fail)
 {
     const char *output;
     int32_t size;
@@ -329,7 +359,7 @@ TEST_F (ConfigKeyvalBooleanTest, get_value_string_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalBooleanTest, set_value_integer_shall_fail)
+TEST_F (ConfigKeyvalConstructingBooleanTest, set_value_integer_shall_fail)
 {
     status = dc_set_value_integer (context_keyval, 74);
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
@@ -337,7 +367,7 @@ TEST_F (ConfigKeyvalBooleanTest, set_value_integer_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalBooleanTest, get_value_integer_shall_fail)
+TEST_F (ConfigKeyvalConstructingBooleanTest, get_value_integer_shall_fail)
 {
     int64_t value = LLONG_MAX;
     status = dc_get_value_integer (context_keyval, &value);
@@ -346,7 +376,7 @@ TEST_F (ConfigKeyvalBooleanTest, get_value_integer_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalBooleanTest, set_value_float_shall_fail)
+TEST_F (ConfigKeyvalConstructingBooleanTest, set_value_float_shall_fail)
 {
     status = dc_set_value_float (context_keyval, 42.123);
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
@@ -354,7 +384,22 @@ TEST_F (ConfigKeyvalBooleanTest, set_value_float_shall_fail)
                   dc_context_error (context_keyval));
 }
 
-TEST_F (ConfigKeyvalBooleanTest, get_value_float_shall_fail)
+TEST_F (ConfigKeyvalConstructingBooleanTest, set_value_float_fails_keep_float_value)
+{
+    double value;
+    enum disir_value_type type;
+
+    status = dc_set_value_float (context_keyval, 42.123);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    type = dc_value_type (context_keyval);
+    EXPECT_EQ (DISIR_VALUE_TYPE_FLOAT, type);
+    status = dc_get_value_float (context_keyval, &value);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_EQ (42.123, value);
+}
+
+TEST_F (ConfigKeyvalConstructingBooleanTest, get_value_float_shall_fail)
 {
     double value = LONG_MAX;
 
