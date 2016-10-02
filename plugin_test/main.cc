@@ -5,6 +5,22 @@
 
 #include <disir/disir.h>
 #include <disir/util.h>
+#include <disir/plugin.h>
+
+#define MQ_ENQUEUE(q, x)                                                \
+    {                                                                   \
+        (x)->next = NULL;                                               \
+                                                                        \
+        if ((q) == NULL) {                                              \
+            (q) = (x)->prev = (x);                                      \
+        } else {                                                        \
+            (q)->prev->next = (x);                                      \
+            (x)->prev = (q)->prev;                                      \
+            (q)->prev = (x);                                            \
+        }                                                               \
+    }
+
+
 
 
 typedef enum disir_status (*output_mold)(struct disir_mold **);
@@ -21,18 +37,17 @@ typedef enum disir_status (*output_mold)(struct disir_mold **);
 #include "basic_version_difference.cc"
 
 // Forward declaration
-enum disir_status
-dio_test_config_read (struct disir_instance *disir, const char *id,
-                      struct disir_mold *mold, struct disir_config **config);
-enum disir_status
-dio_test_config_list (struct disir_instance *disir, struct disir_collection **collection);
-enum disir_status
-dio_test_config_version (struct disir_instance *disir,
-                         const char *id, struct semantic_version *semver);
-enum disir_status
-dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_mold **mold);
-enum disir_status
-dio_test_mold_list (struct disir_instance *disir, struct disir_collection **collection);
+enum disir_status dio_test_config_read (struct disir_instance *disir,
+                                        void *storage, const char *entry_id,
+                                        struct disir_mold *mold, struct disir_config **config);
+enum disir_status dio_test_config_entries (struct disir_instance *disir,
+                                           void *storage, struct disir_entry **entries);
+enum disir_status dio_test_config_version (struct disir_instance *disir, void *storage,
+                                           const char *entry_id, struct semantic_version *semver);
+enum disir_status dio_test_mold_read (struct disir_instance *disir, void *storage,
+                                      const char *entry_id, struct disir_mold **mold);
+enum disir_status dio_test_mold_entries (struct disir_instance *disir,
+                                         void *storage, struct disir_entry **entries);
 
 struct cmp_str
 {
@@ -61,13 +76,15 @@ static std::map<const char *, output_mold, cmp_str> molds = {
 };
 
 enum disir_status
-dio_test_config_read (struct disir_instance *disir, const char *id,
+dio_test_config_read (struct disir_instance *disir, void *storage, const char *entry_id,
                       struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
     output_mold func_mold;
 
-    func_mold = molds[id];
+    fprintf (stderr, "TEST_CONFIG_READ: stroage: %p\n", storage);
+
+    func_mold = molds[entry_id];
     if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
@@ -82,42 +99,28 @@ dio_test_config_read (struct disir_instance *disir, const char *id,
 }
 
 enum disir_status
-dio_test_config_list (struct disir_instance *disir, struct disir_collection **collection)
+dio_test_config_entries (struct disir_instance *disir, void *storage, struct disir_entry **entries)
 {
-    return dio_test_mold_list (disir, collection);
+    return dio_test_mold_entries (disir, storage, entries);
 }
 
 enum disir_status
-dio_test_config_version (struct disir_instance *disir,
-                         const char *id, struct semantic_version *semver)
+dio_test_config_query (struct disir_instance *disir, void *storage, const char *entry_id)
 {
-    enum disir_status status;
-    struct disir_mold *mold;
-    output_mold func_mold;
-
-    if (id == NULL || semver == NULL)
-    {
-        return DISIR_STATUS_INVALID_ARGUMENT;
-    }
-
-    func_mold = molds[id];
-    if (func_mold == NULL)
-        return DISIR_STATUS_INVALID_ARGUMENT;
-
-    status = func_mold (&mold);
-    if (status != DISIR_STATUS_OK)
-        return status;
-
-    return dc_mold_get_version (mold, semver);
+    if (molds[entry_id] == NULL)
+        return DISIR_STATUS_NOT_EXIST;
+    else
+        return DISIR_STATUS_EXISTS;
 }
 
 enum disir_status
-dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_mold **mold)
+dio_test_mold_read (struct disir_instance *disir, void *storage,
+                    const char *entry_id, struct disir_mold **mold)
 {
     enum disir_status status;
     output_mold func_mold;
 
-    func_mold = molds[id];
+    func_mold = molds[entry_id];
     if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
@@ -129,46 +132,61 @@ dio_test_mold_read (struct disir_instance *disir, const char *id, struct disir_m
 }
 
 enum disir_status
-dio_test_mold_list (struct disir_instance *disir, struct disir_collection **collection)
+dio_test_mold_entries (struct disir_instance *disir, void *storage, struct disir_entry **entries)
 {
-    enum disir_status status;
-    struct disir_collection *col;
-    struct disir_context *context;
+    struct disir_entry *queue;
+    struct disir_entry *entry;
 
-    col = dc_collection_create ();
-    if (col == NULL)
-    {
-        return DISIR_STATUS_NO_MEMORY;
-    }
+    queue = NULL;
 
     for (auto i = molds.begin(); i != molds.end(); ++i)
     {
-        status = dc_free_text_create (i->first, &context);
-        if (status != DISIR_STATUS_OK)
-        {
+        entry  = (struct disir_entry *) calloc (1, sizeof (struct disir_entry));
+        if (entry == NULL)
             continue;
-        }
-        dc_collection_push_context (col, context);
-        dc_putcontext (&context);
+
+        entry->de_entry_name = strdup (i->first);
+        entry->DE_READABLE = 1;
+        entry->DE_WRITABLE = 1;
+        MQ_ENQUEUE (queue, entry);
     }
 
-    *collection = col;
+    *entries = queue;
+
     return DISIR_STATUS_OK;
 }
 
-extern "C" enum disir_status
-dio_register_plugin (struct disir_instance *disir)
+enum disir_status
+dio_test_mold_query (struct disir_instance *disir, void *storage, const char *entry_id)
 {
-    struct disir_input_plugin input;
+    if (molds[entry_id] == NULL)
+        return DISIR_STATUS_NOT_EXIST;
+    else
+        return DISIR_STATUS_EXISTS;
+}
 
-    input.in_struct_size = sizeof (struct disir_input_plugin);
-    input.in_config_read = dio_test_config_read;
-    input.in_config_list = dio_test_config_list;
+extern "C" enum disir_status
+dio_register_plugin (struct disir_instance *disir, const char *name)
+{
+    struct disir_plugin plugin;
 
-    input.in_config_version = dio_test_config_version;
-    input.in_mold_read = dio_test_mold_read;
-    input.in_mold_list = dio_test_mold_list;
+    plugin.dp_name = (char *) "test";
+    plugin.dp_description = (char *) "A collection of various molds to enumerate functionality in libdisir";
+    plugin.dp_type = (char *) "test";
+    // Storage space unused.
+    plugin.dp_storage = NULL;
+    plugin.dp_plugin_finished = NULL;
 
-    return disir_register_input (disir, "test", "libdisir test molds", &input);
+    plugin.dp_config_read = dio_test_config_read;
+    plugin.dp_config_write = NULL;
+    plugin.dp_config_entries = dio_test_config_entries;
+    plugin.dp_config_query = dio_test_config_query;
+
+    plugin.dp_mold_read = dio_test_mold_read;
+    plugin.dp_mold_write = NULL;
+    plugin.dp_mold_entries = dio_test_mold_entries;
+    plugin.dp_mold_query = dio_test_mold_query;
+
+    return disir_plugin_register (disir, &plugin);
 }
 
