@@ -18,7 +18,7 @@ protected:
         context_config = NULL;
         context_keyval = NULL;
 
-        status = disir_mold_input (instance, "test", "basic_keyval", &mold);
+        status = disir_mold_read (instance, "basic_keyval", &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         status = dc_config_begin (mold, &context_config);

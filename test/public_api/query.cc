@@ -22,11 +22,11 @@ class QueryTest : public testing::DisirTestTestPlugin
         context_section = NULL;
         context_config = NULL;
 
-        status = disir_mold_input (instance, "test", "basic_keyval", &mold);
+        status = disir_mold_read (instance, "basic_keyval", &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (mold != NULL);
 
-        status = disir_mold_input (instance, "test", "basic_section", &section_mold);
+        status = disir_mold_read (instance, "basic_section", &section_mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (mold != NULL);
 
