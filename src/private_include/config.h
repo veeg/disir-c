@@ -14,6 +14,11 @@ struct disir_config
     //! The config acquires a cf_mold->mo_reference_count when created.
     struct disir_mold               *cf_mold;
 
+    //! Populated with the plugin this config was loaded from (if applicable)
+    //! This information is used internally to determine the plugin source
+    //! when attempting a write-back.
+    char                            *cf_plugin_name;
+
     //! Version of this config instance.
     //! The version of a config shall always represent a snapshot
     //! of its mold, with appropriate modifications. Version cannot

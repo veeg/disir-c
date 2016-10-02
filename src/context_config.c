@@ -183,6 +183,12 @@ dx_config_destroy (struct disir_config **config)
     // Remove our reference to the mold
     disir_mold_finished (&(*config)->cf_mold);
 
+    // Free plugin-name, if allocated.
+    if ((*config)->cf_plugin_name)
+    {
+        free ((*config)->cf_plugin_name);
+    }
+
     // Destroy all element_storage children
     status = dx_element_storage_get_all ((*config)->cf_elements, &collection);
     if (status == DISIR_STATUS_OK)
