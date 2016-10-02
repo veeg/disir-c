@@ -30,7 +30,7 @@ testing::DisirTestWrapper::DisirLogCurrentTestEnter ()
 void
 testing::DisirTestWrapper::DisirLogCurrentTestExit ()
 {
-    DisirLogCurrentTest ("EXITING TEST SETUP");
+    DisirLogCurrentTest ("EXITING TEST TEARDOWN");
 }
 
 void
