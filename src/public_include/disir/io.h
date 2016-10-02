@@ -6,236 +6,99 @@ extern "C"{
 #endif // _cplusplus
 
 
-//! \brief Function signature for inputting disir_config from external source.
-//!
-//! It is the callers responsibility to invoke disir_mold_finished() if he
-//! allocates one and it is not provided by the callee.
-//!
-//! \param[in] id String identifier for the config file to read.
-//! \param[in] mold Optional mold to validate config against. If not provided, function
-//!     is responsible to locate and create the mold associated with id.
-//! \param[out] config The fully populated config object
-//!
-//! \return DISIR_STATUS_OK on success.
-//!
-typedef enum disir_status (*config_read) (struct disir_instance *disir,
-                                          const char *id,
-                                          struct disir_mold *mold,
-                                          struct disir_config **config);
-
-//! \brief Function signature for outputting disir_config to external source.
-//!
-//! \param[in] id String identifier for the config file to write.
-//! \param[in] config The config object to persist to 'id' locatiton.
-//!
-//! \return DISIR_STATUS_OK on success.
-//!
-typedef enum disir_status (*config_write) (struct disir_instance *disir,
-                                           const char *id,
-                                           struct disir_config *config);
-
-//! \brief Retrieve all configs available
-//! TODO: Docs
-//! XXX: implement as output list?
-typedef enum disir_status (*config_list) (struct disir_instance *disir,
-                                          struct disir_collection **collection);
-
-//! \brief Retrieve the mold version from this configuration file
-//!
-//! \param[in] id String identifier for the config file to query for version.
-//! \param[out] semver Semantic version number of this config file.
-//!
-//! \return DISIR_STATUS_OK on success.
-//!
-typedef enum disir_status (*config_version) (struct disir_instance *disir,
-                                             const char *id,
-                                             struct semantic_version *semver);
-
-//! \brief Query if the config with passed id exists
-typedef enum disir_status (*config_query) (struct disir_instance *disir,
-                                           const char *id);
-
-//! \brief Function signature for inputting disir_mold from external source.
-//!
-//! \param[in] id String identifier for the mold file to read.
-//! \param[out] mold Ouput mold to populate read from the 'id' source.
-//!
-//! \return DISIR_STATUS_OK on success.
-//!
-typedef enum disir_status (*mold_read) (struct disir_instance *disir,
-                                        const char *id,
-                                        struct disir_mold **mold);
-
-//! \brief Function signature for outputting disir_mold to external source.
-//!
-//! \param[in] id String identifier for the mold file to write.
-//! \param[in] mold The mold object to presist to 'id' location.
-//!
-//! \return DISIR_STATUS_OK on success
-//!
-typedef enum disir_status (*mold_write) (struct disir_instance *disir,
-                                         const char *id,
-                                         struct disir_mold *mold);
-
-//! TODO: Docs
-//! XXX: implement as output list?
-typedef enum disir_status (*mold_list) (struct disir_instance *disir,
-                                        struct disir_collection **collection);
-
-//! \brief Query if the mold with passed id exists
-//! TODO: docs
-typedef enum disir_status (*mold_query) (struct disir_instance *disir,
-                                         const char *id);
-
-//! Maximum number of bytes the 'type' parameter can identify an I/O type.
-#define DISIR_IO_TYPE_MAXLENGTH             32
-//! Maximum number of bytes the 'description' parameter can describe an I/O type.
-#define DISIR_IO_DESCRIPTION_MAXLENGTH      255
-
-
-//! \brief Structure containing callbacks to register a disir input plugin.
-struct disir_input_plugin
+//! Disir Entry - holds information about single config/mold entries.
+struct disir_entry
 {
-    //! Structure size in bytes of the disir_input_plugin structure.
-    uint64_t        in_struct_size;
+    //! Name of this entry.
+    char                *de_entry_name;
+    union
+    {
+        uint64_t        de_attributes;
+        struct
+        {
+                        //! Entry is readbale by the user who queried this entry.
+            uint64_t    DE_READABLE                 : 1,
+                        //! Entry is writable by the user who queried this entry.
+                        DE_WRITABLE                 : 1,
+                        //! Entry is valid for all subentries of this namespace.
+                        DE_NAMESPACE_ENTRY          : 1,
+                                                    : 0;
+        };
+    };
 
-    //! Callback to read configuration from external source.
-    config_read     in_config_read;
-    //! Callback to list available configurations from external source.
-    //! Output will contain only the generated configurations found
-    //! in the mold list.
-    config_list     in_config_list;
-    //! Callback to query mold version of a given configuration.
-    config_version  in_config_version;
-
-    //! Callback to read mold from external source.
-    mold_read       in_mold_read;
-    //! Callback to list available molds from external source.
-    mold_list       in_mold_list;
-};
-
-//! \brief Structure containing callbacks to register a disir output plugin.
-struct disir_output_plugin
-{
-    //! Structure size in bytes of the disir_output_plugin structure.
-    uint64_t        out_struct_size;
-
-    //! Callback to output configration to external source.
-    config_write    out_config_write;
-
-    //! Callback to output mold to external source.
-    mold_write      out_mold_write;
+    //! Double-linked list pointers.
+    struct disir_entry *next, *prev;
 };
 
 
-//! \brief Register a read input plugin with the libdisir instance
+//! \brief Free a entry structure returned from a I/O API.
 //!
-//! Register two read input methods to populate config and mold objects
-//! identifed by a specific type.
-//!
-//! \param disir Instance to register input type with.
-//! \param type Identifier of the input type. Must be within DISIR_IO_TYPE_MAXLENGTH bytes long.
-//! \param description Describes the type format it reads from.
-//! \param plugin Structure containing all input callbacks implemented
-//!     in the input plugin.
-//!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the input parameters are NULL
-//! \return DISIR_STATUS_NO_MEMORY if memory allocation failed.
-//! \return DISIR_STATUS_OK on success
-//!
+//! \return DISIR_STATUS_OK
 enum disir_status
-disir_register_input (struct disir_instance *disir, const char *type, const char *description,
-                      struct disir_input_plugin *plugin);
+disir_entry_finished (struct disir_entry **entry);
 
-//! \brief Register a write output plugin with the libdisir instance
+//! \brief Input a config entry from the disir instance.
 //!
-//! Register two write output methods to output config and mold objects
-//! identifed by a specific type to external format.
+//! Read a Config object from `disir` identified by ID `entry_id`.
+//! The `mold` argument may optionally override the internal mold associated
+//! wth `entry_id`. If supplied, it is the callers responsibility to invoke disir_mold_finished()
+//! on this instance. Normally, this argument should be NULL.
 //!
-//! \param disir Instance to register output type with.
-//! \param type Identifier of the output type. Must be within DISIR_IO_TYPE_MAXLENGTH bytes long.
-//! \param description Describes the type format it write to.
-//! \param plugin Structure containing all output callbacks implemented in this output plugin.
-//!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the input parameters are NULL
-//! \return DISIR_STATUS_NO_MEMORY if memory allocation failed.
-//! \return DISIR_STATUS_OK on success
-//!
-enum disir_status
-disir_register_output (struct disir_instance *disir, const char *type, const char *description,
-                       struct disir_output_plugin *plugin);
-
-//! \brief Input a config object with of I/O plugin 'type', identified by 'id'
-//!
-//! Read a config object identified by 'id' with I/O plugin 'type', registered in 'disir'.
-//! The mold that describes the config may be NULL, which requires the I/O plugin
-//! to also locate and read in the associated mold.
-//!
-//! \param[in] disir Library instance
-//! \param[in] type Kind of I/O plugin to use on 'id' to populate 'config'
-//! \param[in] id Identifier for the config source to read.
+//! \param[in] disir Library instance.
+//! \param[in] entry_id String identifier for the config entry to read.
 //! \param[in] mold Optional mold that describes the config to parse. If NULL,
 //!     I/O plugin must locate a mold instead.
 //! \param[out] config Object to populate with the state read from 'id'
 //!
-//! \return DISIR_STATUS_OK on success
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either of arguments `disir`,
+//      `entry_id` or `config` are NULL.
+//! \return DISIR_STATUS_NO_CAN_DO if the matching plugin
+//!     for some reason does not implement config_write operation.
+//! \return DISIR_STATUS_NOT_EXIST if the plugin associated with `config`
+//!     is not registered with `disir`.
+//! \return status of the plugin config_read operation.
 //!
 enum disir_status
-disir_config_input (struct disir_instance *disir, const char *type, const char *id,
-                    struct disir_mold *mold, struct disir_config **config);
+disir_config_read (struct disir_instance *disir, const char *entry_id,
+                   struct disir_mold *mold, struct disir_config **config);
 
-
-//! \brief Input a mold object with I/O plugin 'type', identified by 'id'
+//! \brief Output the config object to the disir instance.
 //!
-//! Read a mold object identified by 'id' with I/O plugin 'type', registed in 'disir'.
+//! \param[in] disir Library instance.
+//! \param[in] entry_id String identifier for output location.
+//! \param[in] config The config object to output.
 //!
-//! \param[in] disir Library instance
-//! \param[in] type Kind of I/O plugin to use on 'id' to populate 'mold'
-//! \param[in] id Identifier for the mold source to read.
-//! \param[out] mold Object to populate with the state read from 'id'
-//!
-//! \return DISIR_STATUS_OK on success
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the input arguments are NULL.
+//! \return DISIR_STATUS_NO_CAN_DO if the `config` object is not associated with a plugin.
+//! \return DISIR_STATUS_NO_CAN_DO if the matching plugin
+//!     for some reason does not implement config_write operation.
+//! \return DISIR_STATUS_NOT_EXIST if the plugin associated with `config`
+//!     is not registered with `disir`.
+//! \return status of the plugin config_write operation.
 //!
 enum disir_status
-disir_mold_input (struct disir_instance *disir, const char *type, const char *id,
-                    struct disir_mold **mold);
+disir_config_write (struct disir_instance *disir, const char *entry_id,
+                    struct disir_config *config);
 
-//! \brief Output the config object to a register type output plugin
+//! \brief List all the available config entries, from all plugins.
 //!
-//! \param disir Instance holding libdisir state
-//! \param type Output type. Must be previously registered as so with disir.
-//! \param id Identifier of the mold to external source.
-//! \param config The config object to output to the external type format.
+//! Duplicate entries from plugins who is superseeded by another plugin
+//! is not returned.
+//! Populates the `entries` pointer with the first returned entry in a double-linked
+//! list of disir_entry's. The caller is responsible to invoke disir_entry_finished ()
+//! on (every) entry returned when he is finished with the queried result.
 //!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the input arguments are
-//!     NULL or the type cannot be found in the instance.
-//! \return status of the output plugin
+//! Call does not fail if any of the plugins registered with `disir` fail.
+//! The aggregated sucessful calls to plugins is gahtered in the output `entries`
+//! argument and DISIR_STATUS_OK is returned.
+//! All calls that exit with a non-OK status code from a plugin is logged as a warning.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either `disir` or `entries` are NULL.
+//! \return DISRI_STATUS_NO_MEMORY if internal memory allocations fail.
+//! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_config_output (struct disir_instance *disir, const char *type, const char *id,
-                     struct disir_config *config);
-
-//! \brief Output the mold object to a register type output plugin
-//!
-//! \param disir Instance holding libdisir state
-//! \param type Output type. Must be previously registered as so with disir.
-//! \param id Identifier of the mold to external source.
-//! \param mold The mold object to output to the external type format.
-//!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the input arguments are
-//!     NULL or the type cannot be found in the instance.
-//! \return status of the output plugin
-//!
-enum disir_status
-disir_mold_output (struct disir_instance *disir, const char *type, const char *id,
-                     struct disir_mold *mold);
-
-//! \brief List the available configuration files from this input plugin
-//!
-//! \param type Input type. Must be previously registed with disir
-enum disir_status
-disir_config_list (struct disir_instance *disir, const char *type,
-                   struct disir_collection **collection);
+disir_config_entries (struct disir_instance *disir, struct disir_entry **entries);
 
 //! \brief Mark yourself finished with the configuration object
 //!
@@ -247,6 +110,62 @@ disir_config_list (struct disir_instance *disir, const char *type,
 enum disir_status
 disir_config_finished (struct disir_config **config);
 
+//! \brief Input a mold entry from the Disir instance.
+//!
+//! Read a Mold object from `disir` identified by ID `entry_id`.
+//!
+//! \param[in] disir Library instance.
+//! \param[in] entry_id String identifier for the config entry to read.
+//! \param[out] mold Object to populate with the state read from `entry_id`.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either of arguments `disir`,
+//      `entry_id` or `mold` are NULL.
+//! \return DISIR_STATUS_NO_CAN_DO if the matching plugin
+//!     for some reason does not implement mold_write operation.
+//! \return DISIR_STATUS_NOT_EXIST if the plugin associated with `mold`
+//!     is not registered with `disir`.
+//! \return status of the plugin mold_read operation.
+//!
+enum disir_status
+disir_mold_read (struct disir_instance *disir, const char *entry_id, struct disir_mold **mold);
+
+//! \brief Output the mold object to the Disir instance.
+//!
+//! \param[in] disir Library instance.
+//! \param[in] entry_id String identifier for output location.
+//! \param[in] mold The mold object to output.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the input arguments are NULL.
+//! \return DISIR_STATUS_NO_CAN_DO if the `mold` object is not associated with a plugin.
+//! \return DISIR_STATUS_NO_CAN_DO if the matching plugin
+//!     for some reason does not implement mold_write operation.
+//! \return DISIR_STATUS_NOT_EXIST if the plugin associated with `mold`
+//!     is not registered with `disir`.
+//! \return status of the plugin mold_write operation.
+//!
+enum disir_status
+disir_mold_write (struct disir_instance *disir, const char *entry_id, struct disir_mold *mold);
+
+//! \brief List all the available mold entries, from all plugins.
+//!
+//! Duplicate entries from plugins who is superseeded by another plugin
+//! is not returned.
+//! Populates the `entries` pointer with the first returned entry in a double-linked
+//! list of disir_entry's. The caller is responsible to invoke disir_entry_finished ()
+//! on (every) entry returned when he is finished with the queried result.
+//!
+//! Call does not fail if any of the plugins registered with `disir` fail.
+//! The aggregated sucessful calls to plugins is gahtered in the output `entries`
+//! argument and DISIR_STATUS_OK is returned.
+//! All calls that exit with a non-OK status code from a plugin is logged as a warning.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either `disir` or `entries` are NULL.
+//! \return DISRI_STATUS_NO_MEMORY if internal memory allocations fail.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_mold_entries (struct disir_instance *disir, struct disir_entry **entries);
+
 //! \brief Mark yourself finished with the mold object.
 //!
 //! \\param[in,out] mold Object to mark as finished. Turns the pointer to NULL
@@ -257,18 +176,6 @@ disir_config_finished (struct disir_config **config);
 enum disir_status
 disir_mold_finished (struct disir_mold **mold);
 
-
-//! \brief List all registered input plugins
-//!
-//! \param[in] disir Libdisir instance to query for input plugins
-//! \param[out] collection A context collection with FREE_TEXT contexts
-//!
-//! \return DISIR_STATUS_NO_MEMORY if collection memory allocation failed.
-//! \return DISIR_STATUS_EXHAUSTED if there were no input plugins registered.
-//! \return DISIR_STATUS_OK on success.
-//!
-enum disir_status
-disir_input_plugin_list (struct disir_instance *disir, struct disir_collection **collection);
 
 #ifdef __cplusplus
 }

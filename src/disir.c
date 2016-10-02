@@ -27,12 +27,15 @@
 
 //! INTERNAL STATIC
 static void
-load_plugin (struct disir_instance *disir, const char *plugin_filepath)
+load_plugin (struct disir_instance *disir, const char *plugin_filepath, const char *plugin_name)
 {
     enum disir_status status;
     void *handle;
-    struct disir_plugin *plugin;
-    enum disir_status (*dio_reg)(struct disir_instance *);
+    struct disir_plugin_internal *plugin;
+    struct disir_plugin_internal *last_plugin;
+    enum disir_status (*dio_reg)(struct disir_instance *, const char *);
+
+    last_plugin = MQ_TAIL (disir->dio_plugin_queue);
 
     // Attempt to load the filepath dynamically
     handle = dlopen (plugin_filepath, RTLD_NOW | RTLD_LOCAL);
@@ -54,25 +57,31 @@ load_plugin (struct disir_instance *disir, const char *plugin_filepath)
         return;
     }
 
-    status = dio_reg (disir);
+    status = dio_reg (disir, plugin_name);
     if (status != DISIR_STATUS_OK)
     {
         dlclose (handle);
         return;
     }
 
-    // Allocate some storage handler and store this shit
-    plugin = calloc (1, sizeof (struct disir_plugin));
-    if (plugin == NULL)
+    // Iterate backwards in the queue list. All entries between tail and last_plugin
+    // are new entries added by dio_reg.
+    // XXX: This probably doesnt work too well if multiple plugins are registered from the same
+    // SO, since the dl_handle does not have multiple open references. Maybe we need to
+    // do a dl_open X number of times to fool the reference count.
+    // Oh well, problem for another day.
+    plugin = MQ_TAIL (disir->dio_plugin_queue);
+    while (plugin != last_plugin && plugin != NULL)
     {
-        // Ship is going down - abandon
-        return;
+        plugin->pi_dl_handler = handle;
+        plugin->pi_filepath = strdup (plugin_filepath);
+        plugin->pi_name = strdup (plugin_name);
+
+        plugin = plugin->prev;
+        // Guard against first insertion
+        if (last_plugin == NULL)
+            break;
     }
-
-    plugin->pl_dl_handler = handle;
-    plugin->pl_filepath = strdup (plugin_filepath);
-
-    MQ_ENQUEUE (disir->dio_plugin_queue, plugin);
 
     return;
 }
@@ -122,7 +131,8 @@ load_plugins_from_config (struct disir_instance *disir, struct disir_config *con
 
         if (strcmp (name, "plugin_filepath") == 0)
         {
-            load_plugin (disir, value);
+            // TODO: Retrieve plugin name from config
+            load_plugin (disir, value, "tmpname");
         }
 
         dc_putcontext (&element);
@@ -342,9 +352,7 @@ error:
 enum disir_status
 disir_instance_destroy (struct disir_instance **disir)
 {
-    struct disir_plugin *plugin;
-    struct disir_input *input;
-    struct disir_output *output;
+    struct disir_plugin_internal *plugin;
 
     if (disir == NULL || *disir == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
@@ -356,33 +364,26 @@ disir_instance_destroy (struct disir_instance **disir)
         if (plugin == NULL)
             break;
 
-        dlclose (plugin->pl_dl_handler);
-        free (plugin->pl_filepath);
+        // Call cleanup method specified by plugin.
+        if (plugin->pi_plugin.dp_plugin_finished)
+        {
+            plugin->pi_plugin.dp_plugin_finished (*disir, plugin->pi_plugin.dp_storage);
+        }
+
+        dlclose (plugin->pi_dl_handler);
+
+        if (plugin->pi_filepath)
+            free (plugin->pi_filepath);
+        if (plugin->pi_name)
+            free (plugin->pi_name);
+        if (plugin->pi_plugin.dp_name)
+            free (plugin->pi_plugin.dp_name);
+        if (plugin->pi_plugin.dp_type)
+            free (plugin->pi_plugin.dp_type);
+        if (plugin->pi_plugin.dp_description)
+            free (plugin->pi_plugin.dp_description);
+
         free (plugin);
-    }
-
-    // Free loaded input
-    while (1)
-    {
-        input = MQ_POP ((*disir)->dio_input_queue);
-        if (input == NULL)
-            break;
-
-        free (input->di_type);
-        free (input->di_description);
-        free (input);
-    }
-
-    // Free loaded output
-    while (1)
-    {
-        output = MQ_POP ((*disir)->dio_output_queue);
-        if (output == NULL)
-            break;
-
-        free (output->do_type);
-        free (output->do_description);
-        free (output);
     }
 
     disir_config_finished(&(*disir)->libdisir_config);
