@@ -14,6 +14,9 @@ struct disir_mold
     //! Count of how many ADT structure pointers the user posesses.
     int                             mo_reference_count;
 
+    //! Name of the plugin that loaded this mold (if applicable)
+    char                            *mo_plugin_name;
+
     //! Semantic version of this mold.
     //! This value is determined by the highest semantic version number found
     //! in any of the child contexts contained within the mold.
