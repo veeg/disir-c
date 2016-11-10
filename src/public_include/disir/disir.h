@@ -58,6 +58,8 @@ enum disir_status
     DISIR_STATUS_RESTRICTION_VIOLATED,
     //! One ore more children of context is invalid
     DISIR_STATUS_ELEMENTS_INVALID,
+    //! The operation is not supported by the API endpoint.
+    DISIR_STATUS_NOT_SUPPORTED,
 
     //! Sentinel status - not returned by any API
     DISIR_STATUS_UNKNOWN // Must be the last status in enumeration

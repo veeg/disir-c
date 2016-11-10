@@ -35,6 +35,7 @@ const char *disir_status_strings[] = {
     "NOT EXIST",
     "RESTRICTION VIOLATED",
     "ELEMENTS INVALID",
+    "NOT SUPPORTED",
     "UNKNOWN",
 };
 
