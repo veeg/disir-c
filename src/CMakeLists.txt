@@ -15,7 +15,7 @@ add_custom_target (configure_version ALL
   COMMENT "Configuring version.c"
 )
 
-set (PROJECT_3PARTY_LIBDIR ${CMAKE_SOURCE_DIR}/lib)
+set (PROJECT_3PARTY_LIBDIR ${CMAKE_SOURCE_DIR}/3rdparty)
 set (_LIBDISIR_3PARTY_LIB_SOURCES
   "${PROJECT_3PARTY_LIBDIR}/void-multimap/multimap.c"
   "${PROJECT_3PARTY_LIBDIR}/void-list/list.c"
@@ -68,7 +68,7 @@ target_include_directories (${PROJECT_SO_LIBRARY} PRIVATE
 )
 
 target_include_directories (${PROJECT_SO_LIBRARY} PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/public_include/>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
   $<INSTALL_INTERFACE:include/>
 )
 
