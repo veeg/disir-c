@@ -55,7 +55,7 @@ restriction_entries (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    // XXX TODO add section
+    dc_putcontext (&context_keyval);
 
     status = dc_mold_finalize (&context_mold, mold);
     if (status != DISIR_STATUS_OK)
