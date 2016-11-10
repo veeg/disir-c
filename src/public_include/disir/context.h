@@ -1118,6 +1118,33 @@ enum disir_status dc_mold_finalize (struct disir_context **context, struct disir
 //!
 enum disir_status dc_free_text_create (const char *text, struct disir_context **context);
 
+// TODO: Find a proper place for this structure.
+//! XXX: Very simple container. Only a list of allocated strings.
+struct disir_diff_report
+{
+    int     dr_entries;
+    char    **dr_diff_string;
+
+    int     dr_internal_allocated;
+};
+
+//! \brief Compare two context objects for equality.
+//!
+//! \param[in] lhs First context argument.
+//! \param[in] rhs Second context argument.
+//! \param[out] report Optional difference report.
+//!
+//! NOTE: Only implemented for CONFIG toplevel contexts
+//!
+//! \return DISIR_STATUS_CONFLICT when objects differ.
+//! \return DISIR_STATUS_NO_MEMORY on memory allocation failure.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_compare (struct disir_context *lhs, struct disir_context *rhs,
+            struct disir_diff_report **report);
+
+
 #ifdef __cplusplus
 }
 #endif // _cplusplus
