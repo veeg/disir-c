@@ -544,6 +544,7 @@ dc_get_value_type (struct disir_context *context, enum disir_value_type *type)
     return status;
 }
 
+//! PUBLIC API
 const char *
 dc_context_error (struct disir_context *context)
 {
