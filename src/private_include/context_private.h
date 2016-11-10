@@ -236,10 +236,14 @@ enum disir_status dx_context_sp_full_check_log_error (struct disir_context *cont
 enum disir_status dx_context_dp_full_check_log_error (struct disir_context **context,
                                                       const char *function_name);
 
-
-
 // Transfer the logwarn entry from source to destination
 void dx_context_transfer_logwarn (struct disir_context *destination, struct disir_context *source);
+
+//! \brief Retrieve a name for this context.
+//!
+//! If the context is of type KEYVAL or SECTION, return the actual name given.
+//! Otherwise return the string representation of its context type.
+const char *dx_context_name (struct disir_context *context);
 
 
 #endif // _LIBDISIR_CONTEXT_PRIVATE_H

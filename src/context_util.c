@@ -555,3 +555,19 @@ dc_context_error (struct disir_context *context)
     return context->cx_error_message;
 }
 
+// INTERNAL API
+const char *
+dx_context_name (struct disir_context *context)
+{
+    const char *name;
+
+    if (context == NULL)
+        return NULL;
+
+    if (dc_get_name (context, &name, NULL) == DISIR_STATUS_OK)
+    {
+        return name;
+    }
+
+    return dc_context_type_string (context);
+}
