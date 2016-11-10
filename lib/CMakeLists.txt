@@ -63,7 +63,7 @@ add_library(${PROJECT_SO_LIBRARY} SHARED ${_LIBDISIR_SOURCES})
 add_dependencies (${PROJECT_SO_LIBRARY} configure_version)
 
 target_include_directories (${PROJECT_SO_LIBRARY} PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/private_include/
+  ${CMAKE_CURRENT_SOURCE_DIR}/include/
   ${_LIBDISIR_3PARTY_LIB_INCLUDEDIR}
 )
 

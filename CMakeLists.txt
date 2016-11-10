@@ -10,7 +10,7 @@ include (GNUInstallDirs)
 set (EXPORT_TARGET libdisir-targets)
 set (EXPORT_NAMESPACE disir::)
 
-add_subdirectory (src)
+add_subdirectory (lib)
 add_subdirectory (plugin_test)
 add_subdirectory (doc)
 
