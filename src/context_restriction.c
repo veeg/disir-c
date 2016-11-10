@@ -1161,7 +1161,7 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
             else if (entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MAX && diff > max_closes_match)
             {
                 max_closes_match = diff;
-                min = entry->re_value_max;
+                max = entry->re_value_max;
             }
         }
     });
