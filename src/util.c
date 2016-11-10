@@ -177,6 +177,7 @@ dc_semantic_version_convert (const char *input, struct semantic_version *semver)
     return DISIR_STATUS_OK;
 }
 
+// TODO: Refactor this function. Return int as normal string functions
 //! INTERNAL API
 enum disir_status
 dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
@@ -239,6 +240,7 @@ dx_value_compare (struct disir_value *v1, struct disir_value *v2)
     if (v1->dv_size != v2->dv_size)
         return (v1->dv_size - v2->dv_size);
 
+    // TODO: Make more extensive unit tests. This most definately does not compare all cases.
     return memcmp (v1->dv_string, v2->dv_string, v1->dv_size);
 }
 
