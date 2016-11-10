@@ -160,6 +160,13 @@ TEST_F (StatusTest, elements_invalid)
     ASSERT_STREQ (status_string, "ELEMENTS INVALID");
 }
 
+TEST_F (StatusTest, not_supported)
+{
+    status = DISIR_STATUS_NOT_SUPPORTED;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "NOT SUPPORTED");
+}
+
 TEST_F (StatusTest, unknown)
 {
     status = DISIR_STATUS_UNKNOWN;
