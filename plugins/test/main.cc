@@ -35,6 +35,7 @@ typedef enum disir_status (*output_mold)(struct disir_mold **);
 #include "restriction_config_parent_section_max_entry.cc"
 #include "restriction_section_parent_keyval_max_entry.cc"
 #include "basic_version_difference.cc"
+#include "complex_section.cc"
 
 // Forward declaration
 enum disir_status dio_test_config_read (struct disir_instance *disir,
@@ -73,6 +74,7 @@ static std::map<const char *, output_mold, cmp_str> molds = {
     std::make_pair ("restriction_section_parent_keyval_max_entry",
                     restriction_section_parent_keyval_max_entry),
     std::make_pair ("basic_version_difference", basic_version_difference),
+    std::make_pair ("complex_section", complex_section),
 };
 
 enum disir_status
