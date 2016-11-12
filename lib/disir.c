@@ -632,7 +632,8 @@ disir_log_user (struct disir_instance *disir, const char *message, ...)
 {
     va_list args;
 
-    if (disir == NULL || message == NULL)
+    // TODO: disir argument not error checked. its not USED anyway.. (yet)
+    if (message == NULL)
         return;
 
     va_start (args, message);
