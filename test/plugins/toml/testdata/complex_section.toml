@@ -1,0 +1,20 @@
+'@DISIR_CONFIG_VERSION' = "1.0.0"
+
+[single_section]
+key_boolean = false
+
+  [single_section.nested]
+  key_integer = 42
+
+[[array_table]]
+key_string = "Manchester"
+
+[[array_table]]
+key_string = "Manchester"
+
+[[nested_array_table]]
+  [[nested_array_table.nest]]
+  key_boolean = true
+
+  [[nested_array_table.nest]]
+  key_boolean = true

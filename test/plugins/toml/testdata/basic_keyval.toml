@@ -1,0 +1,5 @@
+'@DISIR_CONFIG_VERSION' = "1.0.0"
+key_string = "string_value"
+key_integer = 42
+key_float = 3.140000
+key_boolean = true
