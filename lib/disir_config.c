@@ -240,6 +240,10 @@ disir_config_finished (struct disir_config **config)
     enum disir_status status;
     struct disir_context *context;
 
+    if (config == NULL || *config == NULL)
+        return DISIR_STATUS_INVALID_ARGUMENT;
+
+
     context = (*config)->cf_context;
     status = dc_destroy (&context);
     if (status == DISIR_STATUS_OK)
