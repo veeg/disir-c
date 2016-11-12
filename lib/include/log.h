@@ -43,7 +43,7 @@ enum disir_log_level {
 void dx_log_disir (enum disir_log_level dll,
                 int severity,
                 struct disir_context *context,
-                struct disir_instance *disir,
+                struct disir_instance *instance,
                 int32_t log_context,
                 const char *file,
                 const char *function,
@@ -54,7 +54,7 @@ void dx_log_disir (enum disir_log_level dll,
 void dx_log_disir_va (enum disir_log_level dll,
                 int severity,
                 struct disir_context *context,
-                struct disir_instance *disir,
+                struct disir_instance *instance,
                 int32_t log_context,
                 const char *file,
                 const char *function,
@@ -63,11 +63,11 @@ void dx_log_disir_va (enum disir_log_level dll,
                 const char *fmt_message, ...);
 
 
-#define _log_disir_full(level, severity, context, disir, log_context, prefix, message, ...) \
+#define _log_disir_full(level, severity, context, instance, log_context, prefix, message, ...) \
     dx_log_disir_va (level, \
                  severity, \
                  context, \
-                 disir, \
+                 instance, \
                  log_context, \
                  __FILE__, \
                  __FUNCTION__, \

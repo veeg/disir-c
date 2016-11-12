@@ -11,7 +11,7 @@ class DisirInstanceTest : public testing::DisirTestWrapper
     void SetUp()
     {
         status = DISIR_STATUS_OK;
-        disir = NULL;
+        instance = NULL;
 
         DisirLogTestBodyEnter ();
     }
@@ -23,17 +23,17 @@ class DisirInstanceTest : public testing::DisirTestWrapper
 
 public:
     enum disir_status status;
-    struct disir_instance *disir;
+    struct disir_instance *instance;
 };
 
 TEST_F (DisirInstanceTest, should_create_destroy_disir_instance)
 {
-    status = disir_instance_create (NULL, NULL, &disir);
+    status = disir_instance_create (NULL, NULL, &instance);
     ASSERT_EQ (DISIR_STATUS_OK, status);
-    ASSERT_TRUE (disir != NULL);
+    ASSERT_TRUE (instance != NULL);
 
-    status = disir_instance_destroy (&disir);
+    status = disir_instance_destroy (&instance);
     ASSERT_EQ (DISIR_STATUS_OK, status);
-    ASSERT_TRUE (disir == NULL);
+    ASSERT_TRUE (instance == NULL);
 }
 

@@ -9,16 +9,16 @@
 
 //! PUBLIC API
 enum disir_status
-disir_plugin_register (struct disir_instance *disir, struct disir_plugin *plugin)
+disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plugin)
 {
     enum disir_status status;
     struct disir_plugin_internal *internal;
 
     internal = NULL;
 
-    if (disir == NULL || plugin == NULL)
+    if (instance == NULL || plugin == NULL)
     {
-        log_debug (0, "invoked with NULL pointer(s). (%p %p)", disir, plugin);
+        log_debug (0, "invoked with NULL pointer(s). (%p %p)", instance, plugin);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -55,7 +55,7 @@ disir_plugin_register (struct disir_instance *disir, struct disir_plugin *plugin
         goto error;
     }
 
-    MQ_PUSH (disir->dio_plugin_queue, internal);
+    MQ_PUSH (instance->dio_plugin_queue, internal);
 
     return DISIR_STATUS_OK;
 

@@ -38,16 +38,16 @@ typedef enum disir_status (*output_mold)(struct disir_mold **);
 #include "complex_section.cc"
 
 // Forward declaration
-enum disir_status dio_test_config_read (struct disir_instance *disir,
+enum disir_status dio_test_config_read (struct disir_instance *instance,
                                         void *storage, const char *entry_id,
                                         struct disir_mold *mold, struct disir_config **config);
-enum disir_status dio_test_config_entries (struct disir_instance *disir,
+enum disir_status dio_test_config_entries (struct disir_instance *instance,
                                            void *storage, struct disir_entry **entries);
-enum disir_status dio_test_config_version (struct disir_instance *disir, void *storage,
+enum disir_status dio_test_config_version (struct disir_instance *instance, void *storage,
                                            const char *entry_id, struct semantic_version *semver);
-enum disir_status dio_test_mold_read (struct disir_instance *disir, void *storage,
+enum disir_status dio_test_mold_read (struct disir_instance *instance, void *storage,
                                       const char *entry_id, struct disir_mold **mold);
-enum disir_status dio_test_mold_entries (struct disir_instance *disir,
+enum disir_status dio_test_mold_entries (struct disir_instance *instance,
                                          void *storage, struct disir_entry **entries);
 
 struct cmp_str
@@ -78,7 +78,7 @@ static std::map<const char *, output_mold, cmp_str> molds = {
 };
 
 enum disir_status
-dio_test_config_read (struct disir_instance *disir, void *storage, const char *entry_id,
+dio_test_config_read (struct disir_instance *instance, void *storage, const char *entry_id,
                       struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
@@ -99,13 +99,13 @@ dio_test_config_read (struct disir_instance *disir, void *storage, const char *e
 }
 
 enum disir_status
-dio_test_config_entries (struct disir_instance *disir, void *storage, struct disir_entry **entries)
+dio_test_config_entries (struct disir_instance *instance, void *storage, struct disir_entry **entries)
 {
-    return dio_test_mold_entries (disir, storage, entries);
+    return dio_test_mold_entries (instance, storage, entries);
 }
 
 enum disir_status
-dio_test_config_query (struct disir_instance *disir, void *storage, const char *entry_id)
+dio_test_config_query (struct disir_instance *instance, void *storage, const char *entry_id)
 {
     if (molds[entry_id] == NULL)
         return DISIR_STATUS_NOT_EXIST;
@@ -114,7 +114,7 @@ dio_test_config_query (struct disir_instance *disir, void *storage, const char *
 }
 
 enum disir_status
-dio_test_mold_read (struct disir_instance *disir, void *storage,
+dio_test_mold_read (struct disir_instance *instance, void *storage,
                     const char *entry_id, struct disir_mold **mold)
 {
     enum disir_status status;
@@ -132,7 +132,7 @@ dio_test_mold_read (struct disir_instance *disir, void *storage,
 }
 
 enum disir_status
-dio_test_mold_entries (struct disir_instance *disir, void *storage, struct disir_entry **entries)
+dio_test_mold_entries (struct disir_instance *instance, void *storage, struct disir_entry **entries)
 {
     struct disir_entry *queue;
     struct disir_entry *entry;
@@ -157,7 +157,7 @@ dio_test_mold_entries (struct disir_instance *disir, void *storage, struct disir
 }
 
 enum disir_status
-dio_test_mold_query (struct disir_instance *disir, void *storage, const char *entry_id)
+dio_test_mold_query (struct disir_instance *instance, void *storage, const char *entry_id)
 {
     if (molds[entry_id] == NULL)
         return DISIR_STATUS_NOT_EXIST;
@@ -166,7 +166,7 @@ dio_test_mold_query (struct disir_instance *disir, void *storage, const char *en
 }
 
 extern "C" enum disir_status
-dio_register_plugin (struct disir_instance *disir, const char *name)
+dio_register_plugin (struct disir_instance *instance, const char *name)
 {
     struct disir_plugin plugin;
 
@@ -187,6 +187,6 @@ dio_register_plugin (struct disir_instance *disir, const char *name)
     plugin.dp_mold_entries = dio_test_mold_entries;
     plugin.dp_mold_query = dio_test_mold_query;
 
-    return disir_plugin_register (disir, &plugin);
+    return disir_plugin_register (instance, &plugin);
 }
 

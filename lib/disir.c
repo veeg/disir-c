@@ -27,7 +27,7 @@
 
 //! INTERNAL STATIC
 static void
-load_plugin (struct disir_instance *disir, const char *plugin_filepath, const char *plugin_name)
+load_plugin (struct disir_instance *instance, const char *plugin_filepath, const char *plugin_name)
 {
     enum disir_status status;
     void *handle;
@@ -35,13 +35,13 @@ load_plugin (struct disir_instance *disir, const char *plugin_filepath, const ch
     struct disir_plugin_internal *last_plugin;
     enum disir_status (*dio_reg)(struct disir_instance *, const char *);
 
-    last_plugin = MQ_TAIL (disir->dio_plugin_queue);
+    last_plugin = MQ_TAIL (instance->dio_plugin_queue);
 
     // Attempt to load the filepath dynamically
     handle = dlopen (plugin_filepath, RTLD_NOW | RTLD_LOCAL);
     if (handle == NULL)
     {
-        disir_error_set (disir, "Plugin located at filepath could not be loaded: %s: %s",
+        disir_error_set (instance, "Plugin located at filepath could not be loaded: %s: %s",
                          plugin_filepath, dlerror());
         return;
     }
@@ -50,14 +50,14 @@ load_plugin (struct disir_instance *disir, const char *plugin_filepath, const ch
     dio_reg = dlsym (handle, "dio_register_plugin");
     if (dio_reg == NULL)
     {
-        disir_error_set (disir,
+        disir_error_set (instance,
                          "Plugin could not locate symbol 'dio_register_plugin' in SO '%s': %s",
                          plugin_filepath, dlerror());
         dlclose (handle);
         return;
     }
 
-    status = dio_reg (disir, plugin_name);
+    status = dio_reg (instance, plugin_name);
     if (status != DISIR_STATUS_OK)
     {
         dlclose (handle);
@@ -70,7 +70,7 @@ load_plugin (struct disir_instance *disir, const char *plugin_filepath, const ch
     // SO, since the dl_handle does not have multiple open references. Maybe we need to
     // do a dl_open X number of times to fool the reference count.
     // Oh well, problem for another day.
-    plugin = MQ_TAIL (disir->dio_plugin_queue);
+    plugin = MQ_TAIL (instance->dio_plugin_queue);
     while (plugin != last_plugin && plugin != NULL)
     {
         plugin->pi_dl_handler = handle;
@@ -88,7 +88,7 @@ load_plugin (struct disir_instance *disir, const char *plugin_filepath, const ch
 
 //! INTERNAL STATIC
 void
-load_plugins_from_config (struct disir_instance *disir, struct disir_config *config)
+load_plugins_from_config (struct disir_instance *instance, struct disir_config *config)
 {
     enum disir_status status;
     struct disir_collection *collection;
@@ -100,7 +100,7 @@ load_plugins_from_config (struct disir_instance *disir, struct disir_config *con
     context = dc_config_getcontext (config);
     if (context == NULL)
     {
-        disir_error_set (disir, "Failed to retrieve context from config object.");
+        disir_error_set (instance, "Failed to retrieve context from config object.");
         return;
     }
 
@@ -132,7 +132,7 @@ load_plugins_from_config (struct disir_instance *disir, struct disir_config *con
         if (strcmp (name, "plugin_filepath") == 0)
         {
             // TODO: Retrieve plugin name from config
-            load_plugin (disir, value, "tmpname");
+            load_plugin (instance, value, "tmpname");
         }
 
         dc_putcontext (&element);
@@ -256,10 +256,10 @@ error:
 
 //! PUBLIC API
 enum disir_status
-disir_libdisir_config_to_disk (struct disir_instance *disir, struct disir_config *config,
+disir_libdisir_config_to_disk (struct disir_instance *instance, struct disir_config *config,
                                const char *filepath)
 {
-    return dio_ini_config_write (disir, filepath, config);
+    return dio_ini_config_write (instance, filepath, config);
 }
 
 // PUBLIC API
@@ -280,7 +280,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 
     if (instance == NULL)
     {
-        log_debug (0, "invoked with disir NULL pointer.");
+        log_debug (0, "invoked with instance NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -350,24 +350,24 @@ error:
 
 //! PUBLIC API
 enum disir_status
-disir_instance_destroy (struct disir_instance **disir)
+disir_instance_destroy (struct disir_instance **instance)
 {
     struct disir_plugin_internal *plugin;
 
-    if (disir == NULL || *disir == NULL)
+    if (instance == NULL || *instance == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
     // Free loaded plugins
     while (1)
     {
-        plugin = MQ_POP ((*disir)->dio_plugin_queue);
+        plugin = MQ_POP ((*instance)->dio_plugin_queue);
         if (plugin == NULL)
             break;
 
         // Call cleanup method specified by plugin.
         if (plugin->pi_plugin.dp_plugin_finished)
         {
-            plugin->pi_plugin.dp_plugin_finished (*disir, plugin->pi_plugin.dp_storage);
+            plugin->pi_plugin.dp_plugin_finished (*instance, plugin->pi_plugin.dp_storage);
         }
 
         dlclose (plugin->pi_dl_handler);
@@ -386,18 +386,18 @@ disir_instance_destroy (struct disir_instance **disir)
         free (plugin);
     }
 
-    disir_config_finished(&(*disir)->libdisir_config);
-    disir_mold_finished(&(*disir)->libdisir_mold);
+    disir_config_finished(&(*instance)->libdisir_config);
+    disir_mold_finished(&(*instance)->libdisir_mold);
 
     // Free any error message set on instance
-    if ((*disir)->disir_error_message)
+    if ((*instance)->disir_error_message)
     {
-        free ((*disir)->disir_error_message);
+        free ((*instance)->disir_error_message);
     }
 
-    free (*disir);
+    free (*instance);
 
-    *disir = NULL;
+    *instance = NULL;
     return DISIR_STATUS_OK;
 }
 
@@ -628,7 +628,7 @@ disir_config_valid (struct disir_config *config, struct disir_collection **colle
 
 //! PUBLIC API
 void
-disir_log_user (struct disir_instance *disir, const char *message, ...)
+disir_log_user (struct disir_instance *instance, const char *message, ...)
 {
     va_list args;
 
@@ -643,39 +643,39 @@ disir_log_user (struct disir_instance *disir, const char *message, ...)
 
 //! PUBLIC API
 void
-disir_error_set (struct disir_instance *disir, const char *message, ...)
+disir_error_set (struct disir_instance *instance, const char *message, ...)
 {
     va_list args;
 
-    if (disir == NULL || message == NULL)
+    if (instance == NULL || message == NULL)
         return;
 
     va_start (args, message);
-    dx_log_disir (DISIR_LOG_LEVEL_ERROR, 0, NULL, disir, 0, NULL, NULL, 0, NULL, message, args);
+    dx_log_disir (DISIR_LOG_LEVEL_ERROR, 0, NULL, instance, 0, NULL, NULL, 0, NULL, message, args);
     va_end (args);
 }
 
 //! PUBLIC API
 void
-disir_error_clear (struct disir_instance *disir)
+disir_error_clear (struct disir_instance *instance)
 {
-    if (disir->disir_error_message_size != 0)
+    if (instance->disir_error_message_size != 0)
     {
-        disir->disir_error_message_size = 0;
-        free (disir->disir_error_message);
-        disir->disir_error_message = NULL;
+        instance->disir_error_message_size = 0;
+        free (instance->disir_error_message);
+        instance->disir_error_message = NULL;
     }
 }
 
 //! PUBLIC API
 enum disir_status
-disir_error_copy (struct disir_instance *disir,
+disir_error_copy (struct disir_instance *instance,
                   char *buffer, int32_t buffer_size, int32_t *bytes_written)
 {
     enum disir_status status;
     int32_t size;
 
-    if (disir == NULL || buffer == NULL)
+    if (instance == NULL || buffer == NULL)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
@@ -687,7 +687,7 @@ disir_error_copy (struct disir_instance *disir,
         return DISIR_STATUS_INSUFFICIENT_RESOURCES;
     }
 
-    size = disir->disir_error_message_size;
+    size = instance->disir_error_message_size;
     if (bytes_written)
     {
         // Write the total size of the error message
@@ -701,7 +701,7 @@ disir_error_copy (struct disir_instance *disir,
         status = DISIR_STATUS_INSUFFICIENT_RESOURCES;
     }
 
-    memcpy (buffer, disir->disir_error_message, size);
+    memcpy (buffer, instance->disir_error_message, size);
     if (status == DISIR_STATUS_INSUFFICIENT_RESOURCES)
     {
         sprintf (buffer + size, "...");
@@ -714,8 +714,8 @@ disir_error_copy (struct disir_instance *disir,
 
 //! PUBLIC API
 const char *
-disir_error (struct disir_instance *disir)
+disir_error (struct disir_instance *instance)
 {
-    return disir->disir_error_message;
+    return instance->disir_error_message;
 }
 

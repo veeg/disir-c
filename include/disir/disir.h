@@ -139,7 +139,7 @@ enum disir_status disir_libdisir_mold (struct disir_mold **mold);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status disir_libdisir_config_to_disk (struct disir_instance *disir,
+enum disir_status disir_libdisir_config_to_disk (struct disir_instance *instance,
                                                  struct disir_config *config,
                                                  const char *filepath);
 
@@ -180,26 +180,26 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 //!
 //! Destroy a libdisir instance previously allocated with disir_instance_create()
 //!
-//! \param[in,out] disir Instance to destroy. Pointer is sat to NULL upon successful destroy
+//! \param[in,out] instance Instance to destroy. Pointer is sat to NULL upon successful destroy
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input paramter address and its pointed to value
 //!     are NULL:
 //! \return DISIR_STATUS_OK on success.
 enum disir_status
-disir_instance_destroy (struct disir_instance **disir);
+disir_instance_destroy (struct disir_instance **instance);
 
 //! \brief Log a USER level log entry to the disir log.
 //!
-void disir_log_user (struct disir_instance *disir, const char *message, ...);
+void disir_log_user (struct disir_instance *instance, const char *message, ...);
 
 //! \brief Set an error message to the disir instance.
 //!
 //! This will also issue a ERROR level log event to the log stream.
 //!
-void disir_error_set (struct disir_instance *disir, const char *message, ...);
+void disir_error_set (struct disir_instance *instance, const char *message, ...);
 
 //! \brief Clear any error message previously sat on the disir instance.
-void disir_error_clear (struct disir_instance *disir);
+void disir_error_clear (struct disir_instance *instance);
 
 //! \brief Copy the contents of the error message
 //!
@@ -211,7 +211,7 @@ void disir_error_clear (struct disir_instance *disir);
 //! which means the input buffer must be atleast 1 byte greater than
 //! the total size of the error message.
 //!
-//! \param[in] disir Libdisir instance to copy error message from.
+//! \param[in] instance Libdisir instance to copy error message from.
 //! \param[in,out] buffer Output buffer to write error message to.
 //! \param[in] buffer_size Size of the output `buffer`.
 //! \param[out] bytes_written Number of bytes written to `buffer`.
@@ -221,14 +221,14 @@ void disir_error_clear (struct disir_instance *disir);
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_error_copy (struct disir_instance *disir,
+disir_error_copy (struct disir_instance *instance,
                   char *buffer, int32_t buffer_size, int32_t *bytes_written);
 
 //! \brief Return the error message from the instance.
 //!
 //!If no error message exists, NULL is returned.
 //!
-const char * disir_error (struct disir_instance *disir);
+const char * disir_error (struct disir_instance *instance);
 
 //! \brief Generate a config at a given version from the finished mold.
 //!

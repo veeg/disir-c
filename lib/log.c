@@ -272,7 +272,7 @@ void
 dx_log_disir_va (enum disir_log_level dll,
             int severity,
             struct disir_context *context,
-            struct disir_instance *disir,
+            struct disir_instance *instance,
             int32_t log_context,
             const char *file,
             const char *function,
@@ -283,7 +283,7 @@ dx_log_disir_va (enum disir_log_level dll,
 {
     va_list args;
     va_start (args, fmt_message);
-    dx_log_disir (dll, severity, context, disir, log_context,
+    dx_log_disir (dll, severity, context, instance, log_context,
                   file, function, line, message_prefix, fmt_message, args);
     va_end (args);
 }
@@ -292,7 +292,7 @@ void
 dx_log_disir (enum disir_log_level dll,
             int severity,
             struct disir_context *context,
-            struct disir_instance *disir,
+            struct disir_instance *instance,
             int32_t log_context,
             const char *file,
             const char *function,
@@ -324,12 +324,12 @@ dx_log_disir (enum disir_log_level dll,
         va_end (args_copy);
     }
 
-    if (disir != NULL)
+    if (instance != NULL)
     {
         va_copy (args_copy, args);
 
-        dx_internal_log_to_storage (&disir->disir_error_message,
-                                    &disir->disir_error_message_size, fmt_message, args_copy);
+        dx_internal_log_to_storage (&instance->disir_error_message,
+                                    &instance->disir_error_message_size, fmt_message, args_copy);
         va_end (args_copy);
     }
 

@@ -44,7 +44,7 @@ disir_entry_finished (struct disir_entry **entry);
 //! wth `entry_id`. If supplied, it is the callers responsibility to invoke disir_mold_finished()
 //! on this instance. Normally, this argument should be NULL.
 //!
-//! \param[in] disir Library instance.
+//! \param[in] instance Library instance.
 //! \param[in] entry_id String identifier for the config entry to read.
 //! \param[in] mold Optional mold that describes the config to parse. If NULL,
 //!     I/O plugin must locate a mold instead.
@@ -59,12 +59,12 @@ disir_entry_finished (struct disir_entry **entry);
 //! \return status of the plugin config_read operation.
 //!
 enum disir_status
-disir_config_read (struct disir_instance *disir, const char *entry_id,
+disir_config_read (struct disir_instance *instance, const char *entry_id,
                    struct disir_mold *mold, struct disir_config **config);
 
 //! \brief Output the config object to the disir instance.
 //!
-//! \param[in] disir Library instance.
+//! \param[in] instance Library instance.
 //! \param[in] entry_id String identifier for output location.
 //! \param[in] config The config object to output.
 //!
@@ -77,7 +77,7 @@ disir_config_read (struct disir_instance *disir, const char *entry_id,
 //! \return status of the plugin config_write operation.
 //!
 enum disir_status
-disir_config_write (struct disir_instance *disir, const char *entry_id,
+disir_config_write (struct disir_instance *instance, const char *entry_id,
                     struct disir_config *config);
 
 //! \brief List all the available config entries, from all plugins.
@@ -98,7 +98,7 @@ disir_config_write (struct disir_instance *disir, const char *entry_id,
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_config_entries (struct disir_instance *disir, struct disir_entry **entries);
+disir_config_entries (struct disir_instance *instance, struct disir_entry **entries);
 
 //! \brief Mark yourself finished with the configuration object
 //!
@@ -114,7 +114,7 @@ disir_config_finished (struct disir_config **config);
 //!
 //! Read a Mold object from `disir` identified by ID `entry_id`.
 //!
-//! \param[in] disir Library instance.
+//! \param[in] instance Library instance.
 //! \param[in] entry_id String identifier for the config entry to read.
 //! \param[out] mold Object to populate with the state read from `entry_id`.
 //!
@@ -127,11 +127,11 @@ disir_config_finished (struct disir_config **config);
 //! \return status of the plugin mold_read operation.
 //!
 enum disir_status
-disir_mold_read (struct disir_instance *disir, const char *entry_id, struct disir_mold **mold);
+disir_mold_read (struct disir_instance *instance, const char *entry_id, struct disir_mold **mold);
 
 //! \brief Output the mold object to the Disir instance.
 //!
-//! \param[in] disir Library instance.
+//! \param[in] instance Library instance.
 //! \param[in] entry_id String identifier for output location.
 //! \param[in] mold The mold object to output.
 //!
@@ -144,7 +144,7 @@ disir_mold_read (struct disir_instance *disir, const char *entry_id, struct disi
 //! \return status of the plugin mold_write operation.
 //!
 enum disir_status
-disir_mold_write (struct disir_instance *disir, const char *entry_id, struct disir_mold *mold);
+disir_mold_write (struct disir_instance *instance, const char *entry_id, struct disir_mold *mold);
 
 //! \brief List all the available mold entries, from all plugins.
 //!
@@ -164,7 +164,7 @@ disir_mold_write (struct disir_instance *disir, const char *entry_id, struct dis
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_mold_entries (struct disir_instance *disir, struct disir_entry **entries);
+disir_mold_entries (struct disir_instance *instance, struct disir_entry **entries);
 
 //! \brief Mark yourself finished with the mold object.
 //!

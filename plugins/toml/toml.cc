@@ -1,6 +1,6 @@
 #include <disir/fslib/toml.h>
 
-enum disir_status dio_toml_config_entries (struct disir_instance *disir,
+enum disir_status dio_toml_config_entries (struct disir_instance *instance,
                                            void *storage, struct disir_entry **entries)
 {
 
@@ -13,7 +13,7 @@ enum disir_status dio_toml_config_entries (struct disir_instance *disir,
 
 
 extern "C" enum disir_status
-dio_register_plugin (struct disir_instance *disir, const char *name)
+dio_register_plugin (struct disir_instance *instance, const char *name)
 {
     struct disir_plugin plugin;
 
@@ -35,6 +35,6 @@ dio_register_plugin (struct disir_instance *disir, const char *name)
     plugin.dp_mold_entries = NULL;
     plugin.dp_mold_query = NULL;
 
-    return disir_plugin_register (disir, &plugin);
+    return disir_plugin_register (instance, &plugin);
 }
 

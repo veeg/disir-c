@@ -11,7 +11,7 @@
 #include "config.h"
 
 enum disir_status
-dio_ini_config_write (struct disir_instance *disir, const char *id, struct disir_config *config)
+dio_ini_config_write (struct disir_instance *instance, const char *id, struct disir_config *config)
 {
     enum disir_status status;
     struct disir_context *config_context;
@@ -175,7 +175,7 @@ error:
 }
 
 enum disir_status
-dio_ini_config_read (struct disir_instance *disir, const char *id,
+dio_ini_config_read (struct disir_instance *instance, const char *id,
                      struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
