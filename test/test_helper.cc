@@ -73,7 +73,7 @@ testing::DisirTestTestPlugin::SetUpTestCase ()
 
     char path[2048];
     strcpy (path, CMAKE_BUILD_DIRECTORY);
-    strcat (path, "/plugin_test/dplugin_test.so");
+    strcat (path, "/plugins/test/dplugin_test.so");
     //std::stringstream ss;
     //ss << CMAKE_BUILD_DIRECTORY << "/plugin_test/dplugin_test.so";
     //s = dc_set_value_string (context_keyval, ss.str().c_str(), ss.str().size());
