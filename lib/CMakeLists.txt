@@ -25,6 +25,14 @@ set (_LIBDISIR_3PARTY_LIB_SOURCES
 set (_LIBDISIR_3PARTY_LIB_INCLUDEDIR
   ${PROJECT_3PARTY_LIBDIR}/void-multimap
   ${PROJECT_3PARTY_LIBDIR}/void-list/include
+  ${PROJECT_3PARTY_LIBDIR}/boost_fdstream
+  ${PROJECT_3PARTY_LIBDIR}
+)
+
+set (FSLIB_SOURCES
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/toml.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/toml_serialize.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/toml_unserialize.cc"
 )
 
 # Define all libdisir source files
@@ -55,6 +63,7 @@ set (_LIBDISIR_SOURCES
     "compare.c"
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     ${_LIBDISIR_3PARTY_LIB_SOURCES}
+    ${FSLIB_SOURCES}
 )
 
 set (PROJECT_SO_LIBRARY disir
