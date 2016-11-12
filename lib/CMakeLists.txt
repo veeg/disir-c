@@ -52,6 +52,7 @@ set (_LIBDISIR_SOURCES
     "io/ini.c"
     "update.c"
     "validate.c"
+    "compare.c"
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     ${_LIBDISIR_3PARTY_LIB_SOURCES}
 )
