@@ -84,8 +84,6 @@ dio_test_config_read (struct disir_instance *disir, void *storage, const char *e
     enum disir_status status;
     output_mold func_mold;
 
-    fprintf (stderr, "TEST_CONFIG_READ: stroage: %p\n", storage);
-
     func_mold = molds[entry_id];
     if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
