@@ -17,4 +17,4 @@ set (LIBDISIR_TEST_INCLUDE_DIRS
 add_subdirectory (public_api)
 add_subdirectory (internal_lib)
 add_subdirectory (internal_util)
-
+add_subdirectory (plugins)
