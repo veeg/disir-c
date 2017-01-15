@@ -1,15 +1,5 @@
+#include <disir/plugin.h>
 #include <disir/fslib/toml.h>
-
-enum disir_status dio_toml_config_entries (struct disir_instance *instance,
-                                           void *storage, struct disir_entry **entries)
-{
-
-    // Return all CONFIG entires as an array of disir_entry
-
-    // Get the list of available molds entries
-    //
-
-}
 
 
 extern "C" enum disir_status
