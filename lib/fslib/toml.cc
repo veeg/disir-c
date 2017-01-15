@@ -11,7 +11,8 @@
 
 //! PLUGIN API
 enum disir_status
-dio_toml_config_read (struct disir_instance *instance, void *storage, const char *entry_id,
+dio_toml_config_read (struct disir_instance *instance,
+                      struct disir_plugin *plugin, const char *entry_id,
                       struct disir_mold *mold, struct disir_config **config)
 {
     // TODO: Resolve entry_id to filepath.
@@ -27,8 +28,8 @@ dio_toml_config_read (struct disir_instance *instance, void *storage, const char
 
 //! PLUGIN API
 enum disir_status
-dio_toml_config_write (struct disir_instance *instance, void *storage, const char *entry_id,
-                       struct disir_config *config)
+dio_toml_config_write (struct disir_instance *instance, struct disir_plugin *plugin,
+                       const char *entry_id, struct disir_config *config)
 {
 
     // TODO: Resolve entry_id to filepath.

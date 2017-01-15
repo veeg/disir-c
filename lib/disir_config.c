@@ -49,7 +49,7 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
             log_debug (1, "Plugin '%s' does not implement config_query", entry->pi_name);
             continue;
         }
-        status = entry->pi_plugin.dp_config_query (instance, entry->pi_plugin.dp_storage, entry_id);
+        status = entry->pi_plugin.dp_config_query (instance, &entry->pi_plugin, entry_id);
         if (status == DISIR_STATUS_NOT_EXIST)
             continue;
         if (status != DISIR_STATUS_EXISTS)
@@ -69,7 +69,7 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
         if (plugin->pi_plugin.dp_config_read)
         {
             *config = NULL;
-            status = plugin->pi_plugin.dp_config_read (instance, plugin->pi_plugin.dp_storage,
+            status = plugin->pi_plugin.dp_config_read (instance, &plugin->pi_plugin,
                                                        entry_id, mold, config);
 
             // Config is loaded - we inject the loaded pluginname into the structure.
@@ -135,7 +135,7 @@ disir_config_write (struct disir_instance *instance, const char *entry_id,
     {
         if (plugin->pi_plugin.dp_config_write)
         {
-            status = plugin->pi_plugin.dp_config_write (instance, plugin->pi_plugin.dp_storage,
+            status = plugin->pi_plugin.dp_config_write (instance, &plugin->pi_plugin,
                                                         entry_id, config);
         }
         else
@@ -194,7 +194,7 @@ disir_config_entries (struct disir_instance *instance, struct disir_entry **entr
         }
 
         status = entry->pi_plugin.dp_config_entries (instance,
-                                                     entry->pi_plugin.dp_storage, &query);
+                                                     &entry->pi_plugin, &query);
         if (status != DISIR_STATUS_OK)
         {
             log_warn ("Plugin '%s' queried for config entries failed with status: %s",

@@ -5,11 +5,18 @@
 extern "C"{
 #endif // _cplusplus
 
+#include <disir/disir.h>
+#include <stdlib.h>
+
+// Forward declare structure for typedef's below
+struct disir_plugin;
+
 //! \brief Function signature for plugin to implement to register with Disir instance.
 typedef enum disir_status (*plugin_register) (struct disir_instance *instance, const char *name);
 
 //! \brief Function signature for plugin to implement to cleanup loaded plugin state.
-typedef enum disir_status (*plugin_finished) (struct disir_instance *instance, void *storage);
+typedef enum disir_status (*plugin_finished) (struct disir_instance *instance,
+                                              struct disir_plugin *plugin);
 
 
 //! \brief Function signature for plugin to implement reading config object.
@@ -18,7 +25,7 @@ typedef enum disir_status (*plugin_finished) (struct disir_instance *instance, v
 //! allocates one and it is not provided by the callee.
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
-//! \param[in] storage The void storage pointer plugin assigned in the plugin register operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[in] entry_id String identifier for the config entry to read.
 //! \param[in] mold Optional mold to validate config against. If not provided, function
 //!     is responsible to locate and create the mold associated with id.
@@ -27,7 +34,7 @@ typedef enum disir_status (*plugin_finished) (struct disir_instance *instance, v
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*config_read) (struct disir_instance *instance,
-                                          void *storage,
+                                          struct disir_plugin *plugin,
                                           const char *entry_id,
                                           struct disir_mold *mold,
                                           struct disir_config **config);
@@ -35,14 +42,14 @@ typedef enum disir_status (*config_read) (struct disir_instance *instance,
 //! \brief Function signature for plugin to implement writing config object.
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
-//! \param[in] storage The void storage pointer plugin assigned in the plugin register operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[in] entry_id String identifier for the config entry to write.
 //! \param[in] config The config object to persist to 'id' locatiton.
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*config_write) (struct disir_instance *instance,
-                                           void *storage,
+                                           struct disir_plugin *plugin,
                                            const char *entry_id,
                                            struct disir_config *config);
 
@@ -52,51 +59,53 @@ typedef enum disir_status (*config_write) (struct disir_instance *instance,
 //! entries returned in the double-linked list of disir_entry' structures.
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
-//! \param[in] storage The void storage pointer plugin assigned in the plugin register operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[out] entries Double-linked list of heap-allocated entries. Only populated on success.
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*config_entries) (struct disir_instance *instance,
-                                             void *storage, struct disir_entry **entries);
+                                             struct disir_plugin *plugin,
+                                             struct disir_entry **entries);
 
 //! \brief Function signature for plugin to implement querying of config entry's existence.
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
-//! \param[in] storage The void storage pointer plugin assigned in the plugin register operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[in] entry_id String identifier for the config entry to query for.
 //!
 //! \return DISIR_STATUS_NOT_EXIST if plugin does not contain `entry_id` config.
 //! \return DISIR_STATUS_EXISTS if `entry_id` config is provided by plugin.
 //!
 typedef enum disir_status (*config_query) (struct disir_instance *instance,
-                                           void *storage, const char *entry_id);
+                                           struct disir_plugin *plugin,
+                                           const char *entry_id);
 
 //! \brief Function signature for plugin to implement reading mold object.
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
-//! \param[in] storage The void storage pointer plugin assigned in the plugin register operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[in] entry_id String identifier for the mold entry to read.
 //! \param[out] mold The fully populated mold object.
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*mold_read) (struct disir_instance *instance,
-                                        void *storage,
+                                        struct disir_plugin *plugin,
                                         const char *entry_id,
                                         struct disir_mold **mold);
 
 //! \brief Function signature for plugin to implement writing mold object.
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
-//! \param[in] storage The void storage pointer plugin assigned in the plugin register operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[in] entry_id String identifier for the mold entry to write.
 //! \param[in] config The config object to persist to 'id' locatiton.
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*mold_write) (struct disir_instance *instance,
-                                         void *storage,
+                                         struct disir_plugin *plugin,
                                          const char *entry_id,
                                          struct disir_mold *mold);
 
@@ -106,25 +115,27 @@ typedef enum disir_status (*mold_write) (struct disir_instance *instance,
 //! entries returned in the double-linked list of disir_entry' structures.
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
-//! \param[in] storage The void storage pointer plugin assigned in the plugin register operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[out] entries Double-linked list of heap-allocated entries. Only populated on success.
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*mold_entries) (struct disir_instance *instance,
-                                           void *storage, struct disir_entry **entries);
+                                           struct disir_plugin *plugin,
+                                           struct disir_entry **entries);
 
 //! \brief Function signature for plugin to implement querying of mold entry's existence.
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
-//! \param[in] storage The void storage pointer plugin assigned in the plugin register operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[in] entry_id String identifier for the mold entry to query for.
 //!
 //! \return DISIR_STATUS_NOT_EXIST if plugin does not contain `entry_id` mold.
 //! \return DISIR_STATUS_EXISTS if `entry_id` mold is provided by plugin.
 //!
 typedef enum disir_status (*mold_query) (struct disir_instance *instance,
-                                         void *storage, const char *entry_id);
+                                         struct disir_plugin *plugin,
+                                         const char *entry_id);
 
 
 //! Disir Plugin - Plugins populate this structure to register itself with a Disir instance.
@@ -165,9 +176,6 @@ struct disir_plugin
 //! information and callback provided by plugin. The `disir` instance will deep-copy the settings
 //! provided, so it is the callers responsibility to free the input structure, and any memory
 //! dynamically allocated within it.
-//!
-//! For a plugin to keep active state, the plugin->dp_storage pointer may be
-//! populated with an address, which will be provided in every plugin call.
 //!
 //! Once the plugin is de-registered with `disir`, the plugin->dp_plugin_finished callback
 //! will be invoked, allowing the plugin to cleanup and de-allocate storage memory.

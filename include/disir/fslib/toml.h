@@ -28,25 +28,23 @@ struct fslib_storage
 
 //! \brief TOML implementation of config_read
 //!
-//! storage pointer is expected to be a fslib_storage structure.
 enum disir_status
-dio_toml_config_read (struct disir_instance *instance, void *storage, const char *entry_id,
+dio_toml_config_read (struct disir_instance *instance,
+                      struct disir_plugin *plugin, const char *entry_id,
                       struct disir_mold *mold, struct disir_config **config);
 
 //! \brief TOML implementation of config_write
 //!
-//! storage pointer is expected to be a fslib_storage structure.
-//!
 enum disir_status
-dio_toml_config_write (struct disir_instance *instance, void *storage, const char *entry_id,
+dio_toml_config_write (struct disir_instance *instance,
+                       struct disir_plugin *plugin, const char *entry_id,
                        struct disir_config *config);
 
 //! \brief TOML imlementation of config_entries
 //!
-//! storage pointer is expected to be a fslib_storage structure.
-//!
 enum disir_status dio_toml_config_entries (struct disir_instance *instance,
-                                           void *storage, struct disir_entry **entries);
+                                           struct disir_plugin *plugin,
+                                           struct disir_entry **entries);
 
 //! TODO: docs
 enum disir_status
