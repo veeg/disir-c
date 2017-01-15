@@ -64,6 +64,7 @@ set (_LIBDISIR_SOURCES
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     ${_LIBDISIR_3PARTY_LIB_SOURCES}
     ${FSLIB_SOURCES}
+    test/plugin.cc
 )
 
 set (PROJECT_SO_LIBRARY disir
