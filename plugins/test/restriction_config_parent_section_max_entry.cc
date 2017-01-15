@@ -37,6 +37,13 @@ restriction_config_parent_section_max_entry (struct disir_mold **mold)
         goto error;
 
 
+    // Add a simple keyval to the section so that it is non-empty
+    status = dc_add_keyval_string (context_section, "key_string", "string_value", "k1value doc",
+                                   NULL, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+
     status = dc_finalize (&context_section);
     if (status != DISIR_STATUS_OK)
         goto error;
