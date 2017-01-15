@@ -111,7 +111,7 @@ install (TARGETS ${PROJECT_SO_LIBRARY}
 )
 
 install (
-  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/public_include/
+  DIRECTORY ${CMAKE_SOURCE_DIR}/include/
   DESTINATION include
   COMPONENT Devel
 )

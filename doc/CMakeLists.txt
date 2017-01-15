@@ -64,7 +64,7 @@ set (
 # Environment variable to control input directory for doxygen
 set (
     DOXYGEN_INPUT_DIR
-    "${CMAKE_SOURCE_DIR}/src/public_include/disir"
+    "${CMAKE_SOURCE_DIR}/include/disir"
 )
 
 # Collect all generated and fixed documentation in a binary output folder
