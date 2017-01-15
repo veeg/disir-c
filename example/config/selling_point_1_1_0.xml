@@ -1,7 +1,0 @@
-<config disir="1.1.0" group="default">
-  <!-- User changed the configurable keyval 'country' from default 'Norway' to 'Greece' prior to
-       1.1.0 upgrade. Since the default value didnt change, we were able to merge the changes in
-       the schema with the changes the user performed. -->
-  <country>Greece</country>
-  <timeout>20</timeout>
-</config>

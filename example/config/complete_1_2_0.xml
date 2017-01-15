@@ -1,7 +1,0 @@
-<config disir="1.1.0" group="default">
-  <unchanged>COOL</unchanged>
-  <output>
-    <rolling_archive>ISP</rolling_archive>
-    <size>10000</size>
-  </output>
-</config>
