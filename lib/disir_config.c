@@ -11,6 +11,7 @@
 #include "multimap.h"
 
 
+// STATIC INTERNAL
 // String hashing function for the multimap
 // http://www.cse.yorku.ca/~oz/hash.html
 static unsigned long djb2 (char *str)
@@ -21,6 +22,70 @@ static unsigned long djb2 (char *str)
         hash = ((hash << 5) + hash) + c;
     }
     return hash;
+}
+
+// STATIC INTERNAL
+static enum disir_status
+recurse_elements_valid (struct disir_context *context,
+                        struct disir_collection *collection)
+{
+    enum disir_status status;
+    enum disir_status invalid;
+    struct disir_collection *col;
+    struct disir_context *element;
+
+    invalid = (context->CONTEXT_STATE_INVALID == 1 ? DISIR_STATUS_INVALID_CONTEXT
+                                                   : DISIR_STATUS_OK);
+
+    status = dc_get_elements (context, &col);
+    if (status != DISIR_STATUS_OK)
+    {
+        log_error ("Failed to retrieve elements from context: %s",
+                    disir_status_string (status));
+    }
+
+    while (status == DISIR_STATUS_OK)
+    {
+        status = dc_collection_next (col, &element);
+        if (status == DISIR_STATUS_EXHAUSTED)
+        {
+            status = DISIR_STATUS_OK;
+            break;
+        }
+        if (status != DISIR_STATUS_OK)
+        {
+            log_error ("Failed to retrieve element from collection: %s",
+                       disir_status_string (status));
+            break;
+        }
+
+        status = dc_context_valid (element);
+        if (status == DISIR_STATUS_INVALID_CONTEXT)
+        {
+            if (collection)
+            {
+                dc_collection_push_context (collection, element);
+            }
+            invalid = status;
+        }
+
+        // Recurse the sections
+        if (dc_context_type (element) == DISIR_CONTEXT_SECTION)
+        {
+            status = recurse_elements_valid (element, collection);
+            if (status == DISIR_STATUS_INVALID_CONTEXT)
+            {
+                invalid = status;
+            }
+        }
+
+        dc_putcontext (&element);
+        status = DISIR_STATUS_OK;
+    }
+
+    dc_collection_finished (&col);
+
+    return (status == DISIR_STATUS_OK ? invalid : status);
 }
 
 //! PUBLIC API
@@ -250,6 +315,44 @@ disir_config_finished (struct disir_config **config)
     status = dc_destroy (&context);
     if (status == DISIR_STATUS_OK)
         *config = NULL;
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+disir_config_valid (struct disir_config *config, struct disir_collection **collection)
+{
+    enum disir_status status;
+    struct disir_collection *col;
+
+    col = NULL;
+    if (config == NULL)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    if (collection)
+    {
+        col = dc_collection_create ();
+    }
+
+    status = recurse_elements_valid (config->cf_context, col);
+
+    // Iterate the config - retrieve all children and call dx_context_valid on it.
+    // Retrieve element strorage - pass it to recursive function
+
+    if (collection)
+    {
+        if (dc_collection_size (col))
+        {
+            *collection = col;
+        }
+        else
+        {
+            dc_collection_finished (&col);
+        }
+    }
+
     return status;
 }
 
