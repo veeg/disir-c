@@ -679,10 +679,10 @@ enum disir_status dc_get_elements (struct disir_context *context,
 //! \param[in] index Index of the keyval if multiple entries. Use 0 if only one entry.
 //! \param[out] output Context to retrieve. Caller must use dc_putcontext when finished.
 //!
-//! \return DISIR_STATUS_OK if the output collection contains all
-//!     child elements of a valid input context.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input parameters are NULL
+//! \return DISIR_STATUS_NOT_EXIST if the requested element/or index does not exist.
 //! \return DISIR_STATUS_WRONG_CONTEXT if the input context is not of correct type.
+//! \return DISIR_STATUS_OK if the output context is populated with the requested entry.
 //!
 enum disir_status
 dc_find_element (struct disir_context *parent, const char *name, unsigned int index,

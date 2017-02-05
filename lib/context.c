@@ -1089,6 +1089,8 @@ dc_find_element (struct disir_context *parent, const char *name, unsigned int in
     struct disir_collection *collection;
     uint32_t size;
 
+    collection = NULL;
+
     if (output == NULL)
     {
         log_debug (0, "invoked with output NULL pointer.");
@@ -1105,16 +1107,27 @@ dc_find_element (struct disir_context *parent, const char *name, unsigned int in
     size = dc_collection_size (collection);
     if ((size - 1) < index)
     {
-        log_debug (5, "requeste index (%d) out-of-bounds (size %d)", size, index);
-        status = DISIR_STATUS_EXHAUSTED;
+        log_debug (5, "requested index (%d) out-of-bounds (size %d)", size, index);
+        status = DISIR_STATUS_NOT_EXIST;
         goto error;
     }
+
+    log_debug (8, "requested index (%d), collection of size (%d)", index, size);
 
     unsigned int i = 0;
     do
     {
         status = dc_collection_next (collection, output);
-        if (status == DISIR_STATUS_EXHAUSTED || i == index)
+        if (status == DISIR_STATUS_EXHAUSTED)
+        {
+            // This should NOT happen, at all.
+            log_error ("collection exhausted on iteration (%d)," \
+                       " requested index (%d) out of size (%d)",
+                        i, index, size);
+            status = DISIR_STATUS_INTERNAL_ERROR;
+            break;
+        }
+        if (i == index)
         {
             status = DISIR_STATUS_OK;
             break;
@@ -1126,10 +1139,12 @@ dc_find_element (struct disir_context *parent, const char *name, unsigned int in
                        disir_status_string (status));
         }
         dc_putcontext (output);
+        i++;
 
     } while (1);
 
-    // status is OK, output is populated, or status is not OK and output is not populated.
+    // status is OK if output element was retrieved successfully from the collection.
+    // FALL-THROUGH
 error:
     if (collection)
     {
