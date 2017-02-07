@@ -55,6 +55,7 @@ set (_LIBDISIR_SOURCES
     "error.c"
     "disir.c"
     "disir_config.c"
+    "disir_config_query.c"
     "disir_entry.c"
     "disir_mold.c"
     "disir_plugin.c"
