@@ -61,7 +61,6 @@ set (_LIBDISIR_SOURCES
     "disir_plugin.c"
     "generate.c"
     "instance_mold.c"
-    "io/ini.c"
     "update.c"
     "validate.c"
     "compare.c"
