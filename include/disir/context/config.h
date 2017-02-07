@@ -5,7 +5,7 @@
 extern "C"{
 #endif // __cplusplus
 
-#include <disir/disir.h>
+#include <disir/context.h>
 
 //!
 //! This file exposes the low level Disir Config Context API.
