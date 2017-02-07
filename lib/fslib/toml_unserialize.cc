@@ -105,7 +105,17 @@ dio_toml_unserialize_primitive (struct disir_instance *instance, const char *key
     case toml::Value::STRING_TYPE:
     {
         std::string str = value.as<std::string>();
-        status = dc_set_value_string (context, str.c_str(), strlen (str.c_str()));
+        if (dc_value_type (context) == DISIR_VALUE_TYPE_ENUM)
+        {
+            status = dc_set_value_enum (context, str.c_str(), strlen (str.c_str()));
+        }
+        else
+        {
+            // Default to setting string type, regardless of the mold equivalent.
+            // That way, if we have any error with regards to type, the context
+            // will be assumed string type.
+            status = dc_set_value_string (context, str.c_str(), strlen (str.c_str()));
+        }
         break;
     }
     default:

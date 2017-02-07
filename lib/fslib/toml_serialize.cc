@@ -27,6 +27,18 @@ toml_serialize_keyval (struct disir_context *context, toml::Value* current, cons
 
     switch (dc_value_type (context))
     {
+    case DISIR_VALUE_TYPE_ENUM:
+    {
+        status = dc_get_value_enum (context, &value_string, NULL);
+        if (status == DISIR_STATUS_OK)
+        {
+            if (current->type () == toml::Value::Type::ARRAY_TYPE)
+                current->push ((toml::Value(value_string)));
+            else
+                current->setChild (name, value_string);
+        }
+        break;
+    }
     case DISIR_VALUE_TYPE_STRING:
     {
         status = dc_get_value_string (context, &value_string, NULL);
