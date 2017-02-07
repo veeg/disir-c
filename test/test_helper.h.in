@@ -59,6 +59,11 @@ extern "C" {
     }
 
 
+#define ASSERT_NO_SETUP_FAILURE()                                           \
+    {                                                                       \
+        if (HasFatalFailure()) return;                                      \
+    }
+
 namespace testing
 {
     class DisirTestWrapper : public testing::Test
