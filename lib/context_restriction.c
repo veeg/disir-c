@@ -883,6 +883,87 @@ error:
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_add_restriction_value_enum (struct disir_context *parent, const char *value, const char *doc,
+                               struct semantic_version *semver,
+                               struct disir_context **output)
+{
+    enum disir_status status;
+    struct disir_context *context_restriction;
+
+    TRACE_ENTER ("parent (%p), value (%s), doc (%s), semver (%p), output (%p)",
+                 parent, value, doc, semver, output);
+
+    status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged ?
+        goto error;
+    }
+
+    status = dc_set_restriction_type (context_restriction, DISIR_RESTRICTION_EXC_VALUE_ENUM);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto error;
+    }
+
+    status = dc_restriction_set_string (context_restriction, value);
+    if (status != DISIR_STATUS_OK)
+    {
+        // This should not happen....
+        goto error;
+    }
+
+    if (semver)
+    {
+        status = dc_add_introduced (context_restriction, semver);
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+    }
+    if (doc)
+    {
+        status = dc_add_documentation (context_restriction, doc, strlen (doc));
+        if (status != DISIR_STATUS_OK)
+        {
+            // Already logged
+            goto error;
+        }
+    }
+
+    if (output)
+    {
+        dx_context_incref (context_restriction);
+        *output = context_restriction;
+    }
+
+    status = dc_finalize (&context_restriction);
+    if (status != DISIR_STATUS_OK)
+    {
+        if (output)
+        {
+            dx_context_decref (&context_restriction);
+            *output = NULL;
+        }
+        goto error;
+    }
+
+    status = DISIR_STATUS_OK;
+error:
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_context_transfer_logwarn (parent, context_restriction);
+        dc_destroy (&context_restriction);
+    }
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
 //! STATIC API
 static enum disir_status
 add_restriction_entries_min_max (struct disir_context *parent, int64_t value,

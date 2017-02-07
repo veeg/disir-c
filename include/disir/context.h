@@ -974,6 +974,26 @@ dc_add_restriction_value_range (struct disir_context *parent, double min, double
                                 const char * doc, struct semantic_version *semver,
                                 struct disir_context **output);
 
+//! \brief Add a DISIR_RESTRICTION_EXC_VALUE_ENUM restriction to parent.
+//!
+//! Only applicable to the following `parent` contexts whose top-level is MOLD:
+//!     * DISIR_CONTET_KEYVAL
+//
+//! This is a shortcut  method instead of running through dc_begin, dc_set_restriction_type,
+//! dc_restriction_set_string and dc_finalize, with optional dc_add_documenation and
+//! dc_add_introduced.
+//!
+//! \param[out] output Optional output context storage. If address is passed,
+//!             the output RESTRICTION context is populated and reference increased.
+//!             Caller must take care to use dc_putcontext () when he is done.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_add_restriction_value_enum (struct disir_context *parent, const char *value, const char *doc,
+                               struct semantic_version *semver,
+                               struct disir_context **output);
+
 //! \brief Add a DISIR_RESTRICTION_INC_ENTRY_MIN restriction to parent.
 //!
 //! The input parent much have root context MOLD, and must be of type:
