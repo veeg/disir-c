@@ -700,3 +700,89 @@ dc_set_value_boolean (struct disir_context *context, uint8_t value)
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_get_value_enum (struct disir_context *context, const char **output, int32_t *size)
+{
+    enum disir_status status;
+    struct disir_value *storage;
+
+    status = get_value_input_check (context, "enum", &storage);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto out;
+    }
+
+    status = dx_value_get_string (storage, output, size);
+    if (status == DISIR_STATUS_INVALID_ARGUMENT)
+    {
+        dx_context_error_set (context,
+                              "cannot get enum with value NULL pointer");
+    }
+    if (status == DISIR_STATUS_WRONG_VALUE_TYPE)
+    {
+        dx_context_error_set (context,
+                              "cannot get enum value on context whose value type is %s",
+                              dc_value_type_string (context));
+    }
+
+out:
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_set_value_enum (struct disir_context *context, const char *value, int32_t value_size)
+{
+    enum disir_status status;
+    enum disir_status invalid;
+    struct disir_value *value_storage;
+
+    TRACE_ENTER ("context: %p, value: %s, value_size: %d", context, value, value_size);
+
+    invalid = set_value_input_check (context, DISIR_VALUE_TYPE_ENUM, &value_storage);
+    if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        // Already logged
+        status = invalid;
+        goto out;
+    }
+
+    if (invalid != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        invalid = dx_restriction_exclusive_value_check (context, 0, 0, value);
+    }
+
+     // Do not allow finalized context to change value
+    if (context->CONTEXT_STATE_FINALIZED && invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
+    {
+        status = invalid;
+        goto out;
+    }
+
+    // Mark unfulfilled value sat in constructing mode as invalid context
+    if (invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
+    {
+        context->CONTEXT_STATE_INVALID = 1;
+    }
+
+    status = dx_value_set_string (value_storage, value, value_size);
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_context_error_set (context,
+                              "cannot set %s value on context whose value type is %s.",
+                              dx_value_type_string (DISIR_VALUE_TYPE_ENUM),
+                              dc_value_type_string (context));
+    }
+    else
+    {
+        status = invalid;
+    }
+
+out:
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
+}
+

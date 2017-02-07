@@ -483,6 +483,22 @@ enum disir_status dc_set_value (struct disir_context *context,
 enum disir_status dc_set_value_string (struct disir_context *context,
                                        const char *value, int32_t value_size);
 
+//! \brief Set a enum value to the context.
+//!
+//! Applicable contexts are:
+//!     * DISIR_CONTEXT_DOCUMENTATION
+//!     * DISIR_CONTEXT_KEYVAL whose root is CONFIG
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or value are NULL,
+//!     or if value_size is less or equal to zero.
+//! \return DISIR_STATUS_WRONG_CONTEXT if root context is not CONFIG.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not enum.
+//! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a mold equivalent.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_set_value_enum (struct disir_context *context,
+                                     const char *value, int32_t value_size);
+
 //! \brief Set a integer value to the context.
 //!
 //! Applicable contexts are:
@@ -563,6 +579,25 @@ enum disir_status dc_get_value (struct disir_context *context, int32_t output_bu
 //!
 enum disir_status dc_get_value_string (struct disir_context *context,
                                        const char **output, int32_t *size);
+
+//! \brief Retrieve the enum value stored on the context.
+//!
+//! Only applicable on the following contexts:
+//! * DISIR_CONTEXT_KEYVAL whose root is CONFIG
+//! * DISIR_CONTEXT_DEFAULT
+//!
+//! \param context Input context to retrieve enum string from.
+//! \param[out] output Pointer to redirect the enum string stored in context to.
+//! \param[out] size Optional. Populated with the size of the output string.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or output are NULL
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
+//! \return DISIR_STATUS_WRONG_CONTEXT if the context is of wrong type.
+//! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs root context is not CONFIG.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_get_value_enum (struct disir_context *context,
+                                     const char **output, int32_t *size);
 
 //! \brief Retrieve the integer value stored on the context.
 //!
