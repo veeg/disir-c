@@ -386,6 +386,9 @@ dc_set_restriction_type (struct disir_context *context, enum disir_restriction_t
         return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;
     }
 
+    // QUESTION: Should we allow invalid, constructing contexts by marking the context invalid
+    // and letting it propagate through all the error checks=
+
     // Cannot add inclusive type restrictions to SECTION.
     if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_SECTION &&
         strcmp ("EXCLUSIVE", dc_restriction_group_type (type)) == 0)
