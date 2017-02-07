@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_DISIR_PRIVATE_H
-#define _LIBDISIR_DISIR_PRIVATE_H
+#ifndef _LIBDISIR_PRIVATE_DISIR_H
+#define _LIBDISIR_PRIVATE_DISIR_H
 
 #include <disir/disir.h>
 #include <disir/io.h>
@@ -72,5 +72,5 @@ disir_libdisir_config_from_disk (struct disir_instance *instance,
                                  struct disir_mold *mold,
                                  struct disir_config **config);
 
-#endif // _LIBDISIR_DISIR_PRIVATE_H
+#endif // _LIBDISIR_PRIVATE_DISIR_H
 

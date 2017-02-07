@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_KEYVAL_H
-#define _LIBDISIR_KEYVAL_H
+#ifndef _LIBDISIR_PRIVATE_KEYVAL_H
+#define _LIBDISIR_PRIVATE_KEYVAL_H
 
 #include <disir/disir.h>
 #include <disir/context.h>
@@ -57,5 +57,5 @@ struct disir_keyval *dx_keyval_create (struct disir_context *parent);
 enum disir_status dx_keyval_destroy (struct disir_keyval **keyval);
 
 
-#endif // _LIBDISIR_KEYVAL_H
+#endif // _LIBDISIR_PRIVATE_KEYVAL_H
 

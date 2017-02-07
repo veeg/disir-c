@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_SECTION_H
-#define _LIBDISIR_SECTION_H
+#ifndef _LIBDISIR_PRIVATE_SECTION_H
+#define _LIBDISIR_PRIVATE_SECTION_H
 
 #include "value.h"
 
@@ -44,5 +44,5 @@ struct disir_section *dx_section_create (struct disir_context *parent);
 enum disir_status dx_section_destroy (struct disir_section **section);
 
 
-#endif // _LIBDISIR_SECTION_H
+#endif // _LIBDISIR_PRIVATE_SECTION_H
 

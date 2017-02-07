@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_CONFIG_H
-#define _LIBDISIR_CONFIG_H
+#ifndef _LIBDISIR_PRIVATE_CONFIG_H
+#define _LIBDISIR_PRIVATE_CONFIG_H
 
 #include "context_private.h"
 #include "element_storage.h"
@@ -51,5 +51,5 @@ struct disir_config *dx_config_create (struct disir_context *context);
 enum disir_status dx_config_destroy (struct disir_config **config);
 
 
-#endif // _LIBDISIR_CONFIG_H
+#endif // _LIBDISIR_PRIVATE_CONFIG_H
 

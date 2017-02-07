@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_RESTRICTION_H
-#define _LIBDISIR_RESTRICTION_H
+#ifndef _LIBDISIR_PRIVATE_RESTRICTION_H
+#define _LIBDISIR_PRIVATE_RESTRICTION_H
 
 #include <disir/context.h>
 
@@ -79,5 +79,5 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
                               struct semantic_version *semver, int *output);
 
 
-#endif // _LIBDISIR_RESTRICTION_H
+#endif // _LIBDISIR_PRIVATE_RESTRICTION_H
 

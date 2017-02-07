@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_UPDATE_PRIVATE_H
-#define _LIBDISIR_UPDATE_PRIVATE_H
+#ifndef _LIBDISIR_PRIVATE_UPDATE_H
+#define _LIBDISIR_PRIVATE_UPDATE_H
 
 struct disir_update
 {
@@ -22,5 +22,5 @@ struct disir_update
     char                        *up_mold_value;
 };
 
-#endif // _LIBDISIR_UPDATE_PRIVATE_H
+#endif // _LIBDISIR_PRIVATE_UPDATE_H
 

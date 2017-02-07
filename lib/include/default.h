@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_DEFAULT_H
-#define _LIBDISIR_DEFAULT_H
+#ifndef _LIBDISIR_PRIVATE_DEFAULT_H
+#define _LIBDISIR_PRIVATE_DEFAULT_H
 
 #include <disir/context.h>
 
@@ -50,5 +50,5 @@ dx_default_get_active (struct disir_context *keyval, struct semantic_version *se
                        struct disir_default **def);
 
 
-#endif // _LIBDISIR_DEFAULT_H
+#endif // _LIBDISIR_PRIVATE_DEFAULT_H
 

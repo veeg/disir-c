@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_VALUE_H
-#define _LIBDISIR_VALUE_H
+#ifndef _LIBDISIR_PRIVATE_VALUE_H
+#define _LIBDISIR_PRIVATE_VALUE_H
 
 struct disir_value
 {
@@ -186,5 +186,5 @@ enum disir_status
 dx_value_get_float (struct disir_value *value, double *output_double);
 
 
-#endif // _LIBDISIR_VALUE_H
+#endif // _LIBDISIR_PRIVATE_VALUE_H
 

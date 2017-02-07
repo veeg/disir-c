@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_MOLD_H
-#define _LIBDISIR_MOLD_H
+#ifndef _LIBDISIR_PRIVATE_MOLD_H
+#define _LIBDISIR_PRIVATE_MOLD_H
 
 #include "context_private.h"
 #include "documentation.h"
@@ -48,5 +48,5 @@ enum disir_status dx_mold_destroy (struct disir_mold **mold);
 enum disir_status dx_mold_update_version (struct disir_mold *mold,
                                             struct semantic_version *semver);
 
-#endif // _LIBDISIR_MOLD_H
+#endif // _LIBDISIR_PRIVATE_MOLD_H
 

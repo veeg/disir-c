@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_ELEMENT_STORAGE_H
-#define _LIBDISIR_ELEMENT_STORAGE_H
+#ifndef _LIBDISIR_PRIVATE_ELEMENT_STORAGE_H
+#define _LIBDISIR_PRIVATE_ELEMENT_STORAGE_H
 
 #include <disir/context.h>
 
@@ -111,5 +111,5 @@ dx_element_storage_get_first (struct disir_element_storage *storage,
                               const char *name,
                               struct disir_context **context);
 
-#endif // _LIBDISIR_ELEMENT_STORAGE_H
+#endif // _LIBDISIR_PRIVATE_ELEMENT_STORAGE_H
 

@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_CONTEXT_PRIVATE_H
-#define _LIBDISIR_CONTEXT_PRIVATE_H
+#ifndef _LIBDISIR_PRIVATE_CONTEXT_H
+#define _LIBDISIR_PRIVATE_CONTEXT_H
 
 #include <disir/context.h>
 
@@ -246,5 +246,5 @@ void dx_context_transfer_logwarn (struct disir_context *destination, struct disi
 const char *dx_context_name (struct disir_context *context);
 
 
-#endif // _LIBDISIR_CONTEXT_PRIVATE_H
+#endif // _LIBDISIR_PRIVATE_CONTEXT_H
 

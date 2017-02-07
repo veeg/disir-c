@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_LOG_H
-#define _LIBDISIR_LOG_H
+#ifndef _LIBDISIR_PRIVATE_LOG_H
+#define _LIBDISIR_PRIVATE_LOG_H
 
 #include <stdarg.h>
 
@@ -118,5 +118,5 @@ void dx_log_disir_va (enum disir_log_level dll,
 void dx_crash_and_burn(const char* message, ...);
 
 
-#endif // _LIBDISIR_LOG_H
+#endif // _LIBDISIR_PRIVATE_LOG_H
 

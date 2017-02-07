@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_DOCUMENTATION_H
-#define _LIBDISIR_DOCUMENTATION_H
+#ifndef _LIBDISIR_PRIVATE_DOCUMENTATION_H
+#define _LIBDISIR_PRIVATE_DOCUMENTATION_H
 
 #include "value.h"
 
@@ -41,5 +41,5 @@ int32_t dx_documentation_numentries (struct disir_context *context);
 enum disir_status dx_documentation_add (struct disir_context *parent,
                                         struct disir_documentation *doc);
 
-#endif // _LIBDISIR_DOCUMENTATION_H
+#endif // _LIBDISIR_PRIVATE_DOCUMENTATION_H
 

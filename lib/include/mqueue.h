@@ -1,5 +1,5 @@
-#ifndef _LIBDISIR_MQUEUE_H
-#define _LIBDISIR_MQUEUE_H
+#ifndef _LIBDISIR_PRIVATE_MQUEUE_H
+#define _LIBDISIR_PRIVATE_MQUEUE_H
 
 //
 // These macros work on any structure which has a `next' and  a `prev'
@@ -552,5 +552,5 @@
     })
 
 
-#endif // _LIBDISIR_MQUEUE_H
+#endif // _LIBDISIR_PRIVATE_MQUEUE_H
 
