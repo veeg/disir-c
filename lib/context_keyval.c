@@ -168,17 +168,22 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         goto error;
     }
 
+    status = dc_set_value_type (keyval, type);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto error;
+    }
+
     switch (type)
     {
+    case DISIR_VALUE_TYPE_ENUM:
+        // QUESTION: Should adding a default string entry who does not match existing
+        //  DISIR_RESTRICTION_EXC_VALUE_ENUM mark this status as invalid?
+
+        // FALL-THROUGH
     case DISIR_VALUE_TYPE_STRING:
     {
-        status = dc_set_value_type (keyval, DISIR_VALUE_TYPE_STRING);
-        if (status != DISIR_STATUS_OK)
-        {
-            // Already logged
-            goto error;
-        }
-
         status = dc_add_default_string (keyval, string_input, strlen (string_input), semver);
         if (status != DISIR_STATUS_OK)
         {
@@ -189,13 +194,6 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
     }
     case DISIR_VALUE_TYPE_INTEGER:
     {
-        status = dc_set_value_type (keyval, DISIR_VALUE_TYPE_INTEGER);
-        if (status != DISIR_STATUS_OK)
-        {
-            // Already logged
-            goto error;
-        }
-
         status = dc_add_default_integer (keyval, integer_input, semver);
         if (status != DISIR_STATUS_OK)
         {
@@ -206,13 +204,6 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
     }
     case DISIR_VALUE_TYPE_FLOAT:
     {
-        status = dc_set_value_type (keyval, DISIR_VALUE_TYPE_FLOAT);
-        if (status != DISIR_STATUS_OK)
-        {
-            // Already logged
-            goto error;
-        }
-
         status = dc_add_default_float (keyval, float_input, semver);
         if (status != DISIR_STATUS_OK)
         {
@@ -223,13 +214,6 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
     }
     case DISIR_VALUE_TYPE_BOOLEAN:
     {
-        status = dc_set_value_type (keyval, DISIR_VALUE_TYPE_BOOLEAN);
-        if (status != DISIR_STATUS_OK)
-        {
-            // Already logged
-            goto error;
-        }
-
         status = dc_add_default_boolean (keyval, boolean_input, semver);
         if (status != DISIR_STATUS_OK)
         {
@@ -238,9 +222,8 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         }
         break;
     }
-    default:
-        dx_crash_and_burn ("%s: called with invalid/unhandled type: %s",
-                           __FUNCTION__, dx_value_type_string (type));
+    case DISIR_VALUE_TYPE_UNKNOWN:
+        status = DISIR_STATUS_INTERNAL_ERROR;
     }
 
     if (semver)
@@ -288,6 +271,24 @@ error:
     }
 
     return status;
+}
+
+//! PUBLIC API
+enum disir_status
+dc_add_keyval_enum (struct disir_context *parent, const char *name, const char *def,
+                    const char *doc, struct semantic_version *semver,
+                    struct disir_context **output)
+{
+    // TODO: How do we refine this function signature to take varadic number of arguments,
+    // which we only want to add as restrictions to the enum? Hmm
+    return add_keyval_generic (parent, name, doc, semver,
+                               DISIR_VALUE_TYPE_ENUM,
+                               def,
+                               0,
+                               0,
+                               0,
+                               output
+                               );
 }
 
 //! PUBLIC API

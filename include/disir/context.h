@@ -768,6 +768,32 @@ enum disir_status dc_add_keyval_string (struct disir_context *parent,
                                         struct semantic_version *semver,
                                         struct disir_context **output);
 
+
+//! \brief Shortcut to add a KEYVAL enum entry to a parent context.
+//!
+//! Instead of beginning a context on a parent, setting the required name, type,
+//! default, documentation fields, this function wraps all that logic into one
+//! simple function call. If you require special restrictions and additional defaults,
+//! you will need to go the long route through beginning and finalizing a context.
+//!
+//! NOTE: The enum requires additional restrictions on it to mark valid enum values.
+//! The context will be invalid after this call. One SHOULD catch the output context
+//! and add the required restrictions
+//!
+//! \param[out] output Optional output context storage. If address is passed,
+//!             the output KEYVAL context is populated and reference increased.
+//!             Caller must take care to use dc_putcontext () when he is done.
+//!
+//! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
+//!     the input semver 'semver'.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
+//!
+enum disir_status
+dc_add_keyval_enum (struct disir_context *parent, const char *name, const char *def,
+                    const char *doc, struct semantic_version *semver,
+                    struct disir_context **output);
+
 //! \brief Shortcut to add a KEYVAL integer entry to a parent context.
 //!
 //! Instead of beginning a context on a parent, setting the required name, type,
