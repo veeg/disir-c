@@ -19,6 +19,7 @@
 #include "value.h"
 #include "restriction.h"
 
+//! STATIC API
 static enum disir_status
 get_value_input_check (struct disir_context *context, const char *type,
                        struct disir_value **storage)
@@ -70,6 +71,7 @@ get_value_input_check (struct disir_context *context, const char *type,
     return DISIR_STATUS_OK;
 }
 
+//! STATIC API
 static enum disir_status
 set_value_input_check (struct disir_context *context, enum disir_value_type type,
                        struct disir_value **storage)
@@ -204,7 +206,6 @@ set_value_input_check (struct disir_context *context, enum disir_value_type type
 
     return status;
 }
-
 
 // PUBLIC API
 enum disir_status
