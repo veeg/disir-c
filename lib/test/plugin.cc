@@ -29,6 +29,7 @@
 #include "restriction_section_parent_keyval_max_entry.cc"
 #include "basic_version_difference.cc"
 #include "complex_section.cc"
+#include "config_query_permutations.cc"
 
 typedef enum disir_status (*output_mold)(struct disir_mold **);
 
@@ -57,6 +58,7 @@ static std::map<const char *, output_mold, cmp_str> molds = {
                     restriction_section_parent_keyval_max_entry),
     std::make_pair ("basic_version_difference", basic_version_difference),
     std::make_pair ("complex_section", complex_section),
+    std::make_pair ("config_query_permutations", config_query_permutations),
 };
 
 enum disir_status
