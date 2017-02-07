@@ -118,6 +118,7 @@ enum disir_restriction_type
 
 
 #include <disir/util.h>
+#include <disir/config.h>
 #include <disir/context.h>
 #include <disir/collection.h>
 #include <disir/io.h>
@@ -225,19 +226,6 @@ disir_error_copy (struct disir_instance *instance,
 //!
 const char *
 disir_error (struct disir_instance *instance);
-
-//! \brief Generate a config at a given version from the finished mold.
-//!
-//! \param[in] mold The completed mold of which to generate a config object of.
-//! \param[in] semver Version number of mold to generate config of. If NULL, highest
-//!     mold version is used for generation.
-//! \param[out] config Output config object allocated with generated config object.
-//!
-//! \return DISIR_STATUS_OK on success.
-//!
-enum disir_status
-disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
-                                 struct disir_config **config);
 
 //! \brief Validate the config, checking for any contexts that are invalid.
 //!

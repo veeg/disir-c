@@ -12,6 +12,21 @@ extern "C"{
 //! This file exposes the high level Disir Config API.
 //!
 
+
+//! \brief Generate a config at a given version from the finished mold.
+//!
+//! \param[in] mold The completed mold of which to generate a config object of.
+//! \param[in] semver Version number of mold to generate config of. If NULL, highest
+//!     mold version is used for generation.
+//! \param[out] config Output config object allocated with generated config object.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if mold argument is NULL.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
+                                 struct disir_config **config);
+
 //! \brief Query the config for a string valued keyval.
 //!
 //! For an exhaustive explaination of the query syntax, see XXX_QUERY_XXX
