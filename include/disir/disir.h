@@ -112,8 +112,6 @@ enum disir_restriction_type
     //! Value of key must be exact numeric value.
     //! Applicable to value type INTEGER and FLOAT
     DISIR_RESTRICTION_EXC_VALUE_NUMERIC,
-    //! TODO: Support REGEX
-    //DISIR_RESTRICTION_EXC_VALUE_REGEX,
 
     DISIR_RESTRICTION_UNKNOWN // Sentinel value - do not add any entries below this.
 };
