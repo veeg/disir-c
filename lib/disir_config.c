@@ -111,7 +111,7 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
     ({
         if (entry->pi_plugin.dp_config_query == NULL)
         {
-            log_debug (1, "Plugin '%s' does not implement config_query", entry->pi_name);
+            log_debug (1, "Plugin '%s' does not implement config_query", entry->pi_io_id);
             continue;
         }
         status = entry->pi_plugin.dp_config_query (instance, &entry->pi_plugin, entry_id);
@@ -119,9 +119,9 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
             continue;
         if (status != DISIR_STATUS_EXISTS)
         {
-            log_warn ("Plugin '%s' (named %s, type %s) failed to query for entry '%s': %s",
-                      entry->pi_name, entry->pi_plugin.dp_name,
-                      entry->pi_plugin.dp_type, entry_id), disir_status_string (status);
+            log_warn ("Plugin '%s' (id %s) failed to query for entry '%s': %s",
+                      entry->pi_io_id, entry->pi_plugin.dp_name,
+                      entry_id), disir_status_string (status);
             continue;
         }
 
@@ -140,13 +140,13 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
             // Config is loaded - we inject the loaded pluginname into the structure.
             if (*config != NULL)
             {
-                (*config)->cf_plugin_name = strdup (plugin->pi_name);
+                (*config)->cf_plugin_name = strdup (plugin->pi_io_id);
             }
         }
         else
         {
             status = DISIR_STATUS_NO_CAN_DO;
-            log_debug (1, "Plugin '%s' does not implement config_read", plugin->pi_name);
+            log_debug (1, "Plugin '%s' does not implement config_read", plugin->pi_io_id);
         }
     }
     else
@@ -189,7 +189,7 @@ disir_config_write (struct disir_instance *instance, const char *entry_id,
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
-        if (strcmp (entry->pi_name, config->cf_plugin_name) == 0)
+        if (strcmp (entry->pi_io_id, config->cf_plugin_name) == 0)
         {
             plugin = entry;
             break;
@@ -206,7 +206,7 @@ disir_config_write (struct disir_instance *instance, const char *entry_id,
         else
         {
             status = DISIR_STATUS_NO_CAN_DO;
-            log_debug (1, "Plugin '%s' does not implement config_write", plugin->pi_name);
+            log_debug (1, "Plugin '%s' does not implement config_write", plugin->pi_io_id);
         }
     }
     else
@@ -254,7 +254,7 @@ disir_config_entries (struct disir_instance *instance, struct disir_entry **entr
     ({
         if (entry->pi_plugin.dp_config_entries == NULL)
         {
-            log_debug (1, "Plugin '%s' does not implement config_entries.", entry->pi_name);
+            log_debug (1, "Plugin '%s' does not implement config_entries.", entry->pi_io_id);
             continue;
         }
 
@@ -263,7 +263,7 @@ disir_config_entries (struct disir_instance *instance, struct disir_entry **entr
         if (status != DISIR_STATUS_OK)
         {
             log_warn ("Plugin '%s' queried for config entries failed with status: %s",
-                      entry->pi_name, disir_status_string (status));
+                      entry->pi_io_id, disir_status_string (status));
             continue;
         }
 

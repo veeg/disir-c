@@ -7,18 +7,29 @@
 #include "log.h"
 #include "mqueue.h"
 
+#define PLUGIN_STRING_MEMBER_COPY(name) { do {              \
+    internal->pi_plugin.name = strndup (plugin->name, 512); \
+    if (internal->pi_plugin.name == NULL)                   \
+    {                                                       \
+        status = DISIR_STATUS_NO_MEMORY;                    \
+        goto error;                                         \
+    }                                                       \
+    } while (0);}
+
 //! PUBLIC API
 enum disir_status
-disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plugin)
+disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plugin,
+                       const char *io_id, const char *group_id)
 {
     enum disir_status status;
     struct disir_plugin_internal *internal;
 
     internal = NULL;
 
-    if (instance == NULL || plugin == NULL)
+    if (instance == NULL || plugin == NULL || io_id == NULL || group_id == NULL)
     {
-        log_debug (0, "invoked with NULL pointer(s). (%p %p)", instance, plugin);
+        log_debug (0, "invoked with NULL pointer(s). (%p %p %p %p)",
+                   instance, plugin, io_id, group_id);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -34,26 +45,16 @@ disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plu
     // Copy the plugin input structure verbatim to our internal copy.
     memcpy (&internal->pi_plugin, plugin, sizeof (*plugin));
 
+    internal->pi_io_id = strdup (io_id);
+    internal->pi_group_id = strdup (io_id);
+
     // Make actual copies of the strings, since we do not own the strings
     // in the input plugin
-    internal->pi_plugin.dp_description = strndup (plugin->dp_description, 512);
-    if (internal->pi_plugin.dp_description == NULL)
-    {
-        status = DISIR_STATUS_NO_MEMORY;
-        goto error;
-    }
-    internal->pi_plugin.dp_name = strndup (plugin->dp_name, 512);
-    if (internal->pi_plugin.dp_name == NULL)
-    {
-        status = DISIR_STATUS_NO_MEMORY;
-        goto error;
-    }
-    internal->pi_plugin.dp_type = strndup (plugin->dp_type, 512);
-    if (internal->pi_plugin.dp_type == NULL)
-    {
-        status = DISIR_STATUS_NO_MEMORY;
-        goto error;
-    }
+    // NOTE: These macros route control flow to error:
+    PLUGIN_STRING_MEMBER_COPY (dp_name);
+    PLUGIN_STRING_MEMBER_COPY (dp_description);
+    PLUGIN_STRING_MEMBER_COPY (dp_config_entry_type);
+    PLUGIN_STRING_MEMBER_COPY (dp_mold_entry_type);
 
     MQ_PUSH (instance->dio_plugin_queue, internal);
 
@@ -68,9 +69,13 @@ error:
     {
         free (internal->pi_plugin.dp_description);
     }
-    if (internal->pi_plugin.dp_type)
+    if (internal->pi_plugin.dp_config_entry_type)
     {
-        free (internal->pi_plugin.dp_type);
+        free (internal->pi_plugin.dp_config_entry_type);
+    }
+    if (internal->pi_plugin.dp_mold_entry_type)
+    {
+        free (internal->pi_plugin.dp_mold_entry_type);
     }
     if (internal)
     {

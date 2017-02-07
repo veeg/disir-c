@@ -45,7 +45,7 @@ disir_mold_read (struct disir_instance *instance, const char *entry_id, struct d
     ({
         if (entry->pi_plugin.dp_mold_query == NULL)
         {
-            log_debug (1, "Plugin '%s' does not implement mold_query", entry->pi_name);
+            log_debug (1, "Plugin '%s' does not implement mold_query", entry->pi_io_id);
             continue;
         }
         status = entry->pi_plugin.dp_mold_query (instance, entry->pi_plugin.dp_storage, entry_id);
@@ -53,9 +53,9 @@ disir_mold_read (struct disir_instance *instance, const char *entry_id, struct d
             continue;
         if (status != DISIR_STATUS_EXISTS)
         {
-            log_warn ("Plugin '%s' (named %s, type %s) failed to query for entry '%s': %s",
-                      entry->pi_name, entry->pi_plugin.dp_name,
-                      entry->pi_plugin.dp_type, entry_id), disir_status_string (status);
+            log_warn ("Plugin '%s' (id %s) failed to query for entry '%s': %s",
+                      entry->pi_io_id, entry->pi_plugin.dp_name,
+                      entry_id), disir_status_string (status);
             continue;
         }
 
@@ -74,13 +74,13 @@ disir_mold_read (struct disir_instance *instance, const char *entry_id, struct d
             // Mold is loaded - we inject the loaded plugin name into the structure.
             if (*mold != NULL)
             {
-                (*mold)->mo_plugin_name = strdup (plugin->pi_name);
+                (*mold)->mo_plugin_name = strdup (plugin->pi_io_id);
             }
         }
         else
         {
             status = DISIR_STATUS_NO_CAN_DO;
-            log_debug (1, "Plugin '%s' does not implement mold_read", plugin->pi_name);
+            log_debug (1, "Plugin '%s' does not implement mold_read", plugin->pi_io_id);
         }
     }
     else
@@ -122,7 +122,7 @@ disir_mold_write (struct disir_instance *instance, const char *entry_id, struct 
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
-        if (strcmp (entry->pi_name, mold->mo_plugin_name) == 0)
+        if (strcmp (entry->pi_io_id, mold->mo_plugin_name) == 0)
         {
             plugin = entry;
             break;
@@ -140,7 +140,7 @@ disir_mold_write (struct disir_instance *instance, const char *entry_id, struct 
         {
             // TODO: Change status to something more sensible.
             status = DISIR_STATUS_INTERNAL_ERROR;;
-            log_debug (1, "Plugin '%s' does not implement mold_write", plugin->pi_name);
+            log_debug (1, "Plugin '%s' does not implement mold_write", plugin->pi_io_id);
         }
     }
     else
@@ -190,7 +190,7 @@ disir_mold_entries (struct disir_instance *instance, struct disir_entry **entrie
     ({
         if (entry->pi_plugin.dp_mold_entries == NULL)
         {
-            log_debug (1, "Plugin '%s' does not implement mold_entries.", entry->pi_name);
+            log_debug (1, "Plugin '%s' does not implement mold_entries.", entry->pi_io_id);
             continue;
         }
 
@@ -198,7 +198,7 @@ disir_mold_entries (struct disir_instance *instance, struct disir_entry **entrie
         if (status != DISIR_STATUS_OK)
         {
             log_debug (1, "Plugin '%s' queried for mold entries failed with status: %s",
-                          entry->pi_name, disir_status_string (status));
+                          entry->pi_io_id, disir_status_string (status));
             continue;
         }
 

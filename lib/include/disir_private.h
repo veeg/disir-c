@@ -14,7 +14,10 @@ struct disir_plugin_internal
     char                *pi_filepath;
 
     //! Internal name given to this plugin when it registered.
-    char                *pi_name;
+    char                *pi_io_id;
+
+    //! Group this plugin is registerd to.
+    char                *pi_group_id;
 
     //! Copy of plugin parameters this plugin registered itself with.
     struct disir_plugin pi_plugin;
@@ -41,34 +44,33 @@ struct disir_instance
     int32_t                         disir_error_message_size;
 };
 
-
-// TODO: Remove dio_ini_config_read and dio_ini_config_write.
-//          Replace with a toml/json hybrid instead.
-
-//! \brief Read INI formatted configuration file from id filepath
+//! \brief Output the libdisir config entry to disk.
 //!
-//! \param[in] instance A libdisir instance to associate with the read operation.
-//! \param[in] id An entry identifier for which file to read. Corresponds to a full filepath.
-//! \param[in] mold A associated mold with this config read operation. Required parameter.
-//! \param[out] config Output parameter populated with the read config object.
+//! \param[in] instance Disir library instance associated with this operation.
+//! \param[in] config Valid configuration object based of libdisir_mold
+//! \param[in] filepath Path to disk location to write the INI-formatted config file.
 //!
-//! \return DISIR_STATUS_OK on success
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status disir_libdisir_config_to_disk (struct disir_instance *instance,
+                                                 struct disir_config *config,
+                                                 const char *filepath);
+
+//! \brief Read the libdisri config entry from disk.
+//!
+//! \param[in] instance Disir library instance associated with this operation.
+//! \param[in] filepath Full filepath to the location on disk to locate the configuration file.
+//! \param[in] mold Mold instance for libdisir.
+//! \param[out] config The config structure to populate with the read configuration file.
+//
+//! \return DISIR_STATUS_INVALID_ARGUMENT if config_filepath cannot be opened.
+//! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-dio_ini_config_read (struct disir_instance *instance, const char *id,
-                     struct disir_mold *mold, struct disir_config **config);
-
-//! \brief Write INI formatted configuration file to id filepath
-//!
-//! \param[in] instance A libdisir instance to associate with the write operation.
-//! \param[in] id An entry identifier for which to write the file. Corresponds to a full filepath.
-//! \param[in] config The config object to persist to disk at filepath location `id`.
-//!
-//! \return DISIR_STATUS_OK on success
-//!
-enum disir_status
-dio_ini_config_write (struct disir_instance *instance, const char *id, struct disir_config *config);
-
+disir_libdisir_config_from_disk (struct disir_instance *instance,
+                                 const char *filepath,
+                                 struct disir_mold *mold,
+                                 struct disir_config **config);
 
 #endif // _LIBDISIR_DISIR_PRIVATE_H
 

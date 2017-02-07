@@ -7,6 +7,7 @@ extern "C"{
 
 
 #include <disir/disir.h>
+#include <disir/plugin.h>
 #include <stdio.h>
 
 //! PLEASE NOTE:

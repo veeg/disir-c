@@ -12,7 +12,8 @@ extern "C"{
 struct disir_plugin;
 
 //! \brief Function signature for plugin to implement to register with Disir instance.
-typedef enum disir_status (*plugin_register) (struct disir_instance *instance, const char *name);
+typedef enum disir_status (*plugin_register) (struct disir_instance *instance,
+                                              struct disir_plugin *plugin);
 
 //! \brief Function signature for plugin to implement to cleanup loaded plugin state.
 typedef enum disir_status (*plugin_finished) (struct disir_instance *instance,
@@ -145,18 +146,26 @@ struct disir_plugin
     uint32_t        dp_major_version;
     uint32_t        dp_minor_version;
 
-    //! Internal name identify of this plugin
+    //! A unique name to identify the plugin origin in general.
     char            *dp_name;
 
     //! String description of this plugin.
     char            *dp_description;
 
-    //! Short string description of what type this plugin is.
-    //! e.g., TOML, JSON, sqlite3
-    char            *dp_type;
+    //! Configuration entry type identifier.
+    //! For filesystem based plugins, this will be the file extension.
+    char            *dp_config_entry_type;
+
+    //! Mold entry type identifier.
+    //! For filesystem based plugins, this will be the file extension.
+    char            *dp_mold_entry_type;
 
     //! Pointer to plugin-specific storage space. Allocated and free'd by the plugin.
     void            *dp_storage;
+
+    //! Populated by disir.
+    //! The base identifier used to resolve config entries.
+    char            *dp_config_base_id;
 
     plugin_finished dp_plugin_finished;
 
@@ -185,7 +194,8 @@ struct disir_plugin
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plugin);
+disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plugin,
+                       const char *io_id, const char *group_id);
 
 
 #ifdef __cplusplus
