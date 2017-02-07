@@ -3,7 +3,7 @@
 
 #ifdef __cplusplus
 extern "C"{
-#endif // _cplusplus
+#endif // __cplusplus
 
 
 #include <stdint.h>
@@ -132,10 +132,12 @@ enum disir_restriction_type
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status disir_libdisir_mold (struct disir_mold **mold);
+enum disir_status
+disir_libdisir_mold (struct disir_mold **mold);
 
 //! \brief Return a string representation of the disir status.
-const char * disir_status_string (enum disir_status status);
+const char *
+disir_status_string (enum disir_status status);
 
 //! \brief Allocate a new libdisir instance.
 //!
@@ -180,16 +182,19 @@ disir_instance_destroy (struct disir_instance **instance);
 
 //! \brief Log a USER level log entry to the disir log.
 //!
-void disir_log_user (struct disir_instance *instance, const char *message, ...);
+void
+disir_log_user (struct disir_instance *instance, const char *message, ...);
 
 //! \brief Set an error message to the disir instance.
 //!
 //! This will also issue a ERROR level log event to the log stream.
 //!
-void disir_error_set (struct disir_instance *instance, const char *message, ...);
+void
+disir_error_set (struct disir_instance *instance, const char *message, ...);
 
 //! \brief Clear any error message previously sat on the disir instance.
-void disir_error_clear (struct disir_instance *instance);
+void
+disir_error_clear (struct disir_instance *instance);
 
 //! \brief Copy the contents of the error message
 //!
@@ -218,7 +223,8 @@ disir_error_copy (struct disir_instance *instance,
 //!
 //!If no error message exists, NULL is returned.
 //!
-const char * disir_error (struct disir_instance *instance);
+const char *
+disir_error (struct disir_instance *instance);
 
 //! \brief Generate a config at a given version from the finished mold.
 //!
@@ -231,7 +237,7 @@ const char * disir_error (struct disir_instance *instance);
 //!
 enum disir_status
 disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
-                                   struct disir_config **config);
+                                 struct disir_config **config);
 
 //! \brief Validate the config, checking for any contexts that are invalid.
 //!
@@ -308,7 +314,7 @@ disir_update_finished (struct disir_update **update);
 
 #ifdef __cplusplus
 }
-#endif // _cplusplus
+#endif // __cplusplus
 
 #endif // _LIBDISIR_H
 
