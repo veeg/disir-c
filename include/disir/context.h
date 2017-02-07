@@ -237,8 +237,11 @@ enum disir_status dc_get_documentation (struct disir_context *context,
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if name or name_size are zero
 //! \return DISIR_STATUS_NO_CAN_DO if an unsupported context type
-//! \return DISIR_STATUS_WRONG_CONTEXT if the name attempted to add on a context whose root
-//!     is CONFIG, is not found in the associated MOLD.
+//! \return DISIR_STATUS_NOT_EXIST if the input context' root is CONFIG, and there are no
+//!     mold equivalent entry for name in the parent context mold.
+//!     May also be returned if the parent of context is also missing a mold equivalent.
+//! \return DISIR_STATUS_WRONG_CONTEXT if the located context' mold entry by name is not
+//!     the same context type as the input context.
 //! \return DISIR_STATUS_OK on successful insertion of name to context.
 //!
 enum disir_status dc_set_name (struct disir_context *context, const char *name, int32_t name_size);
