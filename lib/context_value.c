@@ -537,7 +537,7 @@ dc_set_value_integer (struct disir_context *context, int64_t value)
 
     if (invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
-        invalid = dx_restriction_exclusive_value_check (context, value, 0);
+        invalid = dx_restriction_exclusive_value_check (context, value, 0, NULL);
     }
 
     // Do not allow finalized context to change value
@@ -611,7 +611,7 @@ dc_set_value_float (struct disir_context *context, double value)
 
     if (invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
-        invalid = dx_restriction_exclusive_value_check (context, 0, value);
+        invalid = dx_restriction_exclusive_value_check (context, 0, value, NULL);
     }
 
     // Do not allow finalized context to change value

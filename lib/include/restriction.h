@@ -54,7 +54,8 @@ enum disir_status dx_restriction_destroy (struct disir_restriction **restriction
 //!
 enum disir_status dx_restriction_exclusive_value_check (struct disir_context *context,
                                                         int64_t integer_value,
-                                                        double float_value);
+                                                        double float_value,
+                                                        const char *string_value);
 
 //! \brief Retrieve the minimum or maximum entries allowed for input context.
 //!

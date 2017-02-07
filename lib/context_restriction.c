@@ -1048,7 +1048,8 @@ dc_add_restriction_entries_max (struct disir_context *parent, int64_t max,
 //! INTERNAL API
 enum disir_status
 dx_restriction_exclusive_value_check (struct disir_context *context, int64_t integer_value,
-                                                                     double float_value)
+                                                                     double float_value,
+                                                                     const char *string_value)
 {
     enum disir_status status;
     struct disir_restriction **queue;
@@ -1079,6 +1080,9 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
         value = float_value;
         break;
     }
+    case DISIR_VALUE_TYPE_ENUM:
+        // Do not handle
+        break;
     default:
     {
         log_fatal_context (context, "restriction check value type not handled: %s",
@@ -1133,6 +1137,17 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
             }
             break;
         }
+        case DISIR_RESTRICTION_EXC_VALUE_ENUM:
+        {
+            log_debug (9, "value (%s) enum (%s)", string_value, entry->re_value_string);
+            if (strcmp (string_value, entry->re_value_string) == 0)
+            {
+                // QUESTION: Check length aswell ?
+                log_debug (6, "Exclusive_restriction fufilled (Value (%s) == %s)",
+                              string_value, entry->re_value_string);
+                exclusive_fulfilled = 1;
+            }
+        }
         default:
         {
             log_warn_context (context, "unhandled exclusive restriction check: %s",
@@ -1149,6 +1164,17 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
                       " Out of range (%d) vs entires (%d)",
                       restriction_entries_oor, MQ_SIZE (*queue));
 
+        status = DISIR_STATUS_RESTRICTION_VIOLATED;
+    }
+    // Jesus christ.
+    // So, if the type is ENUM, we require it to actually have some restrictions in-place.
+    // If there are no value restriction, then it has per definition no legal value.
+    if (exclusive_fulfilled == 0 &&
+        status != DISIR_STATUS_RESTRICTION_VIOLATED &&
+        dc_value_type (context) == DISIR_VALUE_TYPE_ENUM &&
+        MQ_SIZE(*queue) == restriction_entries_oor)
+    {
+        log_debug (4, "Missing enum restrictions. Keyval considered invalid.");
         status = DISIR_STATUS_RESTRICTION_VIOLATED;
     }
 

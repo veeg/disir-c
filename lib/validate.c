@@ -147,20 +147,21 @@ validate_exclusive_restrictions (struct disir_context *context)
     {
         status = dx_restriction_exclusive_value_check (context,
                                                        context->cx_keyval->kv_value.dv_integer,
-                                                       0);
+                                                       0, NULL);
         break;
     }
     case DISIR_VALUE_TYPE_FLOAT:
     {
         status = dx_restriction_exclusive_value_check (context, 0,
-                                                       context->cx_keyval->kv_value.dv_float);
+                                                       context->cx_keyval->kv_value.dv_float,
+                                                       NULL);
         break;
 
     }
     case DISIR_VALUE_TYPE_ENUM:
     {
-        // TODO: Support enum type check.
-        status = DISIR_STATUS_INTERNAL_ERROR;
+        status = dx_restriction_exclusive_value_check (context, 0, 0,
+                                                       context->cx_keyval->kv_value.dv_string);
         break;
     }
     case DISIR_VALUE_TYPE_STRING:
