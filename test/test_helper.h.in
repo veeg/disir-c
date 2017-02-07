@@ -142,9 +142,10 @@ namespace testing
                 goto out;
             }
 
-
             // open file for reading and writing
-            file = fopen ("/tmp/disir_plugin_serialize_unserialize.txt", "w+");
+            char filepath[4098];
+            snprintf (filepath, 4098, "/tmp/disir_plugin_serialize_unserialize_%s.toml", entry);
+            file = fopen (filepath, "w+");
             EXPECT_TRUE (file != NULL);
             if (file == NULL)
             {
@@ -180,7 +181,10 @@ namespace testing
         out:
             DisirLogCurrentTest ("compare serialize-unserialize out clause");
             // Cleanup this entry and move to the next
-            fclose (file);
+            if (file != NULL)
+            {
+                fclose (file);
+            }
             dc_putcontext (&context_config1);
             dc_putcontext (&context_config2);
             disir_config_finished (&config_original);
