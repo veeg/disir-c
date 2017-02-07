@@ -250,6 +250,8 @@ dx_value_copy (struct disir_value *destination, struct disir_value *source)
 {
     switch (dx_value_type_sanify (source->dv_type))
     {
+    case DISIR_VALUE_TYPE_ENUM:
+        // FALL-THROUGH
     case DISIR_VALUE_TYPE_STRING:
         return dx_value_set_string (destination, source->dv_string, source->dv_size);
         break;
@@ -262,8 +264,6 @@ dx_value_copy (struct disir_value *destination, struct disir_value *source)
     case DISIR_VALUE_TYPE_BOOLEAN:
         return dx_value_set_boolean (destination, source->dv_boolean);
         break;
-    case DISIR_VALUE_TYPE_ENUM:
-        //! TODO: Implement enum type for value_copy
     case DISIR_VALUE_TYPE_UNKNOWN:
         dx_crash_and_burn ("%s unhandled", __FUNCTION__);
         break;
@@ -417,7 +417,8 @@ dx_value_set_string (struct disir_value *value, const char *input, int32_t size)
         log_debug (0, "invoked with NULL value pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    if (value->dv_type != DISIR_VALUE_TYPE_STRING)
+    if (value->dv_type != DISIR_VALUE_TYPE_STRING &&
+        value->dv_type != DISIR_VALUE_TYPE_ENUM)
     {
         log_debug (0, "invoked with non-string value type %s (%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
@@ -480,7 +481,7 @@ dx_value_get_string (struct disir_value *value, const char **output, int32_t *si
         log_debug (0, "invoked with NULL string pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    if (value->dv_type != DISIR_VALUE_TYPE_STRING)
+    if (value->dv_type != DISIR_VALUE_TYPE_STRING && value->dv_type != DISIR_VALUE_TYPE_ENUM)
     {
         log_debug (0, "invoked with non-string value type (%d)", value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
