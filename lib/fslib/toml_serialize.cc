@@ -92,7 +92,7 @@ toml_serialize_keyval (struct disir_context *context, toml::Value* current, cons
     }
     default:
     {
-        disir_log_user (NULL, "Unhandled value type of keyval: %s", dc_value_type_string (context));
+        disir_log_user (NULL, "TOML: Unhandled value type of keyval: %s", dc_value_type_string (context));
         status = DISIR_STATUS_INTERNAL_ERROR;
     }
     }
@@ -171,6 +171,12 @@ toml_serialize_inner (struct disir_context *parent, struct disir_context *contex
             status = DISIR_STATUS_INTERNAL_ERROR;
             goto out;
         }
+        }
+
+        // Bail if the serialization goes awry
+        if (status != DISIR_STATUS_OK)
+        {
+            goto out;
         }
 
         dc_putcontext (&key_element);

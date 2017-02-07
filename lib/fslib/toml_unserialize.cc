@@ -159,6 +159,7 @@ dio_toml_unserialize_table (struct disir_instance *instance, const char *key,
     if (status != DISIR_STATUS_OK)
     {
         // QUESTION: Handle the sitation?
+        // TODO: Definately handle this situvation
         disir_log_user (instance, "TOML: Name error for SECTION: %s",
                                   disir_status_string (status));
         goto error;
