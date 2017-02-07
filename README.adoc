@@ -1,70 +1,61 @@
-= Disir - Text-based configuration files management
+= Disir - Configuration through time and space made slightly less painful
 
-_Disir_ is a text-based configuration file management system. Why? Because configuration files are made to be configured. _They change_. When the provider of a configuration file changes the semantics of a configurable variable, this change is not propagated to deployed configuration files through an upgrade. Heck, even the changes made by the user is not saved through an update.
+_Disir_ is confiuration entry management system. It implements a C library with plugin
+end-points to interact with pheripiral entries. A Command Line Interfacec (CLI) allows
+the user to interact and manage the conforming configurations available on his system.
 
-== But we have RPM, which readily stores modified configuration files as *.rpmnew. Why not just use that?
+== Motivation
 
-Because its **manual**. It does not aid you in resolving conflict between the saved backup and the new version. It provides no documentation **alongside** the configuration definition. It does not automatically provide type safety and restriction checks. This is all left up to be manually handled by the application deploying a configuration file. 
+Developers like to change their code; which often implies changing the configuration
+their code exposes to the end-user. Over time, when the user decides to update their system
+to the latest and greatest, they will be forced to handle the new configuration options
+and how it impacts his previously working setup.
 
-== Contributing Guidelines
+Depending on your point of view, this has many caveats.
 
-* When first cloning the git repository, you must run the `dev/init_repo.sh` script
-    to align your local git repository with upstream codebase policy.
+a) The developers should never make incompatible changes to their configuration file.
+How dare they! Assume that they didn't make any incompatible changes, but rather added a ton
+of additional features that are all configured or intertwined with existing functionality,
+and to not break the previously working setup, this set of configuration keys and values
+must be present. If the user already has his old working copy of the configuration entry,
+he must now (manually) take care of updating his old configuration with the new values.
 
-* General codestyle guidelines include:
-** Opening paranthesis to function calls and definitions shall be separated with a whitespace.
-** Function return type skall be declared on a separate line above the function name.
-** Line length shall strive to be under 100 characters long.
-** Opening bracket shall be on a separate line.
+b) The end-user is such a pessemist! Here I come with my brilliant updates and he complains
+about the maintance of getting the system up-and-running after an upgrade!
+Seperating your code from the configuration the end-user has to interact with can be quite
+the pain. If one naievely maps exposed library configurations directly to the
+end-user, they might be exposed to way too much information that was unneccesary. This also
+makes changing the library very tiresome and grueling work, since the end-user is
+tied in with its (semi) internal workings. If only there was some middleman that can provide
+a clean, generic configuration entry interface to the end-user, whilst still give me the ability
+to iterate and improve my library. It would be even cooler if the updates I allow on
+my exposed configuration entry could go through an upgrade procedure at the end-user,
+so my semantically correct changes can propogate to their configuration, if applicable!
 
-== TODO List
+
+=== Enter *Disir*
+
+TODO: Write about how molds represent the lifetime of a configuration entry,
+describing the changes it has gone through.
+
+.Features
+* Generic C library to interface for full interaction with configuration entries and molds.
+* Plugin based interface to implement different sources of configuration entries.
+Default plugin implements reading configuration entries from TOML configuration files on disk,
+and reading the mold description for entries from JSON configuration files on disk.
+* Command Line Interface to interact with configuration entries.
+* Generate out-of-the-box configuration entries based on the associated mold.
+* Seemless semantic upgrade of previously generated configuration entries.
+** May require human intervention if both parties has modified a key-value pair.
+* Upgrade report: What configuration entries and key-value pairs within them has changed
+when deploying a system upgrade.
+
+== Alternatives
 
 [horizontal]
-Restrictions:: No restritions are implemented on neither section nor keyval.
+RPM::
+It does not aid you in resolving conflict between the saved backup and the new version.
+It provides no documentation **alongside** the configuration definition.
+It does not automatically provide type safety and restriction checks.
+This is all left up to be manually handled by the application deploying a configuration file.
 
-Update:: Allow update procedure to generate a collection of conflicts, instead of
-resolving them immediately
-
-Update:: Do not override the input config object, rather create a new one.
-
-Update:: Iterate mold instead of config, to support add/removal/rename(?)
-
-Update:: Create a detailed update report. Every keyval that changes value, either implicitly or
-explicitly, should be part of the report. It should be split into entry sections, so they can be
-merged into a single grand report detailing all changes. This should be implemented
-after sections.
-
-dc_context_compare()::  Implement a compare method. This should only every be true if
-all children and state, even order-of-elements, are equal.
-It might be reasonable to add a CRC or equivalent checksum that is computed for all contexts.
-If so, this checksum MUST be take the order of operations into account.
-
-verify:: Add some method to verify the state of the context. Should pinpoint an error message
-to the invalid state characteristic.
-
-value type:: Missing support for enums. These should be implemented as int64 and restrictions
-should map their enum value to string representation.
-
-Deprecrated:: Implement a deprecrated notion. KEYVALS and sections can be deprecrated
-
-Rename:: KEYVALS and SECTION should possible be renamed across versions?
-
-visiblity flag:: Annotate mold entries with a 'hidden' flag to indicate their presence,
-but make them optional to a config entry - if queried and does not exist in the config,
-it can be retrieved from the mold instead? This would allow us to hide ugly configuration
-options that are so rarely changed, but still have them active in the configuration.
-
-fixed flag:: Similar to visibilty flag, let the mold decide that this entry is of a fixed value
-and wont show up on the configuration entry, but can be queried from it because
-it will be retrieved in the mold instead.
-
-
-== Developer dependencies
-
-* cmake
-* gtest
-* gtest-devel
-* (cmocka until it is deprecrated)
-* doxygen
-* gem install asciidoctor
-* git@github.com:veeg/doxml2asciidoc

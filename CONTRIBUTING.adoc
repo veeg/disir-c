@@ -1,0 +1,24 @@
+= Contributing
+
+== Code style
+
+* Opening paranthesis to function calls and definitions shall be separated with a whitespace.
+* Function return type skall be declared on a separate line above the function name.
+* Line length shall strive to be under 100 characters long.
+* Opening bracket shall be on a separate line.
+
+
+== Developer dependencies
+
+This project uses CMake to build, and GTest to implement unit tests.
+
+The following packages and utilities are required for build and test.
+* cmake
+* gtest
+* gtest-devel
+
+The following utilities are required for generating documentation.
+* doxygen
+* gem install asciidoctor
+* git@github.com:veeg/doxml2asciidoc
+
