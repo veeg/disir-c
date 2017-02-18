@@ -36,6 +36,9 @@ const char *disir_status_strings[] = {
     "RESTRICTION VIOLATED",
     "ELEMENTS INVALID",
     "NOT SUPPORTED",
+    "PLUGIN ERROR",
+    "LOAD ERROR",
+    "CONFIG INVALID",
     "UNKNOWN",
 };
 

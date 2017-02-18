@@ -60,6 +60,12 @@ enum disir_status
     DISIR_STATUS_ELEMENTS_INVALID,
     //! The operation is not supported by the API endpoint.
     DISIR_STATUS_NOT_SUPPORTED,
+    //! An error related to a plugin operation.
+    DISIR_STATUS_PLUGIN_ERROR,
+    //! A resource failed to load.
+    DISIR_STATUS_LOAD_ERROR,
+    //! The configuration entry is invalid.
+    DISIR_STATUS_CONFIG_INVALID,
 
     //! Sentinel status - not returned by any API
     DISIR_STATUS_UNKNOWN // Must be the last status in enumeration
