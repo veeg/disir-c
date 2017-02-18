@@ -23,7 +23,7 @@ class ValidateTest : public testing::DisirTestTestPlugin
         context_keyval = NULL;
         context = NULL;
 
-        status = disir_config_read (instance, "basic_keyval", NULL, &bkeyval_config);
+        status = disir_config_read (instance, "test", "basic_keyval", NULL, &bkeyval_config);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (bkeyval_config != NULL);
 

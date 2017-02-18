@@ -56,14 +56,14 @@ public:
 
     void read_config1 (const char *entry)
     {
-        status = disir_config_read (instance, entry, NULL, &config1);
+        status = disir_config_read (instance, "test", entry, NULL, &config1);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         context_config1 = dc_config_getcontext (config1);
     }
 
     void read_config2 (const char *entry)
     {
-        status = disir_config_read (instance, entry, NULL, &config2);
+        status = disir_config_read (instance, "test", entry, NULL, &config2);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         context_config2 = dc_config_getcontext (config2);
     }

@@ -104,7 +104,7 @@ namespace testing
             struct disir_entry *current = NULL;
             struct disir_entry *next = NULL;
 
-            status = disir_config_entries (instance, &entries);
+            status = disir_config_entries (instance, "test", &entries);
             ASSERT_STATUS (DISIR_STATUS_OK, status);
             ASSERT_TRUE (entries != NULL);
 
@@ -133,7 +133,7 @@ namespace testing
             struct disir_mold *mold = NULL;
 
             // read the current entry
-            status = disir_config_read (instance, entry,
+            status = disir_config_read (instance, "test", entry,
                                         NULL, &config_original);
             EXPECT_STATUS (DISIR_STATUS_OK, status);
             if (status != DISIR_STATUS_OK)

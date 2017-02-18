@@ -24,7 +24,7 @@ class DisirConfigSetGetKeyvalString : public testing::DisirTestTestPlugin
     {
         DisirTestTestPlugin::SetUp ();
 
-        status = disir_config_read (instance, "config_query_permutations",
+        status = disir_config_read (instance, "test", "config_query_permutations",
                                     NULL, &config);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         context_config = dc_config_getcontext (config);
