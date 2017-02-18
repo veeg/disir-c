@@ -35,9 +35,8 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
     handle = dlopen (plugin_filepath, RTLD_NOW | RTLD_LOCAL);
     if (handle == NULL)
     {
-        disir_error_set (instance, "Plugin located at filepath could not be loaded: %s: %s",
-                         plugin_filepath, dlerror());
-        status = DISIR_STATUS_INVALID_ARGUMENT;
+        disir_error_set (instance, "Plugin '%s' could not be loaded: %s", io_id, dlerror());
+        status = DISIR_STATUS_LOAD_ERROR;
         goto error;
     }
 
@@ -48,7 +47,7 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
         disir_error_set (instance,
                          "Plugin could not locate symbol 'dio_register_plugin' in SO '%s': %s",
                          plugin_filepath, dlerror());
-        status = DISIR_STATUS_INVALID_ARGUMENT;
+        status = DISIR_STATUS_PLUGIN_ERROR;
         goto error;
     }
 
@@ -60,6 +59,9 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
     status = dio_reg (instance, &plugin);
     if (status != DISIR_STATUS_OK)
     {
+        // Regardless of the error supplied by the plugin, we return PLUGIN_ERROR
+        log_error ("Plugin '%d' failed to register: %s", disir_status_string (status));
+        status = DISIR_STATUS_PLUGIN_ERROR;
         goto error;
     }
 
@@ -91,7 +93,7 @@ error:
 }
 
 //! INTERNAL STATIC
-void
+enum disir_status
 load_plugins_from_config (struct disir_instance *instance, struct disir_config *config)
 {
     enum disir_status status;
@@ -102,19 +104,25 @@ load_plugins_from_config (struct disir_instance *instance, struct disir_config *
     const char *group_id;
     const char *io_id;
     const char *config_base_id;
+    int plugin_num;
+
+    context = NULL;
+    collection = NULL;
+    plugin = NULL;
+    plugin_num = 1;
 
     context = dc_config_getcontext (config);
     if (context == NULL)
     {
         disir_error_set (instance, "Failed to retrieve context from config object.");
-        return;
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
     }
 
     status = dc_find_elements (context, "plugin", &collection);
     if (status != DISIR_STATUS_OK)
     {
-        dc_putcontext (&context);
-        return;
+        goto error;
     }
 
     while (dc_collection_next (collection, &plugin) == DISIR_STATUS_OK)
@@ -129,21 +137,53 @@ load_plugins_from_config (struct disir_instance *instance, struct disir_config *
         dc_config_get_keyval_string (plugin, &io_id, "io_id");
         dc_config_get_keyval_string (plugin, &config_base_id, "config_base_id");
 
-        if (plugin_filepath && group_id && io_id && config_base_id)
+        // Check required keyvals to register plugin
+        if (plugin_filepath == NULL || *plugin_filepath == '\0')
         {
-            load_plugin (instance, plugin_filepath, io_id, group_id, config_base_id);
+            log_error ("Plugin #%d missing plugin_filepath. Cannot load plugin.", plugin_num);
+            status = DISIR_STATUS_CONFIG_INVALID;
+            goto error;
         }
-        else
+        if (group_id == NULL || *group_id == '\0')
         {
-            // TODO: Improve this logging and/or handling
-            log_error ("missing required keyval values.");
+            log_error ("Plugin #%d missing group_id. Cannot load plugin.", plugin_num);
+            status = DISIR_STATUS_CONFIG_INVALID;
+            goto error;
+        }
+        if (io_id == NULL || *io_id == '\0')
+        {
+            log_error ("Plugin #%d missing io_id. Cannot load plugin.", plugin_num);
+            status = DISIR_STATUS_CONFIG_INVALID;
+            goto error;
+        }
+
+        // config_base_id may be optional to some plugins.
+        status = load_plugin (instance, plugin_filepath, io_id, group_id, config_base_id);
+        if (status != DISIR_STATUS_OK)
+        {
+            goto error;
         }
 
         dc_putcontext (&plugin);
+        plugin_num += 1;
     }
 
-    dc_putcontext (&context);
-    dc_collection_finished (&collection);
+    status = DISIR_STATUS_OK;
+    // FALL-THROUGH
+error:
+    if (plugin)
+    {
+        dc_putcontext (&plugin);
+    }
+    if (context)
+    {
+        dc_putcontext (&context);
+    }
+    if (collection)
+    {
+        dc_collection_finished (&collection);
+    }
+    return status;
 }
 
 // PUBLIC API
@@ -204,6 +244,8 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 
     if (status != DISIR_STATUS_OK)
     {
+        // TODO: If we get a validation error  (INVALID_CONTEXT), we probably
+        //  should exit more sanely and give the user a better error message.
         log_error ("Failed to generate internal configuration: %s", disir_status_string (status));
         goto error;
     }
@@ -211,14 +253,21 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
     // TODO: Validate libconf
     // XXX: Validate version? Upgrade?
 
-    load_plugins_from_config (dis, libconf);
+    status = load_plugins_from_config (dis, libconf);
+    if (status != DISIR_STATUS_OK)
+    {
+        log_fatal ("Cannot instanciate disir from its configuration. Rejecting allocation.");
+        goto error;
+    }
 
     dis->libdisir_mold = libmold;
     dis->libdisir_config = libconf;
-
     *instance= dis;
-    TRACE_EXIT ("*instance: %p", *instance);
-    return DISIR_STATUS_OK;
+
+    dis = NULL;
+    libmold = NULL;
+    status = DISIR_STATUS_OK;
+    // FALL-THROUGH
 error:
     if (dis)
     {
@@ -229,6 +278,7 @@ error:
         disir_mold_finished (&libmold);
     }
 
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
