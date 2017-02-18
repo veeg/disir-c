@@ -44,33 +44,6 @@ struct disir_instance
     int32_t                         disir_error_message_size;
 };
 
-//! \brief Output the libdisir config entry to disk.
-//!
-//! \param[in] instance Disir library instance associated with this operation.
-//! \param[in] config Valid configuration object based of libdisir_mold
-//! \param[in] filepath Path to disk location to write the INI-formatted config file.
-//!
-//! \return DISIR_STATUS_OK on success.
-//!
-enum disir_status disir_libdisir_config_to_disk (struct disir_instance *instance,
-                                                 struct disir_config *config,
-                                                 const char *filepath);
-
-//! \brief Read the libdisri config entry from disk.
-//!
-//! \param[in] instance Disir library instance associated with this operation.
-//! \param[in] filepath Full filepath to the location on disk to locate the configuration file.
-//! \param[in] mold Mold instance for libdisir.
-//! \param[out] config The config structure to populate with the read configuration file.
-//
-//! \return DISIR_STATUS_INVALID_ARGUMENT if config_filepath cannot be opened.
-//! \return DISIR_STATUS_OK on success.
-//!
-enum disir_status
-disir_libdisir_config_from_disk (struct disir_instance *instance,
-                                 const char *filepath,
-                                 struct disir_mold *mold,
-                                 struct disir_config **config);
 
 #endif // _LIBDISIR_PRIVATE_DISIR_H
 
