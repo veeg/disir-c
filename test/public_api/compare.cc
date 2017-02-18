@@ -50,7 +50,7 @@ public:
 
     void read_mold (const char *entry, struct disir_mold **mold)
     {
-        status = disir_mold_read (instance, entry, mold);
+        status = disir_mold_read (instance, "test", entry, mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 

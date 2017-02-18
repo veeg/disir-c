@@ -28,13 +28,25 @@ public:
 
 TEST_F (DisirMoldTest, entries_invalid_arguments)
 {
-    status = disir_mold_entries (NULL, NULL);
+    status = disir_mold_entries (NULL, NULL, NULL);
     EXPECT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
 
-    status = disir_mold_entries (instance, NULL);
+    status = disir_mold_entries (instance, NULL, NULL);
     EXPECT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
 
-    status = disir_mold_entries (NULL, &entries);
+    status = disir_mold_entries (instance, "test", NULL);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    status = disir_mold_entries (NULL, "test", NULL);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    status = disir_mold_entries (NULL, "test", &entries);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    status = disir_mold_entries (NULL, NULL, &entries);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    status = disir_mold_entries (instance, NULL, &entries);
     EXPECT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
 }
 
@@ -44,7 +56,7 @@ TEST_F (DisirMoldTest, entries)
     struct disir_entry *current;
     struct disir_entry *next;
 
-    status = disir_mold_entries (instance, &entries);
+    status = disir_mold_entries (instance, "test", &entries);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     ASSERT_TRUE (entries != NULL);

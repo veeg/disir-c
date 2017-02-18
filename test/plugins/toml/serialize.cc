@@ -33,7 +33,7 @@ public:
 
     void setup_testconfig (const char *entry, struct semantic_version *semver)
     {
-        status = disir_mold_read (instance, entry, &mold);
+        status = disir_mold_read (instance, "test", entry, &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         status = disir_generate_config_from_mold (mold, semver, &config);

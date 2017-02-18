@@ -27,11 +27,11 @@ class ValidateTest : public testing::DisirTestTestPlugin
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (bkeyval_config != NULL);
 
-        status = disir_mold_read (instance, "basic_keyval", &bkeyval_mold);
+        status = disir_mold_read (instance, "test", "basic_keyval", &bkeyval_mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (bkeyval_mold != NULL);
 
-        status = disir_mold_read (instance, "basic_section", &bsection_mold);
+        status = disir_mold_read (instance, "test", "basic_section", &bsection_mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (bkeyval_mold != NULL);
 
@@ -92,7 +92,7 @@ public:
 
     void setup_testmold (const char *name)
     {
-        status = disir_mold_read (instance, name, &mold);
+        status = disir_mold_read (instance, "test", name, &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
     }
 

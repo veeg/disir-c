@@ -45,7 +45,7 @@ class ContextRestrictionConfigConstructingEntriesTestPluginTest : public testing
 public:
     void setup_testmold (const char *entry)
     {
-        status = disir_mold_read (instance, entry, &mold);
+        status = disir_mold_read (instance, "test", entry, &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         status = dc_config_begin (mold, &context_config);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
@@ -102,7 +102,7 @@ class ContextRestrictionConfigFinalizedEntriesTestPluginTest : public testing::D
 public:
     void setup_testconfig (const char *entry, struct semantic_version *semver)
     {
-        status = disir_mold_read (instance, entry, &mold);
+        status = disir_mold_read (instance, "test", entry, &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         status = dc_config_begin (mold, &context_config);

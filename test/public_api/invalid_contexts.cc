@@ -14,7 +14,7 @@ class InvalidContextsTest : public testing::DisirTestTestPlugin
         context_config = NULL;
         context_section = NULL;
 
-        status = disir_mold_read (instance, "basic_section", &mold);
+        status = disir_mold_read (instance, "test", "basic_section", &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         ASSERT_TRUE (mold != NULL);
 

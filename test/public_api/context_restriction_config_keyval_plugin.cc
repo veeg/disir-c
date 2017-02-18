@@ -10,7 +10,7 @@ class ContextRestrictionConfigConstructingKeyvalPluginTest : public testing::Dis
     {
         DisirTestTestPlugin::SetUp ();
 
-        status = disir_mold_read (instance, "restriction_keyval_numeric_types", &mold);
+        status = disir_mold_read (instance, "test", "restriction_keyval_numeric_types", &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
         status = dc_config_begin (mold, &context_config);
         ASSERT_STATUS (DISIR_STATUS_OK, status);

@@ -37,7 +37,7 @@ public:
         input = fopen (filepath.str().c_str(), "r");
         ASSERT_TRUE (input != NULL);
 
-        status = disir_mold_read (instance, entry, &mold);
+        status = disir_mold_read (instance, "test", entry, &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         status = dio_toml_unserialize_config (instance, input, mold, &config);
