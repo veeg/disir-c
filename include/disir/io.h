@@ -120,6 +120,7 @@ disir_config_finished (struct disir_config **config);
 //! Read a Mold object from `disir` identified by ID `entry_id`.
 //!
 //! \param[in] instance Library instance.
+//! \param[in] group_id String identifier for the which group to look for entry.
 //! \param[in] entry_id String identifier for the config entry to read.
 //! \param[out] mold Object to populate with the state read from `entry_id`.
 //!
@@ -132,11 +133,13 @@ disir_config_finished (struct disir_config **config);
 //! \return status of the plugin mold_read operation.
 //!
 enum disir_status
-disir_mold_read (struct disir_instance *instance, const char *entry_id, struct disir_mold **mold);
+disir_mold_read (struct disir_instance *instance, const char *group_id,
+                 const char *entry_id, struct disir_mold **mold);
 
 //! \brief Output the mold object to the Disir instance.
 //!
 //! \param[in] instance Library instance.
+//! \param[in] group_id String identifier for the which group to look for entry.
 //! \param[in] entry_id String identifier for output location.
 //! \param[in] mold The mold object to output.
 //!
@@ -149,9 +152,12 @@ disir_mold_read (struct disir_instance *instance, const char *entry_id, struct d
 //! \return status of the plugin mold_write operation.
 //!
 enum disir_status
-disir_mold_write (struct disir_instance *instance, const char *entry_id, struct disir_mold *mold);
+disir_mold_write (struct disir_instance *instance, const char *groupd_id,
+                  const char *entry_id, struct disir_mold *mold);
 
 //! \brief List all the available mold entries, from all plugins.
+//!
+//! \param[in] group_id String identifier for the which group to look for entry.
 //!
 //! Duplicate entries from plugins who is superseeded by another plugin
 //! is not returned.
@@ -169,7 +175,8 @@ disir_mold_write (struct disir_instance *instance, const char *entry_id, struct 
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_mold_entries (struct disir_instance *instance, struct disir_entry **entries);
+disir_mold_entries (struct disir_instance *instance,
+                    const char *group_id, struct disir_entry **entries);
 
 //! \brief Mark yourself finished with the mold object.
 //!

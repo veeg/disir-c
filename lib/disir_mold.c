@@ -25,7 +25,8 @@ static unsigned long djb2 (char *str)
 
 //! PUBLIC API
 enum disir_status
-disir_mold_read (struct disir_instance *instance, const char *entry_id, struct disir_mold **mold)
+disir_mold_read (struct disir_instance *instance, const char *group_id,
+                 const char *entry_id, struct disir_mold **mold)
 {
     enum disir_status status;
     struct disir_plugin_internal *plugin;
@@ -34,15 +35,21 @@ disir_mold_read (struct disir_instance *instance, const char *entry_id, struct d
 
     if (instance == NULL || entry_id == NULL || mold == NULL)
     {
-        log_debug (0, "invoked with NULL argument(s). instance (%p), entry_id (%p), mold (%p)",
-                      instance, entry_id, mold);
+        log_debug (0, "invoked with NULL argument(s)." \
+                      " instance (%p), group_id (%p), entry_id (%p), mold (%p)",
+                      instance, group_id, entry_id, mold);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    TRACE_ENTER ("instance (%p) entry_id (%s) mold (%p)", instance, entry_id, mold, mold);
+    TRACE_ENTER ("instance (%p) group_id (%s) entry_id (%s) mold (%p)",
+                 instance, group_id, entry_id, mold, mold);
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            continue;
+        }
         if (entry->pi_plugin.dp_mold_query == NULL)
         {
             log_debug (1, "Plugin '%s' does not implement mold_query", entry->pi_io_id);
@@ -85,7 +92,8 @@ disir_mold_read (struct disir_instance *instance, const char *entry_id, struct d
     }
     else
     {
-        disir_error_set (instance, "No plugin contains mold entry '%s'", entry_id);
+        disir_error_set (instance, "No plugin in group '%s' contains mold entry '%s'",
+                         group_id, entry_id);
         status = DISIR_STATUS_NOT_EXIST;
     }
 
@@ -95,7 +103,8 @@ disir_mold_read (struct disir_instance *instance, const char *entry_id, struct d
 
 //! PUBLIC API
 enum disir_status
-disir_mold_write (struct disir_instance *instance, const char *entry_id, struct disir_mold *mold)
+disir_mold_write (struct disir_instance *instance, const char *group_id,
+                  const char *entry_id, struct disir_mold *mold)
 {
     enum disir_status status;
     struct disir_plugin_internal *plugin;
@@ -109,7 +118,8 @@ disir_mold_write (struct disir_instance *instance, const char *entry_id, struct 
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    TRACE_ENTER ("instance (%p) entry_id (%s) mold (%p)", instance, entry_id, mold);
+    TRACE_ENTER ("instance (%p) group_id (%s) entry_id (%s) mold (%p)",
+                 instance, group_id, entry_id, mold);
 
     if (mold->mo_plugin_name == NULL)
     {
@@ -122,6 +132,10 @@ disir_mold_write (struct disir_instance *instance, const char *entry_id, struct 
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            continue;
+        }
         if (strcmp (entry->pi_io_id, mold->mo_plugin_name) == 0)
         {
             plugin = entry;
@@ -147,7 +161,8 @@ disir_mold_write (struct disir_instance *instance, const char *entry_id, struct 
     {
         log_warn ("The plugin '%s' associated with Mold (%p) is not loaded.",
                   mold->mo_plugin_name, mold);
-        disir_error_set (instance, "No loaded plugin available: '%s'.", mold->mo_plugin_name);
+        disir_error_set (instance, "No plugin in group '%s' available: '%s'.",
+                         group_id, mold->mo_plugin_name);
         status = DISIR_STATUS_NOT_EXIST;
     }
 
@@ -159,7 +174,8 @@ disir_mold_write (struct disir_instance *instance, const char *entry_id, struct 
 
 //! PUBLIC API
 enum disir_status
-disir_mold_entries (struct disir_instance *instance, struct disir_entry **entries)
+disir_mold_entries (struct disir_instance *instance,
+                    const char *group_id, struct disir_entry **entries)
 {
     enum disir_status status;
     struct multimap *map;
@@ -171,10 +187,10 @@ disir_mold_entries (struct disir_instance *instance, struct disir_entry **entrie
     query = NULL;
     current = NULL;
 
-    if (instance == NULL || entries == NULL)
+    if (instance == NULL || group_id == NULL || entries == NULL)
     {
-        log_debug (0, "invoked with NULL argument(s). instance (%p), entries (%p)",
-                      instance, entries);
+        log_debug (0, "invoked with NULL argument(s). instance (%p), group_id (%p), entries (%p)",
+                      instance, group_id, entries);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -188,6 +204,10 @@ disir_mold_entries (struct disir_instance *instance, struct disir_entry **entrie
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            continue;
+        }
         if (entry->pi_plugin.dp_mold_entries == NULL)
         {
             log_debug (1, "Plugin '%s' does not implement mold_entries.", entry->pi_io_id);
