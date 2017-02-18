@@ -167,6 +167,27 @@ TEST_F (StatusTest, not_supported)
     ASSERT_STREQ (status_string, "NOT SUPPORTED");
 }
 
+TEST_F (StatusTest, plugin_error)
+{
+    status = DISIR_STATUS_PLUGIN_ERROR;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "PLUGIN ERROR");
+}
+
+TEST_F (StatusTest, load_error)
+{
+    status = DISIR_STATUS_LOAD_ERROR;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "LOAD ERROR");
+}
+
+TEST_F (StatusTest, config_invalid)
+{
+    status = DISIR_STATUS_CONFIG_INVALID;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "CONFIG INVALID");
+}
+
 TEST_F (StatusTest, unknown)
 {
     status = DISIR_STATUS_UNKNOWN;
