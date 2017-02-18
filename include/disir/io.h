@@ -45,6 +45,7 @@ disir_entry_finished (struct disir_entry **entry);
 //! on this instance. Normally, this argument should be NULL.
 //!
 //! \param[in] instance Library instance.
+//! \param[in] group_id String identifier for the which group to look for entry.
 //! \param[in] entry_id String identifier for the config entry to read.
 //! \param[in] mold Optional mold that describes the config to parse. If NULL,
 //!     I/O plugin must locate a mold instead.
@@ -59,12 +60,13 @@ disir_entry_finished (struct disir_entry **entry);
 //! \return status of the plugin config_read operation.
 //!
 enum disir_status
-disir_config_read (struct disir_instance *instance, const char *entry_id,
+disir_config_read (struct disir_instance *instance, const char *group_id, const char *entry_id,
                    struct disir_mold *mold, struct disir_config **config);
 
 //! \brief Output the config object to the disir instance.
 //!
 //! \param[in] instance Library instance.
+//! \param[in] group_id String identifier for the which group to look for entry.
 //! \param[in] entry_id String identifier for output location.
 //! \param[in] config The config object to output.
 //!
@@ -77,10 +79,12 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
 //! \return status of the plugin config_write operation.
 //!
 enum disir_status
-disir_config_write (struct disir_instance *instance, const char *entry_id,
-                    struct disir_config *config);
+disir_config_write (struct disir_instance *instance, const char *group_id,
+                    const char *entry_id, struct disir_config *config);
 
 //! \brief List all the available config entries, from all plugins.
+//!
+//! \param[in] group_id String identifier for the which group to look for entry.
 //!
 //! Duplicate entries from plugins who is superseeded by another plugin
 //! is not returned.
@@ -98,7 +102,8 @@ disir_config_write (struct disir_instance *instance, const char *entry_id,
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_config_entries (struct disir_instance *instance, struct disir_entry **entries);
+disir_config_entries (struct disir_instance *instance,
+                      const char *group_id, struct disir_entry **entries);
 
 //! \brief Mark yourself finished with the configuration object
 //!

@@ -90,7 +90,7 @@ recurse_elements_valid (struct disir_context *context,
 
 //! PUBLIC API
 enum disir_status
-disir_config_read (struct disir_instance *instance, const char *entry_id,
+disir_config_read (struct disir_instance *instance, const char *group_id, const char *entry_id,
                    struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
@@ -98,10 +98,11 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
 
     plugin = NULL;
 
-    if (instance == NULL || entry_id == NULL || config == NULL)
+    if (instance == NULL || group_id == NULL || entry_id == NULL || config == NULL)
     {
-        log_debug (0, "invoked with NULL argument(s). instance (%p), entry_id (%p), config (%p)",
-                      instance, entry_id, config);
+        log_debug (0, "invoked with NULL argument(s)." \
+                      " instance (%p), group_id (%p) entry_id (%p), config (%p)",
+                      instance, group_id, entry_id, config);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -109,6 +110,10 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            continue;
+        }
         if (entry->pi_plugin.dp_config_query == NULL)
         {
             log_debug (1, "Plugin '%s' does not implement config_query", entry->pi_io_id);
@@ -151,7 +156,8 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
     }
     else
     {
-        disir_error_set (instance, "No plugin contains config entry '%s'", entry_id);
+        disir_error_set (instance, "No plugin in group '%s' contains config entry '%s'",
+                         group_id, entry_id);
         status = DISIR_STATUS_NOT_EXIST;
     }
 
@@ -161,7 +167,7 @@ disir_config_read (struct disir_instance *instance, const char *entry_id,
 
 //! PUBLIC API
 enum disir_status
-disir_config_write (struct disir_instance *instance, const char *entry_id,
+disir_config_write (struct disir_instance *instance, const char *group_id, const char *entry_id,
                     struct disir_config *config)
 {
     enum disir_status status;
@@ -169,14 +175,16 @@ disir_config_write (struct disir_instance *instance, const char *entry_id,
 
     plugin = NULL;
 
-    if (instance == NULL || entry_id == NULL || config == NULL)
+    if (instance == NULL || group_id == NULL || entry_id == NULL || config == NULL)
     {
-        log_debug (0, "invoked with NULL argument(s). instance (%p), entry_id (%p), config (%p)",
-                      instance, entry_id, config);
+        log_debug (0, "invoked with NULL argument(s)." \
+                      " instance (%p), group_id (%p), entry_id (%p), config (%p)",
+                      instance, group_id, entry_id, config);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    TRACE_ENTER ("instance (%p) entry_id (%s) config (%p)", instance, entry_id, config);
+    TRACE_ENTER ("instance (%p) group_id (%s) entry_id (%s) config (%p)",
+                 instance, group_id, entry_id, config);
 
     if (config->cf_plugin_name == NULL)
     {
@@ -189,6 +197,11 @@ disir_config_write (struct disir_instance *instance, const char *entry_id,
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            continue;
+        }
+        // TODO: is this right? cf_plugin_name?? Probably old design.
         if (strcmp (entry->pi_io_id, config->cf_plugin_name) == 0)
         {
             plugin = entry;
@@ -213,7 +226,8 @@ disir_config_write (struct disir_instance *instance, const char *entry_id,
     {
         log_warn ("The plugin '%s' associated with Config (%p) is not loaded.",
                   config->cf_plugin_name, config);
-        disir_error_set (instance, "No loaded plugin available: '%s'.", config->cf_plugin_name);
+        disir_error_set (instance, "No plugin in group '%s' available: '%s'.",
+                        group_id, config->cf_plugin_name);
         status = DISIR_STATUS_NOT_EXIST;
     }
 
@@ -223,7 +237,8 @@ disir_config_write (struct disir_instance *instance, const char *entry_id,
 
 //! PUBLIC API
 enum disir_status
-disir_config_entries (struct disir_instance *instance, struct disir_entry **entries)
+disir_config_entries (struct disir_instance *instance, const char *group_id,
+                      struct disir_entry **entries)
 {
     enum disir_status status;
     struct multimap *map;
@@ -235,10 +250,10 @@ disir_config_entries (struct disir_instance *instance, struct disir_entry **entr
     query = NULL;
     current = NULL;
 
-    if (instance == NULL || entries == NULL)
+    if (instance == NULL || group_id == NULL || entries == NULL)
     {
-        log_debug (0, "invoked with NULL argument(s). instance(%p), entries (%p)",
-                      instance, entries);
+        log_debug (0, "invoked with NULL argument(s). instance(%p), group_id (%p), entries (%p)",
+                      instance, group_id, entries);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -252,6 +267,10 @@ disir_config_entries (struct disir_instance *instance, struct disir_entry **entr
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            continue;
+        }
         if (entry->pi_plugin.dp_config_entries == NULL)
         {
             log_debug (1, "Plugin '%s' does not implement config_entries.", entry->pi_io_id);
