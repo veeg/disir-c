@@ -117,6 +117,8 @@ disir_config_read (struct disir_instance *instance, const char *group_id, const 
 
     TRACE_ENTER ("instance (%p) entry_id (%s) mold (%p) config (%p)", instance, entry_id, mold, config);
 
+    disir_error_clear (instance);
+
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
         if (strcmp (entry->pi_group_id, group_id) != 0)
@@ -195,6 +197,7 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
     TRACE_ENTER ("instance (%p) group_id (%s) entry_id (%s) config (%p)",
                  instance, group_id, entry_id, config);
 
+    disir_error_clear (instance);
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
@@ -254,6 +257,8 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
     }
 
     TRACE_ENTER ("instance (%p) group_id (%s) entries (%p)", instance, group_id, entries);
+
+    disir_error_clear (instance);
 
     map = multimap_create ((int (*)(const void *, const void *)) strcmp,
                            (unsigned long (*)(const void*)) djb2);
