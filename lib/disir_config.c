@@ -37,6 +37,15 @@ recurse_elements_valid (struct disir_context *context,
     invalid = (context->CONTEXT_STATE_INVALID == 1 ? DISIR_STATUS_INVALID_CONTEXT
                                                    : DISIR_STATUS_OK);
 
+    // Handle the root specially
+    if (context == context->cx_root_context)
+    {
+        if (collection && (invalid == DISIR_STATUS_INVALID_CONTEXT))
+        {
+            dc_collection_push_context (collection, context);
+        }
+    }
+
     status = dc_get_elements (context, &col);
     if (status != DISIR_STATUS_OK)
     {
