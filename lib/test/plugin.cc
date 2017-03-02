@@ -128,6 +128,10 @@ dio_test_mold_entries (struct disir_instance *instance,
         entry->de_entry_name = strdup (i->first.c_str());
         entry->DE_READABLE = 1;
         entry->DE_WRITABLE = 1;
+        if (i->first.back() == '/')
+        {
+            entry->DE_NAMESPACE_ENTRY = 1;
+        }
         MQ_ENQUEUE (queue, entry);
     }
 
