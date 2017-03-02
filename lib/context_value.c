@@ -219,11 +219,13 @@ dc_set_value (struct disir_context *context, const char *value, int32_t value_si
     char *endptr;
     char c;
 
+    TRACE_ENTER ("context (%p) value (%p) value_size (%d)", context, value, value_size);
+
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
-        // Already logged;
-        return status;
+        // Already logged
+        goto error;
     }
 
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
@@ -231,14 +233,15 @@ dc_set_value (struct disir_context *context, const char *value, int32_t value_si
     {
         dx_context_error_set (context, "Cannot set value to %s.",
                                        dc_context_type_string (context));
-        return status;
+        goto error;
     }
     if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
     {
         dx_context_error_set (context, "Cannot set value to %s whose top-level is %s.",
                                        dc_context_type_string (context),
                                        dc_context_type_string (context->cx_root_context));
-        return DISIR_STATUS_WRONG_CONTEXT;
+        status = DISIR_STATUS_WRONG_CONTEXT;
+        goto error;
     }
 
     switch (dc_value_type (context))
@@ -319,6 +322,9 @@ dc_set_value (struct disir_context *context, const char *value, int32_t value_si
     }
     }
 
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -329,18 +335,21 @@ dc_get_value (struct disir_context *context, int32_t output_buffer_size,
 {
     enum disir_status status;
 
+    TRACE_ENTER ("context (%p) output_buffer_size (%d) output (%p) output_size (%p)",
+                 context, output_buffer_size, output, output_size);
+
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged;
-        return status;
+        goto error;
     }
 
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_FREE_TEXT);
     if (status != DISIR_STATUS_OK)
     {
         dx_log_context (context, "cannot get value from context type");
-        return status;
+        goto error;
     }
     switch (dc_context_type (context))
     {
@@ -350,7 +359,8 @@ dc_get_value (struct disir_context *context, int32_t output_buffer_size,
         {
             dx_log_context (context,
                             "cannot get value from KEYVAL context whose root is not CONFIG");
-            return DISIR_STATUS_WRONG_CONTEXT;
+            status = DISIR_STATUS_WRONG_CONTEXT;
+            goto error;
         }
         status = dx_value_stringify (&context->cx_keyval->kv_value,
                                      output_buffer_size, output, output_size);
@@ -363,12 +373,15 @@ dc_get_value (struct disir_context *context, int32_t output_buffer_size,
     }
     default:
     {
+        log_fatal_context (context, "Unhandled context type %s", dc_context_type_string (context));
         status = DISIR_STATUS_INTERNAL_ERROR;
-        dx_crash_and_burn ("%s - UNHANDLED_CONTEXT_TYPE: %s",
-                           __FUNCTION__, dc_context_type_string (context));
+        goto error;
     }
     }
 
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -380,13 +393,14 @@ dc_set_value_string (struct disir_context *context, const char *value, int32_t v
     enum disir_status invalid;
     struct disir_value *value_storage;
 
-    TRACE_ENTER ("context: %p, value: %s, value_size: %d", context, value, value_size);
+    TRACE_ENTER ("context  (%p) value (%s) value_size (%d)", context, value, value_size);
 
     invalid = set_value_input_check (context, DISIR_VALUE_TYPE_STRING, &value_storage);
     if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
-        return invalid;
+        status = invalid;
+        goto error;
     }
 
     status = dx_value_set_string (value_storage, value, value_size);
@@ -398,9 +412,13 @@ dc_set_value_string (struct disir_context *context, const char *value, int32_t v
                               dc_value_type_string (context));
     }
     else
+    {
         status = invalid;
+    }
 
-    TRACE_EXIT ("status: %s", disir_status_string (status));
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -417,7 +435,7 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
-        return status;
+        goto error;
     }
 
     status = CONTEXT_TYPE_CHECK (context,
@@ -428,13 +446,14 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
     if (status != DISIR_STATUS_OK)
     {
         // Already logged ?
-        return status;
+        goto error;
     }
 
     if (output == NULL)
     {
         log_debug (0, "invoked with output NULL pointer");
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
     }
 
     status = dc_get_value_type (context, &type);
@@ -442,14 +461,15 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
     {
         dx_log_context (context, "cannot retrieve value type of context: %s",
                         disir_status_string (status));
-        return status;
+        goto error;
     }
 
     if (type != DISIR_VALUE_TYPE_STRING)
     {
         dx_log_context (context, "cannot get string value on context whose value type is %s",
                         dx_value_type_string (type));
-        return DISIR_STATUS_WRONG_VALUE_TYPE;
+        status = DISIR_STATUS_WRONG_VALUE_TYPE;
+        goto error;
     }
 
     switch (dc_context_type (context))
@@ -459,7 +479,8 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
         if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
         {
             dx_log_context (context, "cannot retrieve value when root context is not CONFIG");
-            return DISIR_STATUS_WRONG_CONTEXT;
+            status = DISIR_STATUS_WRONG_CONTEXT;
+            goto error;
         }
         status = dx_value_get_string (&context->cx_keyval->kv_value, output, size);
         break;
@@ -480,11 +501,14 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
     default:
     {
         log_fatal_context (context, "slipped through guard - unsupported.");
-        return DISIR_STATUS_INTERNAL_ERROR;
+        status = DISIR_STATUS_INTERNAL_ERROR;
+        goto error;
     }
     }
 
-    TRACE_EXIT ("status: %s", disir_status_string (status));
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -495,11 +519,13 @@ dc_get_value_integer (struct disir_context *context, int64_t *value)
     enum disir_status status;
     struct disir_value *storage;
 
+    TRACE_ENTER ("context (%p) value (%p)", context, value);
+
     status = get_value_input_check (context, "integer", &storage);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
-        return status;
+        goto error;
     }
 
     status = dx_value_get_integer (storage, value);
@@ -515,6 +541,9 @@ dc_get_value_integer (struct disir_context *context, int64_t *value)
                               dc_value_type_string (context));
     }
 
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -526,11 +555,14 @@ dc_set_value_integer (struct disir_context *context, int64_t value)
     enum disir_status invalid;
     struct disir_value *value_storage;
 
+    TRACE_ENTER ("context (%p) value (%d)", context, value);
+
     invalid = set_value_input_check (context, DISIR_VALUE_TYPE_INTEGER, &value_storage);
     if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
-        return invalid;
+        status = invalid;
+        goto error;
     }
 
     // Restriction check
@@ -546,7 +578,8 @@ dc_set_value_integer (struct disir_context *context, int64_t value)
     // Do not allow finalized context to change value
     if (context->CONTEXT_STATE_FINALIZED && invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
     {
-        return invalid;
+        status = invalid;
+        goto error;
     }
 
     // Mark unfulfilled value sat in constructing mode as invalid context
@@ -564,7 +597,11 @@ dc_set_value_integer (struct disir_context *context, int64_t value)
                               dc_value_type_string (context));
     }
 
-    return (status == DISIR_STATUS_OK ? invalid : status);
+    status = (status == DISIR_STATUS_OK ? invalid : status);
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
 }
 
 //! PUBLIC API
@@ -574,11 +611,13 @@ dc_get_value_float (struct disir_context *context, double *value)
     enum disir_status status;
     struct disir_value *storage;
 
+    TRACE_ENTER ("context (%p) value (%p)", context, value);
+
     status = get_value_input_check (context, "float", &storage);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
-        return status;
+        goto error;
     }
 
     status = dx_value_get_float(storage, value);
@@ -594,6 +633,9 @@ dc_get_value_float (struct disir_context *context, double *value)
                               dc_value_type_string (context));
     }
 
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -605,11 +647,14 @@ dc_set_value_float (struct disir_context *context, double value)
     enum disir_status invalid;
     struct disir_value *value_storage;
 
+    TRACE_ENTER ("context (%p) value (%f)", context, value);
+
     invalid = set_value_input_check (context, DISIR_VALUE_TYPE_FLOAT, &value_storage);
     if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
-        return invalid;
+        status = invalid;
+        goto error;
     }
 
     if (invalid != DISIR_STATUS_INVALID_CONTEXT)
@@ -620,7 +665,8 @@ dc_set_value_float (struct disir_context *context, double value)
     // Do not allow finalized context to change value
     if (context->CONTEXT_STATE_FINALIZED && invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
     {
-        return invalid;
+        status = invalid;
+        goto error;
     }
 
     // Mark unfulfilled value sat in constructing mode as invalid context
@@ -638,8 +684,13 @@ dc_set_value_float (struct disir_context *context, double value)
                               dc_value_type_string (context));
     }
     else
+    {
         status = invalid;
+    }
 
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -650,11 +701,13 @@ dc_get_value_boolean (struct disir_context *context, uint8_t *value)
     enum disir_status status;
     struct disir_value *storage;
 
+    TRACE_ENTER ("context (%p) value (%p)", context, value);
+
     status = get_value_input_check (context, "boolean", &storage);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
-        return status;
+        goto error;
     }
 
     status = dx_value_get_boolean (storage, value);
@@ -670,6 +723,9 @@ dc_get_value_boolean (struct disir_context *context, uint8_t *value)
                               dc_value_type_string (context));
     }
 
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -681,11 +737,14 @@ dc_set_value_boolean (struct disir_context *context, uint8_t value)
     enum disir_status invalid;
     struct disir_value *value_storage;
 
+    TRACE_ENTER ("context (%p) value (%d)", context, value);
+
     invalid = set_value_input_check (context, DISIR_VALUE_TYPE_BOOLEAN, &value_storage);
     if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged
-        return invalid;
+        status = invalid;
+        goto error;
     }
 
     status = dx_value_set_boolean (value_storage, value);
@@ -697,8 +756,13 @@ dc_set_value_boolean (struct disir_context *context, uint8_t value)
                               dc_value_type_string (context));
     }
     else
+    {
         status = invalid;
+    }
 
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -784,7 +848,7 @@ dc_set_value_enum (struct disir_context *context, const char *value, int32_t val
     }
 
 out:
-    TRACE_EXIT ("status: %s", disir_status_string (status));
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
