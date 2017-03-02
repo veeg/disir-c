@@ -105,19 +105,12 @@ dc_config_finalize (struct disir_context **context, struct disir_config **config
 
     // Perform full config validation.
     status = dx_validate_context (*context);
-    if (status == DISIR_STATUS_OK ||
-        status == DISIR_STATUS_INVALID_CONTEXT ||
-        status == DISIR_STATUS_ELEMENTS_INVALID)
+    // Only set state if the validate operation went as planned
+    if (status == DISIR_STATUS_OK || status == DISIR_STATUS_INVALID_CONTEXT)
     {
         *config = (*context)->cx_config;
         (*context)->CONTEXT_STATE_FINALIZED = 1;
         (*context)->CONTEXT_STATE_CONSTRUCTING = 0;
-
-        // Only let API return INVALID_CONTEXT if anything is amiss
-        if (status == DISIR_STATUS_ELEMENTS_INVALID)
-        {
-            status = DISIR_STATUS_INVALID_CONTEXT;
-        }
 
         // We do not decref context refcount on finalize
         // Deprive the user of his context reference.

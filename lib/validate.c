@@ -19,8 +19,11 @@
 
 //! STATIC API
 //!
+//! Validate the children of context if they fulfill inclusive restrictions
+//! within context.
+//!
 //! \return DISIR_STATUS_INTERNAL_ERROR if invoked with non-element bearing context.
-//! \return DISIR_STATUS_INVALID_CONTEXT if this context does not fulfill min/max restrictions
+//! \return DISIR_STATUS_RESTRICTION_VIOLATED if this context does not fulfill min/max restrictions
 //!         of its children.
 //! \return DISIR_STATUS_OK on success.
 //!
@@ -109,18 +112,25 @@ validate_inclusive_restrictions (struct disir_context *context)
         if (size < min)
         {
             context->CONTEXT_STATE_INVALID = 1;
-            // XXX Issue error report entry
+            // TODO: Add complete resolved name
+            dx_log_context (context,
+                           "%s did not fulfill minumum required entities (minimum: %d, actual: %d)",
+                           name, min, size);
+
             log_debug (2, "violated minimum restriction (count %d vx min %d)", size, min);
-            invalid = DISIR_STATUS_INVALID_CONTEXT;
+            invalid = DISIR_STATUS_RESTRICTION_VIOLATED;
         }
 
         // Maximum restriction not fufilled
         if (size > max && max != 0)
         {
             context->CONTEXT_STATE_INVALID = 1;
-            // XXX Issue error report entry
+            // TODO: Add complete resolved name
+            dx_log_context (context,
+                           "%s exceeded maximum allowed entities (maximum: %d, actual: %d)",
+                           name, max, size);
             log_debug (2, "violated maximum restriction (count %d vx max %d)", size, max);
-            invalid = DISIR_STATUS_INVALID_CONTEXT;
+            invalid = DISIR_STATUS_RESTRICTION_VIOLATED;
         }
     } while (1);
     if (mold_collection)
@@ -181,6 +191,8 @@ validate_exclusive_restrictions (struct disir_context *context)
 }
 
 //! STATIC API
+//!
+//! Check the input context will exceed a finalized parents max restriction for it.
 //!
 //! \return DISIR_STATUS_INTERNAL_ERROR if context is not KEYVAL or SECTION.
 //! \return DISIR_STATUS_RESTRICTION_VIOLATED if maximum entries for this context
@@ -278,9 +290,13 @@ validate_children (struct disir_context *context)
                 break;
         }
 
+        // XXX: What if the last context was finalized? We should still validate, shant we?
         // Break out if a serious error occurred in last iteration
         if (status_validate != DISIR_STATUS_OK && status_validate != DISIR_STATUS_INVALID_CONTEXT)
         {
+            // TODO: Verify that this scenario occurs and find a reasonable way to deal with it.
+            log_fatal ("XXX: VALIDATE CHILDREN RETURNED NON-OK (NON-INVALID) status: %s",
+                       disir_status_string (status));
             break;
         }
 
@@ -296,6 +312,7 @@ validate_children (struct disir_context *context)
         }
 
         status_validate = dx_validate_context (element);
+        // Only update invalid with either DISIR_STATUS_OK or the previous value of invalid.
         invalid = (status_validate != DISIR_STATUS_OK ? DISIR_STATUS_ELEMENTS_INVALID : invalid);
     } while (1);
 
@@ -362,8 +379,9 @@ validate_config_keyval (struct disir_context *keyval)
 //! STATIC API
 //!
 //! \return DISIR_STATUS_MOLD_MISSING if keyval doesnt have a mold equivalent.
-//! \return DISIR_STATUS_RESTRICTION_VIOLATED if keyval is finalized
+//! \return DISIR_STATUS_RESTRICTION_VIOLATED if
 //!         and violating parent max restrictions.
+//!     Also returned when
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if mold value type differs from section value type.
 //! \return DISIR_STATUS_OK on valid section.
 //!
@@ -422,17 +440,17 @@ validate_context_validity (struct disir_context *context)
     enum disir_status status;
     enum disir_status invalid;
 
+    // variable 'invalid' preserves the most important state.
     invalid = DISIR_STATUS_OK;
+    // variable 'status' is used to propagate fatal operational errors.
     status = DISIR_STATUS_OK;
 
     switch (dc_context_type (context))
     {
     case DISIR_CONTEXT_CONFIG:
     {
-        status = validate_inclusive_restrictions (context);
-        invalid = (status == DISIR_STATUS_INVALID_CONTEXT ? status : invalid);
-
-        if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
+        invalid = validate_inclusive_restrictions (context);
+        if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_RESTRICTION_VIOLATED)
         {
             // Something is horribly wrong - break out.
             break;
@@ -443,6 +461,10 @@ validate_context_validity (struct disir_context *context)
     {
         // TODO: Clear error reports
         status = validate_children (context);
+        // Update invalid with new state, if non were already present.
+        invalid = (invalid == DISIR_STATUS_OK ? status : invalid);
+        // Clear ELEMENTS_INVALID status if present - its not a fatal error to proagate
+        status = (status == DISIR_STATUS_ELEMENTS_INVALID ? DISIR_STATUS_OK : status);
         break;
     }
     case DISIR_CONTEXT_SECTION:
@@ -467,6 +489,10 @@ validate_context_validity (struct disir_context *context)
         }
 
         status = validate_children (context);
+        // Update invalid with new state, if non were already present.
+        invalid = (invalid == DISIR_STATUS_OK ? status : invalid);
+        // Clear ELEMENTS_INVALID status if present - its not a fatal error to proagate
+        status = (status == DISIR_STATUS_ELEMENTS_INVALID ? DISIR_STATUS_OK : status);
         break;
     }
     case DISIR_CONTEXT_KEYVAL:
@@ -492,7 +518,7 @@ validate_context_validity (struct disir_context *context)
                 context->cx_keyval->kv_default_queue == NULL)
             {
                 dx_log_context (context, "Missing default entry for keyval.");
-                invalid = DISIR_STATUS_INVALID_CONTEXT;
+                invalid = DISIR_STATUS_DEFAULT_MISSING;
             }
         }
         break;
@@ -505,6 +531,7 @@ validate_context_validity (struct disir_context *context)
     }
     }
 
+    // status must be a fatal status, else return the invalid status
     return (status != DISIR_STATUS_OK ? status : invalid);
 }
 
@@ -522,21 +549,61 @@ dx_validate_context (struct disir_context *context)
     // The below checks will return it to invalid state if checks fail.
     context->CONTEXT_STATE_INVALID = 0;
 
+    // XXX: This validity check may return any number of error conditions.
+    // This is used to determine if finalization of calling context may be done.
     status = validate_context_validity (context);
-    if (status == DISIR_STATUS_INVALID_CONTEXT ||
-        status == DISIR_STATUS_WRONG_VALUE_TYPE ||
-        status == DISIR_STATUS_MOLD_MISSING ||
-        status == DISIR_STATUS_RESTRICTION_VIOLATED)
+
+    // If our parent context is finalized, and we get any sort of error, we mark invalid state
+    // and return the original status back - we do not allow this context to be finalized
+    // (which means that INVALID_CONTEXT is a terrible status on error conditions - should remove that)
+    if (context->cx_parent_context
+        && context->cx_parent_context->CONTEXT_STATE_FINALIZED
+        && status != DISIR_STATUS_OK)
+    {
+        // if status is DISIR_STATUS_INVALID_CONTEXT, we have made a mistake earlier.
+        if (status == DISIR_STATUS_INVALID_CONTEXT)
+        {
+            dx_crash_and_burn ("VALIDITY CHECK PROGRAMMER ERROR: RETURNED INVALID_CONTEXT");
+        }
+
+        // Do nothing - we are returning status as-is.
+    }
+    // We are invalid - mark us as such.
+    // ELEMENTS_INVALID does NOT put the calling context into invalid state.
+    else if (status == DISIR_STATUS_WRONG_VALUE_TYPE
+             || status == DISIR_STATUS_DEFAULT_MISSING
+             || status == DISIR_STATUS_MOLD_MISSING
+             || status == DISIR_STATUS_RESTRICTION_VIOLATED)
     {
         context->CONTEXT_STATE_INVALID = 1;
-        if (context->cx_parent_context &&
-            context->cx_parent_context->CONTEXT_STATE_CONSTRUCTING)
+        // QUESTION: Why do we check parent_context?
+        //  Changed to check our own context instead. Document any side-effects when encountered.
+        if (context->CONTEXT_STATE_CONSTRUCTING)
         {
             status = DISIR_STATUS_INVALID_CONTEXT;
         }
+        else
+        {
+            log_debug (4, "context is not constructing.. Returning trivial error: %s",
+                       disir_status_string (status));
+        }
+    }
+    // Even though we ourselves are not invalid, our children are.
+    // Since we are in constructing mode, we will return INVALID_CONTEXT instead
+    else if (status == DISIR_STATUS_ELEMENTS_INVALID
+             && context->CONTEXT_STATE_CONSTRUCTING)
+    {
+        log_debug_context (4, context, "we are not invalid, but our children are." \
+                           " Since we are constructing, returning INVALID_CONTEXT either way.");
+        status = DISIR_STATUS_INVALID_CONTEXT;
+    }
+    else
+    {
+        log_debug (4, "validate context returned non-trivial error: %s",
+                   disir_status_string (status));
     }
 
-    TRACE_EXIT ("status: %s", disir_status_string (status));
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
