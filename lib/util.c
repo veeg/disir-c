@@ -39,6 +39,10 @@ const char *disir_status_strings[] = {
     "PLUGIN ERROR",
     "LOAD ERROR",
     "CONFIG INVALID",
+    "GROUP MISSING",
+    "PERMISSION ERROR",
+    "FILESYSTEM ERROR",
+    "DEFAULT MISSING",
     "UNKNOWN",
 };
 

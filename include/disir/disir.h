@@ -66,6 +66,14 @@ enum disir_status
     DISIR_STATUS_LOAD_ERROR,
     //! The configuration entry is invalid.
     DISIR_STATUS_CONFIG_INVALID,
+    //! The operation was attempted on a group that does not exist.
+    DISIR_STATUS_GROUP_MISSING,
+    //! The operation was denied due to insufficient permissions.
+    DISIR_STATUS_PERMISSION_ERROR,
+    //! An operation against the filesystem failed.
+    DISIR_STATUS_FS_ERROR,
+    //! The default property is missing from a context.
+    DISIR_STATUS_DEFAULT_MISSING,
 
     //! Sentinel status - not returned by any API
     DISIR_STATUS_UNKNOWN // Must be the last status in enumeration
