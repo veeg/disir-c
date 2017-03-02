@@ -511,6 +511,8 @@ enum disir_status dc_set_value_enum (struct disir_context *context,
 //!
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
+//! \return DISIR_STATUS_INVALID_CONTEXT if context is under construction, and this operation
+//!     caused it to enter an invalid state.
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status dc_set_value_integer (struct disir_context *context, int64_t value);
