@@ -1,87 +1,54 @@
 = *Disir* Developer Documentation
 
-== Contents of _Disir Config_
-
-* **Disir_config_attributes**, which only includes the named key/value pairs listed above.
-
-* A **keyval** defines a named key, and associates it with a single value. The **keyval** name is not necessarily unique - whether or not this the case is defined by the _Disir Schema_.
-* A **section** which contains one or more **keyval**s. The **section** is named by a canonical identifier, which cannot be the same as any **keyval**. There may be multiple **section**s with the same name active at once. This is again defined by the _Disir Schema_.
-
-Both **keyval** and **section** may have a **_disabled_** attribute - This may not necessarily feasible to represent in all text-based formats, but still a feature of _Disir Config_. When the element is disabled, it will still be parsed and stored in the in-memory object representation, but it will not be validated or affect the state of the configuration file at all.
-
-== _Disir Schema_
-
-Defines all available **keyval**s and **section**s for a configuration file. Many of the elements within the schema are _versioned_, with an **introduced** and **deprecrated** attribute. This means that the whole history of the configuration file is expressed through the same schema file. One are able to update any old version of a configuration file, since all changes are recorded.
-
-== Key elements
-
-* **Introduced**: At what semantic version of the schema this element  is valid from.
-* **Deprecrated**: At what semantic version of the schema this element is no longer valid. If the semver of deprecated is less or equal than **introduced**, the the schema is **invalid**.
-  * **Deprecation notice**: Why was this element deprecated? String explanation for it goes right here!
-* **Documentation**: Text string documenting the intent behind this keyval
-  * **introduced**: When was this documentation introduced! There may be multiple documentation entries to keyval. This is simply to update the documentation between major updates of the element. Documentation is not deprecated, only surpassed.
-
-* **Value type**: What kind of value does this element hold. Only applicable to the *keyval* element.
-  * Boolean
-  * Integer
-  * Float
-  * String
-* **Restriction**: What restrictions are in place either on the key or the value. The key can either conflict with existing keys, be required if another key exists. The value can also be restricted to hold a specific value of its type, or a range within it.
-
-
-A **section** contains 
-
-** **Introduced**
-** **Deprecate**
-** **Restriction**s
-** **keyval**s
-
-A **keyval** contains
-
-** **Introduced**
-** **Deprecated**
-** **Documentation**
-** **Value type**
-** **Restriction**s
-
-
-== Disir IO Interface
-
-Since _Disir_ has an in-memory object model agnostic to the textual representation on disk,
-it provides a highly extensible I/O interface.
-It is a series of reader/writer operations that expect the I/O interface to perform a
-dedicated task to/from the disk/resource format it represents.
-As such, we provide interfaces for
+This document details the nitty gritty details of how Disir is designed and
+rationale behind various implementation details.
 
 [horizontal]
-**XML**:: Read and write XML formated _Disir_ files and construct the in-memory object model.
-**JSON**:: Read and write JSON formatted _Disir_ files to/from the in-memory object model.
-**INI**:: Read and write INI formatted _Disir files to/from the in-memory object model.
-This format is restricted from the full feature set of Disir.
+.Dictionary
+Element container:: Either context SECTION, CONFIG or MOLD.
+Element:: Either context SECTION or KEYVAL.
 
-The operations that the I/O Interface must support are
-[source, C]
-----
-// Read the configuration identified by the passed id and populate a configuration object.
-dio_config_read(id)
+== Context validity
 
-// Write the config object to the location identified by the passed id.
-dio_config_write(id, config)
+A context may have one of two states: constructing or finalized. When a context is constructing,
+Disir will still process any operation that places the context in an invalid state, and the
+status code DISIR_STATUS_INVALID_CONTEXT is returned. This status shall only ever be returned
+from context functions when the context is in constructing state.
 
-// Return only the semantic version of this config file.
-dio_config_version(id)
+The rationale for handling the complexity of storing objects with invalid state is to allow
+unserialization to completely construct the object, regardless of how invalid it is.
+After the unserialization is complete, and the object is finalized, the erroneous conditions
+can be programmatically retrieved and displayed to a human user who may take corrective measures.
+It is far more user friendly to be prompted with fully parsed view of the object, with
+only those that are invalid marked with an appropriate error message, than throwing 'an error has
+ocurred in parsing. Please fix' at the user.
 
-// Return only the group this config file is associated with.
-dio_config_group(id)
+Finalized state means that any operation that places the context in an invalid state, shall be
+denied with an appropriate status, e.g., DISIR_STATUS_RESTRICTION_VIOLATED.
 
-// Read the schema located at the passed identifier, return the schema object.
-dio_schema_read(id)
+There are quite a few cases that may lead objects into invalid state.
 
-// Write the schema object identified by the passed id, in the appropriate group.
-dio_schema_write(id, group, schema)
-----
+* Element containers may be invalid if an element in its mold does not
+fulfill maximum or minimum requirements.
+* Element may be invalid because its name is not found in the mold.
+* Element may be invalid because its value type is not equal to that of the mold.
+* Element may be invalid because its value does not satisfy one of the exclusive restrictions
+put in place by the mold.
+* Finalizing invalid context to a finalized parent shall be dis-allowed. Do not
+enter the context into the element storage of the parent(element container).
 
-== Notes:
+From the above rules, we may conclude that CONFIG context shall not be in invalid state
+if one of their elements are invalid, unless that invalidity is due to maximum or minimum requirements.
+
+Internal functions shall _NOT_ return DISIR_STATUS_INVALID_CONTEXT, that is solely the
+responsibility of the outer public API methods to convert based on context state. (This is
+with the exception of dx_validate_context, which hides all the rough details of validating
+our contexts)
+
+QUESTION: Shall the element within an element container be invalid if it does not fulfill
+the maximum/minimum requirements of its element container?
+
+== Notes
 
 *What are there calls to `dx_crash_and_burn` in library code that exits the program*?
 Simple answer is there shouldnt be, but they are put in place during initial development
