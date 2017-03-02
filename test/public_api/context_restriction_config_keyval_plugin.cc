@@ -162,7 +162,7 @@ TEST_F (ContextRestrictionConfigConstructingKeyvalPluginTest, integer_restrictio
 
     // We are allowed to set the value, but it will become invalid
     status = dc_set_value_integer (context_keyval, 12);
-    ASSERT_STATUS (DISIR_STATUS_RESTRICTION_VIOLATED, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     // Assert context is invalid
     status = dc_context_valid (context_keyval);
