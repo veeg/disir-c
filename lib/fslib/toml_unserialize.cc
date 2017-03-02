@@ -29,7 +29,7 @@ dio_toml_parse_array (struct disir_instance *instance, const char *key,
     for (const auto& entry : array.as<toml::Array> ())
     {
         status = dio_toml_unserialize_all (instance, key, entry, parent);
-        if (status != DISIR_STATUS_OK)
+        if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
         {
             break;
         }
@@ -49,7 +49,7 @@ dio_toml_parse_table (struct disir_instance *instance, const toml::Value& table,
     for (const auto& kv : table.as<toml::Table> ())
     {
         status = dio_toml_unserialize_all (instance, kv.first.c_str (), kv.second, parent);
-        if (status != DISIR_STATUS_OK)
+        if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
         {
             break;
         }
@@ -74,7 +74,7 @@ dio_toml_unserialize_primitive (struct disir_instance *instance, const char *key
     }
 
     status = dc_set_name (context, key, strlen (key));
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_NOT_EXIST)
     {
         // QUESTION: Handle the sitation?
         disir_log_user (instance, "TOML: Name error for plain KEYVAL: %s",
@@ -126,7 +126,7 @@ dio_toml_unserialize_primitive (struct disir_instance *instance, const char *key
     }
     }
 
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         disir_log_user (instance, "TOML: Value not accepted: %s",
                                   disir_status_string (status));
@@ -156,10 +156,8 @@ dio_toml_unserialize_table (struct disir_instance *instance, const char *key,
     }
 
     status = dc_set_name (context, key, strlen (key));
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_NOT_EXIST)
     {
-        // QUESTION: Handle the sitation?
-        // TODO: Definately handle this situvation
         disir_log_user (instance, "TOML: Name error for SECTION: %s",
                                   disir_status_string (status));
         goto error;
@@ -167,7 +165,7 @@ dio_toml_unserialize_table (struct disir_instance *instance, const char *key,
 
     // Parse the table and append it to the newly created section
     status = dio_toml_parse_table (instance, table, context);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         disir_log_user (instance, "TOML: Sub-table failed convert: %s",
                                   disir_status_string (status));
@@ -255,9 +253,10 @@ dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
     toml::ParseResult pr = toml::parse (file);
     if (pr.valid() == false)
     {
-        // LOG ERROR
+        disir_log_user (instance, "TOML: Parse error: %s", pr.errorReason.c_str());
+        disir_error_set (instance, pr.errorReason.c_str());
         // XXX: Revise error code
-        return DISIR_STATUS_INTERNAL_ERROR;
+        return DISIR_STATUS_FS_ERROR;
     }
     toml::Value& root = pr.value;
 
@@ -274,11 +273,11 @@ dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
     {
         struct semantic_version semver;
 
-        disir_log_user (instance, "we have the config!");
+        disir_log_user (instance, "TOML: we have the config!");
         if (version->is<std::string>() == false)
         {
             // XXX: set error on CONFIG_CONTEXT
-            disir_error_set (instance, "Attribute %s is of unexpected type %s."
+            disir_error_set (instance, "TOML: Attribute %s is of unexpected type %s."
                                        " Expecting string. Defaulting to version 1.0.0",
                                        ATTRIBUTE_KEY_DISIR_CONFIG_VERSION,
                                        version->typeAsString ());
@@ -289,7 +288,7 @@ dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
             if (status != DISIR_STATUS_OK)
             {
                 // XXX: set error on CONFIG_CONTEXT
-                disir_error_set (instance, "Malformed %s string '%s'.",
+                disir_error_set (instance, "TOML: Malformed %s string '%s'.",
                                            ATTRIBUTE_KEY_DISIR_CONFIG_VERSION,
                                            version->as<std::string>().c_str ());
             }
@@ -297,7 +296,7 @@ dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
             if (status != DISIR_STATUS_OK)
             {
                 // TODO. Determine how to handle this situvation.
-                disir_log_user (instance, "Failed to set version on CONTEXT_CONFIG: %s",
+                disir_log_user (instance, "TOML: Failed to set version on CONTEXT_CONFIG: %s",
                                           disir_status_string (status));
             }
         }
@@ -306,25 +305,26 @@ dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
         // XXX TOML: erase may be nested. Key must be quoted
         if (root.erase (ATTRIBUTE_KEY_DISIR_CONFIG_VERSION_QUOTED) == false)
         {
-            disir_log_user (instance, "Failed to erase %s from parsed TOML object.",
+            disir_log_user (instance, "TOML: Failed to erase %s from parsed TOML object.",
                                       ATTRIBUTE_KEY_DISIR_CONFIG_VERSION);
         }
     }
     else
     {
-        disir_log_user (instance, "we do not have the config!");
+        disir_log_user (instance, "TOML: we do not have the config!");
     }
 
     // Parse the entire root object into the disir config
     status = dio_toml_parse_table (instance, root, context_config);
     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
-        disir_log_user (instance, "Fatal error in toml unserialize. Cannot provide config object");
+        disir_log_user (instance, "TOML: Fatal error in toml unserialize. Cannot provide config object");
         dc_destroy (&context_config);
         return status;
     }
 
+    status = dc_config_finalize (&context_config, config);
     disir_log_user (instance, "TRACE EXIT dio_toml_unserialize_config");
-    return dc_config_finalize (&context_config, config);
+    return status;
 }
 
