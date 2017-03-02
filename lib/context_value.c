@@ -140,7 +140,7 @@ set_value_input_check (struct disir_context *context, enum disir_value_type type
     // Use cases this function shall handle:
     // 1: Config Keyval in construction state with no mold equivalent
     //      (no set_name has been invoked)
-    //      solution: Store input value in FFA value storage. set INVALID state.
+    //      solution: Store input value in value storage. set INVALID state.
     //                Construct error message.
     //      return: DISIR_STATUS_MOLD_MISSING
     // 2: Config Keyval in construction state with invalid context
@@ -152,7 +152,8 @@ set_value_input_check (struct disir_context *context, enum disir_value_type type
     //      return: DISIR_STATUS_INVALID_CONTEXT
     // 4: Config Keyval in finalized state with with no mold equivalent
     //      (By extension, also invalid state)
-    //      solution: store input value in FFA value storage.
+    //      solution: store input value in value storage. We cannot reason about its type.
+    //      return: DISIR_STATUS_INVALID_CONTEXT
     // 5: Config Keyval in finalized state with mold equivalent
     //      Nominal use case.
 
@@ -308,6 +309,7 @@ dc_set_value (struct disir_context *context, const char *value, int32_t value_si
     }
     case DISIR_VALUE_TYPE_ENUM:
     {
+        // TODO: Implement dc_set_value enum
         dx_crash_and_burn ("dc_set_value ENUM NOT HANDLED!");
     }
     case DISIR_VALUE_TYPE_UNKNOWN:
