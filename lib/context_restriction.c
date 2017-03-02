@@ -1,5 +1,6 @@
 // Standard includes
 #include <stdlib.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include <limits.h>
@@ -16,6 +17,10 @@
 #include "section.h"
 #include "config.h"
 #include "mold.h"
+
+//! Define the size of the buffer used to name values of all restrictions
+//! active in a restriction check
+#define RESTRICTION_ENTRIES_BUFFER_SIZE 4096
 
 const char *disir_restriction_strings[] = {
     "INVALID",
@@ -1058,7 +1063,11 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
     int restriction_entries_oor = 0;
     double value;
 
+    char allowed_values[RESTRICTION_ENTRIES_BUFFER_SIZE];
+    int allowed_written;
+
     status = DISIR_STATUS_OK;
+    allowed_written = 0;
 
     TRACE_ENTER ("%s(%p), int (%d) float (%f)", dc_context_type_string (context), context,
                                                 integer_value, float_value);
@@ -1115,6 +1124,29 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
         {
             log_debug (9, "value (%f), min (%f), max (%f)", value,
                           entry->re_value_min, entry->re_value_max);
+
+            if (dc_value_type (context) == DISIR_VALUE_TYPE_INTEGER)
+            {
+                allowed_written += snprintf (allowed_values + allowed_written,
+                                             RESTRICTION_ENTRIES_BUFFER_SIZE - allowed_written,
+                                             "[%lld, %lld], ",
+                                             (long long int)entry->re_value_min,
+                                             (long long int)entry->re_value_max);
+            }
+            else if (dc_value_type (context) == DISIR_VALUE_TYPE_FLOAT)
+            {
+                allowed_written += snprintf (allowed_values + allowed_written,
+                                             RESTRICTION_ENTRIES_BUFFER_SIZE - allowed_written,
+                                             "[%f, %f], ",
+                                             entry->re_value_min, entry->re_value_max);
+            }
+            if (allowed_written >= RESTRICTION_ENTRIES_BUFFER_SIZE)
+            {
+                // Set the written property to the size of the buffer, dis-allowing any
+                // further writes.
+                allowed_written = RESTRICTION_ENTRIES_BUFFER_SIZE;
+            }
+
             if (value >= entry->re_value_min && value <= entry->re_value_max)
             {
                 log_debug (8, "Exclusive restriction %s(%p) fufilled. (Value (%f) == [%f, %f])",
@@ -1127,6 +1159,26 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
         case DISIR_RESTRICTION_EXC_VALUE_NUMERIC:
         {
             log_debug (9, "value (%f) numeric (%f)", value, entry->re_value_numeric);
+
+            if (dc_value_type (context) == DISIR_VALUE_TYPE_INTEGER)
+            {
+                allowed_written += snprintf (allowed_values + allowed_written,
+                                             RESTRICTION_ENTRIES_BUFFER_SIZE - allowed_written,
+                                             "%lld, ", (long long int)entry->re_value_numeric);
+            }
+            else if (dc_value_type (context) == DISIR_VALUE_TYPE_FLOAT)
+            {
+                allowed_written += snprintf (allowed_values + allowed_written,
+                                             RESTRICTION_ENTRIES_BUFFER_SIZE - allowed_written,
+                                             "%f, ", entry->re_value_numeric);
+            }
+            if (allowed_written >= RESTRICTION_ENTRIES_BUFFER_SIZE)
+            {
+                // Set the written property to the size of the buffer, dis-allowing any
+                // further writes.
+                allowed_written = RESTRICTION_ENTRIES_BUFFER_SIZE;
+            }
+
             if (value == entry->re_value_numeric)
             {
                 log_debug (6, "Exclusive restriction %s(%p) fufilled. (Value (%f) == %f)",
@@ -1140,6 +1192,17 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
         case DISIR_RESTRICTION_EXC_VALUE_ENUM:
         {
             log_debug (9, "value (%s) enum (%s)", string_value, entry->re_value_string);
+
+            allowed_written += snprintf (allowed_values + allowed_written,
+                                         RESTRICTION_ENTRIES_BUFFER_SIZE - allowed_written,
+                                         "'%s', ", entry->re_value_string);
+            if (allowed_written >= RESTRICTION_ENTRIES_BUFFER_SIZE)
+            {
+                // Set the written property to the size of the buffer, dis-allowing any
+                // further writes.
+                allowed_written = RESTRICTION_ENTRIES_BUFFER_SIZE;
+            }
+
             if (strcmp (string_value, entry->re_value_string) == 0)
             {
                 // QUESTION: Check length aswell ?
@@ -1157,12 +1220,37 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
 
     });
 
+    // Strip the last ', ' from allowed_values buffer
+    if (allowed_written != 0)
+    {
+        allowed_values[allowed_written - 2] = '\0';
+    }
+
     // Entry did not fulfill the exclusive restrictions. Get out' here!
     if (exclusive_fulfilled == 0 && MQ_SIZE (*queue) > restriction_entries_oor)
     {
         log_debug (4, "Exclusive restriction(s) violated."
                       " Out of range (%d) vs entires (%d)",
                       restriction_entries_oor, MQ_SIZE (*queue));
+
+        switch (dc_value_type (context))
+        {
+        case DISIR_VALUE_TYPE_INTEGER:
+            dx_context_error_set (context, "No exclusive restrictions fulfilled for value %lld." \
+                                  " Must be one of: %s", integer_value, allowed_values);
+            break;
+        case DISIR_VALUE_TYPE_FLOAT:
+            dx_context_error_set (context, "No exclusive restrictions fulfilled for value %f." \
+                                  " Must be one of: %s", float_value, allowed_values);
+            break;
+        case DISIR_VALUE_TYPE_ENUM:
+            dx_context_error_set (context, "No exclusive restrictions fulfilled for value %s." \
+                                  " Must be one of: %s", string_value, allowed_values);
+            break;
+        default:
+            // Do not handle
+            break;
+        }
 
         status = DISIR_STATUS_RESTRICTION_VIOLATED;
     }
@@ -1175,6 +1263,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
         MQ_SIZE(*queue) == restriction_entries_oor)
     {
         log_debug (4, "Missing enum restrictions. Keyval considered invalid.");
+        dx_context_error_set (context, "Enum requires atleast one value restriction.");
         status = DISIR_STATUS_RESTRICTION_VIOLATED;
     }
 
