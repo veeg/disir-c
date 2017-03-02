@@ -581,11 +581,14 @@ dc_set_value_integer (struct disir_context *context, int64_t value)
         status = invalid;
         goto error;
     }
+    // We are constructing
 
     // Mark unfulfilled value sat in constructing mode as invalid context
+    // Also return INVALID_CONTEXT to the caller
     if (invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
     {
         context->CONTEXT_STATE_INVALID = 1;
+        invalid = DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = dx_value_set_integer (value_storage, value);
