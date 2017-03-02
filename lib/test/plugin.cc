@@ -146,7 +146,23 @@ dio_test_mold_query (struct disir_instance *instance, struct disir_plugin *plugi
     std::string name(entry_id);
     if (molds.count (name) == 0)
         return DISIR_STATUS_NOT_EXIST;
-    else
-        return DISIR_STATUS_EXISTS;
+
+
+    if (entry != NULL)
+    {
+        *entry  = (struct disir_entry *) calloc (1, sizeof (struct disir_entry));
+        if (*entry == NULL)
+            return DISIR_STATUS_NO_MEMORY;
+
+        (*entry)->de_entry_name = strdup (name.c_str());
+        (*entry)->DE_READABLE = 1;
+        (*entry)->DE_WRITABLE = 1;
+        if (name.back() == '/')
+        {
+            (*entry)->DE_NAMESPACE_ENTRY = 1;
+        }
+    }
+
+    return DISIR_STATUS_EXISTS;
 }
 
