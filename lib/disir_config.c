@@ -121,21 +121,27 @@ disir_config_read (struct disir_instance *instance, const char *group_id, const 
     ({
         if (strcmp (entry->pi_group_id, group_id) != 0)
         {
+            entry = entry->next;
             continue;
         }
         if (entry->pi_plugin.dp_config_query == NULL)
         {
             log_debug (1, "Plugin '%s' does not implement config_query", entry->pi_io_id);
+            entry = entry->next;
             continue;
         }
         status = entry->pi_plugin.dp_config_query (instance, &entry->pi_plugin, entry_id, NULL);
         if (status == DISIR_STATUS_NOT_EXIST)
+        {
+            entry = entry->next;
             continue;
+        }
         if (status != DISIR_STATUS_EXISTS)
         {
             log_warn ("Plugin '%s' (id %s) failed to query for entry '%s': %s",
                       entry->pi_io_id, entry->pi_plugin.dp_name,
                       entry_id), disir_status_string (status);
+            entry = entry->next;
             continue;
         }
 
@@ -194,6 +200,7 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
     ({
         if (strcmp (entry->pi_group_id, group_id) != 0)
         {
+            entry = entry->next;
             continue;
         }
 
@@ -258,11 +265,13 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
     ({
         if (strcmp (entry->pi_group_id, group_id) != 0)
         {
+            entry = entry->next;
             continue;
         }
         if (entry->pi_plugin.dp_config_entries == NULL)
         {
             log_debug (1, "Plugin '%s' does not implement config_entries.", entry->pi_io_id);
+            entry = entry->next;
             continue;
         }
 
@@ -272,6 +281,7 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
         {
             log_warn ("Plugin '%s' queried for config entries failed with status: %s",
                       entry->pi_io_id, disir_status_string (status));
+            entry = entry->next;
             continue;
         }
 
