@@ -33,15 +33,18 @@ dio_toml_config_write (struct disir_instance *instance,
 
 //! \brief TOML imlementation of config_entries
 //!
-enum disir_status dio_toml_config_entries (struct disir_instance *instance,
-                                           struct disir_plugin *plugin,
-                                           struct disir_entry **entries);
+enum disir_status
+dio_toml_config_entries (struct disir_instance *instance,
+                         struct disir_plugin *plugin,
+                         struct disir_entry **entries);
 
 //! \brief TOML imlementation of config_query
 //!
-enum disir_status dio_toml_config_query (struct disir_instance *instance,
-                                         struct disir_plugin *plugin,
-                                         const char *entry_id);
+enum disir_status
+dio_toml_config_query (struct disir_instance *instance,
+                       struct disir_plugin *plugin,
+                       const char *entry_id,
+                       struct disir_entry **entry);
 
 //! TODO: docs
 enum disir_status
