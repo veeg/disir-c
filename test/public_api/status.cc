@@ -188,6 +188,34 @@ TEST_F (StatusTest, config_invalid)
     ASSERT_STREQ (status_string, "CONFIG INVALID");
 }
 
+TEST_F (StatusTest, group_missing)
+{
+    status = DISIR_STATUS_GROUP_MISSING;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "GROUP MISSING");
+}
+
+TEST_F (StatusTest, permission_error)
+{
+    status = DISIR_STATUS_PERMISSION_ERROR;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "PERMISSION ERROR");
+}
+
+TEST_F (StatusTest, fs_error)
+{
+    status = DISIR_STATUS_FS_ERROR;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "FILESYSTEM ERROR");
+}
+
+TEST_F (StatusTest, default_missing)
+{
+    status = DISIR_STATUS_DEFAULT_MISSING;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "DEFAULT MISSING");
+}
+
 TEST_F (StatusTest, unknown)
 {
     status = DISIR_STATUS_UNKNOWN;
