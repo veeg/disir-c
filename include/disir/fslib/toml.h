@@ -17,17 +17,6 @@ extern "C"{
 //! in the deployed configurations in a filesystem.
 
 
-//! Magic constant used by plugin methods expecting a fslib_storage pointer.
-#define FSLIB_MAGIC_CONSTANT 0xF5DDA61C
-
-struct fslib_storage
-{
-    //! Magic constant 0xF5DDA61C
-    int64_t     fs_magic;
-    //! Configuration files map to this prefix + entry_id
-    char        *fs_config_path_prefix;
-};
-
 //! \brief TOML implementation of config_read
 //!
 enum disir_status
