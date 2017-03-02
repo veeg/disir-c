@@ -105,6 +105,19 @@ enum disir_status
 disir_config_entries (struct disir_instance *instance,
                       const char *group_id, struct disir_entry **entries);
 
+//! \brief Query for the existence of a config entry within a group.
+//!
+//! \param[out] entry Optional output structure containing entry details. If supplied,
+//!     caller must free the entry struct with disir_entry_finished().
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either `instance`, `group_id` or `entry_id` are NULL.
+//! \return DISIR_STATUS_NOT_EXIST if the entry does not exist.
+//! \return DISIR_STATUS_EXISTS if the entry exists.
+//!
+enum disir_status
+disir_config_query (struct disir_instance *instance, const char *group_id,
+                    const char *entry_id, struct disir_entry **entry);
+
 //! \brief Mark yourself finished with the configuration object
 //!
 //! \param[in,out] config Object to mark as finished. Turns the pointer to NULL
@@ -177,6 +190,19 @@ disir_mold_write (struct disir_instance *instance, const char *groupd_id,
 enum disir_status
 disir_mold_entries (struct disir_instance *instance,
                     const char *group_id, struct disir_entry **entries);
+
+//! \brief Query for the existence of a mold entry within a group.
+//!
+//! \param[out] entry Optional output structure containing entry details. If supplied,
+//!     caller must free the entry struct with disir_entry_finished().
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either `instance`, `group_id` or `entry_id` are NULL.
+//! \return DISIR_STATUS_NOT_EXIST if the entry does not exist.
+//! \return DISIR_STATUS_EXISTS if the entry exists.
+//!
+enum disir_status
+disir_mold_query (struct disir_instance *instance, const char *group_id,
+                  const char *entry_id, struct disir_entry **entry);
 
 //! \brief Mark yourself finished with the mold object.
 //!

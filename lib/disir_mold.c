@@ -258,6 +258,64 @@ out:
 
 //! PUBLIC API
 enum disir_status
+disir_mold_query (struct disir_instance *instance, const char *group_id,
+                  const char *entry_id, struct disir_entry **entry_internal)
+{
+    enum disir_status status;
+    struct disir_plugin_internal *plugin;
+
+    if (instance == NULL || group_id == NULL || entry_id == NULL)
+    {
+        log_debug (0, "invoked with NULL argument(s). instance(%p), group_id (%p), entry_id (%p)",
+                      instance, group_id, entry_id);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    TRACE_ENTER ("instance (%p) group_id (%s) entry_id (%s) entry_internal (%p)",
+                 instance, group_id, entry_id, entry_internal);
+
+    disir_error_clear (instance);
+
+    MQ_FOREACH (instance->dio_plugin_queue,
+    ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            entry = entry->next;
+            continue;
+        }
+
+        if (entry->pi_plugin.dp_mold_query == NULL)
+        {
+            log_debug (1, "Plugin '%s' does not implement mold_query.", entry->pi_io_id);
+            entry = entry->next;
+            continue;
+        }
+
+        plugin = entry;
+    }));
+
+    if (plugin)
+    {
+        status = plugin->pi_plugin.dp_mold_query (instance, &plugin->pi_plugin,
+                                                  entry_id, entry_internal);
+        if (status != DISIR_STATUS_EXISTS && status != DISIR_STATUS_NOT_EXIST)
+        {
+            log_warn ("Plugin '%s' config_query failed with status: %s",
+                      plugin->pi_io_id, disir_status_string (status));
+        }
+    }
+    else
+    {
+        disir_error_set (instance, "No plugin available to handle operation.");
+        status = DISIR_STATUS_GROUP_MISSING;
+    }
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
 disir_mold_finished (struct disir_mold **mold)
 {
     enum disir_status status;
