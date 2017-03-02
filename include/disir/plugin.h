@@ -74,13 +74,16 @@ typedef enum disir_status (*config_entries) (struct disir_instance *instance,
 //! \param[in] instance Library instance associated with this I/O operation.
 //! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[in] entry_id String identifier for the config entry to query for.
+//! \param[out] entry Optional pointer to populate with an entry structure describing
+//!     the entry that exists. The caller must take care to call disir_entry_finished().
 //!
 //! \return DISIR_STATUS_NOT_EXIST if plugin does not contain `entry_id` config.
 //! \return DISIR_STATUS_EXISTS if `entry_id` config is provided by plugin.
 //!
 typedef enum disir_status (*config_query) (struct disir_instance *instance,
                                            struct disir_plugin *plugin,
-                                           const char *entry_id);
+                                           const char *entry_id,
+                                           struct disir_entry **entry);
 
 //! \brief Function signature for plugin to implement reading mold object.
 //!
@@ -130,13 +133,16 @@ typedef enum disir_status (*mold_entries) (struct disir_instance *instance,
 //! \param[in] instance Library instance associated with this I/O operation.
 //! \param[in] plugin The plugin instance this operation is associated with.
 //! \param[in] entry_id String identifier for the mold entry to query for.
+//! \param[out] entry Optional pointer to populate with an entry structure describing
+//!     the entry that exists. The caller must take care to call disir_entry_finished().
 //!
 //! \return DISIR_STATUS_NOT_EXIST if plugin does not contain `entry_id` mold.
 //! \return DISIR_STATUS_EXISTS if `entry_id` mold is provided by plugin.
 //!
 typedef enum disir_status (*mold_query) (struct disir_instance *instance,
                                          struct disir_plugin *plugin,
-                                         const char *entry_id);
+                                         const char *entry_id,
+                                         struct disir_entry **entry);
 
 
 //! Disir Plugin - Plugins populate this structure to register itself with a Disir instance.

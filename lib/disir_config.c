@@ -119,7 +119,7 @@ disir_config_read (struct disir_instance *instance, const char *group_id, const 
             log_debug (1, "Plugin '%s' does not implement config_query", entry->pi_io_id);
             continue;
         }
-        status = entry->pi_plugin.dp_config_query (instance, &entry->pi_plugin, entry_id);
+        status = entry->pi_plugin.dp_config_query (instance, &entry->pi_plugin, entry_id, NULL);
         if (status == DISIR_STATUS_NOT_EXIST)
             continue;
         if (status != DISIR_STATUS_EXISTS)

@@ -15,7 +15,8 @@ enum disir_status dio_test_config_entries (struct disir_instance *instance,
 
 enum disir_status dio_test_config_query (struct disir_instance *instance,
                                          struct disir_plugin *plugin,
-                                         const char *entry_id);
+                                         const char *entry_id,
+                                         struct disir_entry **entry);
 
 enum disir_status dio_test_mold_read (struct disir_instance *instance,
                                       struct disir_plugin *plugin,
@@ -28,7 +29,8 @@ enum disir_status dio_test_mold_entries (struct disir_instance *instance,
 
 enum disir_status dio_test_mold_query (struct disir_instance *instance,
                                        struct disir_plugin *plugin,
-                                       const char *entry_id);
+                                       const char *entry_id,
+                                       struct disir_entry **entry);
 
 #ifdef __cplusplus
 }

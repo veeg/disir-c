@@ -91,8 +91,8 @@ dio_test_config_entries (struct disir_instance *instance,
 }
 
 enum disir_status
-dio_test_config_query (struct disir_instance *instance,
-                       struct disir_plugin *plugin, const char *entry_id)
+dio_test_config_query (struct disir_instance *instance, struct disir_plugin *plugin,
+                       const char *entry_id, struct disir_entry **entry)
 {
     if (molds[entry_id] == NULL)
         return DISIR_STATUS_NOT_EXIST;
@@ -145,8 +145,8 @@ dio_test_mold_entries (struct disir_instance *instance,
 }
 
 enum disir_status
-dio_test_mold_query (struct disir_instance *instance,
-                     struct disir_plugin *plugin, const char *entry_id)
+dio_test_mold_query (struct disir_instance *instance, struct disir_plugin *plugin,
+                     const char *entry_id, struct disir_entry **entry)
 {
     if (molds[entry_id] == NULL)
         return DISIR_STATUS_NOT_EXIST;
