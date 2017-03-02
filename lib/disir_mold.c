@@ -182,6 +182,8 @@ disir_mold_entries (struct disir_instance *instance,
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
+    TRACE_ENTER ("instance (%p) group_id (%s), entries (%p)", instance, group_id, entries);
+
     map = multimap_create ((int (*)(const void *, const void *)) strcmp,
                            (unsigned long (*)(const void*)) djb2);
     if (map == NULL)
@@ -243,6 +245,8 @@ disir_mold_entries (struct disir_instance *instance,
 out:
     if (map)
         multimap_destroy (map, NULL, NULL);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 

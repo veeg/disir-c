@@ -170,7 +170,7 @@ disir_config_read (struct disir_instance *instance, const char *group_id, const 
         status = DISIR_STATUS_NOT_EXIST;
     }
 
-    TRACE_EXIT ("status: %s", disir_status_string (status));
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -227,7 +227,7 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
         status = DISIR_STATUS_NOT_EXIST;
     }
 
-    TRACE_EXIT ("status: %s", disir_status_string (status));
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -252,6 +252,8 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
                       instance, group_id, entries);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
+
+    TRACE_ENTER ("instance (%p) group_id (%s) entries (%p)", instance, group_id, entries);
 
     map = multimap_create ((int (*)(const void *, const void *)) strcmp,
                            (unsigned long (*)(const void*)) djb2);
@@ -315,6 +317,8 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
 out:
     if (map)
         multimap_destroy (map, NULL, NULL);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -328,11 +332,14 @@ disir_config_finished (struct disir_config **config)
     if (config == NULL || *config == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
+    TRACE_ENTER ("config (%p)", *config);
 
     context = (*config)->cf_context;
     status = dc_destroy (&context);
     if (status == DISIR_STATUS_OK)
         *config = NULL;
+
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
@@ -343,10 +350,13 @@ disir_config_valid (struct disir_config *config, struct disir_collection **colle
     enum disir_status status;
     struct disir_collection *col;
 
+    TRACE_ENTER ("config (%p) collection (%p)", config, collection);
+
     col = NULL;
     if (config == NULL)
     {
-        return DISIR_STATUS_INVALID_ARGUMENT;
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
     }
 
     if (collection)
@@ -371,6 +381,9 @@ disir_config_valid (struct disir_config *config, struct disir_collection **colle
         }
     }
 
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 
