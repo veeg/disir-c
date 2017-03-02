@@ -77,12 +77,6 @@ disir_mold_read (struct disir_instance *instance, const char *group_id,
             *mold = NULL;
             status = plugin->pi_plugin.dp_mold_read (instance, plugin->pi_plugin.dp_storage,
                                                      entry_id, mold);
-
-            // Mold is loaded - we inject the loaded plugin name into the structure.
-            if (*mold != NULL)
-            {
-                (*mold)->mo_plugin_name = strdup (plugin->pi_io_id);
-            }
         }
         else
         {
@@ -121,26 +115,15 @@ disir_mold_write (struct disir_instance *instance, const char *group_id,
     TRACE_ENTER ("instance (%p) group_id (%s) entry_id (%s) mold (%p)",
                  instance, group_id, entry_id, mold);
 
-    if (mold->mo_plugin_name == NULL)
-    {
-        log_warn ("Cannot persis mold (%p), missing loaded plugin name.", mold);
-        disir_error_set (instance, "Mold not loaded through plugin API."
-                                " Cannot infere origin plugin."
-                                " Please use plugin specific write operation instead.");
-        return DISIR_STATUS_NO_CAN_DO;
-    }
-
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
         if (strcmp (entry->pi_group_id, group_id) != 0)
         {
             continue;
         }
-        if (strcmp (entry->pi_io_id, mold->mo_plugin_name) == 0)
-        {
-            plugin = entry;
-            break;
-        }
+
+        plugin = entry;
+        break;
     }));
 
     if (plugin)
@@ -159,10 +142,7 @@ disir_mold_write (struct disir_instance *instance, const char *group_id,
     }
     else
     {
-        log_warn ("The plugin '%s' associated with Mold (%p) is not loaded.",
-                  mold->mo_plugin_name, mold);
-        disir_error_set (instance, "No plugin in group '%s' available: '%s'.",
-                         group_id, mold->mo_plugin_name);
+        disir_error_set (instance, "No plugin in group '%s' available: '%s'.", group_id);
         status = DISIR_STATUS_NOT_EXIST;
     }
 

@@ -156,12 +156,6 @@ dx_mold_destroy (struct disir_mold **mold)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    // Free plugin name string (if assigned)
-    if ((*mold)->mo_plugin_name)
-    {
-        free ((*mold)->mo_plugin_name);
-    }
-
     // Destroy all element_storage children
     status = dx_element_storage_get_all ((*mold)->mo_elements, &collection);
     if (status == DISIR_STATUS_OK)

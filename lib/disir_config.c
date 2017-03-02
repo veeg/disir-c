@@ -141,12 +141,6 @@ disir_config_read (struct disir_instance *instance, const char *group_id, const 
             *config = NULL;
             status = plugin->pi_plugin.dp_config_read (instance, &plugin->pi_plugin,
                                                        entry_id, mold, config);
-
-            // Config is loaded - we inject the loaded pluginname into the structure.
-            if (*config != NULL)
-            {
-                (*config)->cf_plugin_name = strdup (plugin->pi_io_id);
-            }
         }
         else
         {
@@ -186,14 +180,6 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
     TRACE_ENTER ("instance (%p) group_id (%s) entry_id (%s) config (%p)",
                  instance, group_id, entry_id, config);
 
-    if (config->cf_plugin_name == NULL)
-    {
-        log_warn ("Cannot persis config (%p), missing loaded plugin name.", config);
-        disir_error_set (instance, "Config not loaded through plugin API."
-                                " Cannot infere origin plugin."
-                                " Please use plugin specific write operation instead.");
-        return DISIR_STATUS_NO_CAN_DO;
-    }
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
@@ -201,12 +187,9 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
         {
             continue;
         }
-        // TODO: is this right? cf_plugin_name?? Probably old design.
-        if (strcmp (entry->pi_io_id, config->cf_plugin_name) == 0)
-        {
-            plugin = entry;
-            break;
-        }
+
+        plugin = entry;
+        break;
     }));
 
     if (plugin)
@@ -224,10 +207,7 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
     }
     else
     {
-        log_warn ("The plugin '%s' associated with Config (%p) is not loaded.",
-                  config->cf_plugin_name, config);
-        disir_error_set (instance, "No plugin in group '%s' available: '%s'.",
-                        group_id, config->cf_plugin_name);
+        disir_error_set (instance, "No plugin in group '%s' available.", group_id);
         status = DISIR_STATUS_NOT_EXIST;
     }
 
