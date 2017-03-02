@@ -33,16 +33,8 @@
 
 typedef enum disir_status (*output_mold)(struct disir_mold **);
 
-struct cmp_str
-{
-   bool operator()(char const *a, char const *b)
-   {
-      return strcmp(a, b) < 0;
-   }
-};
-
 //! Internal static map to store test molds by id
-static std::map<const char *, output_mold, cmp_str> molds = {
+static std::map<std::string, output_mold> molds = {
     std::make_pair ("basic_keyval", basic_keyval),
     std::make_pair ("basic_section", basic_section),
     std::make_pair ("json_test_mold", json_test_mold),
@@ -69,7 +61,7 @@ dio_test_config_read (struct disir_instance *instance,
     enum disir_status status;
     output_mold func_mold;
 
-    func_mold = molds[entry_id];
+    func_mold = molds[std::string(entry_id)];
     if (func_mold == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
@@ -133,7 +125,7 @@ dio_test_mold_entries (struct disir_instance *instance,
         if (entry == NULL)
             continue;
 
-        entry->de_entry_name = strdup (i->first);
+        entry->de_entry_name = strdup (i->first.c_str());
         entry->DE_READABLE = 1;
         entry->DE_WRITABLE = 1;
         MQ_ENQUEUE (queue, entry);
@@ -148,7 +140,11 @@ enum disir_status
 dio_test_mold_query (struct disir_instance *instance, struct disir_plugin *plugin,
                      const char *entry_id, struct disir_entry **entry)
 {
-    if (molds[entry_id] == NULL)
+    if (entry_id == NULL)
+        return DISIR_STATUS_INTERNAL_ERROR;;
+
+    std::string name(entry_id);
+    if (molds.count (name) == 0)
         return DISIR_STATUS_NOT_EXIST;
     else
         return DISIR_STATUS_EXISTS;
