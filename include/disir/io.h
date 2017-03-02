@@ -57,6 +57,10 @@ disir_entry_finished (struct disir_entry **entry);
 //!     for some reason does not implement config_write operation.
 //! \return DISIR_STATUS_NOT_EXIST if the plugin associated with `config`
 //!     is not registered with `disir`.
+//! \return DISIR_STATUS_INVALID_CONTEXT is returned when the config retrieved is invalid
+//!     according to its mold definition. disir_error is not set on the instance, since the
+//!     invalid state lies in the individual context elements of the config. Iterate all child
+//!     contexts and test state retrieve the erroneous state.
 //! \return status of the plugin config_read operation.
 //!
 enum disir_status
