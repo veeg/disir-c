@@ -85,6 +85,84 @@ fslib_stat_filepath (struct disir_instance *instance,
     return DISIR_STATUS_OK;
 }
 
+enum disir_status
+fslib_query_entries (struct disir_instance *instance, struct disir_plugin *plugin,
+                     const char *basedir, struct disir_entry **entries)
+{
+    enum disir_status status;
+    DIR *directory;
+    struct dirent *dp;
+    struct disir_entry *entry;
+    struct disir_entry *mold_entry;
+
+    // File extension is always without the leading dot - add 1 for it
+    std::stringstream suffix_stream;
+    suffix_stream << "." << plugin->dp_config_entry_type;
+    std::string suffix = suffix_stream.str();
+
+    // Directory is a combinarion of plugin config_base_id and input basedir
+    std::stringstream sd;
+    sd << plugin->dp_config_base_id;
+    if (basedir)
+    {
+        sd << '/';
+        sd << basedir;
+    }
+    std::string searchdir = sd.str();
+
+    directory = opendir (searchdir.c_str());
+    while ((dp = readdir(directory)) != NULL)
+    {
+        // entry file, relative to basedir
+        std::stringstream ef;
+        if (basedir)
+        {
+            ef << basedir;
+            ef << '/';
+        }
+        ef << dp->d_name;
+        std::string name = ef.str();
+
+        if (dp->d_type == DT_REG)
+        {
+            // Check that our file extension (suffix) is valid for this file entry
+            if (name.size() > suffix.size()
+                && name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0)
+            {
+                //! Check if we have a mold entry for this directory entry
+                std::string entry_name(name, 0, name.size() - suffix.size());
+                status = plugin->dp_mold_query (instance, plugin, entry_name.c_str(), &mold_entry);
+                if (status != DISIR_STATUS_EXISTS)
+                {
+                    // We dont really care what happened here...
+                    continue;
+                }
+
+                entry = (struct disir_entry *) calloc (1, sizeof (struct disir_entry));
+                entry->de_entry_name = strdup(entry_name.c_str());
+                entry->DE_READABLE = mold_entry->DE_READABLE;
+                entry->DE_WRITABLE = mold_entry->DE_WRITABLE;
+                entry->DE_NAMESPACE_ENTRY = mold_entry->DE_NAMESPACE_ENTRY;
+                MQ_ENQUEUE (*entries, entry);
+
+                disir_entry_finished (&mold_entry);
+            }
+        }
+        else if (dp->d_type == DT_DIR)
+        {
+            // Must be a better way to check this..
+            if (strcmp (dp->d_name, ".") == 0) {}
+            else if (strcmp (dp->d_name, "..") == 0) {}
+            else
+            {
+                fslib_query_entries (instance, plugin, name.c_str(), entries);
+            }
+        }
+    }
+
+    return DISIR_STATUS_OK;
+}
+
 //! PLUGIN API
 enum disir_status
 dio_toml_config_read (struct disir_instance *instance,
@@ -241,53 +319,7 @@ dio_toml_config_entries (struct disir_instance *instance,
                          struct disir_plugin *plugin,
                          struct disir_entry **entries)
 {
-    enum disir_status status;
-    // XXX: Recursive function to grab all subdirs?
-    DIR *directory;
-    struct dirent *dp;
-    struct disir_entry *entry;
-    struct disir_entry *mold_entry;
-
-    // File extension is always without the leading dot - add 1 for it
-    std::stringstream suffix_stream;
-    suffix_stream << "." << plugin->dp_config_entry_type;
-    std::string suffix = suffix_stream.str();
-
-    directory = opendir (plugin->dp_config_base_id);
-    while ((dp = readdir(directory)) != NULL)
-    {
-        if (dp->d_type == DT_REG)
-        {
-            // TODO: this name must be a recursive build-up from directories below
-            std::string name(dp->d_name);
-            if (name.size() > suffix.size() &&
-                    name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0)
-            {
-                // !
-                std::string entry_name(name, 0, name.size() - suffix.size());
-                status = plugin->dp_mold_query (instance, plugin, entry_name.c_str(), &mold_entry);
-                if (status != DISIR_STATUS_EXISTS)
-                {
-                    // We dont really care what happened here...
-                    continue;
-                }
-
-                entry = (struct disir_entry *) calloc (1, sizeof (struct disir_entry));
-                entry->de_entry_name = strdup(entry_name.c_str());
-                entry->DE_READABLE = mold_entry->DE_READABLE;
-                entry->DE_WRITABLE = mold_entry->DE_WRITABLE;
-                entry->DE_NAMESPACE_ENTRY = mold_entry->DE_NAMESPACE_ENTRY;
-                MQ_ENQUEUE (*entries, entry);
-
-                disir_entry_finished (&mold_entry);
-            }
-        }
-        else if (dp->d_type == DT_DIR)
-        {
-        }
-    }
-
-    return DISIR_STATUS_OK;
+    return fslib_query_entries (instance, plugin, NULL, entries);
 }
 
 // PLUGIN API
