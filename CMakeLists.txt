@@ -13,6 +13,7 @@ set (EXPORT_NAMESPACE disir::)
 add_subdirectory (lib)
 add_subdirectory (plugins)
 add_subdirectory (doc)
+add_subdirectory (cli)
 
 
 write_basic_package_version_file (
