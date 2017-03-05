@@ -183,6 +183,7 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
 {
     enum disir_status status;
     struct disir_plugin_internal *plugin;
+    int entry_id_length;
 
     plugin = NULL;
 
@@ -198,6 +199,14 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
                  instance, group_id, entry_id, config);
 
     disir_error_clear (instance);
+
+    entry_id_length = strlen (entry_id);
+    if (entry_id[entry_id_length - 1] == '/')
+    {
+        // TODO: Add a better status?
+        disir_error_set (instance, "cannot write namespace entry: %s", entry_id);
+        return DISIR_STATUS_FS_ERROR;
+    }
 
     MQ_FOREACH (instance->dio_plugin_queue,
     ({
