@@ -9,6 +9,7 @@
 #include <map>
 #include <utility>
 #include <string.h>
+#include <limits.h>
 
 #include <disir/disir.h>
 #include <disir/util.h>
@@ -52,7 +53,13 @@ static std::map<std::string, output_mold> molds = {
     std::make_pair ("basic_version_difference", basic_version_difference),
     std::make_pair ("complex_section", complex_section),
     std::make_pair ("config_query_permutations", config_query_permutations),
+    std::make_pair ("nested/basic_keyval", basic_keyval),
+    std::make_pair ("nested/", basic_keyval),
+    std::make_pair ("super/", basic_keyval),
+    std::make_pair ("super/nested/", basic_keyval),
+    std::make_pair ("super/nested/basic_keyval", basic_keyval),
 };
+
 
 enum disir_status
 dio_test_config_read (struct disir_instance *instance,
@@ -61,10 +68,18 @@ dio_test_config_read (struct disir_instance *instance,
 {
     enum disir_status status;
     output_mold func_mold;
+    char namespace_entry[PATH_MAX];
 
     func_mold = molds[std::string(entry_id)];
     if (func_mold == NULL)
-        return DISIR_STATUS_INVALID_ARGUMENT;
+    {
+        if (fslib_namespace_entry (entry_id, namespace_entry) == NULL)
+            return DISIR_STATUS_INVALID_ARGUMENT;
+
+        func_mold = molds[namespace_entry];
+        if (func_mold == NULL)
+            return DISIR_STATUS_INVALID_ARGUMENT;
+    }
 
     status = func_mold (&mold);
     if (status != DISIR_STATUS_OK)
@@ -99,10 +114,21 @@ dio_test_mold_read (struct disir_instance *instance, struct disir_plugin *plugin
 {
     enum disir_status status;
     output_mold func_mold;
+    char namespace_entry[PATH_MAX];
 
     func_mold = molds[entry_id];
     if (func_mold == NULL)
-        return DISIR_STATUS_INVALID_ARGUMENT;
+    {
+
+        if (fslib_namespace_entry (entry_id, namespace_entry) == NULL)
+            return DISIR_STATUS_INVALID_ARGUMENT;
+
+        func_mold = molds[namespace_entry];
+        if (func_mold == NULL)
+        {
+            return DISIR_STATUS_INVALID_ARGUMENT;
+        }
+    }
 
     status = func_mold (mold);
     if (status != DISIR_STATUS_OK)
@@ -141,17 +167,30 @@ dio_test_mold_entries (struct disir_instance *instance,
     return DISIR_STATUS_OK;
 }
 
+
+
 enum disir_status
 dio_test_mold_query (struct disir_instance *instance, struct disir_plugin *plugin,
                      const char *entry_id, struct disir_entry **entry)
 {
+    char namespace_entry[PATH_MAX];
+
     if (entry_id == NULL)
         return DISIR_STATUS_INTERNAL_ERROR;;
 
     std::string name(entry_id);
     if (molds.count (name) == 0)
-        return DISIR_STATUS_NOT_EXIST;
+    {
+        if (fslib_namespace_entry (entry_id, namespace_entry) == NULL)
+            return DISIR_STATUS_INVALID_ARGUMENT;
 
+        name = std::string (namespace_entry);
+        // The namespace entry does not exist
+        if (molds.count (name) == 0)
+        {
+            return DISIR_STATUS_NOT_EXIST;
+        }
+    }
 
     if (entry != NULL)
     {
