@@ -1,0 +1,11 @@
+{
+    "version" : "1.0.0",
+    "mold" : {
+        "keyval" : {
+            "type" : "INTEGER",
+            "introduced" : "1.0.0",
+            "unpresent_defaults" : [
+            ]
+        }
+    }
+}

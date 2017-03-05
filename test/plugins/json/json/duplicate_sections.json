@@ -1,0 +1,11 @@
+{
+    "version" : "1.0.0",
+    "config" : {
+        "section_name" : {
+            "k1" : "k1value"
+        },
+        "section_name@2" : {
+            "k1" : "k1value"
+        }
+    }
+}

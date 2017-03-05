@@ -1,0 +1,7 @@
+{
+    "version" : "1.0.0",
+    "config" : {
+        "test1" : "value1",
+        "test1@2" : "value2"
+    }
+}
