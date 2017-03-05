@@ -295,6 +295,15 @@ dio_toml_config_write (struct disir_instance *instance, struct disir_plugin *plu
         // Already logged
         return status;
     }
+    else
+    {
+        // Check if stat'd file is a directory - that should fail
+        if (S_ISREG (statbuf.st_mode) == 0)
+        {
+            disir_error_set (instance, "resolved filepath is not a file: %s", filepath);
+            return DISIR_STATUS_FS_ERROR;
+        }
+    }
 
     FILE *file;
 
