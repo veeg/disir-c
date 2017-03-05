@@ -11,12 +11,12 @@
 
 #include <disir/disir.h>
 #include <disir/fslib/toml.h>
+#include <disir/fslib/util.h>
 
 // The headonly implementation of TOML.
 #include "tinytoml/toml.h"
 
 // Private
-#include "fs.h"
 #include "mqueue.h"
 
 //! STATIC API

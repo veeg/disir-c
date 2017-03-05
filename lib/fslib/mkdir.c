@@ -4,8 +4,7 @@
 #include <errno.h>
 
 #include <disir/disir.h>
-
-#include "fs.h"
+#include <disir/fslib/util.h>
 
 //! STATIC API
 static enum disir_status

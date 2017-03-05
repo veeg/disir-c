@@ -14,6 +14,7 @@
 #include <disir/util.h>
 #include <disir/plugin.h>
 #include <disir/test.h>
+#include <disir/fslib/util.h>
 
 #include "mqueue.h"
 
