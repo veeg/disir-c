@@ -34,6 +34,7 @@ set (FSLIB_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/toml_serialize.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/toml_unserialize.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/mkdir.c"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/namespace.cc"
 )
 
 # Define all libdisir source files
