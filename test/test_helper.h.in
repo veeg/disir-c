@@ -81,7 +81,7 @@ namespace testing
 
     class DisirTestTestPlugin : public DisirTestWrapper
     {
-    protected:
+    public:
 
         static void SetUpTestCase ();
         static void TearDownTestCase ();
@@ -94,101 +94,6 @@ namespace testing
         void TearDown ()
         {
             DisirLogCurrentTestExit ();
-        }
-
-        // TODO: Create dio_fslib_serialize and dio_fslib_unserialize typedefs
-        void ConfigSerializeUnserializeCompareAll (void)
-        {
-            // Iterate all available configs
-            struct disir_entry *entries = NULL;
-            struct disir_entry *current = NULL;
-            struct disir_entry *next = NULL;
-
-            status = disir_config_entries (instance, "test", &entries);
-            ASSERT_STATUS (DISIR_STATUS_OK, status);
-            ASSERT_TRUE (entries != NULL);
-
-            current = entries;
-            while (current != NULL)
-            {
-                next = current->next;
-
-                DisirLogCurrentTest (current->de_entry_name);
-                serialize_unserialize_compare_single (current->de_entry_name);
-
-                disir_entry_finished (&current);
-                current = next;
-            }
-        }
-
-        // XXX: Using hardcoded toml serialize/unserialize for now.
-        // XXX: This should be replaced with generic fslib plugin signatures
-        void serialize_unserialize_compare_single (const char *entry)
-        {
-            struct disir_config *config_original = NULL;
-            struct disir_config *config_parsed = NULL;
-            struct disir_context *context_config1 = NULL;
-            struct disir_context *context_config2 = NULL;
-            FILE *file = NULL;
-            struct disir_mold *mold = NULL;
-
-            // read the current entry
-            status = disir_config_read (instance, "test", entry,
-                                        NULL, &config_original);
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
-            if (status != DISIR_STATUS_OK)
-            {
-                DisirLogCurrentTest (disir_status_string (status));
-                goto out;
-            }
-
-            // open file for reading and writing
-            char filepath[4098];
-            snprintf (filepath, 4098, "/tmp/disir_plugin_serialize_unserialize_%s.toml", entry);
-            file = fopen (filepath, "w+");
-            EXPECT_TRUE (file != NULL);
-            if (file == NULL)
-            {
-                DisirLogCurrentTest ("Failed to open file...");
-                goto out;
-            }
-
-            // Serialize the current entry config
-            status = dio_toml_serialize_config (config_original, file);
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
-            if (status != DISIR_STATUS_OK)
-                goto out;
-
-            // Unserialize the previously serialized config
-            // XXX: Cheat by extracting the mold directly from the config.
-            mold = config_original->cf_mold;
-            fseek (file, 0, SEEK_SET);
-            status = dio_toml_unserialize_config (instance, file, mold, &config_parsed);
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
-            if (status != DISIR_STATUS_OK)
-                goto out;
-
-            // compare the two
-            context_config1 = dc_config_getcontext (config_original);
-            context_config2 = dc_config_getcontext (config_parsed);
-            EXPECT_TRUE (context_config1 != NULL);
-            EXPECT_TRUE (context_config2 != NULL);
-            if (context_config1 == NULL || context_config2 == NULL)
-                goto out;
-            status = dc_compare (context_config1, context_config2, NULL);
-            EXPECT_STATUS (DISIR_STATUS_OK, status)
-
-        out:
-            DisirLogCurrentTest ("compare serialize-unserialize out clause");
-            // Cleanup this entry and move to the next
-            if (file != NULL)
-            {
-                fclose (file);
-            }
-            dc_putcontext (&context_config1);
-            dc_putcontext (&context_config2);
-            disir_config_finished (&config_original);
-            disir_config_finished (&config_parsed);
         }
 
     public:
