@@ -1,5 +1,6 @@
 #include "test_helper.h"
 
+#include <disir/fslib/util.h>
 #include <disir/fslib/toml.h>
 
 #include "log.h"
@@ -19,18 +20,13 @@ const char *molds[] = {
     "config_query_permutations",
 };
 
-typedef enum disir_status (*serialize_config) (struct disir_config *, FILE *);
-typedef enum disir_status (*unserialize_config) (struct disir_instance *,
-                                                 FILE *, struct disir_mold *,
-                                                 struct disir_config **);
-
 class SerializeUnserializeTest : public ::testing::DisirTestTestPlugin,
                                  public ::testing::WithParamInterface<const char *>
 {
 public:
     void serialize_unserialize_config (const char *entry,
-                                       serialize_config func_serialize,
-                                       unserialize_config func_unserialize)
+                                       dio_serialize_config func_serialize,
+                                       dio_unserialize_config func_unserialize)
     {
         struct disir_config *config_original = NULL;
         struct disir_config *config_parsed = NULL;
@@ -63,7 +59,7 @@ public:
         }
 
         // Serialize the current entry config
-        status = func_serialize (config_original, file);
+        status = func_serialize (instance, config_original, file);
         EXPECT_STATUS (DISIR_STATUS_OK, status);
         if (status != DISIR_STATUS_OK)
             goto out;

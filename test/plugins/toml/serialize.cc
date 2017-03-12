@@ -73,7 +73,7 @@ TEST_F (TOMLSerializeConfigTest, DISABLED_basic_keyval)
 {
     ASSERT_NO_FATAL_FAILURE (setup_testconfig ("basic_keyval", NULL));
 
-    dio_toml_serialize_config (config, serial_fd);
+    dio_toml_serialize_config (instance, config, serial_fd);
     compare_serial_with_file ("basic_keyval.toml");
 }
 
@@ -81,7 +81,7 @@ TEST_F (TOMLSerializeConfigTest, DISABLED_basic_section)
 {
     ASSERT_NO_FATAL_FAILURE (setup_testconfig ("basic_section", NULL));
 
-    dio_toml_serialize_config (config, serial_fd);
+    dio_toml_serialize_config (instance, config, serial_fd);
     compare_serial_with_file ("basic_section.toml");
 }
 
@@ -89,7 +89,7 @@ TEST_F (TOMLSerializeConfigTest, DISABLED_complex_section)
 {
     ASSERT_NO_FATAL_FAILURE (setup_testconfig ("complex_section", NULL));
 
-    dio_toml_serialize_config (config, serial_fd);
+    dio_toml_serialize_config (instance, config, serial_fd);
     compare_serial_with_file ("complex_section.toml");
 }
 
