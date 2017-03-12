@@ -27,6 +27,10 @@ namespace dio
        //!
        enum dplugin_status marshal (struct disir_config *config, std::string& output);
 
+       //! \brief Marshal a disir_config object to JSON, writing it to the ostream
+       enum dplugin_status marshal (struct disir_config *config, std::ostream& stream);
+
+
     private:
        // Variables
        Json::Value m_configRoot;
@@ -100,6 +104,9 @@ namespace dio
     public:
        //! \brief
        enum dplugin_status marshal (struct disir_mold *mold, std::string& mold_json);
+
+       //! \brief
+       enum dplugin_status marshal (struct disir_mold *mold, std::ostream& stream);
 
        //! \brief Constructor
        MoldWriter (struct disir_instance *disir);

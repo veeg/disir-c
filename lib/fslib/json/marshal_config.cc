@@ -27,6 +27,38 @@ ConfigWriter::~ConfigWriter ()
 }
 
 enum dplugin_status
+ConfigWriter::marshal (struct disir_config *config, std::ostream& stream)
+{
+    enum dplugin_status pstatus;
+    std::string outputJson;
+    Json::StyledWriter writer;
+
+    pstatus = DPLUGIN_STATUS_OK;
+
+    // Retrieving the config's context object
+    m_contextConfig = dc_config_getcontext (config);
+    if (m_contextConfig == NULL )
+    {
+        disir_error_set (m_disir, "could not retrieve cconfig context object");
+        return DPLUGIN_FATAL_ERROR;
+    }
+
+    pstatus = set_config_version (m_contextConfig, m_configRoot);
+    if (pstatus != DPLUGIN_STATUS_OK)
+        goto end;
+
+    pstatus = _marshal_context (m_contextConfig, m_configRoot[CONFIG]);
+    if (pstatus != DPLUGIN_STATUS_OK)
+        goto end;
+
+    stream << writer.writeOrdered (m_configRoot);
+
+end:
+    dc_putcontext (&m_contextConfig);
+    return pstatus;
+}
+
+enum dplugin_status
 ConfigWriter::marshal (struct disir_config *config, std::string& output)
 {
     enum dplugin_status pstatus;

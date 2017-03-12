@@ -21,6 +21,10 @@ namespace dio
 
         virtual ~ConfigReader () {};
 
+        //! \brief Read a disir_config from a istream
+        enum dplugin_status unmarshal (struct disir_config **config, std::istream& stream);
+
+
         //! \brief reads a disir_config from a json file
         enum dplugin_status unmarshal (struct disir_config **config,
                                        const std::string Json);
@@ -86,6 +90,9 @@ namespace dio
         //! a disir_config object
         enum dplugin_status build_config_from_json (struct disir_context *context_config);
 
+        //! \brief After unserialization into internal m_configRoot, this constructs the config.
+        enum dplugin_status construct_config (struct disir_config **config);
+
         //! \brief recursively reads a json config starting from root and
         //! populated a disir_config accordingly
         //!
@@ -117,6 +124,20 @@ namespace dio
 
             virtual ~MoldReader () {};
 
+            //! \brief construct a disir_mold from the JSON formatted data read from stream
+            //!
+            //! - Errors are set on the disir instance
+            //!
+            //! \param[in] stream reference to the stream to read from
+            //! \param[out] mold reference to where the constructed mold object is placed
+            //!
+            //! \return DPLUGIN_STATUS_OK on success.
+            //! \return DPLUGIN_FATAL_ERROR on unrecoverable errors.
+            //! \return DPLUGIN_PARSE_ERROR if json object on has syntax errors.
+            //!
+            enum dplugin_status unmarshal (std::istream& stream, struct disir_mold **mold);
+
+
             //! \brief constructs a disir_mold object from a json file on filepath
             //!
             //! - Errors are set on the disir instance
@@ -137,6 +158,9 @@ namespace dio
             Json::Value m_moldRoot;
 
             /* Methods */
+
+            //! \brief construct the disir_mold based on already parsed m_moldRoot
+            enum dplugin_status construct_mold (struct disir_mold **mold);
 
             //! \brief recursively extract jsonValue to create mold object.
             //!

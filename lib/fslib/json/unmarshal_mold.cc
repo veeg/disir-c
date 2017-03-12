@@ -18,18 +18,42 @@ MoldReader::MoldReader (struct disir_instance *disir) : JsonIO (disir) {}
 enum dplugin_status
 MoldReader::unmarshal (const char *filepath, struct disir_mold **mold)
 {
+    enum dplugin_status pstatus;
+
+    pstatus = read_config (filepath, m_moldRoot);
+    if (pstatus != DPLUGIN_STATUS_OK)
+    {
+        return pstatus;
+    }
+
+    return construct_mold (mold);
+}
+
+//! PUBLIC
+enum dplugin_status
+MoldReader::unmarshal (std::istream& stream, struct disir_mold **mold)
+{
+    Json::Reader reader;
+
+    bool success = reader.parse (stream, m_moldRoot);
+    if (!success)
+    {
+        disir_error_set (m_disir, "Parse error: %s",
+                                  reader.getFormattedErrorMessages().c_str());
+        return DPLUGIN_PARSE_ERROR;
+    }
+
+    return construct_mold (mold);
+}
+
+enum dplugin_status
+MoldReader::construct_mold (struct disir_mold **mold)
+{
     struct disir_context *context_mold = NULL;
     struct semantic_version semver;
     enum disir_status status;
     enum dplugin_status pstatus;
     std::string version;
-
-    pstatus = read_config (filepath, m_moldRoot);
-
-    if (pstatus != DPLUGIN_STATUS_OK)
-    {
-        return pstatus;
-    }
 
     pstatus = MEMBERS_CHECK (m_moldRoot, MOLD, VERSION);
     if (pstatus != DPLUGIN_STATUS_OK)

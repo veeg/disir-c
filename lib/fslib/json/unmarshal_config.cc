@@ -60,11 +60,25 @@ ConfigReader::read_config_version (struct semantic_version *semver, const char *
 
 //! PUBLIC
 enum dplugin_status
+ConfigReader::unmarshal (struct disir_config **config, std::istream& stream)
+{
+    Json::Reader reader;
+    bool success = reader.parse (stream, m_configRoot);
+
+    if (!success)
+    {
+        disir_error_set (m_disir, "Parse error: %s",
+                                   reader.getFormattedErrorMessages ().c_str());
+        return DPLUGIN_PARSE_ERROR;
+    }
+
+    return construct_config (config);
+}
+
+//! PUBLIC
+enum dplugin_status
 ConfigReader::unmarshal (struct disir_config **config, const std::string Json)
 {
-    enum disir_status status;
-    enum dplugin_status dstatus;
-    struct disir_context *context_config = NULL;
     Json::Reader reader;
 
     bool success = reader.parse (Json, m_configRoot);
@@ -75,45 +89,30 @@ ConfigReader::unmarshal (struct disir_config **config, const std::string Json)
         return DPLUGIN_PARSE_ERROR;
     }
 
-    status = dc_config_begin (m_refMold, &context_config);
-    if (status != DISIR_STATUS_OK)
-    {
-        disir_log_user (m_disir, "Could not create config context from mold");
-        return DPLUGIN_FATAL_ERROR;
-    }
-
-     dstatus = build_config_from_json (context_config);
-     if (dstatus != DPLUGIN_STATUS_OK)
-         goto error;
-
-     status = dc_config_finalize (&context_config, config);
-     if (status != DISIR_STATUS_OK)
-     {
-         return DPLUGIN_FATAL_ERROR;
-     }
-
-     return DPLUGIN_STATUS_OK;
-error:
-     if (context_config)
-     {
-        dc_destroy (&context_config);
-     }
-     return DPLUGIN_FATAL_ERROR;
+    return construct_config (config);
 }
 
 //! PUBLIC
 enum dplugin_status
 ConfigReader::unmarshal (struct disir_config **config, const char *filepath)
 {
-    enum disir_status status;
     enum dplugin_status pstatus;
-    struct disir_context *context_config = NULL;
 
     pstatus = read_config (filepath, m_configRoot);
     if (pstatus != DPLUGIN_STATUS_OK)
     {
         return pstatus;
     }
+
+    return construct_config (config);
+}
+
+enum dplugin_status
+ConfigReader::construct_config (struct disir_config **config)
+{
+    enum disir_status status;
+    enum dplugin_status pstatus;
+    struct disir_context *context_config = NULL;
 
     status = dc_config_begin (m_refMold, &context_config);
     if (status != DISIR_STATUS_OK)

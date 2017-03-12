@@ -74,6 +74,31 @@ end:
 }
 
 enum dplugin_status
+MoldWriter::marshal (struct disir_mold *mold, std::ostream& stream)
+{
+    struct disir_context *context_mold;
+    enum dplugin_status pstatus;
+    Json::StyledWriter writer;
+    Json::Value root;
+
+    context_mold = dc_mold_getcontext (mold);
+    if (context_mold == NULL)
+        return DPLUGIN_FATAL_ERROR;
+
+    extract_context_metadata (context_mold, root);
+
+    pstatus = _marshal_mold_contexts (context_mold, root[MOLD]);
+    if (pstatus != DPLUGIN_STATUS_OK)
+        goto end;
+
+    stream << writer.writeOrdered (root);
+
+end:
+    dc_putcontext (&context_mold);
+    return pstatus;
+}
+
+enum dplugin_status
 MoldWriter::marshal_mold_keyval (struct disir_context *context_keyval, Json::Value& keyval)
 {
     enum disir_status status;
