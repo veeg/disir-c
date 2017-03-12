@@ -2,6 +2,9 @@
 #define _LIBDISIR_FSLIB_UTIL_H
 
 #include <disir/disir.h>
+#include <disir/plugin.h>
+
+#include <sys/stat.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -48,6 +51,56 @@ fslib_mkdir_p (struct disir_instance *instance, const char *path);
 //!
 const char *
 fslib_namespace_entry (const char *name, char *namespace_entry);
+
+//! \brief Resolve entry_id to plugin filepath
+//!
+//! \param[out] filepath Populate the output buffer with the complete, resolved filepath.
+//!     Buffer is required to be PATH_MAX sized.
+//!
+//! \return DISIR_STATUS_INSUFFICIENT_RESOURCES if the resolved path is too large.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+fslib_resolve_filepath (struct disir_instance *instance, struct disir_plugin *plugin,
+                        const char *entry_id, char *filepath);
+
+//! \brief Stat the filepath and return appropriate error (with message set)
+//!
+//! \return DISIR_STATUS_FS_ERROR if filepath contains a non-directory in path.
+//! \return DISIR_STATUS_PERMISSION_ERROR if user has insufficient permission to stat filepath.
+//! \return DISIR_STATUS_NOT_EXIST if filepath does not exist.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+fslib_stat_filepath (struct disir_instance *instance,
+                     const char *filepath, struct stat *statbuf);
+
+//! \brief Recursively query basedir for matching plugin entries.
+//!
+//! \return DISIR_STATUS_OK regardless of query operation
+//!
+enum disir_status
+fslib_query_entries (struct disir_instance *instance, struct disir_plugin *plugin,
+                     const char *basedir, struct disir_entry **entries);
+
+
+//! \brief Generic filesystem based implementation of config_read
+enum disir_status
+fslib_plugin_config_read (struct disir_instance *instance,
+                          struct disir_plugin *plugin, const char *entry_id,
+                          struct disir_mold *mold, struct disir_config **config,
+                          dio_unserialize_config func_unserialize);
+
+//! \brief Generic filesystem based implementation of config_write
+enum disir_status
+fslib_plugin_config_write (struct disir_instance *instance, struct disir_plugin *plugin,
+                           const char *entry_id, struct disir_config *config,
+                           dio_serialize_config func_serialize);
+
+//! \brief Generic filesystem based implementation of config_query
+enum disir_status
+fslib_plugin_config_query (struct disir_instance *instance, struct disir_plugin *plugin,
+                           const char *entry_id, struct disir_entry **entry);
 
 
 #ifdef __cplusplus
