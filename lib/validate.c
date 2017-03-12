@@ -292,8 +292,14 @@ validate_children (struct disir_context *context)
 
         // XXX: What if the last context was finalized? We should still validate, shant we?
         // Break out if a serious error occurred in last iteration
-        if (status_validate != DISIR_STATUS_OK && status_validate != DISIR_STATUS_INVALID_CONTEXT)
+        if (status_validate != DISIR_STATUS_OK
+            && status_validate != DISIR_STATUS_INVALID_CONTEXT
+            && status_validate != DISIR_STATUS_RESTRICTION_VIOLATED
+            && status_validate != DISIR_STATUS_WRONG_VALUE_TYPE
+            && status_validate != DISIR_STATUS_MOLD_MISSING
+            && status_validate != DISIR_STATUS_DEFAULT_MISSING)
         {
+            status = status_validate;
             // TODO: Verify that this scenario occurs and find a reasonable way to deal with it.
             log_fatal ("XXX: VALIDATE CHILDREN RETURNED NON-OK (NON-INVALID) status: %s",
                        disir_status_string (status));
