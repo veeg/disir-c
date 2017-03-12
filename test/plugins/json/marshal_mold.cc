@@ -6,18 +6,20 @@ class MarshallMoldTest : public testing::JsonDioTestWrapper
 {
     void SetUp()
     {
-       SetUpDisir ();
+        DisirLogCurrentTestEnter();
 
-       mold = NULL;
+        status = disir_mold_read (instance, "test", "json_test_mold", &mold);
+        ASSERT_TRUE (mold != NULL);
 
-       status = disir_mold_input (disir, "test", "json_test_mold", &mold);
-       ASSERT_TRUE (mold != NULL);
+        writer = new dio::MoldWriter (instance);
 
-       writer = new dio::MoldWriter (disir);
+        DisirLogTestBodyEnter();
+    }
 
-   }
     void TearDown()
     {
+        DisirLogTestBodyExit();
+
         if (mold)
         {
             disir_mold_finished (&mold);
@@ -28,12 +30,12 @@ class MarshallMoldTest : public testing::JsonDioTestWrapper
             delete writer;
         }
 
-        TearDownDisir ();
+        DisirLogCurrentTestExit();
     }
 
     public:
-        struct disir_mold *mold;
-        dio::MoldWriter *writer;
+        struct disir_mold *mold = NULL;
+        dio::MoldWriter *writer = NULL;
 };
 
 TEST_F (MarshallMoldTest, marshal_mold_shall_match)

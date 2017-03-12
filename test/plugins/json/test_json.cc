@@ -22,7 +22,7 @@ JsonDioTestWrapper::GetJsonObject (Json::Value& root, std::string path)
     bool success = reader.parse (buffer.str(), root);
     if (!success) {
         std::cerr << reader.getFormattedErrorMessages() << std::endl;
-        log_debug ("Could not parse jsonfile: %s",
+        log_test ("Could not parse jsonfile: %s",
                     reader.getFormattedErrorMessages().c_str());
         return false;
     }
@@ -40,45 +40,6 @@ JsonDioTestWrapper::compare_json_objects (std::string a, std::string b)
     reader.parse (b.c_str(), rootB);
 
     return _compare_json_objects (rootA, rootB);
-}
-
-void
-JsonDioTestWrapper::TearDownDisir ()
-{
-    if (disir)
-    {
-        status = disir_instance_destroy (&disir);
-        ASSERT_TRUE (status == DISIR_STATUS_OK);
-    }
-}
-
-void
-JsonDioTestWrapper::SetUpDisir ()
-{
-    disir = NULL;
-    std::stringstream ss;
-    try {
-        // TODO: Fix this shait. It wont work
-        ss << CMAKE_CURRENT_SOURCE_DIR << "/dio_json_test_config.ini";
-        std::string configstr = ss.str ();
-
-        status = disir_instance_create (configstr.c_str (), NULL, &disir);
-
-        ASSERT_TRUE (disir != NULL);
-    }
-    catch (std::exception& e) {
-        std::cerr << e.what () << std::endl;
-    }
-}
-
-void
-JsonDioTestWrapper::SetUpTestCase ()
-{
-
-}
-void
-JsonDioTestWrapper::TearDownTestCase ()
-{
 }
 
 bool

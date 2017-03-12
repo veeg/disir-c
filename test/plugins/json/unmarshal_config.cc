@@ -6,23 +6,21 @@ class UnMarshallConfigTest : public testing::JsonDioTestWrapper
 {
     void SetUp()
     {
-        SetUpDisir ();
+        DisirLogCurrentTestEnter();
 
-        mold = NULL;
-        config = NULL;
-        reader = NULL;
-        writer = NULL;
-        collection = NULL;
-        context_config = NULL;
-
-        status = disir_mold_input (disir, "test", "json_test_mold", &mold);
+        status = disir_mold_read (instance, "test", "json_test_mold", &mold);
         ASSERT_TRUE (mold != NULL);
 
-        reader = new dio::ConfigReader (disir, mold);
-        writer = new dio::ConfigWriter (disir);
+        reader = new dio::ConfigReader (instance, mold);
+        writer = new dio::ConfigWriter (instance);
+
+        DisirLogTestBodyEnter();
     }
+
     void TearDown()
     {
+        DisirLogTestBodyExit();
+
         if (reader)
         {
             delete reader;
@@ -51,18 +49,19 @@ class UnMarshallConfigTest : public testing::JsonDioTestWrapper
             dc_collection_finished (&collection);
             EXPECT_STATUS (DISIR_STATUS_OK, status);
         }
-        TearDownDisir ();
+
+        DisirLogCurrentTestExit();
     }
 
     public:
-        struct disir_mold *mold;
-        struct disir_context *context_config;
-        struct disir_config *config;
-        struct disir_collection *collection;
+        struct disir_mold *mold = NULL;
+        struct disir_context *context_config = NULL;
+        struct disir_config *config = NULL;
+        struct disir_collection *collection = NULL;
         enum dplugin_status pstatus;
         enum disir_status status;
-        dio::ConfigWriter *writer;
-        dio::ConfigReader *reader;
+        dio::ConfigWriter *writer = NULL;
+        dio::ConfigReader *reader = NULL;
 };
 
 TEST_F(UnMarshallConfigTest, unmarshal_succeed)
@@ -160,7 +159,7 @@ TEST_F (UnMarshallConfigTest, invalid_context_on_wrong_value)
     EXPECT_NO_THROW ({
         pstatus = reader->unmarshal (&config, filepath.c_str ());
     });
-    std::cout << disir_error (disir) << std::endl;
+    std::cout << disir_error (instance) << std::endl;
     ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
 
     ASSERT_EQ (true, check_context_validity (config, "boolean"));
@@ -175,7 +174,7 @@ TEST_F (UnMarshallConfigTest, invalid_context_on_wrong_key)
     EXPECT_NO_THROW ({
         pstatus = reader->unmarshal (&config, filepath.c_str ());
     });
-    std::cerr << disir_error (disir) << std::endl;
+    std::cerr << disir_error (instance) << std::endl;
     ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
 
     ASSERT_EQ (true, check_context_validity (config, "noname"));
@@ -224,7 +223,7 @@ TEST_F (UnMarshallConfigTest, parse_duplicate_sections)
     EXPECT_NO_THROW ({
         pstatus = reader->unmarshal (&config, filepath.c_str());
     });
-    std::cerr << disir_error (disir) << std::endl;
+    std::cerr << disir_error (instance) << std::endl;
     ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
 
     context_config = dc_config_getcontext (config);

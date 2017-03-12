@@ -5,25 +5,23 @@ class MarshallConfigTest : public testing::JsonDioTestWrapper
 {
     void SetUp()
     {
-       mold = NULL;
-       config = NULL;
-       context_keyval = NULL;
-       context_config = NULL;
-       context_section = NULL;
-       context_section_nested = NULL;
+        DisirLogCurrentTestEnter();
 
-       SetUpDisir ();
+        status = disir_mold_read (instance, "test", "json_test_mold", &mold);
+        ASSERT_TRUE (mold != NULL);
 
-       status = disir_mold_input (disir, "test", "json_test_mold", &mold);
-       ASSERT_TRUE (mold != NULL);
+        status = dc_config_begin (mold, &context_config);
+        EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-       status = dc_config_begin (mold, &context_config);
-       EXPECT_STATUS (DISIR_STATUS_OK, status);
+        writer = new dio::ConfigWriter (instance);
 
-       writer = new dio::ConfigWriter (disir);
+        DisirLogTestBodyEnter();
     }
+
     void TearDown()
     {
+        DisirLogTestBodyExit();
+
         if (writer)
         {
             delete writer;
@@ -59,17 +57,17 @@ class MarshallConfigTest : public testing::JsonDioTestWrapper
             EXPECT_STATUS (DISIR_STATUS_OK, status);
         }
 
-        TearDownDisir ();
+        DisirLogCurrentTestExit();
     }
 
     public:
-        struct disir_mold *mold;
-        struct disir_context *context_keyval;
-        struct disir_context *context_config;
-        struct disir_context *context_section;
-        struct disir_context *context_section_nested;
-        struct disir_config *config;
-        dio::ConfigWriter *writer;
+        struct disir_mold *mold = NULL;
+        struct disir_context *context_keyval = NULL;
+        struct disir_context *context_config = NULL;
+        struct disir_context *context_section = NULL;
+        struct disir_context *context_section_nested = NULL;
+        struct disir_config *config = NULL;
+        dio::ConfigWriter *writer = NULL;
 };
 
 TEST_F(MarshallConfigTest, no_keyval_context)
@@ -97,7 +95,7 @@ TEST_F(MarshallConfigTest, no_keyval_context)
 
     // Checking if we got a valid json string
     success = formatJson (result, json);
-    std::cerr << disir_error (disir) << std::endl;
+    std::cerr << disir_error (instance) << std::endl;
     ASSERT_TRUE (success);
 
     ASSERT_STREQ (expected.c_str(), result.c_str());

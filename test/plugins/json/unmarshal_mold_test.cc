@@ -7,19 +7,18 @@ class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 {
     void SetUp()
     {
-        SetUpDisir ();
+        DisirLogCurrentTestEnter();
 
-        mold = NULL;
-        config = NULL;
-        context_mold = NULL;
-        context_config = NULL;
+        reader = new dio::MoldReader (instance);
+        writer = new dio::MoldWriter (instance);
 
-        reader = new dio::MoldReader (disir);
-        writer = new dio::MoldWriter (disir);
-
+        DisirLogTestBodyEnter();
     }
+
     void TearDown()
     {
+        DisirLogTestBodyExit();
+
         delete reader;
         delete writer;
 
@@ -42,17 +41,18 @@ class UnMarshallMoldTest : public testing::JsonDioTestWrapper
             status = disir_mold_finished (&mold);
             EXPECT_STATUS (DISIR_STATUS_OK, status);
         }
-        TearDownDisir ();
+
+        DisirLogCurrentTestExit();
     }
 
     public:
-        struct disir_mold *mold;
-        struct disir_context *context_config;
-        struct disir_config *config;
-        struct disir_context *context_mold;
+        struct disir_mold *mold = NULL;
+        struct disir_context *context_config = NULL;
+        struct disir_config *config = NULL;
+        struct disir_context *context_mold = NULL;
         enum dplugin_status pstatus;
-        dio::MoldReader *reader;
-        dio::MoldWriter *writer;
+        dio::MoldReader *reader = NULL;
+        dio::MoldWriter *writer = NULL;
 };
 
 TEST_F (UnMarshallMoldTest, read_mold_shall_succeed)
@@ -93,7 +93,7 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_defaults)
 
     status = reader->unmarshal (path.c_str (), &mold);
     ASSERT_EQ (DPLUGIN_FATAL_ERROR, status);
-    std::cerr << disir_error (disir) << std::endl;
+    std::cerr << disir_error (instance) << std::endl;
 }
 
 TEST_F (UnMarshallMoldTest, crash_on_absent_type)
@@ -104,7 +104,7 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_type)
 
     status = reader->unmarshal (path.c_str (), &mold);
     ASSERT_EQ (DPLUGIN_FATAL_ERROR, status);
-    std::cerr << disir_error (disir) << std::endl;
+    std::cerr << disir_error (instance) << std::endl;
 }
 
 TEST_F (UnMarshallMoldTest, crash_on_absent_introduced)
@@ -115,7 +115,7 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_introduced)
 
     status = reader->unmarshal (path.c_str (), &mold);
     ASSERT_EQ (DPLUGIN_FATAL_ERROR, status);
-    std::cerr << disir_error (disir) << std::endl;
+    std::cerr << disir_error (instance) << std::endl;
 }
 
 TEST_F (UnMarshallMoldTest, crash_on_absent_elements)
@@ -126,7 +126,7 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_elements)
 
     status = reader->unmarshal (path.c_str (), &mold);
     ASSERT_EQ (DPLUGIN_FATAL_ERROR, status);
-    std::cerr << disir_error (disir) << std::endl;
+    std::cerr << disir_error (instance) << std::endl;
 
 }
 
@@ -152,7 +152,7 @@ TEST_F (UnMarshallMoldTest, correct_documentation)
     ASSERT_TRUE (context_mold != NULL);
 
     status = dc_get_documentation (context_mold, NULL, &doc, NULL);
-    std::cerr << disir_error (disir) << std::endl;
+    std::cerr << disir_error (instance) << std::endl;
     ASSERT_EQ (DISIR_STATUS_OK, status);
 
     ASSERT_STREQ ("this is a mold documentation", doc);

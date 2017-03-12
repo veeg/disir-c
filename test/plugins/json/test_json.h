@@ -20,29 +20,21 @@
 
 namespace testing
 {
-    class JsonDioTestWrapper : public testing::Test
+    class JsonDioTestWrapper : public testing::DisirTestTestPlugin
     {
         protected:
             const std::string m_configjsonPath
-                = CMAKE_PROJECT_SOURCE_DIR "/test/json/reference_config.json";
+                = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/json/reference_config.json";
 
             const std::string m_moldjsonPath
-                = CMAKE_PROJECT_SOURCE_DIR "/test/json/reference_mold.json";
+                = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/json/reference_mold.json";
 
-            const std::string m_jsonPath = CMAKE_PROJECT_SOURCE_DIR "/test/json/";
-
-            static void SetUpTestCase ();
+            const std::string m_jsonPath = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/json/";
 
             bool _compare_json_objects (Json::Value& objOne, Json::Value& objTwo);
 
-           static void TearDownTestCase ();
-
-            void SetUpDisir ();
-            void TearDownDisir ();
-
             // Variables
-            enum disir_status status;
-            struct disir_instance *disir;
+            enum disir_status status = DISIR_STATUS_OK;
 
         public:
             //! \breif compares two json strings
