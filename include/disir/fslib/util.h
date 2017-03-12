@@ -3,10 +3,33 @@
 
 #include <disir/disir.h>
 #include <string.h>
+#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C"{
 #endif // __cplusplus
+
+//! Function signature for standard filesystem serializable config format
+typedef enum disir_status (*dio_serialize_config) (struct disir_instance *,
+                                                   struct disir_config *,
+                                                   FILE *);
+
+//! Function signature for standard filesystem unserializable config format
+typedef enum disir_status (*dio_unserialize_config) (struct disir_instance *,
+                                                     FILE *,
+                                                     struct disir_mold *,
+                                                     struct disir_config **);
+
+//! Function signature for standard filesystem serializable mold format
+typedef enum disir_status (*dio_serialize_mold) (struct disir_instance *,
+                                                 struct disir_mold *,
+                                                 FILE *);
+
+//! Function signature for standard filesystem unserializable mold format
+typedef enum disir_status (*dio_unserialize_mold) (struct disir_instance *,
+                                                   FILE *,
+                                                   struct disir_mold **);
+
 
 //! Create the input path recursively
 //! Similar to shall command mkdir -p
