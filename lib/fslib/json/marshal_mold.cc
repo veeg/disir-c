@@ -257,8 +257,11 @@ MoldWriter::get_default (struct disir_context *context, Json::Value& defaults)
             def[VALUE] = !!boolval;
             break;
         case DISIR_VALUE_TYPE_ENUM:
-            // NOT IMPLEMENTED
-            assert (0);
+            status = dc_get_value_enum (context, &stringval, &size);
+            if (status != DISIR_STATUS_OK)
+                goto error;
+
+            def[VALUE] = stringval;
             break;
         default:
             // HUH? Type not supported?
