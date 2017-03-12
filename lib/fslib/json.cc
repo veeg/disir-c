@@ -1,45 +1,49 @@
+// public
 #include <disir/disir.h>
+#include <disir/fslib/util.h>
 #include <disir/fslib/json.h>
 
 
-//! FSLIB API
+//! PLUGIN API
 enum disir_status
 dio_json_config_read (struct disir_instance *instance,
                       struct disir_plugin *plugin, const char *entry_id,
                       struct disir_mold *mold, struct disir_config **config)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    return fslib_plugin_config_read (instance, plugin, entry_id, mold,
+                                     config, dio_json_unserialize_config);
 }
 
-//! FSLIB API
+//! PLUGIN API
 enum disir_status
 dio_json_config_write (struct disir_instance *instance,
                        struct disir_plugin *plugin, const char *entry_id,
                        struct disir_config *config)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    return fslib_plugin_config_write (instance, plugin, entry_id,
+                                      config, dio_json_serialize_config);
 }
 
-//! FSLIB API
+//! PLUGIN API
 enum disir_status
 dio_json_config_entries (struct disir_instance *instance,
                          struct disir_plugin *plugin,
                          struct disir_entry **entries)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    return fslib_query_entries (instance, plugin, NULL, entries);
 }
 
-//! FSLIB API
+//! PLUGIN API
 enum disir_status
 dio_json_config_query (struct disir_instance *instance,
                        struct disir_plugin *plugin,
                        const char *entry_id,
                        struct disir_entry **entry)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    return fslib_plugin_config_query (instance, plugin, entry_id, entry);
 }
 
-//! FSLIB API
+//! PLUGIN API
 enum disir_status
 dio_json_mold_read (struct disir_instance *instance,
                     struct disir_plugin *plugin, const char *entry_id,
@@ -48,7 +52,7 @@ dio_json_mold_read (struct disir_instance *instance,
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
-//! FSLIB API
+//! PLUGIN API
 enum disir_status
 dio_json_mold_write (struct disir_instance *instance,
                      struct disir_plugin *plugin, const char *entry_id,
@@ -57,7 +61,7 @@ dio_json_mold_write (struct disir_instance *instance,
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
-//! FSLIB API
+//! PLUGIN API
 enum disir_status
 dio_json_mold_entries (struct disir_instance *instance,
                        struct disir_plugin *plugin,
@@ -66,7 +70,7 @@ dio_json_mold_entries (struct disir_instance *instance,
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
-//! FSLIB API
+//! PLUGIN API
 enum disir_status
 dio_json_mold_query (struct disir_instance *instance,
                      struct disir_plugin *plugin,
