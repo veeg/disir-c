@@ -10,8 +10,6 @@ extern "C" {
 #include <disir/disir.h>
 #include <disir/context.h>
 
-// XXX: Remove me when ConfigSerializeUnserializeCompare hack is fixed
-#include <disir/fslib/toml.h>
 // XXX: REmove me when/if we get the mold form config from API instead of stealing it from config
 extern "C" {
 #include "config.h"
@@ -19,6 +17,8 @@ extern "C" {
 
 #define CMAKE_BUILD_DIRECTORY "@CMAKE_BINARY_DIR@"
 #define CMAKE_SOURCE_DIRECTORY "@CMAKE_SOURCE_DIR@"
+#define CMAKE_PROJECT_SOURCE_DIR "@PROJECT_SOURCE_DIR@"
+#define CMAKE_CURRENT_SOURCE_DIR "@CMAKE_CURRENT_SOURCE_DIR@"
 
 #define ASSERT_STATUS(a,b)                                                  \
     {                                                                       \
