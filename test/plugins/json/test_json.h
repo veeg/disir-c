@@ -1,8 +1,8 @@
 #ifndef _TEST_HELPER_H
 #define _TEST_HELPER_H
 
-#include <gtest/gtest.h>
-#include <disir/disir.h>
+#include "test_helper.h"
+
 #include <json/json.h>
 #include <fstream>
 
@@ -17,22 +17,6 @@
         << "\n";                                \
     }                                           \
 }
-
-#define EXPECT_STATUS(a,b) \
-    {                                                                \
-        if (a != b)                                                  \
-        {                                                            \
-            ADD_FAILURE() << "Expected status '"                     \
-            << disir_status_string (a)                               \
-            << " (" << a << ")'"                                     \
-            << ", got '"                                             \
-            << disir_status_string (b)                               \
-            << " (" << b << ")'";                                    \
-        }                                                            \
-    }
-
-#define CMAKE_PROJECT_SOURCE_DIR "@PROJECT_SOURCE_DIR@"
-#define CMAKE_CURRENT_SOURCE_DIR "@CMAKE_CURRENT_SOURCE_DIR@"
 
 namespace testing
 {

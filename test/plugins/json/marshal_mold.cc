@@ -1,9 +1,5 @@
-#include <gtest/gtest.h>
-#include <disir/disir.h>
-#include <json/json.h>
-#include "test_helper.h"
-#include "log.h"
-#include "output.h"
+#include "test_json.h"
+#include "json/output.h"
 
 
 class MarshallMoldTest : public testing::JsonDioTestWrapper

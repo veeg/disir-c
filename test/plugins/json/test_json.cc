@@ -1,8 +1,5 @@
-#include "test_helper.h"
-#include <gtest/gtest.h>
-#include <json/json.h>
-#include "log.h"
-#include <fstream>
+#include "test_json.h"
+
 
 using namespace testing;
 
@@ -61,6 +58,7 @@ JsonDioTestWrapper::SetUpDisir ()
     disir = NULL;
     std::stringstream ss;
     try {
+        // TODO: Fix this shait. It wont work
         ss << CMAKE_CURRENT_SOURCE_DIR << "/dio_json_test_config.ini";
         std::string configstr = ss.str ();
 

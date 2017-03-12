@@ -1,11 +1,7 @@
-#include <gtest/gtest.h>
-#include <disir/disir.h>
-#include <json/json.h>
-#include "test_helper.h"
-#include "log.h"
-#include "input.h"
-#include "output.h"
-#include "dplugin_json.h"
+#include "test_json.h"
+#include "json/input.h"
+#include "json/output.h"
+
 
 class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 {
