@@ -145,7 +145,7 @@ disir_libdisir_config_to_disk (struct disir_instance *instance, struct disir_con
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    status = dio_toml_serialize_config (config, file);
+    status = dio_toml_serialize_config (instance, config, file);
     fclose (file);
 
     return status;

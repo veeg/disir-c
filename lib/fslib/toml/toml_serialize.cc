@@ -262,7 +262,8 @@ out:
 
 //! FSLIB API
 enum disir_status
-dio_toml_serialize_config (struct disir_config *config, FILE *output)
+dio_toml_serialize_config (struct disir_instance *instance,
+                           struct disir_config *config, FILE *output)
 {
     enum disir_status status;
     struct disir_context *context_config;
@@ -273,7 +274,7 @@ dio_toml_serialize_config (struct disir_config *config, FILE *output)
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    disir_log_user (NULL, "TRACE ENTER serialize_config");
+    disir_log_user (instance, "TRACE ENTER serialize_config");
 
     context_config = dc_config_getcontext (config);
     // Create a TOML document, and lets roll!!
@@ -304,7 +305,7 @@ dio_toml_serialize_config (struct disir_config *config, FILE *output)
     boost::fdostream file(fileno(output));
     root.write (&file);
 
-    disir_log_user (NULL, "TRACE EXIT serialize_config");
+    disir_log_user (instance, "TRACE EXIT serialize_config");
     return DISIR_STATUS_OK;
 }
 

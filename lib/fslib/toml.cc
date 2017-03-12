@@ -316,7 +316,7 @@ dio_toml_config_write (struct disir_instance *instance, struct disir_plugin *plu
         return DISIR_STATUS_FS_ERROR;
     }
 
-    status = dio_toml_serialize_config (config, file);
+    status = dio_toml_serialize_config (instance, config, file);
     fclose (file);
 
     return status;

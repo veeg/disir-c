@@ -78,12 +78,23 @@ dio_json_mold_query (struct disir_instance *instance,
 
 //! TODO: docs
 enum disir_status
-dio_json_serialize_config (struct disir_config *config, FILE* output);
+dio_json_serialize_config (struct disir_instance *instance,
+                           struct disir_config *config, FILE *output);
 
 //! TODO: docs
 enum disir_status
 dio_json_unserialize_config (struct disir_instance *instance, FILE *input,
                              struct disir_mold *mold, struct disir_config **config);
+
+//! TODO: docs
+enum disir_status
+dio_json_serialize_mold (struct disir_instance *instance,
+                         struct disir_mold *mold, FILE *output);
+
+//! TODO: docs
+enum disir_status
+dio_json_unserialize_mold (struct disir_instance *instance,
+                           FILE *input, struct disir_mold **mold);
 
 
 #ifdef __cplusplus

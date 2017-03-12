@@ -48,7 +48,8 @@ dio_toml_config_query (struct disir_instance *instance,
 
 //! TODO: docs
 enum disir_status
-dio_toml_serialize_config (struct disir_config *config, FILE* output);
+dio_toml_serialize_config (struct disir_instance *instance,
+                           struct disir_config *config, FILE *output);
 
 //! TODO: docs
 enum disir_status
