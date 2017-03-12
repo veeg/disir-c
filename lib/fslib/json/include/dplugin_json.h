@@ -1,9 +1,33 @@
 #ifndef DIO_JSON_H
 #define DIO_JSON_H
 #include <iostream>
-#include "status_codes.h"
 #include <json/json.h>
 #include <disir/disir.h>
+
+
+//! Define in-plugin status codes
+//! TODO: Refactor plugin to only use enum disir_status codes instead
+enum dplugin_status
+{
+    //! Success
+    DPLUGIN_STATUS_OK = 0,
+
+    //! If a json file contains error
+    DPLUGIN_PARSE_ERROR,
+
+    //! Non-recoverable error
+    DPLUGIN_FATAL_ERROR,
+
+    //! Error returned on error
+    //! with disk interaction
+    DPLUGIN_IO_ERROR,
+
+    DPLUGIN_STATUS_FAILED,
+
+    //
+    DPLUGIN_STATUS_INVALID_CONTEXT,
+};
+
 
 //! Json keynames
 const char DOCUMENTATION[] = "doc";
@@ -21,6 +45,14 @@ object_members_check (Json::Value& object, ...);
 
 #define MEMBERS_CHECK(object, ...) \
         object_members_check (object, __VA_ARGS__, 0)
+
+
+//! \brief helper function that resolves typeof val and sets context's value accordingly
+enum disir_status set_value (Json::Value& val, struct disir_context *context);
+
+//! \brief resolve disir_value_type from its string representation
+enum disir_value_type string_to_type (std::string type);
+
 
 namespace dio
 {

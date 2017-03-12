@@ -2,7 +2,6 @@
 #define DIO_JSON_INPUT_H
 
 #include "dplugin_json.h"
-#include "status_codes.h"
 #include <json/json.h>
 
 namespace dio
