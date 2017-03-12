@@ -2,6 +2,7 @@
 
 #include <disir/fslib/util.h>
 #include <disir/fslib/toml.h>
+#include <disir/fslib/json.h>
 
 #include "log.h"
 
@@ -103,6 +104,15 @@ TEST_P(SerializeUnserializeTest, toml)
 
     ASSERT_NO_FATAL_FAILURE (
         serialize_unserialize_config (key, dio_toml_serialize_config, dio_toml_unserialize_config);
+    );
+}
+
+TEST_P(SerializeUnserializeTest, config_json)
+{
+    const char *key= GetParam();
+
+    ASSERT_NO_FATAL_FAILURE (
+        serialize_unserialize_config (key, dio_json_serialize_config, dio_json_unserialize_config);
     );
 }
 
