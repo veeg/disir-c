@@ -20,12 +20,14 @@ set (_LIBDISIR_3PARTY_LIB_SOURCES
   "${PROJECT_3PARTY_LIBDIR}/void-multimap/multimap.c"
   "${PROJECT_3PARTY_LIBDIR}/void-list/list.c"
   "${PROJECT_3PARTY_LIBDIR}/void-list/list_iterator.c"
+  "${PROJECT_3PARTY_LIBDIR}/jsoncpp/jsoncpp.cpp"
 )
 
 set (_LIBDISIR_3PARTY_LIB_INCLUDEDIR
   ${PROJECT_3PARTY_LIBDIR}/void-multimap
   ${PROJECT_3PARTY_LIBDIR}/void-list/include
   ${PROJECT_3PARTY_LIBDIR}/boost_fdstream
+  ${PROJECT_3PARTY_LIBDIR}/jsoncpp
   ${PROJECT_3PARTY_LIBDIR}
 )
 
@@ -35,6 +37,16 @@ set (FSLIB_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/toml/toml_unserialize.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/mkdir.c"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/namespace.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_serialize.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_unserialize.cc"
+
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/jsonIO.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/marshal_config.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/unmarshal_config.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/marshal_mold.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/unmarshal_mold.cc"
+
 )
 
 # Define all libdisir source files
