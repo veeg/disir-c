@@ -245,7 +245,7 @@ MoldReader::set_context_metadata (struct disir_context *context,
         return DPLUGIN_FATAL_ERROR;
     }
 
-    status = dc_add_introduced (context, semver);
+    status = dc_add_introduced (context, &semver);
     if (status != DISIR_STATUS_OK)
     {
         append_disir_error (Jcontext, "could not add introduced: %s",
@@ -364,7 +364,7 @@ MoldReader::fetch_default_data (struct disir_context *context_default, Json::Val
         return DPLUGIN_FATAL_ERROR;
     }
 
-    status = dc_add_introduced (context_default, intro);
+    status = dc_add_introduced (context_default, &intro);
     if (status != DISIR_STATUS_OK)
     {
         append_disir_error (it, "could not fetch introduced: %s",
