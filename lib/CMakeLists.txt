@@ -37,6 +37,12 @@ set (FSLIB_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/toml/toml_unserialize.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/mkdir.c"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/namespace.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/filepath.c"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/query.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/read.c"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/write.c"
+
+
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_serialize.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_unserialize.cc"
