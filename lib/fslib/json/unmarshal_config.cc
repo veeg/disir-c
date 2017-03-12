@@ -1,12 +1,13 @@
+// JSON private
+#include "json/input.h"
+
+// public
 #include <disir/disir.h>
-#include <json/json.h>
-#include <assert.h>
+
+// standard
 #include <fstream>
-#include "input.h"
 #include <iostream>
 #include <stdint.h>
-#include "log.h"
-#include "util.h" // merge into jsonIO
 
 
 #define VERSION "version"

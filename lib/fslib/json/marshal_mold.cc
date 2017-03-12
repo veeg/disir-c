@@ -1,10 +1,12 @@
+// JSON private
+#include "json/dplugin_json.h"
+#include "json/output.h"
+
+// public
 #include <disir/disir.h>
+
+// standard
 #include <iostream>
-#include "log.h"
-#include <json/json.h>
-#include <assert.h>
-#include "dplugin_json.h"
-#include "output.h"
 
 using namespace dio;
 

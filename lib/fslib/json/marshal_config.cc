@@ -1,11 +1,13 @@
-#include <iostream>
+// JSON private
+#include "json/output.h"
+
+// public
 #include <disir/disir.h>
-#include "output.h"
+
+// standard
+#include <iostream>
 #include <stdint.h>
-#include <json/json.h>
-#include <log.h>
 #include <stdlib.h>
-#include <assert.h>
 #include <string>
 
 using namespace dio;
