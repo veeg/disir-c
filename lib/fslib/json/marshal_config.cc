@@ -243,8 +243,9 @@ ConfigWriter::set_keyval (struct disir_context *context, std::string name, Json:
             keyval = !!boolval;
             break;
         case DISIR_VALUE_TYPE_ENUM:
-            // NOT IMPLEMENTED
-            assert (0);
+            status = dc_get_value_enum (context, &stringval, NULL);
+            if (status != DISIR_STATUS_OK)
+                goto error;
             break;
         case DISIR_VALUE_TYPE_UNKNOWN:
             // If type is not know, we mark it
