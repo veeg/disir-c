@@ -1,54 +1,30 @@
 enable_testing()
 
-find_package(GTest REQUIRED)
+set (TESTS_PLUGIN_JSON tests_plugin_json)
+file (GLOB TESTS_PLUGIN_JSON_SOURCES *.cc)
+list (APPEND TESTS_PLUGIN_JSON_SOURCES "../../test_helper.cc")
 
-set (JSONCPP_ROOTDIR ${PROJECT_SOURCE_DIR}/lib/jsoncpp)
+add_executable (${TESTS_PLUGIN_JSON} ${TESTS_PLUGIN_JSON_SOURCES})
 
-set (JSONIO_TEST_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}
-
-    ${GTEST_INCLUDE_DIRS}
-    ${PROJECT_SOURCE_DIR}/json/include/
-    ${JSONCPP_ROOTDIR}
-)
-
-set (TESTS_JSON_IO tests_json_io)
-#file (GLOB TESTS_JSON_IO_SOURCES *.cc)
-
-set(TESTS_JSON_IO_SOURCES
-    "${JSONCPP_ROOTDIR}/jsoncpp.cpp"
-    "jsontest.cc"
-    "marshal_config.cc"
-    "test_helper.cc"
-    "unmarshal_config.cc"
-    "marshal_mold.cc"
-    "test_mold_input.cc"
-    "unmarshal_mold_test.cc"
-)
-
-
-add_executable (${TESTS_JSON_IO} ${TESTS_JSON_IO_SOURCES})
-set_property (TARGET ${TESTS_JSON_IO} PROPERTY CXX_STANDARD 11)
-set_property (TARGET ${TESTS_JSON_IO} PROPERTY CXX_STANDARD_REQUIRED ON)
-
-set_property (TARGET ${TESTS_JSON_IO} PROPERTY PREFIX "")
-
-include_directories (
-    ${JSONIO_TEST_INLCUDE_DIRS}
-    ${CMAKE_CURRENT_BINARY_DIR}
-    )
+set_property (TARGET ${TESTS_PLUGIN_JSON} PROPERTY CXX_STANDARD 11)
+set_property (TARGET ${TESTS_PLUGIN_JSON} PROPERTY CXX_STANDARD_REQUIRED ON)
 
 add_definitions ("-Wall")
 add_definitions ("-Werror")
-target_compile_definitions (${TESTS_JSON_IO} PRIVATE DEBUG=1)
 
-configure_file ("test_helper.h.in" "test_helper.h")
+include_directories (${LIBDISIR_TEST_INCLUDE_DIRS})
+include_directories (${CMAKE_SOURCE_DIR}/3rdparty/)
+include_directories (${CMAKE_SOURCE_DIR}/3rdparty/boost_fdstream)
+include_directories (${CMAKE_SOURCE_DIR}/3rdparty/jsoncpp)
+include_directories (${CMAKE_SOURCE_DIR}/include/)
+# Private include headers
+include_directories (${CMAKE_SOURCE_DIR}/lib/include/)
 
-include_directories (${JSONIO_TEST_INCLUDE_DIRS})
+target_link_libraries (${TESTS_PLUGIN_JSON} ${PROJECT_SO_LIBRARY})
+target_link_libraries (${TESTS_PLUGIN_JSON} ${GTEST_BOTH_LIBRARIES})
+# TODO: Why pthread not part of gtest?? (it is on fedora)
+target_link_libraries (${TESTS_PLUGIN_JSON} pthread)
 
-target_link_libraries (${TESTS_JSON_IO} dplugin_json)
-target_link_libraries (${TESTS_JSON_IO} disir::disir)
-target_link_libraries (${TESTS_JSON_IO} ${GTEST_BOTH_LIBRARIES})
-target_link_libraries (${TESTS_JSON_IO} pthread)
+add_test (LibDisirPluginJSONTest ${TESTS_PLUGIN_JSON})
 
-add_test (JsonDIOTests ${TESTS_JSON_IO})
+

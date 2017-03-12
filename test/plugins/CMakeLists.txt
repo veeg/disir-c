@@ -1,6 +1,7 @@
 enable_testing ()
 
 add_subdirectory (toml)
+add_subdirectory (json)
 
 set (TESTS_PLUGIN_PLUGIN tests_plugin_plugin)
 file (GLOB TESTS_PLUGIN_PLUGIN_SOURCES *.cc)
