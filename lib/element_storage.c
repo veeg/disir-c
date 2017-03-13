@@ -227,7 +227,13 @@ dx_element_storage_remove (struct disir_element_storage *storage,
                            const char * const name,
                            struct disir_context *context)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    multimap_remove_value (storage->es_map, (void*)name, free, context);
+    if (list_remove (storage->es_list, context))
+    {
+        dx_context_decref (&context);
+    }
+
+    return DISIR_STATUS_OK;
 }
 
 enum disir_status
