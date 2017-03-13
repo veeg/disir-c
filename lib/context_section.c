@@ -132,6 +132,10 @@ dx_section_finalize (struct disir_context *section)
         {
             dx_log_context(section, "Unable to insert into element storage - Interesting...");
         }
+        else
+        {
+            section->CONTEXT_STATE_IN_PARENT = 1;
+        }
     }
 
     return (status == DISIR_STATUS_OK ? invalid : status);

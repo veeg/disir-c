@@ -99,6 +99,63 @@ context_get_deprecated_structure (struct disir_context *context,
     return DISIR_STATUS_OK;
 }
 
+void
+context_remove_from_parent (struct disir_context **context)
+{
+    struct disir_element_storage *storage = NULL;
+    const char *name = NULL;
+
+    // Remove from parent, if applicable
+    if ((*context)->CONTEXT_STATE_IN_PARENT == 0)
+    {
+        return;
+    }
+
+    switch (dc_context_type ((*context)->cx_parent_context))
+    {
+    case DISIR_CONTEXT_CONFIG:
+    {
+        storage = (*context)->cx_parent_context->cx_config->cf_elements;
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+    {
+        storage = (*context)->cx_parent_context->cx_config->cf_elements;
+        break;
+    }
+    default:
+    {
+        log_warn ("Unhandled context type for STATE_IN_PARENT: %s",
+                  dc_context_type_string ((*context)->cx_parent_context));
+    }
+    }
+
+    switch (dc_context_type (*context))
+    {
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        name = (*context)->cx_keyval->kv_name.dv_string;
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+    {
+        name = (*context)->cx_section->se_name.dv_string;
+        break;
+    }
+    default:
+    {
+        log_warn ("Unhandled context type for STATE_IN_PARENT: %s",
+                  dc_context_type_string ((*context)->cx_parent_context));
+    }
+    }
+
+    // Remove from parent storage, if available
+    if (storage && name)
+    {
+        dx_element_storage_remove (storage, name, *context);
+    }
+}
+
 //! PUBLIC API
 enum disir_status
 dc_printerror (struct disir_context *context, char *buffer,
@@ -159,8 +216,10 @@ dc_destroy (struct disir_context **context)
         return DISIR_STATUS_OK;
     }
 
-    log_debug_context (6, *context, "destroying (context: %p - *context: %p", context, *context);
+    // Only applicable if CONTEXT_STATE_IN_PARENT
+    context_remove_from_parent (context);
 
+    log_debug_context (6, *context, "destroying (context: %p - *context: %p", context, *context);
     // Call destroy on the object pointed to by context.
     // This shall destroy the element, and every single child.
     switch (dc_context_type (*context))

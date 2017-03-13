@@ -23,6 +23,7 @@ struct disir_context
                         CONTEXT_STATE_FINALIZED                 : 2,
                         CONTEXT_STATE_INVALID                   : 3,
                         CONTEXT_STATE_DESTROYED                 : 4,
+                        CONTEXT_STATE_IN_PARENT                 : 5,
                                                                 : 0;
         };
     };

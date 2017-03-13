@@ -133,6 +133,10 @@ dx_keyval_finalize (struct disir_context *keyval)
         {
             dx_log_context(keyval, "Unable to insert into element storage - Interesting...");
         }
+        else
+        {
+            keyval->CONTEXT_STATE_IN_PARENT = 1;
+        }
     }
 
     return (status == DISIR_STATUS_OK ? invalid : status);
