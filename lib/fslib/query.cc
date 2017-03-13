@@ -36,6 +36,11 @@ fslib_query_entries (struct disir_instance *instance, struct disir_plugin *plugi
     std::string searchdir = sd.str();
 
     directory = opendir (searchdir.c_str());
+    if (directory == NULL)
+    {
+        disir_error_set (instance, "Unable to open directory: %s", searchdir.c_str());
+        return DISIR_STATUS_FS_ERROR;
+    }
     while ((dp = readdir(directory)) != NULL)
     {
         // entry file, relative to basedir
