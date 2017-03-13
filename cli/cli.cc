@@ -2,6 +2,7 @@
 #include <iostream>
 #include <list>
 #include <algorithm>
+#include <numeric>
 #include <unistd.h>
 
 #include <disir/disir.h>
