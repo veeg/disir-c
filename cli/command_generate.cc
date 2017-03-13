@@ -102,7 +102,10 @@ CommandGenerate::handle_command (std::vector<std::string> &args)
     std::set<std::string> available = available_configs();
     std::set<std::string> namespaces = available_namespaces();
     char namespace_entry[PATH_MAX];
-    std::set<std::string> configs = list_configs ();
+    std::set<std::string> configs;
+
+    // XXX: Ignore if this went shait? Or return in full error?
+    list_configs (configs);
 
     // TODO: Combine force and all to re-generate ALL available molds?
 
@@ -118,7 +121,7 @@ CommandGenerate::handle_command (std::vector<std::string> &args)
         for (const auto& entry : args::get (opt_entries))
         {
             fslib_namespace_entry (entry.c_str(), namespace_entry);
-            configs = list_configs();
+
             // Add entry to avalable set if it does not already exist, and
             // it is covered by a namespace mold
             if (namespaces.count (namespace_entry) != 0 && configs.count (entry) == 0)

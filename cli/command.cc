@@ -10,21 +10,20 @@ Command::Command (std::string name)
 {
 }
 
-std::set<std::string>
-Command::list_configs (void)
+int
+Command::list_configs (std::set<std::string>& list)
 {
     enum disir_status status;
     struct disir_entry *config_entries;
     struct disir_entry *next;
     struct disir_entry *current;
-    std::set<std::string> list;
 
     status = disir_config_entries (m_cli->disir(), m_cli->group_id().c_str(), &config_entries);
     if (status != DISIR_STATUS_OK)
     {
-        std::cerr << "Failed to retrieve available configs: "
+        std::cerr << "error querying available configs: "
                   << disir_error (m_cli->disir()) << std::endl;
-        return list;
+        return (-1);
     }
 
     current = config_entries;
@@ -38,6 +37,6 @@ Command::list_configs (void)
         current = next;
     }
 
-    return list;
+    return (0);
 }
 

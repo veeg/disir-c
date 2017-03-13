@@ -26,7 +26,7 @@ namespace disir
         virtual int handle_command (std::vector<std::string> &args) = 0;
 
         //! Return a set of available configs on the system
-        std::set<std::string> list_configs (void);
+        int list_configs (std::set<std::string>& list);
 
     // Variables
     protected:

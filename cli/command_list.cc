@@ -49,8 +49,10 @@ CommandList::handle_command (std::vector<std::string> &args)
 
     // TODO: Expose group selection.
     std::set<std::string> list;
-
-    list = list_configs();
+    if (list_configs(list))
+    {
+        return (-1);
+    }
 
     std::cout << "In group " << m_cli->group_id() << std::endl;
     if (list.empty())
