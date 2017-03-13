@@ -240,6 +240,14 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
     {
         // Load default config
         status = disir_generate_config_from_mold (libmold, NULL, &libconf);
+
+        // Remove the plugin element from default generated config
+        struct disir_context *plugin;
+        status = dc_find_element (dc_config_getcontext (libconf), "plugin", 0, &plugin);
+        if (status == DISIR_STATUS_OK)
+        {
+            dc_destroy (&plugin);
+        }
     }
 
     if (status != DISIR_STATUS_OK)
@@ -254,7 +262,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
     // XXX: Validate version? Upgrade?
 
     status = load_plugins_from_config (dis, libconf);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_NOT_EXIST)
     {
         log_fatal ("Cannot instanciate disir from its configuration. Rejecting allocation.");
         goto error;
