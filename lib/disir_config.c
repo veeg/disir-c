@@ -249,6 +249,7 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
                       struct disir_entry **entries)
 {
     enum disir_status status;
+    enum disir_status retstatus;
     struct multimap *map;
     struct disir_entry *queue;
     struct disir_entry *query;
@@ -257,6 +258,7 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
     queue = NULL;
     query = NULL;
     current = NULL;
+    retstatus = DISIR_STATUS_OK;
 
     if (instance == NULL || group_id == NULL || entries == NULL)
     {
@@ -298,6 +300,7 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
             log_warn ("Plugin '%s' queried for config entries failed with status: %s",
                       entry->pi_io_id, disir_status_string (status));
             entry = entry->next;
+            retstatus = status;
             continue;
         }
 
@@ -326,7 +329,7 @@ disir_config_entries (struct disir_instance *instance, const char *group_id,
 
     *entries = queue;
 
-    status = DISIR_STATUS_OK;
+    status = retstatus;
     // FALL-THROUGH
 out:
     if (map)
