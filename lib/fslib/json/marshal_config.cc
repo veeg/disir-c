@@ -217,35 +217,46 @@ ConfigWriter::set_keyval (struct disir_context *context, std::string name, Json:
         case DISIR_VALUE_TYPE_STRING:
             status = dc_get_value_string (context, &stringval, &size);
             if (status != DISIR_STATUS_OK)
+            {
                 goto error;
+            }
 
             keyval = stringval;
             break;
         case DISIR_VALUE_TYPE_INTEGER:
             status = dc_get_value_integer (context, &intval);
             if (status != DISIR_STATUS_OK)
+            {
                 goto error;
+            }
 
             keyval = (Json::Int64)intval;
             break;
         case DISIR_VALUE_TYPE_FLOAT:
             status = dc_get_value_float (context, &floatval);
             if (status != DISIR_STATUS_OK)
+            {
                 goto error;
+            }
 
             keyval = floatval;
             break;
         case DISIR_VALUE_TYPE_BOOLEAN:
             status = dc_get_value_boolean (context, &boolval);
             if  (status != DISIR_STATUS_OK)
+            {
                 goto error;
+            }
 
             keyval = !!boolval;
             break;
         case DISIR_VALUE_TYPE_ENUM:
             status = dc_get_value_enum (context, &stringval, NULL);
             if (status != DISIR_STATUS_OK)
+            {
                 goto error;
+            }
+            keyval = stringval;
             break;
         case DISIR_VALUE_TYPE_UNKNOWN:
             // If type is not know, we mark it

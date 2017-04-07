@@ -182,8 +182,16 @@ set_value (Json::Value& val, struct disir_context *context)
         case Json::realValue:
             return dc_set_value_float (context, (double)val.asDouble());
         case Json::stringValue:
-            return dc_set_value_string (context,
-                    val.asString().c_str(), val.asString().size());
+            if (dc_value_type (context) == DISIR_VALUE_TYPE_ENUM)
+            {
+                return dc_set_value_enum (context,
+                        val.asString().c_str(), val.asString().size());
+            }
+            else
+            {
+                return dc_set_value_string (context,
+                        val.asString().c_str(), val.asString().size());
+            }
         case Json::arrayValue:
             return DISIR_STATUS_WRONG_VALUE_TYPE;
         case Json::uintValue:
