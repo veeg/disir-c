@@ -90,8 +90,8 @@ TEST_F(MarshallConfigTest, no_keyval_context)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-    auto pstatus = writer->marshal (config, json);
-    ASSERT_TRUE (pstatus == DPLUGIN_STATUS_OK);
+    auto status = writer->marshal (config, json);
+    EXPECT_STATUS (status, DISIR_STATUS_OK);
 
     // Checking if we got a valid json string
     success = formatJson (result, json);
@@ -129,7 +129,6 @@ TEST_F(MarshallConfigTest, marshall_section_shall_pass)
              } \
             }}}");
     ASSERT_TRUE (success);
-
 
     status = dc_begin (context_config,
             DISIR_CONTEXT_SECTION, &context_section);
@@ -172,8 +171,8 @@ TEST_F(MarshallConfigTest, marshall_section_shall_pass)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-    auto pstatus = writer->marshal (config, json);
-    ASSERT_TRUE (pstatus == DPLUGIN_STATUS_OK);
+    auto status = writer->marshal (config, json);
+    EXPECT_STATUS (status,DISIR_STATUS_OK);
     ASSERT_STREQ (expected.c_str(), json.c_str());
 }
 
@@ -184,7 +183,7 @@ TEST_F(MarshallConfigTest, empty_config_shall_fail)
 
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    ASSERT_FALSE (writer->marshal (config, empty) != DPLUGIN_STATUS_OK);
+    ASSERT_FALSE (writer->marshal (config, empty) != DISIR_STATUS_OK);
 }
 /*
 {
@@ -263,7 +262,7 @@ TEST_F(MarshallConfigTest, marshall_all_types)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-    ASSERT_TRUE (writer->marshal(config, json) == DPLUGIN_STATUS_OK);
+    ASSERT_TRUE (writer->marshal(config, json) == DISIR_STATUS_OK);
     ASSERT_STREQ (expected.c_str(), json.c_str());
 }
 
@@ -303,9 +302,9 @@ TEST_F (MarshallConfigTest, duplicate_keyvals_shall_succeed)
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_config_finalize (&context_config, &config);
-    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
-    ASSERT_TRUE (writer->marshal (config, json) == DPLUGIN_STATUS_OK);
+    ASSERT_TRUE (writer->marshal (config, json) == DISIR_STATUS_OK);
 
     ASSERT_JSON_STREQ (expected.c_str (), json.c_str ());
 }
@@ -340,9 +339,9 @@ TEST_F (MarshallConfigTest, duplicate_sections_shall_succeed)
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_config_finalize (&context_config, &config);
-    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
-    ASSERT_TRUE (writer->marshal (config, json) == DPLUGIN_STATUS_OK);
+    ASSERT_TRUE (writer->marshal (config, json) == DISIR_STATUS_OK);
 
     ASSERT_JSON_STREQ (expected.c_str (), json.c_str ());
 }
@@ -367,10 +366,10 @@ TEST_F (MarshallConfigTest, context_without_value_shall_succeed)
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     status = dc_config_finalize (&context_config, &config);
-    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
-    auto pstatus = writer->marshal (config, json);
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
+    auto status = writer->marshal (config, json);
+    ASSERT_EQ (DISIR_STATUS_OK, status);
 
     dc_putcontext (&context_keyval);
 

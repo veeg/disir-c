@@ -75,11 +75,11 @@ TEST_F(UnMarshallConfigTest, unmarshal_succeed)
     result = Jwriter.writeOrdered (root);
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, m_configjsonPath.c_str ());
+        status = reader->unmarshal (&config, m_configjsonPath.c_str ());
     });
 
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
-    ASSERT_TRUE (writer->marshal (config, expected) == DPLUGIN_STATUS_OK);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_TRUE (writer->marshal (config, expected) == DISIR_STATUS_OK);
     ASSERT_STREQ (result.c_str(), expected.c_str());
 }
 
@@ -89,9 +89,9 @@ TEST_F(UnMarshallConfigTest, version_should_be_correct)
     struct semantic_version actual;
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, std::string ("{\"version\" : \"1.0.0\"}"));
+        status = reader->unmarshal (&config, std::string ("{\"version\" : \"1.0.0\"}"));
     });
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_semantic_version_convert ("1.0.0", &expected);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
@@ -112,10 +112,10 @@ TEST_F(UnMarshallConfigTest, no_version_should_result_standard)
     struct semantic_version actual;
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, std::string ("{\"noversion\" : \"1.0.0\"}"));
+        status = reader->unmarshal (&config, std::string ("{\"noversion\" : \"1.0.0\"}"));
     });
 
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_semantic_version_convert ("1.0.0", &expected);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
@@ -135,9 +135,9 @@ TEST_F(UnMarshallConfigTest, unmarshal_returns_parse_error)
     std::string invalid ("invalid_json");
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, invalid);
+        status = reader->unmarshal (&config, invalid);
     });
-    ASSERT_EQ (DPLUGIN_PARSE_ERROR, pstatus);
+    EXPECT_STATUS (DISIR_STATUS_FS_ERROR, status);
 }
 
 TEST_F(UnMarshallConfigTest, return_error_on_invalid_path)
@@ -145,9 +145,9 @@ TEST_F(UnMarshallConfigTest, return_error_on_invalid_path)
     std::string output_s;
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, "fake");
+        status = reader->unmarshal (&config, "fake");
     });
-    ASSERT_EQ (DPLUGIN_IO_ERROR, pstatus);
+    EXPECT_STATUS (DISIR_STATUS_FS_ERROR, status);
 }
 
 TEST_F (UnMarshallConfigTest, invalid_context_on_wrong_value)
@@ -157,12 +157,9 @@ TEST_F (UnMarshallConfigTest, invalid_context_on_wrong_value)
     filepath += "wrong_value_in_config.json";
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, filepath.c_str ());
+        status = reader->unmarshal (&config, filepath.c_str ());
     });
-    std::cout << disir_error (instance) << std::endl;
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
-
-    ASSERT_EQ (true, check_context_validity (config, "boolean"));
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
 
 TEST_F (UnMarshallConfigTest, invalid_context_on_wrong_key)
@@ -172,12 +169,9 @@ TEST_F (UnMarshallConfigTest, invalid_context_on_wrong_key)
     filepath += "wrong_name.json";
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, filepath.c_str ());
+        status = reader->unmarshal (&config, filepath.c_str ());
     });
-    std::cerr << disir_error (instance) << std::endl;
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
-
-    ASSERT_EQ (true, check_context_validity (config, "noname"));
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
 
 TEST_F (UnMarshallConfigTest, DISABLED_invalid_context_section_on_wrong_key)
@@ -187,9 +181,9 @@ TEST_F (UnMarshallConfigTest, DISABLED_invalid_context_section_on_wrong_key)
     filepath += "fake_section.json";
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unmarshal (&config, filepath.c_str());
     });
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     ASSERT_EQ (true, check_context_validity (config, "noname"));
 }
@@ -201,7 +195,7 @@ TEST_F (UnMarshallConfigTest, parse_duplicate_keyvals)
     filepath += "duplicate_keyvals.json";
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unmarshal (&config, filepath.c_str());
     });
 
     context_config = dc_config_getcontext (config);
@@ -221,10 +215,9 @@ TEST_F (UnMarshallConfigTest, parse_duplicate_sections)
     filepath += "duplicate_sections.json";
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unmarshal (&config, filepath.c_str());
     });
-    std::cerr << disir_error (instance) << std::endl;
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     context_config = dc_config_getcontext (config);
 
@@ -232,8 +225,6 @@ TEST_F (UnMarshallConfigTest, parse_duplicate_sections)
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     ASSERT_EQ (2, dc_collection_size (collection));
-
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
 }
 
 
@@ -244,11 +235,11 @@ TEST_F (UnMarshallConfigTest, invalid_section_shall_succeed)
     filepath += "invalid_section.json";
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unmarshal (&config, filepath.c_str());
     });
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
-    ASSERT_EQ (true, check_context_validity (config, "fake_section"));
+//    ASSERT_EQ (true, check_context_validity (config, "fake_section"));
 }
 
 TEST_F (UnMarshallConfigTest, float_value_conversion)
@@ -273,8 +264,6 @@ TEST_F (UnMarshallConfigTest, float_value_conversion)
      status = dc_get_value_float (context_keyval_float, &value);
      EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-     printf ("%f\n", value);
-
      ASSERT_EQ (12.123, value);
 }
 
@@ -282,27 +271,11 @@ TEST_F (UnMarshallConfigTest, float_value_conversion)
 TEST_F (UnMarshallConfigTest, invalid_keyval_on_invalid_parent)
 {
     std::string filepath (m_jsonPath);
-    struct disir_collection *collection;
-    struct disir_context *invalid_section;
 
     filepath += "invalid_child_on_invalid_section.json";
 
     EXPECT_NO_THROW ({
-        pstatus = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unmarshal (&config, filepath.c_str());
     });
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
-
-    ASSERT_EQ (true, check_context_validity (config, "fake_section"));
-
-    context_config = dc_config_getcontext (config);
-
-    status = dc_get_elements (context_config, &collection);
-    ASSERT_EQ (DISIR_STATUS_OK, status);
-
-    status = dc_collection_next (collection, &invalid_section);
-    ASSERT_EQ (DISIR_STATUS_OK, status);
-
-    ASSERT_EQ (true, check_context_validity (invalid_section, "unimportant_name"));
-
-    dc_collection_finished (&collection);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }

@@ -17,7 +17,7 @@ JsonIO::JsonIO (struct disir_instance *disir)
     m_disir = disir;
 }
 
-enum dplugin_status
+enum disir_status
 JsonIO::read_config (const char *filepath, Json::Value& root)
 {
     std::ifstream file (filepath);
@@ -31,7 +31,7 @@ JsonIO::read_config (const char *filepath, Json::Value& root)
     else
     {
         disir_error_set (m_disir, "Could not open file on filepath: %s", strerror (errno));
-        return DPLUGIN_IO_ERROR;
+        return DISIR_STATUS_FS_ERROR;
     }
 
     bool success = reader.parse (buffer, root);
@@ -39,9 +39,9 @@ JsonIO::read_config (const char *filepath, Json::Value& root)
     {
         disir_error_set (m_disir, "Could not parse jsonfile: %s",
                                    reader.getFormattedErrorMessages ().c_str ());
-        return DPLUGIN_PARSE_ERROR;
+        return DISIR_STATUS_FS_ERROR;
     }
-    return DPLUGIN_STATUS_OK;
+    return DISIR_STATUS_OK;
 }
 
 
