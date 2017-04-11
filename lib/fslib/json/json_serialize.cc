@@ -18,23 +18,15 @@ dio_json_serialize_config (struct disir_instance *instance,
 
     try
     {
-        enum dplugin_status pstatus;
         boost::fdostream file(fileno(output));
         dio::ConfigWriter writer (NULL);
 
-        pstatus = writer.marshal (config, file);
-        if (pstatus != DPLUGIN_STATUS_OK)
-        {
-            disir_log_user (instance, "JSON: serialize_config failed");
-            return DISIR_STATUS_INTERNAL_ERROR;
-        }
+         return writer.marshal (config, file);
     }
     catch (std::exception& e)
     {
         return DISIR_STATUS_INTERNAL_ERROR;
     }
-
-    return DISIR_STATUS_OK;
 }
 
 // FSLIB API

@@ -25,10 +25,12 @@ namespace dio
        //! \return DPLUGIN_STATUS_OK on success.
        //! \return DPLUGIN_FATAL_ERROR on unrecoverable errors.
        //!
-       enum dplugin_status marshal (struct disir_config *config, std::string& output);
+       enum disir_status
+       marshal (struct disir_config *config, std::string& output);
 
        //! \brief Marshal a disir_config object to JSON, writing it to the ostream
-       enum dplugin_status marshal (struct disir_config *config, std::ostream& stream);
+       enum disir_status
+       marshal (struct disir_config *config, std::ostream& stream);
 
 
     private:
@@ -43,7 +45,8 @@ namespace dio
        //! \return name of context on success.
        //! \return empty string on failure (Logged to disir).
        //!
-       std::string get_context_key (struct disir_context *context);
+       enum disir_status
+       get_context_key (struct disir_context *context, std::string& key);
 
        //! \brief Insering a section onto its respective parent
        //!
@@ -57,9 +60,10 @@ namespace dio
        //! \return DPLUGIN_STATUS_OK on success.
        //! \return DPLUGIN_FATAL_ERROR if we cannot retrieve the value store in context
        //!
-       enum dplugin_status set_section_keyname (struct disir_context *context,
-                                 Json::Value& parent,
-                                 Json::Value& sectionVal);
+       enum disir_status
+       set_section_keyname (struct disir_context *context,
+                            Json::Value& parent,
+                            Json::Value& sectionVal);
 
         //! \brief Insering a keyval onto its respective parent
        //!
@@ -70,26 +74,27 @@ namespace dio
        //! \param[in] parent
        //! \param[in] sectionVal
        //!
-       //! \return DPLUGIN_STATUS_OK on success.
+       //! \return DISIR_STATUS_OK on success.
        //! \return DPLUGIN_FATAL_ERROR if we cannot retrieve the value store in context
        //!
-       enum dplugin_status set_keyval (struct disir_context *context,
-                                       std::string name,
-                                       Json::Value& node);
+       enum disir_status
+       set_keyval (struct disir_context *context, std::string name, Json::Value& node);
 
        //! \brief parses a json object mirroring a disir_keyval and
        //!  generates a new config_keyval object.
        //!
-       enum dplugin_status marshal_keyval (struct disir_context *context,
-                                           Json::Value& parent);
+       enum disir_status
+       marshal_keyval (struct disir_context *context, Json::Value& parent);
 
        //! \brief sets the disir_config version
-       enum dplugin_status set_config_version (struct disir_context *context_config,
-                                               Json::Value& root);
+       enum disir_status
+       set_config_version (struct disir_context *context_config,
+                                                Json::Value& root);
 
        //! \brief recursive function that extracts an entire config starting from root
-       enum dplugin_status _marshal_context (struct disir_context *parent_context,
-                                             Json::Value& parent);
+       enum disir_status
+       _marshal_context (struct disir_context *parent_context,
+                                              Json::Value& parent);
 
        //! \brief if a config has keyvals with identical names
        //! under the same root, we enumerate their names.

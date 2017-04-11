@@ -17,16 +17,10 @@ dio_json_unserialize_config (struct disir_instance *instance, FILE *input,
     disir_log_user (instance, "TRACE ENTER dio_json_unserialize_config");
     try
     {
-        enum dplugin_status pstatus;
         boost::fdistream file(fileno(input));
         dio::ConfigReader reader (instance, mold);
 
-        pstatus = reader.unmarshal (config, file);
-        if (pstatus != DPLUGIN_STATUS_OK)
-        {
-            disir_log_user (instance, "JSON: unserialize_config failed");
-            return DISIR_STATUS_INTERNAL_ERROR;
-        }
+        return reader.unmarshal (config, file);
     }
     catch (std::exception& e)
     {

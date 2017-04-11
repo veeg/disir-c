@@ -26,107 +26,120 @@ ConfigWriter::~ConfigWriter ()
     }
 }
 
-enum dplugin_status
+enum disir_status
 ConfigWriter::marshal (struct disir_config *config, std::ostream& stream)
 {
-    enum dplugin_status pstatus;
-    std::string outputJson;
+    enum disir_status status;
     Json::StyledWriter writer;
+    std::string outputJson;
 
-    pstatus = DPLUGIN_STATUS_OK;
+    status = DISIR_STATUS_OK;
 
     // Retrieving the config's context object
     m_contextConfig = dc_config_getcontext (config);
     if (m_contextConfig == NULL )
     {
         disir_error_set (m_disir, "could not retrieve cconfig context object");
-        return DPLUGIN_FATAL_ERROR;
+        return DISIR_STATUS_INTERNAL_ERROR;
     }
 
-    pstatus = set_config_version (m_contextConfig, m_configRoot);
-    if (pstatus != DPLUGIN_STATUS_OK)
+    status = set_config_version (m_contextConfig, m_configRoot);
+    if (status != DISIR_STATUS_OK)
+    {
         goto end;
+    }
 
-    pstatus = _marshal_context (m_contextConfig, m_configRoot[CONFIG]);
-    if (pstatus != DPLUGIN_STATUS_OK)
+    status = _marshal_context (m_contextConfig, m_configRoot[CONFIG]);
+    if (status != DISIR_STATUS_OK)
+    {
         goto end;
+    }
 
     stream << writer.writeOrdered (m_configRoot);
 
 end:
     dc_putcontext (&m_contextConfig);
-    return pstatus;
+    return status;
 }
 
-enum dplugin_status
+enum disir_status
 ConfigWriter::marshal (struct disir_config *config, std::string& output)
 {
-    enum dplugin_status pstatus;
-    std::string outputJson;
+    enum disir_status status;
     Json::StyledWriter writer;
-
-    pstatus = DPLUGIN_STATUS_OK;
+    std::string outputJson;
 
     // Retrieving the config's context object
     m_contextConfig = dc_config_getcontext (config);
     if (m_contextConfig == NULL )
     {
         disir_error_set (m_disir, "could not retrieve cconfig context object");
-        return DPLUGIN_FATAL_ERROR;
+        return DISIR_STATUS_INTERNAL_ERROR;
     }
 
-    pstatus = set_config_version (m_contextConfig, m_configRoot);
-    if (pstatus != DPLUGIN_STATUS_OK)
+    status = set_config_version (m_contextConfig, m_configRoot);
+    if (status != DISIR_STATUS_OK)
+    {
         goto end;
+    }
 
-    pstatus = _marshal_context (m_contextConfig, m_configRoot[CONFIG]);
-    if (pstatus != DPLUGIN_STATUS_OK)
+    status = _marshal_context (m_contextConfig, m_configRoot[CONFIG]);
+    if (status != DISIR_STATUS_OK)
+    {
         goto end;
+    }
 
     output = writer.writeOrdered (m_configRoot);
 
+
 end:
     dc_putcontext (&m_contextConfig);
-    return pstatus;
+    return status;
 }
 
-enum dplugin_status
+enum disir_status
 ConfigWriter::set_config_version (struct disir_context *context_config, Json::Value& root)
 {
     struct semantic_version semver;
+    enum disir_status status;
     char buf[500];
     char *temp;
 
-    auto status = dc_get_version (context_config, &semver);
+    status = dc_get_version (context_config, &semver);
     if (status != DISIR_STATUS_OK)
     {
         disir_error_set (m_disir, "Could not read config version: (%s)",
                                    disir_status_string (status));
-        return DPLUGIN_FATAL_ERROR;
+        return status;
     }
 
     temp = dc_semantic_version_string ((char *)buf, (int32_t)500, &semver);
     if (temp == NULL)
     {
-        return DPLUGIN_FATAL_ERROR;
+        disir_error_set (m_disir, "Error retrieving semantic version string");
+        return DISIR_STATUS_INTERNAL_ERROR;
     }
 
     root[VERSION] = buf;
 
-    return DPLUGIN_STATUS_OK;
+    return status;
 }
 
 // Mapping child node (section) to key (section name)
-enum dplugin_status
+enum disir_status
 ConfigWriter::set_section_keyname (struct disir_context *context, Json::Value& parent,
                                    Json::Value& sectionVal)
 {
-    std::string name = get_context_key (context);
-    if (name.empty ())
+    std::string name;
+    enum disir_status status;
+
+    status = get_context_key (context, name);
+    if (status != DISIR_STATUS_OK)
     {
         // logged
-        return DPLUGIN_FATAL_ERROR;
+        return status;
     }
+
     // If name already exists, enumerate it before
     // mapping section to parent
     if (parent[name].isNull () == false)
@@ -143,11 +156,11 @@ ConfigWriter::set_section_keyname (struct disir_context *context, Json::Value& p
 
     parent[name] = sectionVal;
 
-    return DPLUGIN_STATUS_OK;
+    return status;
 }
 
-std::string
-ConfigWriter::get_context_key (struct disir_context *context)
+enum disir_status
+ConfigWriter::get_context_key (struct disir_context *context, std::string& key)
 {
     const char *name;
     int32_t size;
@@ -158,10 +171,12 @@ ConfigWriter::get_context_key (struct disir_context *context)
         // Should not happen
         disir_error_set (m_disir, "Disir returned an error from dc_get_name: %s",
                                    disir_status_string (status));
-        return std::string ();
+        return status;
     }
 
-    return std::string (name, size);
+    key = std::string (name, size);
+
+    return status;
 }
 
 std::string
@@ -183,7 +198,7 @@ ConfigWriter::enumerate_keyname (Json::Value& node, const std::string name)
 }
 
 // Wraps libdisir dc_get_value to handle arbitrary value sizes
-enum dplugin_status
+enum disir_status
 ConfigWriter::set_keyval (struct disir_context *context, std::string name, Json::Value& node)
 {
     enum disir_status status;
@@ -201,7 +216,7 @@ ConfigWriter::set_keyval (struct disir_context *context, std::string name, Json:
     {
         disir_error_set (m_disir, "Could not obtain context_value_type (%s)",
                                    disir_status_string (status));
-        return DPLUGIN_FATAL_ERROR;
+        return status;
     }
 
     // The json rfc dictates that
@@ -267,32 +282,33 @@ ConfigWriter::set_keyval (struct disir_context *context, std::string name, Json:
             // HUH? Type not supported?
             disir_error_set (m_disir, "Got an unsupported disir value type: %s",
                                        dc_value_type_string (context));
-            keyval = dc_value_type_string (context);
             break;
     }
 
     node[name] = keyval;
 
-    return DPLUGIN_STATUS_OK;
+    return status;
 error:
     disir_error_set (m_disir, "Unable to fetch value from keyval with name: %s and type %s",
                                name.c_str(), dc_value_type_string (context));
-    return DPLUGIN_FATAL_ERROR;
+    return status;
 }
 
-enum dplugin_status
+enum disir_status
 ConfigWriter::marshal_keyval (struct disir_context *context, Json::Value& node)
 {
-   std::string name = get_context_key (context);
-   if (name.empty ())
-   {
-       return DPLUGIN_FATAL_ERROR;
-   }
+    enum disir_status status;
+    std::string name;
+    status = get_context_key (context, name);
+    if (status != DISIR_STATUS_OK)
+    {
+       return status;
+    }
 
-   return set_keyval (context, name, node);
+    return set_keyval (context, name, node);
 }
 
-enum dplugin_status
+enum disir_status
 ConfigWriter::_marshal_context (struct disir_context *parent_context, Json::Value& parent)
 {
     struct disir_collection *collection;
@@ -305,7 +321,7 @@ ConfigWriter::_marshal_context (struct disir_context *parent_context, Json::Valu
         goto end;
     }
 
-    pstatus = DPLUGIN_STATUS_OK;
+    status = DISIR_STATUS_OK;
 
     while (dc_collection_next (collection, &child_context)
            != DISIR_STATUS_EXHAUSTED)
@@ -318,31 +334,34 @@ ConfigWriter::_marshal_context (struct disir_context *parent_context, Json::Valu
         switch (dc_context_type (child_context))
         {
             case DISIR_CONTEXT_SECTION:
-                pstatus = _marshal_context (child_context, child);
-                if (pstatus != DPLUGIN_STATUS_OK)
+
+                status = _marshal_context (child_context, child);
+                if (status != DISIR_STATUS_OK)
                 {
                     goto end;
                 }
-                pstatus = set_section_keyname (child_context, parent, child);
-                if (pstatus != DPLUGIN_STATUS_OK)
+
+                status = set_section_keyname (child_context, parent, child);
+                if (status != DISIR_STATUS_OK)
                 {
                     // logged
-                    return pstatus;
+                    return status;
                 }
                 break;
             case DISIR_CONTEXT_KEYVAL:
-                pstatus = marshal_keyval (child_context, parent);
-                if (pstatus != DPLUGIN_STATUS_OK)
+                status = marshal_keyval (child_context, parent);
+                if (status != DISIR_STATUS_OK)
+                {
                     goto end;
-
+                }
                 break;
             default:
                 // should not happen
                 // Informing disir about the error
                 append_disir_error ("Config contained unsupported context (%s)",
                                      dc_context_type_string (child_context));
+                break;
         }
-
         dc_putcontext (&child_context);
     }
 
@@ -354,6 +373,6 @@ end:
 
     dc_collection_finished (&collection);
 
-    return pstatus;
+    return status;
 }
 

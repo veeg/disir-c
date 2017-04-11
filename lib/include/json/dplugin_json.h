@@ -77,7 +77,7 @@ namespace dio
         //! will contain an explenation of any errors.
         //! \return DPLUGIN_IO_ERROR if filepath is invalid.
         //!
-        virtual enum dplugin_status read_config (const char *filepath, Json::Value& root);
+        virtual enum disir_status read_config (const char *filepath, Json::Value& root);
 
    protected:
         //! \brief populates an internal errorlog

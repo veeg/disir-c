@@ -22,12 +22,13 @@ namespace dio
         virtual ~ConfigReader () {};
 
         //! \brief Read a disir_config from a istream
-        enum dplugin_status unmarshal (struct disir_config **config, std::istream& stream);
+        enum disir_status
+        unmarshal (struct disir_config **config, std::istream& stream);
 
 
         //! \brief reads a disir_config from a json file
-        enum dplugin_status unmarshal (struct disir_config **config,
-                                       const std::string Json);
+        enum disir_status
+        unmarshal (struct disir_config **config, const std::string Json);
 
         //! \brief Generates a disir_config object from json
         //!
@@ -38,8 +39,8 @@ namespace dio
         //! \return DPLUGIN_IO_ERROR if filepath is invalid.
         //! \return DPLUGIN_PARSE_ERROR if json file has syntax errors.
         //!
-        enum dplugin_status unmarshal (struct disir_config **config,
-                                       const char *filepath);
+        enum disir_status
+        unmarshal (struct disir_config **config, const char *filepath);
 
         //! \brief  Parses the config on path and returns its semantic version
         //!
@@ -49,14 +50,14 @@ namespace dio
         //! \return DPLUGIN_IO_ERROR if filepath is invalid.
         //! \return DPLUGIN_PARSE_ERROR if json file has syntax errors.
         //!
-        enum dplugin_status read_config_version (struct semantic_version *semver,
-                                                 const char *path);
+        enum disir_status
+        read_config_version (struct semantic_version *semver, const char *path);
 
     private:
         /* Methods */
 
         //! Function to read a jsonconfig from filepath
-        virtual enum dplugin_status
+        virtual enum disir_status
             read_config (const char *filepath, Json::Value& root) {
                 return JsonIO::read_config (filepath, root);
             }
@@ -72,9 +73,10 @@ namespace dio
 
         //! \brief populates parent context with value type of keyval
         //!
-        enum disir_status set_keyval (struct disir_context *parent_context,
-                                      std::string name,
-                                      Json::Value& keyval);
+        enum disir_status
+        set_keyval (struct disir_context *parent_context,
+                    std::string name,
+                    Json::Value& keyval);
 
         //! \brief if duplicate keynames are postfixed, this function removes
         //! them before creating a disir_context object
@@ -83,22 +85,26 @@ namespace dio
         //! \brief Constructs a disir_keyval object from a Json::Value object
         //! The parameter is of type iterator and not Value to provide the function with
         //! the keyname
-        enum dplugin_status unmarshal_keyval_entry (struct disir_context *parent_context,
-                                                    Json::OrderedValueIterator& keyval_entry);
+        enum disir_status
+        unmarshal_keyval_entry (struct disir_context *parent_context,
+                                Json::OrderedValueIterator& keyval_entry);
 
         //! \brief main function that handles the conversion from json to
         //! a disir_config object
-        enum dplugin_status build_config_from_json (struct disir_context *context_config);
+        enum disir_status
+        build_config_from_json (struct disir_context *context_config);
 
         //! \brief After unserialization into internal m_configRoot, this constructs the config.
-        enum dplugin_status construct_config (struct disir_config **config);
+        enum disir_status
+        construct_config (struct disir_config **config);
 
         //! \brief recursively reads a json config starting from root and
         //! populated a disir_config accordingly
         //!
         //!
-        enum dplugin_status _unmarshal_node (struct disir_context *parent_context,
-                                             Json::Value& parent);
+        enum disir_status
+        _unmarshal_node (struct disir_context *parent_context,
+                         Json::Value& parent);
 
         //! \brief Resolves whether node is of type section
         bool value_is_section (Json::Value& node);
@@ -172,7 +178,7 @@ namespace dio
                                                  Json::Value& parent);
 
             //! \brief reads the json config from disk, located at filepath.
-            enum dplugin_status
+            enum disir_status
                 read_config (const char *filepath, Json::Value& root) {
                     return JsonIO::read_config (filepath, root);
                 }

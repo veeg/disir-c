@@ -28,16 +28,15 @@ ConfigReader::ConfigReader (struct disir_instance *disir)
 {
 }
 
-enum dplugin_status
+enum disir_status
 ConfigReader::read_config_version (struct semantic_version *semver, const char *path)
 {
-    enum dplugin_status pstatus;
     enum disir_status status;
 
-    pstatus = read_config (path, m_configRoot);
-    if (pstatus != DPLUGIN_STATUS_OK)
+    status = read_config (path, m_configRoot);
+    if (status != DISIR_STATUS_OK)
     {
-        return pstatus;
+        return status;
     }
 
     auto version = m_configRoot[VERSION];
@@ -47,19 +46,14 @@ ConfigReader::read_config_version (struct semantic_version *semver, const char *
         disir_error_set (m_disir,
                 "Could not read config version. ");
         // We aren't going to crash this hard, are we?
-        return DPLUGIN_FATAL_ERROR;
+        return DISIR_STATUS_FS_ERROR;
     }
 
-    status = dc_semantic_version_convert (version.asCString(), semver);
-    if (status != DISIR_STATUS_OK)
-    {
-        return DPLUGIN_FATAL_ERROR;
-    }
-    return DPLUGIN_STATUS_OK;
+    return dc_semantic_version_convert (version.asCString(), semver);
 }
 
 //! PUBLIC
-enum dplugin_status
+enum disir_status
 ConfigReader::unmarshal (struct disir_config **config, std::istream& stream)
 {
     Json::Reader reader;
@@ -69,14 +63,14 @@ ConfigReader::unmarshal (struct disir_config **config, std::istream& stream)
     {
         disir_error_set (m_disir, "Parse error: %s",
                                    reader.getFormattedErrorMessages ().c_str());
-        return DPLUGIN_PARSE_ERROR;
+        return DISIR_STATUS_FS_ERROR;
     }
 
     return construct_config (config);
 }
 
 //! PUBLIC
-enum dplugin_status
+enum disir_status
 ConfigReader::unmarshal (struct disir_config **config, const std::string Json)
 {
     Json::Reader reader;
@@ -86,32 +80,31 @@ ConfigReader::unmarshal (struct disir_config **config, const std::string Json)
     {
         disir_error_set (m_disir, "Parse error: %s",
                                    reader.getFormattedErrorMessages ().c_str());
-        return DPLUGIN_PARSE_ERROR;
+        return DISIR_STATUS_FS_ERROR;
     }
 
     return construct_config (config);
 }
 
 //! PUBLIC
-enum dplugin_status
+enum disir_status
 ConfigReader::unmarshal (struct disir_config **config, const char *filepath)
 {
-    enum dplugin_status pstatus;
+    enum disir_status status;
 
-    pstatus = read_config (filepath, m_configRoot);
-    if (pstatus != DPLUGIN_STATUS_OK)
+    status = read_config (filepath, m_configRoot);
+    if (status != DISIR_STATUS_OK)
     {
-        return pstatus;
+        return status;
     }
 
     return construct_config (config);
 }
 
-enum dplugin_status
+enum disir_status
 ConfigReader::construct_config (struct disir_config **config)
 {
     enum disir_status status;
-    enum dplugin_status pstatus;
     struct disir_context *context_config = NULL;
 
     status = dc_config_begin (m_refMold, &context_config);
@@ -123,8 +116,8 @@ ConfigReader::construct_config (struct disir_config **config)
 
      set_config_version (context_config, m_configRoot[VERSION]);
 
-     pstatus = build_config_from_json (context_config);
-     if (pstatus != DPLUGIN_STATUS_OK)
+     status = build_config_from_json (context_config);
+     if (status != DISIR_STATUS_OK)
          goto error;
 
      status = dc_config_finalize (&context_config, config);
@@ -135,14 +128,14 @@ ConfigReader::construct_config (struct disir_config **config)
          goto error;
      }
 
-     return DPLUGIN_STATUS_OK;
+     return status;
 error:
      if (context_config)
      {
         dc_destroy (&context_config);
      }
 
-     return DPLUGIN_FATAL_ERROR;
+     return status;
 }
 
 void
@@ -180,7 +173,7 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
 }
 
 //! PRIVATE
-enum dplugin_status
+enum disir_status
 ConfigReader::build_config_from_json (struct disir_context *context_config)
 {
     return _unmarshal_node (context_config, m_configRoot[CONFIG]);
@@ -253,7 +246,7 @@ ConfigReader::set_keyval (struct disir_context *parent_context,
         dc_putcontext (&context_keyval);
     }
 
-    return DISIR_STATUS_OK;
+    return status;
 error:
     if (context_keyval)
     {
@@ -275,13 +268,14 @@ ConfigReader::value_is_keyval (Json::Value& node)
 }
 
 //! PRIVATE
-enum dplugin_status
+enum disir_status
 ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value& parent)
 {
     enum disir_status status;
-    enum dplugin_status dstatus;
     Json::Value child_node;
     struct disir_context *child_context = NULL;
+
+    status = DISIR_STATUS_OK;
 
     Json::OrderedValueIterator iter = parent.beginOrdered ();
 
@@ -314,11 +308,11 @@ ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value
                 goto error;
             }
 
-            dstatus = _unmarshal_node (child_context, child_node);
-            if (dstatus != DPLUGIN_STATUS_OK)
+            status = _unmarshal_node (child_context, child_node);
+            if (status != DISIR_STATUS_OK)
             {
                 // logged
-                return dstatus;
+                return status;
             }
 
             status = dc_finalize (&child_context);
@@ -339,7 +333,11 @@ ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value
         }
         else if (value_is_keyval (child_node))
         {
-            set_keyval (parent_context, name, *iter);
+            status = set_keyval (parent_context, name, *iter);
+            if (status != DISIR_STATUS_OK)
+            {
+
+            }
         }
         else
         {
@@ -349,12 +347,12 @@ ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value
         }
     }
 
-    return DPLUGIN_STATUS_OK;
+    return status;
 error:
     if (child_context)
     {
         dc_destroy (&child_context);
     }
-    return DPLUGIN_FATAL_ERROR;
+    return status;
 }
 
