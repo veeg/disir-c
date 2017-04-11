@@ -4724,7 +4724,7 @@ void StyledWriter::writeValueOrdered(const Value& value) {
         writeCommentBeforeValue(childValue);
         writeWithIndent(valueToQuotedString(name.c_str()));
         document_ += " : ";
-        writeValue(childValue);
+        writeValueOrdered(childValue);
         if (++it == members.end()) {
           writeCommentAfterValueOnSameLine(childValue);
           break;
