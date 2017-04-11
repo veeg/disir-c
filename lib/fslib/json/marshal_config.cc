@@ -298,8 +298,6 @@ ConfigWriter::_marshal_context (struct disir_context *parent_context, Json::Valu
     struct disir_collection *collection;
     struct disir_context *child_context;
     enum disir_status status;
-    enum dplugin_status pstatus;
-    Json::Value child;
 
     status = dc_get_elements (parent_context, &collection);
     if (status != DISIR_STATUS_OK)
@@ -312,7 +310,13 @@ ConfigWriter::_marshal_context (struct disir_context *parent_context, Json::Valu
     while (dc_collection_next (collection, &child_context)
            != DISIR_STATUS_EXHAUSTED)
     {
-        switch (dc_context_type (child_context)) {
+        // per-iteration such that child values
+        // never have old references to pre-marshaled
+        // context objects
+        Json::Value child;
+
+        switch (dc_context_type (child_context))
+        {
             case DISIR_CONTEXT_SECTION:
                 pstatus = _marshal_context (child_context, child);
                 if (pstatus != DPLUGIN_STATUS_OK)
