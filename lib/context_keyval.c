@@ -397,9 +397,10 @@ dx_keyval_destroy (struct disir_keyval **keyval)
         free ((*keyval)->kv_name.dv_string);
     }
 
-    // Free allocated value, if string
-    if ((*keyval)->kv_value.dv_type == DISIR_VALUE_TYPE_STRING &&
-        (*keyval)->kv_value.dv_size != 0)
+    // Free allocated value, if string or enum
+    if (((*keyval)->kv_value.dv_type == DISIR_VALUE_TYPE_STRING
+        || (*keyval)->kv_value.dv_type == DISIR_VALUE_TYPE_ENUM)
+           && (*keyval)->kv_value.dv_size != 0)
     {
         free ((*keyval)->kv_value.dv_string);
     }
