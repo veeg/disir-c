@@ -8,7 +8,7 @@
 struct disir_config
 {
     //! Context object for this config
-    struct disir_context                            *cf_context;
+    struct disir_context            *cf_context;
 
     //! Config has an explicit reference to a mold entry.
     //! The config acquires a cf_mold->mo_reference_count when created.
