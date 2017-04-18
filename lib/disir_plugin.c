@@ -46,7 +46,7 @@ disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plu
     memcpy (&internal->pi_plugin, plugin, sizeof (*plugin));
 
     internal->pi_io_id = strdup (io_id);
-    internal->pi_group_id = strdup (io_id);
+    internal->pi_group_id = strdup (group_id);
 
     // Make actual copies of the strings, since we do not own the strings
     // in the input plugin

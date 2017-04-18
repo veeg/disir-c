@@ -71,6 +71,11 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
         goto error;
     }
 
+    // Need to retrieve the registered internal plugin structure
+    // to set the dl_handle and plugin filepath parameters.
+    // This is not handled as part of disir_plugin_register, because
+    // that function is a public method that may register plugins in
+    // different ways than we load them from disk.
     internal = MQ_TAIL (instance->dio_plugin_queue);
     if (internal == NULL)
     {
@@ -79,8 +84,6 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
     }
     internal->pi_dl_handler = handle;
     internal->pi_filepath = strndup (plugin_filepath, 512);
-    internal->pi_io_id = strndup (io_id, 512);
-    internal->pi_group_id = strndup (group_id, 512);
 
     return DISIR_STATUS_OK;
 error:
@@ -214,7 +217,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    // We do not need to generate a mold entry - simply steal the one provided by the user.
+    // No user provided config - generate the internal mold since user cannot provide one.
     if (config == NULL)
     {
         status = disir_libdisir_mold (&libmold);
@@ -228,6 +231,8 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
     if (config)
     {
         // Use user-provided config
+        // XXX: Incref config and mold? As of now, we STEAL the user provided references,
+        // which probably is a bad design...
         libconf = config;
         libmold = config->cf_mold;
     }
@@ -318,10 +323,16 @@ disir_instance_destroy (struct disir_instance **instance)
             free (plugin->pi_filepath);
         if (plugin->pi_io_id)
             free (plugin->pi_io_id);
+        if (plugin->pi_group_id)
+            free (plugin->pi_group_id);
         if (plugin->pi_plugin.dp_name)
             free (plugin->pi_plugin.dp_name);
         if (plugin->pi_plugin.dp_config_entry_type)
             free (plugin->pi_plugin.dp_config_entry_type);
+        if (plugin->pi_plugin.dp_config_base_id)
+            free (plugin->pi_plugin.dp_config_base_id);
+        if (plugin->pi_plugin.dp_mold_entry_type)
+            free (plugin->pi_plugin.dp_mold_entry_type);
         if (plugin->pi_plugin.dp_description)
             free (plugin->pi_plugin.dp_description);
 
