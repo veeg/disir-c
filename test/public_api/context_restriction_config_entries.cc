@@ -246,6 +246,9 @@ TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
     status = dc_finalize (&context_section);
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
+    // We still have a reference to the context, since it was invalid. Get rid of it.
+    dc_putcontext (&context_section);
+
     // finalizing config yields invalid context
     status = dc_config_finalize (&context_config, &config);
     ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
@@ -484,6 +487,7 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
         }
     }
 
+    dc_putcontext (&context_section);
     dc_putcontext (&context_config);
 }
 
