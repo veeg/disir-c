@@ -124,6 +124,9 @@ disir_config_query (struct disir_instance *instance, const char *group_id,
 
 //! \brief Mark yourself finished with the configuration object
 //!
+//! NOTE: Destroys the config object outright - not usable anywhere after this operation
+//! QUESTION: Should this perhaps only decref the reference counter on the context?
+//!
 //! \param[in,out] config Object to mark as finished. Turns the pointer to NULL
 //!     on success.
 //!
