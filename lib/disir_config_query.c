@@ -604,6 +604,7 @@ disir_config_get_keyval_string (struct disir_config *config, const char **value,
         status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_STRING, query, args,
                                             value, NULL, NULL, NULL);
         va_end (args);
+        dc_putcontext (&context);
     }
 
     // FALL-THROUGH
@@ -636,6 +637,7 @@ disir_config_set_keyval_string (struct disir_config *config, const char *value,
         status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_STRING, query, args,
                                             value, 0, 0, 0);
         va_end (args);
+        dc_putcontext (&context);
     }
 
     // FALL-THROUGH
