@@ -32,7 +32,7 @@ restriction_entries (struct disir_mold **mold)
 
     // Add keyval to section so its non-empty
     status = dc_add_keyval_float (context_section, "nonempty", 3.14, "nonempty do docc", NULL,
-                                  &context_keyval);
+                                  NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
