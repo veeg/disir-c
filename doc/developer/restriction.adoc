@@ -1,0 +1,246 @@
+= Restrictions
+
+Disir allows to impair restrictions on the mold contexts `KEYVAL` and `SECTION`.
+Restrictions are divded into two categorizes:
+
+[horizontal]
+inclusive:: All restrictions on the context must be fulfilled for the context to be valid.
+exclusive:: Only one of the restrictions must be fulfilled for the context to be valid.
+
+A restriction is versioned with both an introduced and deprecated capability. It will not
+effect the configuration entry if its version range is outside the configuration entry's scope.
+
+== Types
+
+The available inclusive restrictions are listed below, and detailed in its own subsection.
+* DISIR_RESTRICTION_INC_ENTRY_MIN
+* DISIR_RESTRICTION_INC_ENTRY_MAX
+
+The available exclusive restrictions are listed below, and detailed in its own subsecton.
+* DISIR_RESTRICTION_EXC_VALUE_ENUM
+* DISIR_RESTRICTION_EXC_VALUE_RANGE
+* DISIR_RESTRICTION_EXC_VALUE_NUMERIC
+
+
+=== DISIR_RESTRICTION_INC_ENTRY_MIN
+
+An inclusive restriction that is valid on mold contexts `KEYVAL` and `SECTION`.
+
+It specifies the minimum number of this context must be present in the parent context
+in the configuration entry for it to be deemed valid. If the minimum is not fulfilled,
+all contexts in the configuration entry are marked invalid.
+
+If no such restriction is imposed on the context, it defaults to a minimum requirement of 0.
+
+When multiple restrictions of this type is present on the same context, they cannot have
+the same introduced version. If two are present, the one with the greatest introduced version
+will supersede the first one, even though the first one does not possess a deprecated version.
+
+The high-level API function to add a minimum restriction to a parent context has the following
+signature:
+
+[source, C]
+----
+enum disir_status
+dc_add_restriction_entries_min (struct disir_context *parent,
+                                int64_t min,
+                                struct semantic_version *semver);
+----
+
+.Example API usage
+[source, C]
+----
+enum disir_status status;
+struct disir_context *parent = NULL;
+struct semantic_version semver;
+
+parent = input_context // Taken from function parameters
+semver.sv_major = 1;
+semver.sv_minor = 5;
+semver.sv_patch = 0;
+
+status = dc_add_restriction_entries_min (parent, 3, &semver);
+ASSERT_STATUS (DISIR_STATUS_OK, status);
+----
+
+
+.Example JSON mold entry for minimum restriction
+[source, json]
+----
+{
+    ...
+
+    restrictions = [
+      {
+        "type" = "MINIMUM_ENTRIES",
+        "introduced" = "1.5.0",
+        "value" = 3
+      }
+    ]
+
+    ...
+}
+----
+
+=== DISIR_RESTRICTION_INC_ENTRY_MAX
+
+An inclusive restriction that is valid on mold contexts `KEYVAL` and `SECTION`.
+
+It specifies the maximum number of instances of this context that can be present in the
+parent context in the configuration entry, for the context to be deemed valid.
+If the maximum is exceeded, all contexts in the configuration entry are marked invalid.
+
+If no such restriction is imposed on the context, it defaults to a maximum amount of 1.
+
+When multiple restrictions of this type is present on the same context, they cannot have
+the same introduced version. If two are present, the one with the greatest introduced version
+will supersede the first one, even though the first one does not possess a deprecated version.
+
+The high-level API convenience function to add a maximum restriction
+to a parent context has the following signature:
+
+[source, C]
+----
+enum disir_status
+dc_add_restriction_entries_max (struct disir_context *parent,
+                                int64_t max,
+                                struct semantic_version *semver);
+----
+
+.Example API usage
+[source, C]
+----
+enum disir_status status;
+struct disir_context *parent = NULL;
+struct semantic_version semver;
+
+parent = input_context // Taken from function parameters
+semver.sv_major = 2;
+semver.sv_minor = 1;
+semver.sv_patch = 0;
+
+status = dc_add_restriction_entries_max (parent, 8, &semver);
+ASSERT_STATUS (DISIR_STATUS_OK, status);
+----
+
+
+.Example JSON mold entry for maximum restriction
+[source, json]
+----
+{
+    ...
+
+    restrictions = [
+      {
+        "type" = "MAXIMUM_ENTRIES",
+        "introduced" = "2.1.0",
+        "value" = 8
+      }
+    ]
+
+    ...
+}
+----
+
+=== DISIR_RESTRICTION_EXC_VALUE_ENUM
+
+A exclusive restriction that is valid on mold context `KEYVAL` whose
+value type is `DISIR_VALUE_TYPE_ENUM`. If this restriction is applied to
+any other context and `KEYVAL` context not of type ENUM, the whole context is deemed invalid.
+
+Each restriction of this type specifies a valid string value the `KEYVAL` may contain.
+They also contain a documentation string explaining what the enumerate value represents.
+The mold context `KEYVAL` is not valid without atleast one restriction of
+this type active at any time. The default value of the mold context `KEYVAL` must also
+be one of the values present in the active selection of restrictions of this type, for its version.
+
+The high-level API convenience function to add an enum restriction
+to a parent context has the following signature:
+
+[source, C]
+----
+enum disir_status
+dc_add_restriction_value_enum (struct disir_context *parent,
+                               const char *value,
+                               const char *doc,
+                               struct semantic_version *semver,
+                               struct disir_context **output);
+----
+
+.Example API usage
+[source, C]
+----
+enum disir_status status;
+struct disir_context *parent = NULL;
+
+parent = input_context // Taken from function parameters
+
+status = dc_add_restriction_value_enum (parent, "8 decoders",
+                                        "Run 8 viterbi decoders on the data stream",
+                                        NULL, NULL);
+ASSERT_STATUS (DISIR_STATUS_OK, status);
+----
+
+.Example JSON mold entry for enum restriction
+[source, json]
+----
+{
+    ...
+
+    restrictions = [
+      {
+        "type" = "ENUM",
+        "introduced" = "1.1.0",
+        "value" = "AOS",
+        "documentation" = "Trigger the operation when the schedule hits Acquisition of Signal."
+      },
+      {
+        "type" = "ENUM",
+        "introduced" = "1.1.0",
+        "value" = "LOS",
+        "documentation" = "Trigger the operation when the schedule hits Loss of Signal."
+      },
+      {
+        "type" = "ENUM",
+        "introduced" = "1.2.0",
+        "value" = "Equinox"
+        "documentation" = "Trigger the operation when the plane of Earths equator passes through the center of the Sun."
+      }
+    ]
+
+    ...
+}
+----
+
+
+=== DISIR_RESTRICTION_EXC_VALUE_NUMERIC
+
+A exclusive restriction that is valid on mold context `KEYVAL` whose
+value type is `DISIR_VALUE_TYPE_FLOAT` or `DISIR_VALUE_TYPE_INTEGER`.
+If this restriction is applied to any other context and `KEYVAL` context
+not of type INTEGER or FLOAT, the whole context is deemed invalid.
+
+Each restriction of this type specifies a valid numeric value, either integer or float,
+the `KEYVAL` must contain to be valid.
+
+
+=== DISIR_RESTRICTION_EXC_VALUE_RANGE
+
+A exclusive restriction that is valid on mold context `KEYVAL` whose
+value type is `DISIR_VALUE_TYPE_FLOAT` or `DISIR_VALUE_TYPE_INTEGER`.
+If this restriction is applied to any other context and `KEYVAL` context
+not of type INTEGER or FLOAT, the whole context is deemed invalid.
+
+Each restriction of this type specifies a valid numeric range, either integer or float,
+that the `KEYVAL`  must reside within to be valid.
+
+
+== Query and retrieve all restrictions
+
+Below is a full fledge example of a generic function to print out all information
+about all restrictions available on a context.
+
+[source, C]
+----
+include::restriction_collection_example.cc[]
+----
