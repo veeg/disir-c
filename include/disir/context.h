@@ -40,6 +40,7 @@ enum disir_context_type
 #include <disir/disir.h>
 #include <disir/collection.h>
 #include <disir/context/config.h>
+#include <disir/context/restriction.h>
 
 //
 // Utility context API

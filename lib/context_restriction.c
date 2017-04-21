@@ -1395,3 +1395,102 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
     return DISIR_STATUS_OK;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_restriction_collection (struct disir_context *context, struct disir_collection **collection)
+{
+    enum disir_status status;
+    struct disir_restriction **exc;
+    struct disir_restriction **inc;
+    struct disir_collection *col;
+
+    TRACE_ENTER ("");
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // already logged
+        return status;
+    }
+    if (collection == NULL)
+    {
+        log_debug (0, "invoked will NULL collection argument");
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_SECTION, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    // Get inclusive queue from context
+    switch (dc_context_type (context))
+    {
+    case DISIR_CONTEXT_SECTION:
+    {
+        if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+        {
+            inc = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_inclusive_queue;
+            exc = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_exclusive_queue;
+        }
+        else
+        {
+            inc = &context->cx_section->se_restrictions_inclusive_queue;
+            exc = &context->cx_section->se_restrictions_exclusive_queue;
+        }
+        break;
+    }
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
+        {
+            inc = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_inclusive_queue;
+            exc = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_exclusive_queue;
+        }
+        else
+        {
+            inc = &context->cx_keyval->kv_restrictions_inclusive_queue;
+            exc = &context->cx_keyval->kv_restrictions_exclusive_queue;
+        }
+        break;
+    }
+    default:
+    {
+        log_fatal ("Slipped through guard - unhandled %s", dc_context_type_string (context));
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+    }
+
+    col = dc_collection_create ();
+    if (col == NULL)
+    {
+        return DISIR_STATUS_NO_MEMORY;
+    }
+
+    MQ_FOREACH (*inc,
+    {
+        dc_collection_push_context (col, entry->re_context);
+    });
+
+    MQ_FOREACH (*exc,
+    {
+        dc_collection_push_context (col, entry->re_context);
+    });
+
+    if (dc_collection_size(col) == 0)
+    {
+        dc_collection_finished (&col);
+        *collection = NULL;
+        status = DISIR_STATUS_NOT_EXIST;
+    }
+    else
+    {
+        *collection = col;
+        status = DISIR_STATUS_OK;
+    }
+
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
+}
+
