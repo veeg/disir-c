@@ -23,3 +23,8 @@ include_directories (
 
 target_link_libraries (${CLI_TARGET} disir)
 
+install (
+  PROGRAMS disir
+  DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
