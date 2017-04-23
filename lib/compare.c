@@ -7,9 +7,12 @@
 
 #include "config.h"
 #include "context_private.h"
+#include "documentation.h"
 #include "keyval.h"
 #include "log.h"
+#include "mold.h"
 #include "multimap.h"
+#include "section.h"
 
 //! Forward declare
 static enum disir_status
@@ -144,6 +147,116 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
     va_end (args);
 }
 
+static enum disir_status
+compare_default_queues (struct disir_default *lhs, struct disir_default *rhs,
+                        struct disir_diff_report *report)
+{
+    // Both queues are of equal length
+    if (lhs == NULL && rhs == NULL)
+    {
+        return DISIR_STATUS_OK;
+    }
+
+    // lhs has at least one additional default entry.
+    if (lhs && rhs == NULL)
+    {
+        dx_diff_report_add (report, "rhs is missing default entry");
+        return DISIR_STATUS_OK;
+    }
+
+    // rhs has at least one additional documentation entry.
+    if (rhs && lhs == NULL)
+    {
+        dx_diff_report_add (report, "lhs is missing default entry");
+        return DISIR_STATUS_OK;
+    }
+
+    // Check introduced version
+    int res;
+    res = dc_semantic_version_compare (&lhs->de_introduced, &rhs->de_introduced);
+    if (res != 0)
+    {
+        char lhsbuf[100];
+        char rhsbuf[100];
+        dc_semantic_version_string (lhsbuf, 100, &lhs->de_introduced);
+        dc_semantic_version_string (rhsbuf, 100, &rhs->de_introduced);
+        dx_diff_report_add (report, "Default differ in version (%s vs %s)",
+                                    lhsbuf, rhsbuf);
+
+        return DISIR_STATUS_OK;
+    }
+
+    // Check value
+    if (dx_value_compare (&lhs->de_value, &rhs->de_value) != 0)
+    {
+        char lhsbuf[100];
+        char rhsbuf[100];
+        dx_value_stringify (&lhs->de_value, 100, lhsbuf, NULL);
+        dx_value_stringify (&rhs->de_value, 100, rhsbuf, NULL);
+
+        dx_diff_report_add (report, "Default value differ ('%s' vs '%s')", lhsbuf, rhsbuf);
+        return DISIR_STATUS_OK;
+    }
+
+    // recurse to next entry
+    return compare_default_queues (lhs->next, rhs->next, report);
+}
+
+//! STATIC FUNCTION
+static enum disir_status
+compare_documentation_queues (struct disir_documentation *lhs, struct disir_documentation *rhs,
+                              struct disir_diff_report *report)
+{
+    // Both queues are of equal length
+    if (lhs == NULL && rhs == NULL)
+    {
+        return DISIR_STATUS_OK;
+    }
+
+    // lhs has at least one additional documentation entry.
+    if (lhs && rhs == NULL)
+    {
+        dx_diff_report_add (report, "rhs is missing documentation entry");
+        return DISIR_STATUS_OK;
+    }
+
+    // rhs has at least one additional documentation entry.
+    if (rhs && lhs == NULL)
+    {
+        dx_diff_report_add (report, "lhs is missing documentation entry");
+        return DISIR_STATUS_OK;
+    }
+
+    // Check introduced version
+    int res;
+    res = dc_semantic_version_compare (&lhs->dd_introduced, &rhs->dd_introduced);
+    if (res != 0)
+    {
+        char lhsbuf[100];
+        char rhsbuf[100];
+        dc_semantic_version_string (lhsbuf, 100, &lhs->dd_introduced);
+        dc_semantic_version_string (rhsbuf, 100, &rhs->dd_introduced);
+        dx_diff_report_add (report, "Documentation differ in version (%s vs %s)",
+                                    lhsbuf, rhsbuf);
+
+        return DISIR_STATUS_OK;
+    }
+
+    // Check value
+    if (dx_value_compare (&lhs->dd_value, &rhs->dd_value) != 0)
+    {
+        const char *doc1;
+        const char *doc2;
+        dx_value_get_string (&lhs->dd_value, &doc1, NULL);
+        dx_value_get_string (&rhs->dd_value, &doc2, NULL);
+        dx_diff_report_add (report, "Documentation string differ ('%s' vs '%s')", doc1, doc2);
+        return DISIR_STATUS_OK;
+    }
+
+    // recurse to next entry
+    return compare_documentation_queues (lhs->next, rhs->next, report);
+}
+
 //! STATIC FUNCTION
 static enum disir_status
 compare_all_in_name (struct disir_context *lhs, struct disir_context *rhs, const char *name,
@@ -161,6 +274,8 @@ compare_all_in_name (struct disir_context *lhs, struct disir_context *rhs, const
     status = dc_find_elements (lhs, name, &lhs_collection);
     if (status != DISIR_STATUS_OK)
     {
+        // Something has really gone awry, since we queried the lhs for this name just
+        // before entering this function..
         goto out;
     }
     status = dc_find_elements (rhs, name, &rhs_collection);
@@ -265,7 +380,162 @@ out:
 }
 
 //! STATIC FUNCTION
+static enum disir_status
+compare_all_elements (struct disir_context *lhs, struct disir_context *rhs,
+                      struct disir_diff_report *report)
+{
+    // Loop over all elements, match element for element by name
+    // This will work for both config and mold
+    // Element names already handled is marked in a map,
+    // and are thus skipped if encountered again (this to compare multiple entries in config)
+    enum disir_status status;
+    struct disir_collection *lhs_elements;
+    struct disir_collection *rhs_elements;
+    struct disir_context *element;
+    const char *name;
+    struct multimap *map;
+
+    element = NULL;
+    lhs_elements = NULL;
+    rhs_elements = NULL;
+    name = NULL;
+
+    // Create a multimap
+    map = multimap_create ((int (*)(const void *, const void*)) strcmp,
+                           (unsigned long (*)(const void*)) djb2);
+    if (map == NULL)
+    {
+        log_debug (1, "failed to allocate multimap for comparison");
+        status = DISIR_STATUS_NO_MEMORY;
+        goto out;
+    }
+
+    status = dc_get_elements (lhs, &lhs_elements);
+    if (status != DISIR_STATUS_OK)
+    {
+        log_debug (1, "failed to get elements from lhs: %s", disir_status_string (status));
+        goto out;
+    }
+
+    do
+    {
+        status = dc_collection_next (lhs_elements, &element);
+        if (status == DISIR_STATUS_EXHAUSTED)
+        {
+            status = DISIR_STATUS_OK;
+            break;
+        }
+        if (status != DISIR_STATUS_OK)
+        {
+            log_debug (1, "Failed to get collection item: %s", disir_status_string (status));
+            break;
+        }
+
+        log_debug (5, "Getting name for element: %p", element);
+        // Get name
+        status = dc_get_name (element, &name, NULL);
+        if (status != DISIR_STATUS_OK)
+        {
+            log_debug (1, "failed to get name: %s", disir_status_string (status));
+            break;
+        }
+
+        dc_putcontext (&element);
+
+        // Entry already handled. Skip it.
+        if (multimap_contains_key (map, (void *) name))
+        {
+            dc_putcontext (&element);
+            continue;
+        }
+
+        // Mark name as already handled
+        multimap_push_value (map, (void *) name, (void *)1);
+
+        // Kick off a sub-search between lhs and rhs on name.
+        // Store already mapped entries in map.
+        status = compare_all_in_name (lhs, rhs, name, report);
+        if (status != DISIR_STATUS_OK)
+        {
+            break;
+        }
+    } while (1);
+
+    // Map now contains all entries that exists in lhs.
+    // We need to iterate rhs to check if there resides any entries there
+    // that is not part of map, e.g., not part of lhs.
+
+    status = dc_get_elements (rhs, &rhs_elements);
+    if (status != DISIR_STATUS_OK)
+    {
+        // QUESTION: Could there be a valid scenario where rhs is empty?
+        log_debug (1, "failed to get elements from rhs: %s", disir_status_string (status));
+        goto out;
+    }
+
+    do
+    {
+        status = dc_collection_next (rhs_elements, &element);
+        if (status == DISIR_STATUS_EXHAUSTED)
+        {
+            status = DISIR_STATUS_OK;
+            break;
+        }
+        if (status != DISIR_STATUS_OK)
+        {
+            log_debug (1, "Failed to get collection item: %s", disir_status_string (status));
+            break;
+        }
+
+        log_debug (5, "Getting name for element: %p", element);
+        // Get name
+        status = dc_get_name (element, &name, NULL);
+        if (status != DISIR_STATUS_OK)
+        {
+            log_debug (1, "failed to get name: %s", disir_status_string (status));
+            break;
+        }
+
+        dc_putcontext (&element);
+
+        // Entry exists in lhs - skip it
+        if (multimap_contains_key (map, (void *) name))
+        {
+            dc_putcontext (&element);
+            continue;
+        }
+
+        // rhs contains extra entry not present in lhs
+        dx_diff_report_add (report, "rhs contains entry '%s' not present in lhs.", name);
+    } while (1);
+
+    // Cleanup
+    if (map)
+    {
+        multimap_destroy (map, NULL, NULL);
+    }
+    if (lhs_elements)
+    {
+        dc_collection_finished (&lhs_elements);
+    }
+    if (rhs_elements)
+    {
+        dc_collection_finished (&lhs_elements);
+    }
+
+    if (element)
+    {
+        dc_putcontext (&element);
+    }
+
+    // FALL-THROUGH
+out:
+    return status;
+}
+
+//! STATIC FUNCTION
 //! Only return non-OK status on exceptional condition.
+//! If lhs and rhs differ, enter the difference into the diff_report and return OK.
 static enum disir_status
 diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_context *rhs,
                                    struct disir_diff_report *report)
@@ -274,6 +544,7 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
 
     status = DISIR_STATUS_OK;
     // QUESTION: Should we resolve names recursively to parent?
+    //  This will allow us to easier identify by name what differs to what.
 
     log_debug (5, "Diff compare contexts (%p vs %p)", lhs, rhs);
 
@@ -318,12 +589,7 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
 
     switch (lhs->cx_type)
     {
-    case DISIR_CONTEXT_MOLD:
-    {
-        return DISIR_STATUS_NOT_SUPPORTED;
-    }
-
-    case DISIR_CONTEXT_KEYVAL:
+        case DISIR_CONTEXT_KEYVAL:
     {
         if (dx_value_compare (&lhs->cx_keyval->kv_value, &rhs->cx_keyval->kv_value) != 0)
         {
@@ -342,103 +608,69 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
         {
             log_debug (3, "lhs and rhs value same value! REJOICE!");
         }
+
+        if (dc_context_type (lhs->cx_root_context) == DISIR_CONTEXT_MOLD)
+        {
+            // check documentation entries
+            status = compare_documentation_queues (lhs->cx_keyval->kv_documentation_queue,
+                                                   rhs->cx_keyval->kv_documentation_queue,
+                                                   report);
+            if (status != DISIR_STATUS_OK)
+            {
+                break;
+            }
+
+            log_debug (6, "Comparing default queues");
+            status = compare_default_queues (lhs->cx_keyval->kv_default_queue,
+                                             rhs->cx_keyval->kv_default_queue,
+                                             report);
+            if (status != DISIR_STATUS_OK)
+            {
+                break;
+            }
+
+            // TODO MOLD: Diff restrictions
+        }
+
+        break;
+    }
+    case DISIR_CONTEXT_MOLD:
+    {
+        status = compare_documentation_queues (lhs->cx_mold->mo_documentation_queue,
+                                               rhs->cx_mold->mo_documentation_queue,
+                                               report);
+        if (status != DISIR_STATUS_OK)
+        {
+            break;
+        }
+
+        status = compare_all_elements (lhs, rhs, report);
         break;
     }
     case DISIR_CONTEXT_CONFIG:
     {
-        // TODO: Compare version?
+        // TODO CONFIG: Compare version?
+
+        status = compare_all_elements (lhs, rhs, report);
+        break;
     }
     case DISIR_CONTEXT_SECTION:
     {
-        // Loop over all elements, match element for element
-        // QUESTION: how to handle array of entries. Hmm.
-        // XXX: Allocate map of already compared entries? Mark entries as mapped? Context
-        // address can be key
+        // TODO MOLD: Diff restrictions
 
-        struct disir_collection *lhs_elements;
-        struct disir_context *element;
-        const char *name;
-        struct multimap *map;
-
-        element = NULL;
-        lhs_elements = NULL;
-        name = NULL;
-
-        // Create a multimap
-        map = multimap_create ((int (*)(const void *, const void*)) strcmp,
-                               (unsigned long (*)(const void*)) djb2);
-        if (map == NULL)
+        // For mold, check documentation entries
+        if (dc_context_type (lhs->cx_root_context) == DISIR_CONTEXT_MOLD)
         {
-            log_debug (1, "failed to allocate multimap for comparison");
-            status = DISIR_STATUS_NO_MEMORY;
-            break;
-        }
-
-        status = dc_get_elements (lhs, &lhs_elements);
-        if (status != DISIR_STATUS_OK)
-        {
-            log_debug (1, "failed to get elements from lhs: %s", disir_status_string (status));
-            break;
-        }
-
-        do
-        {
-            status = dc_collection_next (lhs_elements, &element);
-            if (status == DISIR_STATUS_EXHAUSTED)
-            {
-                status = DISIR_STATUS_OK;
-                break;
-            }
-            if (status != DISIR_STATUS_OK)
-            {
-                log_debug (1, "Failed to get collection item: %s", disir_status_string (status));
-                break;
-            }
-
-            log_debug (5, "Getting name for element: %p", element);
-            // Get name
-            status = dc_get_name (element, &name, NULL);
-            if (status != DISIR_STATUS_OK)
-            {
-                log_debug (1, "failed to get name: %s", disir_status_string (status));
-                break;
-            }
-
-            dc_putcontext (&element);
-
-            // Entry already handled. Skip it.
-            if (multimap_contains_key (map, (void *) name))
-            {
-                dc_putcontext (&element);
-                continue;
-            }
-
-            // Mark name as already handled
-            multimap_push_value (map, (void *) name, (void *)1);
-
-            // Kick off a sub-search between lhs and rhs on name.
-            // Store already mapped entries in map.
-            status = compare_all_in_name (lhs, rhs, name, report);
+            status = compare_documentation_queues (lhs->cx_section->se_documentation_queue,
+                                                   rhs->cx_section->se_documentation_queue,
+                                                   report);
             if (status != DISIR_STATUS_OK)
             {
                 break;
             }
-        } while (1);
-
-        // Cleanup
-        if (map)
-        {
-            multimap_destroy (map, NULL, NULL);
-        }
-        if (lhs_elements)
-        {
-            dc_collection_finished (&lhs_elements);
-        }
-        if (element)
-        {
-            dc_putcontext (&element);
         }
 
+        status = compare_all_elements (lhs, rhs, report);
         break;
     }
     default:
