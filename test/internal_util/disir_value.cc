@@ -184,7 +184,37 @@ TEST_F (DisirValueStringTest, get_string_empty_shall_succeed)
     EXPECT_EQ (0, output_size);
 }
 
+TEST_F (DisirValueStringTest, compare_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_STRING;
 
+    status = dx_value_set_string (&value, sample, strlen (sample));
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_string (&second, sample, strlen (sample));
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_EQ (0, res);
+}
+
+TEST_F (DisirValueStringTest, compare_not_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_STRING;
+
+    status = dx_value_set_string (&value, sample, strlen (sample));
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_string (&second, "ABC", strlen ("ABC"));
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_GT (res, 0);
+}
 
 //
 // DISIR VALUE INTEGER
@@ -198,6 +228,38 @@ TEST_F (DisirValueIntegerTest, sanify)
 TEST_F (DisirValueIntegerTest, string)
 {
     ASSERT_STREQ (dx_value_type_string (type), "INTEGER");
+}
+
+TEST_F (DisirValueIntegerTest, compare_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_INTEGER;
+
+    status = dx_value_set_integer (&value, 5);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_integer (&second, 5);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_EQ (0, res);
+}
+
+TEST_F (DisirValueIntegerTest, compare_not_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_INTEGER;
+
+    status = dx_value_set_integer (&value, 5);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_integer (&second, 2);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_GT (res, 0);
 }
 
 //
@@ -214,6 +276,39 @@ TEST_F (DisirValueFloatTest, string)
     ASSERT_STREQ (dx_value_type_string (type), "FLOAT");
 }
 
+
+TEST_F (DisirValueFloatTest, compare_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_FLOAT;
+
+    status = dx_value_set_float (&value, 14.3);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_float (&second, 14.3);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_EQ (0, res);
+}
+
+TEST_F (DisirValueFloatTest, compare_not_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_FLOAT;
+
+    status = dx_value_set_float (&value, 10.5);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_float (&second, 13.4);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_LT (res, 0);
+}
+
 //
 // DISIR VALUE ENUM
 //
@@ -228,6 +323,38 @@ TEST_F (DisirValueEnumTest, string)
     ASSERT_STREQ (dx_value_type_string (type), "ENUM");
 }
 
+TEST_F (DisirValueEnumTest, compare_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_ENUM;
+
+    status = dx_value_set_string (&value, sample, strlen (sample));
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_string (&second, sample, strlen (sample));
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_EQ (0, res);
+}
+
+TEST_F (DisirValueEnumTest, compare_not_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_ENUM;
+
+    status = dx_value_set_string (&value, sample, strlen (sample));
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_string (&second, "ABC", strlen ("ABC"));
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_GT (res, 0);
+}
+
 //
 // DISIR VALUE BOOLEAN
 //
@@ -240,5 +367,37 @@ TEST_F (DisirValueBooleanTest, sanify)
 TEST_F (DisirValueBooleanTest, string)
 {
     ASSERT_STREQ (dx_value_type_string (type), "BOOLEAN");
+}
+
+TEST_F (DisirValueBooleanTest, compare_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_BOOLEAN;
+
+    status = dx_value_set_boolean (&value, 1);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_boolean (&second, 1);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_EQ (0, res);
+}
+
+TEST_F (DisirValueBooleanTest, compare_not_equal)
+{
+    int res;
+    struct disir_value second;
+    memset (&second, 0, sizeof (struct disir_value));
+    second.dv_type = DISIR_VALUE_TYPE_BOOLEAN;
+
+    status = dx_value_set_boolean (&value, 0);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dx_value_set_boolean (&second, 1);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+    res = dx_value_compare (&value, &second);
+    ASSERT_LT (res, 0);
 }
 
