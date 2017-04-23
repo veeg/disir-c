@@ -247,8 +247,23 @@ dx_value_compare (struct disir_value *v1, struct disir_value *v2)
     if (v1->dv_size != v2->dv_size)
         return (v1->dv_size - v2->dv_size);
 
-    // TODO: Make more extensive unit tests. This most definately does not compare all cases.
-    return memcmp (v1->dv_string, v2->dv_string, v1->dv_size);
+    // FIXME: There is probably some parts of this
+    //  compare that is sustainable to underflow/overflow..
+    switch (dx_value_type_sanify (v1->dv_type))
+    {
+    case DISIR_VALUE_TYPE_ENUM:
+        // FALL-THROUGH
+    case DISIR_VALUE_TYPE_STRING:
+        return memcmp (v1->dv_string, v2->dv_string, v1->dv_size);
+    case DISIR_VALUE_TYPE_INTEGER:
+        return (v1->dv_integer - v2->dv_integer);
+    case DISIR_VALUE_TYPE_FLOAT:
+        return (int)(v1->dv_float - v2->dv_float);
+    case DISIR_VALUE_TYPE_BOOLEAN:
+        return (v1->dv_boolean - v2->dv_boolean);
+    default:
+        return (INT_MIN);
+    }
 }
 
 //! INTERNAL API
