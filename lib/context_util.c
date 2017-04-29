@@ -544,6 +544,35 @@ dc_get_value_type (struct disir_context *context, enum disir_value_type *type)
     return status;
 }
 
+enum disir_status
+dc_fatal_error (struct disir_context *context, const char *msg, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    va_start (args, msg);
+    status = dc_fatal_error_va (context, msg, args);
+    va_end (args);
+
+    return status;
+}
+
+enum disir_status
+dc_fatal_error_va (struct disir_context *context, const char *msg, va_list args)
+{
+    if (context == NULL || msg == NULL)
+        return DISIR_STATUS_INVALID_ARGUMENT;
+
+    // Cannot set fatal error on a finalized context.
+    if (context->CONTEXT_STATE_FINALIZED)
+        return DISIR_STATUS_CONTEXT_IN_WRONG_STATE;
+
+    context->CONTEXT_STATE_FATAL = 1;
+    dx_context_error_set_va (context, msg, args);
+
+    return DISIR_STATUS_OK;
+}
+
 //! PUBLIC API
 const char *
 dc_context_error (struct disir_context *context)

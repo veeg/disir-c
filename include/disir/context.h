@@ -36,6 +36,7 @@ enum disir_context_type
     DISIR_CONTEXT_UNKNOWN, // Must be last entry in enumeration
 };
 
+#include <stdarg.h>
 #include <stdint.h>
 #include <disir/disir.h>
 #include <disir/collection.h>
@@ -1231,6 +1232,29 @@ struct disir_diff_report
 enum disir_status
 dc_compare (struct disir_context *lhs, struct disir_context *rhs,
             struct disir_diff_report **report);
+
+//! \brief Mark the context as fatally invalid with an associated error message.
+//!
+//! The context must be in constructing state.
+//! If invoked multiple times on the same context, the message is simply
+//! overwritten.
+//!
+//! \param[in] context context to mark as fatally invalid
+//! \param[in] msg Error message to set on the context.
+//! \param[in] ... Varadic arguments
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context or msg is NULL.
+//! \return DISIR_STATUS_CONTEXT_IN_WRONG_STATE if context is finalized.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_fatal_error (struct disir_context *context, const char *msg, ...);
+
+//! \see dc_fatal_error
+//! Varadic argument list version of dc_fatal_error()
+//!
+enum disir_status
+dc_fatal_error_va (struct disir_context *context, const char *msg, va_list args);
 
 
 #ifdef __cplusplus

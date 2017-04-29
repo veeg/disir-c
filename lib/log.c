@@ -262,10 +262,19 @@ dx_context_error_set (struct disir_context *context, const char *fmt_message, ..
 {
     va_list args;
     va_start (args, fmt_message);
+    dx_context_error_set_va (context, fmt_message, args);
+    va_end (args);
+}
+
+//! INTERNAL API
+void
+dx_context_error_set_va (struct disir_context *context, const char* fmt_message, va_list args)
+{
+    if (context == NULL)
+        return;
+
     dx_internal_log_to_storage (&context->cx_error_message,
                                 &context->cx_error_message_size, fmt_message, args);
-
-    va_end (args);
 }
 
 void
@@ -318,9 +327,7 @@ dx_log_disir (enum disir_log_level dll,
     if (log_context)
     {
         va_copy (args_copy, args);
-
-        dx_internal_log_to_storage (&context->cx_error_message,
-                                    &context->cx_error_message_size, fmt_message, args_copy);
+        dx_context_error_set_va (context, fmt_message, args_copy);
         va_end (args_copy);
     }
 

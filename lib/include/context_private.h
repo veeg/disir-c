@@ -22,8 +22,9 @@ struct disir_context
             uint64_t    CONTEXT_STATE_CONSTRUCTING              : 1,
                         CONTEXT_STATE_FINALIZED                 : 2,
                         CONTEXT_STATE_INVALID                   : 3,
-                        CONTEXT_STATE_DESTROYED                 : 4,
-                        CONTEXT_STATE_IN_PARENT                 : 5,
+                        CONTEXT_STATE_FATAL                     : 4,
+                        CONTEXT_STATE_DESTROYED                 : 5,
+                        CONTEXT_STATE_IN_PARENT                 : 6,
                                                                 : 0;
         };
     };
@@ -199,7 +200,12 @@ enum disir_status dx_get_mold_equiv_type (struct disir_context *parent,
 enum disir_status dx_validate_context (struct disir_context *context);
 
 //! \brief Set the input message to the error string of context
-void dx_context_error_set (struct disir_context *context, const char *fmt_message, ...);
+void
+dx_context_error_set (struct disir_context *context, const char *fmt_message, ...);
+//! \brief Set the input message to the error string of context from va_list args
+void
+dx_context_error_set_va (struct disir_context *context, const char *fmt_message, va_list args);
+
 
 //! Check that the passed context is either of the passed
 //! DISIR_CONTEXT_* following the variadic list.

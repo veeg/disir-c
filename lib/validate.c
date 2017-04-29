@@ -549,6 +549,13 @@ dx_validate_context (struct disir_context *context)
 
     TRACE_ENTER ("context %s", dc_context_type_string(context));
 
+    if (context->CONTEXT_STATE_FATAL)
+    {
+        log_debug_context (1, context, "in fatal state - not valid");
+        status = DISIR_STATUS_INVALID_CONTEXT;
+        goto out;
+    }
+
     status = DISIR_STATUS_OK;
 
     // Optimistically clear INVALID state
@@ -609,6 +616,7 @@ dx_validate_context (struct disir_context *context)
                    disir_status_string (status));
     }
 
+out:
     TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
