@@ -387,19 +387,18 @@ TEST_F (CompareTest, mold_context_default_value_differ)
 
 TEST_F (CompareTest, mold_context_section_restriction_one_missing)
 {
-    struct disir_context *context_mold;
     struct disir_context *context_section1;
     struct disir_context *context_section2;
     struct semantic_version semver;
 
     ASSERT_NO_SETUP_FAILURE();
 
-    status = dc_mold_begin (&context_mold);
+    status = dc_mold_begin (&context_mold1);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
-    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section1);
+    status = dc_begin (context_mold1, DISIR_CONTEXT_SECTION, &context_section1);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section2);
+    status = dc_begin (context_mold1, DISIR_CONTEXT_SECTION, &context_section2);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_set_name (context_section1, "testsection", strlen ("testsection"));
@@ -423,23 +422,23 @@ TEST_F (CompareTest, mold_context_section_restriction_one_missing)
 
     // TODO: Assert report
 
-    dc_destroy (&context_mold);
+    dc_destroy (&context_section1);
+    dc_destroy (&context_section2);
 }
 
 TEST_F (CompareTest, mold_context_section_restriction_value_differ)
 {
-    struct disir_context *context_mold;
     struct disir_context *context_section1;
     struct disir_context *context_section2;
 
     ASSERT_NO_SETUP_FAILURE();
 
-    status = dc_mold_begin (&context_mold);
+    status = dc_mold_begin (&context_mold1);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
-    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section1);
+    status = dc_begin (context_mold1, DISIR_CONTEXT_SECTION, &context_section1);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section2);
+    status = dc_begin (context_mold1, DISIR_CONTEXT_SECTION, &context_section2);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_set_name (context_section1, "testsection", strlen ("testsection"));
@@ -459,23 +458,23 @@ TEST_F (CompareTest, mold_context_section_restriction_value_differ)
 
     // TODO: Assert report
 
-    dc_destroy (&context_mold);
+    dc_destroy (&context_section1);
+    dc_destroy (&context_section2);
 }
 
 TEST_F (CompareTest, mold_context_section_restriction_type_differ)
 {
-    struct disir_context *context_mold;
     struct disir_context *context_section1;
     struct disir_context *context_section2;
 
     ASSERT_NO_SETUP_FAILURE();
 
-    status = dc_mold_begin (&context_mold);
+    status = dc_mold_begin (&context_mold1);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
-    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section1);
+    status = dc_begin (context_mold1, DISIR_CONTEXT_SECTION, &context_section1);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section2);
+    status = dc_begin (context_mold1, DISIR_CONTEXT_SECTION, &context_section2);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_set_name (context_section1, "testsection", strlen ("testsection"));
@@ -495,7 +494,8 @@ TEST_F (CompareTest, mold_context_section_restriction_type_differ)
 
     // TODO: Assert report
 
-    dc_destroy (&context_mold);
+    dc_destroy (&context_section1);
+    dc_destroy (&context_section2);
 }
 
 // TODO: mold_context_mold_documentation_multiple_entries_match
