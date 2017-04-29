@@ -611,7 +611,7 @@ compare_all_elements (struct disir_context *lhs, struct disir_context *rhs,
     }
     if (rhs_elements)
     {
-        dc_collection_finished (&lhs_elements);
+        dc_collection_finished (&rhs_elements);
     }
 
     if (element)
