@@ -39,11 +39,6 @@ context_get_introduced_structure (struct disir_context *context,
         *introduced = &context->cx_default->de_introduced;
         break;
     }
-    case DISIR_CONTEXT_KEYVAL:
-    {
-        *introduced = &context->cx_keyval->kv_introduced;
-        break;
-    }
     case DISIR_CONTEXT_SECTION:
         *introduced = &context->cx_section->se_introduced;
         break;
@@ -57,6 +52,7 @@ context_get_introduced_structure (struct disir_context *context,
         *introduced = &context->cx_mold->mo_version;
         break;
     }
+    case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:

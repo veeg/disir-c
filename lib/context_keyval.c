@@ -230,16 +230,6 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         status = DISIR_STATUS_INTERNAL_ERROR;
     }
 
-    if (semver)
-    {
-        status = dc_add_introduced (keyval, semver);
-        if (status != DISIR_STATUS_OK)
-        {
-            // Already logged
-            goto error;
-        }
-    }
-
     status = dc_add_documentation (keyval, doc, strlen (doc));
     if (status != DISIR_STATUS_OK)
     {
@@ -371,7 +361,6 @@ dx_keyval_create (struct disir_context *parent)
 
     keyval->kv_context = parent;
     keyval->kv_name.dv_type = DISIR_VALUE_TYPE_STRING;
-    keyval->kv_introduced.sv_major = 1;
 
     return keyval;
 }

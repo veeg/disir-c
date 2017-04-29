@@ -16,9 +16,6 @@ struct disir_keyval
     //! Only applicable to parent toplevel context DISIR_CONTEXT_CONFIG
     struct disir_context        *kv_mold_equiv;
 
-    //! Version this keyval entry was introduced.
-    struct semantic_version     kv_introduced;
-
     //! Version this keyval entry was deprecated
     //! Value of 0.0.0 means it is NOT deprecated.
     struct semantic_version     kv_deprecated;
