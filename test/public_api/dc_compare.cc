@@ -385,6 +385,118 @@ TEST_F (CompareTest, mold_context_default_value_differ)
     // TODO: Assert report entry
 }
 
+TEST_F (CompareTest, mold_context_section_restriction_one_missing)
+{
+    struct disir_context *context_mold;
+    struct disir_context *context_section1;
+    struct disir_context *context_section2;
+    struct semantic_version semver;
+
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = dc_mold_begin (&context_mold);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section1);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section2);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_set_name (context_section1, "testsection", strlen ("testsection"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_section2, "testsection", strlen ("testsection"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    semver.sv_major = 1;
+    semver.sv_minor = 1;
+    semver.sv_patch = 5;
+    // Add equal restriction with different introduced
+    status = dc_add_restriction_entries_min (context_section1, 4, &semver);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    semver.sv_minor = 2;
+    status = dc_add_restriction_entries_min (context_section2, 4, &semver);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Conflict on introduced
+    status = dc_compare (context_section1, context_section2, NULL);
+    ASSERT_STATUS (DISIR_STATUS_CONFLICT, status);
+
+    // TODO: Assert report
+
+    dc_destroy (&context_mold);
+}
+
+TEST_F (CompareTest, mold_context_section_restriction_value_differ)
+{
+    struct disir_context *context_mold;
+    struct disir_context *context_section1;
+    struct disir_context *context_section2;
+
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = dc_mold_begin (&context_mold);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section1);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section2);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_set_name (context_section1, "testsection", strlen ("testsection"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_section2, "testsection", strlen ("testsection"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Add restriction with different value
+    status = dc_add_restriction_entries_max (context_section1, 2, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_add_restriction_entries_max (context_section2, 4, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Conflict on introduced
+    status = dc_compare (context_section1, context_section2, NULL);
+    ASSERT_STATUS (DISIR_STATUS_CONFLICT, status);
+
+    // TODO: Assert report
+
+    dc_destroy (&context_mold);
+}
+
+TEST_F (CompareTest, mold_context_section_restriction_type_differ)
+{
+    struct disir_context *context_mold;
+    struct disir_context *context_section1;
+    struct disir_context *context_section2;
+
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = dc_mold_begin (&context_mold);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section1);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section2);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_set_name (context_section1, "testsection", strlen ("testsection"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_section2, "testsection", strlen ("testsection"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Add restriction with different type
+    status = dc_add_restriction_entries_max (context_section1, 2, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_add_restriction_entries_min (context_section2, 2, NULL);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Conflict on introduced
+    status = dc_compare (context_section1, context_section2, NULL);
+    ASSERT_STATUS (DISIR_STATUS_CONFLICT, status);
+
+    // TODO: Assert report
+
+    dc_destroy (&context_mold);
+}
 
 // TODO: mold_context_mold_documentation_multiple_entries_match
 // TODO: mold_context_mold_documentation_multiple_entries_one_differ
