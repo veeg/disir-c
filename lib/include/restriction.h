@@ -19,6 +19,7 @@ struct disir_restriction
 
     //! The type of restriction this entry represents
     enum disir_restriction_type re_type;
+    // TODO: Move values into disir_value instead
     char                        *re_value_string;
     double                      re_value_numeric;
     double                      re_value_min;
