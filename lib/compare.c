@@ -12,6 +12,7 @@
 #include "log.h"
 #include "mold.h"
 #include "multimap.h"
+#include "restriction.h"
 #include "section.h"
 
 //! Forward declare
@@ -147,6 +148,7 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
     va_end (args);
 }
 
+//! STATIC FUNCTION
 static enum disir_status
 compare_default_queues (struct disir_default *lhs, struct disir_default *rhs,
                         struct disir_diff_report *report)
@@ -255,6 +257,95 @@ compare_documentation_queues (struct disir_documentation *lhs, struct disir_docu
 
     // recurse to next entry
     return compare_documentation_queues (lhs->next, rhs->next, report);
+}
+
+//! STATIC FUNCTION
+static enum disir_status
+compare_restriction_queue (struct disir_restriction *lhs, struct disir_restriction *rhs,
+                           struct disir_diff_report *report)
+{
+    enum disir_status status;
+    int res;
+
+    // Both queues are of equal length
+    if (lhs == NULL && rhs == NULL)
+    {
+        return DISIR_STATUS_OK;
+    }
+
+    // lhs has at least one additional default entry.
+    if (lhs && rhs == NULL)
+    {
+        dx_diff_report_add (report, "rhs is missing restriction entry");
+        return DISIR_STATUS_OK;
+    }
+
+    // rhs has at least one additional documentation entry.
+    if (rhs && lhs == NULL)
+    {
+        dx_diff_report_add (report, "lhs is missing restriction entry");
+        return DISIR_STATUS_OK;
+    }
+
+    // Check introduced version
+    res = dc_semantic_version_compare (&lhs->re_introduced, &rhs->re_introduced);
+    if (res != 0)
+    {
+        char lhsbuf[100];
+        char rhsbuf[100];
+        dc_semantic_version_string (lhsbuf, 100, &lhs->re_introduced);
+        dc_semantic_version_string (rhsbuf, 100, &rhs->re_introduced);
+        dx_diff_report_add (report, "Restriction differ in introduced (%s vs %s)",
+                                    lhsbuf, rhsbuf);
+
+        return DISIR_STATUS_OK;
+    }
+
+    // Check deprecated version
+    res = dc_semantic_version_compare (&lhs->re_deprecated, &rhs->re_deprecated);
+    if (res != 0)
+    {
+        char lhsbuf[100];
+        char rhsbuf[100];
+        dc_semantic_version_string (lhsbuf, 100, &lhs->re_deprecated);
+        dc_semantic_version_string (rhsbuf, 100, &rhs->re_deprecated);
+        dx_diff_report_add (report, "Restriction differ in deprecated (%s vs %s)",
+                                    lhsbuf, rhsbuf);
+
+        return DISIR_STATUS_OK;
+    }
+
+    // Check type
+    if (lhs->re_type != rhs->re_type)
+    {
+        dx_diff_report_add (report, "Restriction type differ (%s vs %s)",
+                                    dc_restriction_enum_string (lhs->re_type),
+                                    dc_restriction_enum_string (rhs->re_type));
+        return DISIR_STATUS_OK;
+    }
+
+    // Check documentation
+    status = compare_documentation_queues (lhs->re_documentation_queue,
+                                           rhs->re_documentation_queue, report);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    // Assert value
+    // This is not pretty...
+    if (lhs->re_value_numeric != rhs->re_value_numeric
+        || lhs->re_value_min != rhs->re_value_min
+        || lhs->re_value_max != rhs->re_value_max
+        || (lhs->re_value_string != NULL
+            && rhs->re_value_string != NULL
+            && strcmp (lhs->re_value_string, rhs->re_value_string) != 0))
+    {
+        dx_diff_report_add (report, "Restriction values differ... (printout NYI)");
+        return DISIR_STATUS_OK;
+    }
+
+    return DISIR_STATUS_OK;
 }
 
 //! STATIC FUNCTION
@@ -611,7 +702,6 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
 
         if (dc_context_type (lhs->cx_root_context) == DISIR_CONTEXT_MOLD)
         {
-            // check documentation entries
             status = compare_documentation_queues (lhs->cx_keyval->kv_documentation_queue,
                                                    rhs->cx_keyval->kv_documentation_queue,
                                                    report);
@@ -620,7 +710,6 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
                 break;
             }
 
-            log_debug (6, "Comparing default queues");
             status = compare_default_queues (lhs->cx_keyval->kv_default_queue,
                                              rhs->cx_keyval->kv_default_queue,
                                              report);
@@ -629,7 +718,21 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
                 break;
             }
 
-            // TODO MOLD: Diff restrictions
+            status = compare_restriction_queue (lhs->cx_keyval->kv_restrictions_inclusive_queue,
+                                                rhs->cx_keyval->kv_restrictions_inclusive_queue,
+                                                report);
+            if (status != DISIR_STATUS_OK)
+            {
+                break;
+            }
+
+            status = compare_restriction_queue (lhs->cx_keyval->kv_restrictions_exclusive_queue,
+                                                rhs->cx_keyval->kv_restrictions_exclusive_queue,
+                                                report);
+            if (status != DISIR_STATUS_OK)
+            {
+                break;
+            }
         }
 
         break;
@@ -664,6 +767,22 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
             status = compare_documentation_queues (lhs->cx_section->se_documentation_queue,
                                                    rhs->cx_section->se_documentation_queue,
                                                    report);
+            if (status != DISIR_STATUS_OK)
+            {
+                break;
+            }
+
+            status = compare_restriction_queue (lhs->cx_section->se_restrictions_inclusive_queue,
+                                                rhs->cx_section->se_restrictions_inclusive_queue,
+                                                report);
+            if (status != DISIR_STATUS_OK)
+            {
+                break;
+            }
+
+            status = compare_restriction_queue (lhs->cx_section->se_restrictions_exclusive_queue,
+                                                rhs->cx_section->se_restrictions_exclusive_queue,
+                                                report);
             if (status != DISIR_STATUS_OK)
             {
                 break;
