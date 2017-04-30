@@ -62,6 +62,13 @@ TEST_F (StatusTest, destroyed_context)
     ASSERT_STREQ (status_string, "DESTROYED CONTEXT");
 }
 
+TEST_F (StatusTest, fatal_context)
+{
+    status = DISIR_STATUS_FATAL_CONTEXT;
+    status_string = disir_status_string (status);
+    ASSERT_STREQ (status_string, "FATAL CONTEXT");
+}
+
 TEST_F (StatusTest, bad_context_object)
 {
     status = DISIR_STATUS_BAD_CONTEXT_OBJECT;
