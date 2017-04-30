@@ -20,13 +20,6 @@
 #define ATTRIBUTE_KEY_CONFIG "config"
 #define ATTRIBUTE_KEY_RESTRICTIONS "restrictions"
 
-enum disir_status
-object_members_check (struct disir_instance *intance, Json::Value& object, ...);
-
-#define ASSERT_MEMBERS_PRESENT(instance, object, ...) \
-        object_members_check (instance, object, __VA_ARGS__, 0)
-
-
 //! \brief helper function that resolves typeof val and sets context's value accordingly
 enum disir_status set_value (Json::Value& val, struct disir_context *context);
 
@@ -62,7 +55,7 @@ namespace dio
         //! will contain an explenation of any errors.
         //! \return DPLUGIN_IO_ERROR if filepath is invalid.
         //!
-        virtual enum disir_status read_config (const char *filepath, Json::Value& root);
+        virtual enum disir_status read_json_from_file (const char *filepath, Json::Value& root);
 
    protected:
         //! \brief populates an internal errorlog

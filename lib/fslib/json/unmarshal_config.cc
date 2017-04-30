@@ -33,7 +33,7 @@ ConfigReader::read_config_version (struct semantic_version *semver, const char *
 {
     enum disir_status status;
 
-    status = read_config (path, m_configRoot);
+    status = read_json_from_file (path, m_configRoot);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -92,7 +92,7 @@ ConfigReader::unmarshal (struct disir_config **config, const char *filepath)
 {
     enum disir_status status;
 
-    status = read_config (filepath, m_configRoot);
+    status = read_json_from_file (filepath, m_configRoot);
     if (status != DISIR_STATUS_OK)
     {
         return status;

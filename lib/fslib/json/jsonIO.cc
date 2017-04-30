@@ -44,7 +44,7 @@ JsonIO::JsonIO (struct disir_instance *disir)
 }
 
 enum disir_status
-JsonIO::read_config (const char *filepath, Json::Value& root)
+JsonIO::read_json_from_file (const char *filepath, Json::Value& root)
 {
     std::ifstream file (filepath);
     std::stringstream buffer;

@@ -58,8 +58,8 @@ namespace dio
 
         //! Function to read a jsonconfig from filepath
         virtual enum disir_status
-            read_config (const char *filepath, Json::Value& root) {
-                return JsonIO::read_config (filepath, root);
+            read_json_from_file (const char *filepath, Json::Value& root) {
+                return JsonIO::read_json_from_file (filepath, root);
             }
 
         //! \brief Sets a version on the config
@@ -188,8 +188,8 @@ namespace dio
 
             //! \brief reads the json config from disk, located at filepath.
             enum disir_status
-                read_config (const char *filepath, Json::Value& root) {
-                    return JsonIO::read_config (filepath, root);
+                read_json_from_file (const char *filepath, Json::Value& root) {
+                    return JsonIO::read_json_from_file (filepath, root);
                 }
 
             bool mold_has_documentation (Json::Value& mold_root);
