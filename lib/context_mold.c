@@ -90,15 +90,28 @@ dc_mold_finalize (struct disir_context **context, struct disir_mold **mold)
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 
-    // TODO: Perform some validation?
+    // Perform full mold validation.
+    status = dx_validate_context (*context);
+    // Only set state if the validate operation went as planned
+    if (status == DISIR_STATUS_OK || status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+        *mold = (*context)->cx_mold;
+        (*context)->CONTEXT_STATE_FINALIZED = 1;
+        (*context)->CONTEXT_STATE_CONSTRUCTING = 0;
 
-    *mold = (*context)->cx_mold;
-    (*context)->CONTEXT_STATE_FINALIZED = 1;
-    *context = NULL;
-    // We do not decref context refcount on finalize
+        // We do not decref context refcount on finalize
+        // Deprive the user of his context reference.
+        *context = NULL;
+    }
+    else
+    {
+        log_fatal_context (*context, "failed internally with status %s",
+                                     disir_status_string (status));
+        status = DISIR_STATUS_INTERNAL_ERROR;
+    }
 
     TRACE_EXIT ("*mold: %p", mold);
-    return DISIR_STATUS_OK;
+    return status;
 }
 
 
