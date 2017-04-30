@@ -176,17 +176,7 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
 enum disir_status
 ConfigReader::build_config_from_json (struct disir_context *context_config)
 {
-    return _unmarshal_node (context_config, m_configRoot[CONFIG]);
-}
-
-void
-ConfigReader::remove_enumeration_postfix (std::string& name)
-{
-    std::size_t found = name.find ("@");
-    if (found != std::string::npos)
-    {
-        name.erase (found, name.size () - found );
-    }
+    return _unmarshal_node (context_config, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
 }
 
 //! PRIVATE
@@ -205,8 +195,6 @@ ConfigReader::set_keyval (struct disir_context *parent_context,
                         disir_status_string (status));
        goto error;
     }
-
-    remove_enumeration_postfix (name);
 
     // if the name does not have a mold equivalent, we recieve and
     // error that it does not exist. However, we can continue.
@@ -255,16 +243,105 @@ error:
     return status;
 }
 
-bool
-ConfigReader::value_is_section (Json::Value& node)
+
+enum disir_status
+ConfigReader::unmarshal_array (struct disir_context *parent, Json::Value& array, std::string& name)
 {
-    return node.isObject ();
+    enum disir_status status;
+    unsigned int i;
+
+    for (i = 0; i < array.size (); ++i)
+    {
+        status = unmarshal_type (parent, array[i], name);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+    }
+    return DISIR_STATUS_OK;
 }
 
-bool
-ConfigReader::value_is_keyval (Json::Value& node)
+enum disir_status
+ConfigReader::unmarshal_type (struct disir_context *context, Json::Value& value, std::string& name)
 {
-    return !node.isArray () || !node.isObject () || !node.isNull ();
+   struct disir_context *child_context = NULL;
+   enum disir_status status;
+
+    switch (value.type ())
+    {
+    case Json::objectValue:
+        status = dc_begin (context, DISIR_CONTEXT_SECTION, &child_context);
+        if (status != DISIR_STATUS_OK)
+        {
+            // This error cannot pass, crash hard!
+            disir_log_user (m_disir, "could not start DISIR_CONTEXT_SECTION");
+            goto error;
+        }
+
+        status = dc_set_name (child_context, name.c_str (), name.size ());
+        if (status != DISIR_STATUS_OK &&
+            status != DISIR_STATUS_NOT_EXIST)
+        {
+            // THis is unexpected, crash hard!
+            disir_log_user (m_disir, "Could not set name (%s) : %s", name.c_str (),
+                                      disir_status_string (status));
+            goto error;
+        }
+
+        status = _unmarshal_node (child_context, value);
+        if (status != DISIR_STATUS_OK)
+        {
+            // logged
+            return status;
+        }
+
+        status = dc_finalize (&child_context);
+        if (status != DISIR_STATUS_OK &&
+            status != DISIR_STATUS_INVALID_CONTEXT)
+        {
+            // Reeling us in by only loggin the error
+            disir_log_user (m_disir, "Could not finalize context: %s",
+                                     disir_status_string (status));
+        }
+
+        // If context is invalid we need to
+        // get rid of our reference to it.
+        if (status == DISIR_STATUS_INVALID_CONTEXT)
+        {
+            dc_putcontext (&child_context);
+        }
+        break;
+    case Json::arrayValue:
+        status = unmarshal_array (context, value, name);
+        if (status != DISIR_STATUS_OK)
+        {
+            // logged
+            return status;
+        }
+        break;
+    case Json::intValue:
+    case Json::stringValue:
+    case Json::realValue:
+    case Json::booleanValue:
+        status = set_keyval (context, name, value);
+        if (status != DISIR_STATUS_OK)
+        {
+            goto error;
+        }
+        break;
+    default:
+        // if object is unparsable, its name is logged
+        append_disir_error ("Got unrecognized json object with name %s",
+                name.c_str ());
+        break;
+    }
+    return status;
+error:
+    if (child_context)
+    {
+        dc_destroy (&child_context);
+    }
+    return status;
 }
 
 //! PRIVATE
@@ -273,7 +350,6 @@ ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value
 {
     enum disir_status status;
     Json::Value child_node;
-    struct disir_context *child_context = NULL;
 
     status = DISIR_STATUS_OK;
 
@@ -286,73 +362,14 @@ ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value
 
         auto name = iter.name ();
 
-        if (value_is_section (child_node))
-        {
-            remove_enumeration_postfix (name);
-
-            status = dc_begin (parent_context, DISIR_CONTEXT_SECTION, &child_context);
-            if (status != DISIR_STATUS_OK)
-            {
-                // This error cannot pass, crash hard!
-                disir_log_user (m_disir, "could not start DISIR_CONTEXT_SECTION");
-                goto error;
-            }
-
-            status = dc_set_name (child_context, name.c_str (), name.size ());
-            if (status != DISIR_STATUS_OK &&
-                status != DISIR_STATUS_NOT_EXIST)
-            {
-                // THis is unexpected, crash hard!
-                disir_log_user (m_disir, "Could not set name (%s) : %s", name.c_str (),
-                                          disir_status_string (status));
-                goto error;
-            }
-
-            status = _unmarshal_node (child_context, child_node);
-            if (status != DISIR_STATUS_OK)
-            {
-                // logged
-                return status;
-            }
-
-            status = dc_finalize (&child_context);
-            if (status != DISIR_STATUS_OK &&
-                status != DISIR_STATUS_INVALID_CONTEXT)
-            {
-                // Reeling us in by only loggin the error
-                disir_log_user (m_disir, "Could not finalize context: %s",
-                                         disir_status_string (status));
-            }
-
-            // If context is invalid we need to
-            // get rid of our reference to it.
-            if (status == DISIR_STATUS_INVALID_CONTEXT)
-            {
-                dc_putcontext (&child_context);
-            }
-        }
-        else if (value_is_keyval (child_node))
-        {
-            status = set_keyval (parent_context, name, *iter);
-            if (status != DISIR_STATUS_OK)
-            {
-
-            }
-        }
-        else
-        {
-            // if object is unparsable, its name is logged
-            append_disir_error ("Got unrecognized json object with name %s",
-                    name.c_str ());
-        }
+        status = unmarshal_type (parent_context, child_node, name);
+        if (status != DISIR_STATUS_OK)
+            goto error;
     }
 
     return status;
 error:
-    if (child_context)
-    {
-        dc_destroy (&child_context);
-    }
+
     return status;
 }
 

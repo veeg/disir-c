@@ -78,6 +78,13 @@ namespace dio
                     std::string name,
                     Json::Value& keyval);
 
+        enum disir_status
+        unmarshal_type (struct disir_context *context , Json::Value& value, std::string& name);
+
+        enum disir_status
+        unmarshal_array (struct disir_context *parent, Json::Value& array,
+                         std::string& name);
+
         //! \brief if duplicate keynames are postfixed, this function removes
         //! them before creating a disir_context object
         void remove_enumeration_postfix (std::string& name);

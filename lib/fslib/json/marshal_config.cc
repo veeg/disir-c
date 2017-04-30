@@ -140,21 +140,7 @@ ConfigWriter::set_section_keyname (struct disir_context *context, Json::Value& p
         return status;
     }
 
-    // If name already exists, enumerate it before
-    // mapping section to parent
-    if (parent[name].isNull () == false)
-    {
-        name = enumerate_keyname (parent, name);
-    }
-
-    // If section is empty
-    // we just print an empty object
-    if (sectionVal.isNull ())
-    {
-        sectionVal = Json::objectValue;
-    }
-
-    parent[name] = sectionVal;
+    serialize_duplicate_entries (parent, sectionVal, name);
 
     return status;
 }
@@ -179,22 +165,28 @@ ConfigWriter::get_context_key (struct disir_context *context, std::string& key)
     return status;
 }
 
-std::string
-ConfigWriter::enumerate_keyname (Json::Value& node, const std::string name)
+void
+ConfigWriter::serialize_duplicate_entries (Json::Value& parent,
+                                           Json::Value& child, const std::string name)
 {
-    std::string enumerated_name = name;
-    std::string enumeration;
-    int counter = 2;
+    Json::Value entries;
 
-    // Enumerate
-    enumerated_name += "@";
-    do {
-        enumeration = enumerated_name;
-        enumeration += std::to_string (counter);
-        counter++;
-    } while (node[enumeration].isNull () != true);
-
-    return enumeration;
+    if (parent[name].isArray())
+    {
+        parent[name].append (child);
+    }
+    else if (parent[name].isNull() == false)
+    {
+        entries = Json::arrayValue;
+        entries.append (parent[name]);
+        entries.append (child);
+        child = entries;
+        parent[name] = child;
+    }
+    else
+    {
+        parent[name] = child;
+    }
 }
 
 // Wraps libdisir dc_get_value to handle arbitrary value sizes
@@ -217,15 +209,6 @@ ConfigWriter::set_keyval (struct disir_context *context, std::string name, Json:
         disir_error_set (m_disir, "Could not obtain context_value_type (%s)",
                                    disir_status_string (status));
         return status;
-    }
-
-    // The json rfc dictates that
-    // no multiple entries shall exist.
-    // Therefore, we store multiple keyvals
-    // as a json array.
-    if (node[name].isNull () == false)
-    {
-        name = enumerate_keyname (node, name);
     }
 
     switch (type) {
@@ -285,7 +268,7 @@ ConfigWriter::set_keyval (struct disir_context *context, std::string name, Json:
             break;
     }
 
-    node[name] = keyval;
+    serialize_duplicate_entries (node, keyval, name);
 
     return status;
 error:
