@@ -16,6 +16,11 @@ namespace disir
 
         //! Handle command implementation
         virtual int handle_command (std::vector<std::string> &args);
+
+        // Print the unserialized config or mold (not both) and
+        // verify its content if the input status is not ok.
+        void print_verify (enum disir_status status, const char *entry,
+                           struct disir_config *config, struct disir_mold *mold);
     };
 
 }
