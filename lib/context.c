@@ -652,6 +652,92 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_resolve_root_name (struct disir_context *context, const char **output)
+{
+    enum disir_status status;
+    int total_size = 0;
+    const char *reverse_name_index[20];
+    int reverse_name_index_index[20];
+    int current_name_index = -1;
+    struct disir_context *current_context = NULL;
+    const char *name = NULL;
+    int32_t name_size;
+    void *buffer;
+
+    // TODO: Reject contexts that are not KEYVALS or SECTIONS
+
+    current_context = context;
+    while (current_context != NULL)
+    {
+        current_name_index += 1;
+        reverse_name_index_index[current_name_index] = -1;
+
+        name_size = 0;
+        status = dc_get_name (context, &name, &name_size);
+        if (status != DISIR_STATUS_OK)
+        {
+            name = "undefined";
+            name_size = 9;
+            reverse_name_index_index[current_name_index] = 0;
+        }
+
+        // Add length of name, plus additional characters for separators and index
+        //  e.g., name@12.
+        total_size += name_size;
+        total_size += 10;
+
+        reverse_name_index[current_name_index] = name;
+        if (reverse_name_index_index[current_name_index] == -1)
+        {
+            // TODO: Goto parrent, find the index of our name in it
+            reverse_name_index_index[current_name_index] = 0;
+        }
+
+        if (current_context == current_context->cx_parent_context)
+        {
+            current_context = NULL;
+        }
+        else
+        {
+            current_context = current_context->cx_parent_context;
+        }
+    }
+
+    // Allocate buffer for name
+    buffer = malloc (total_size);
+    if (buffer == NULL)
+        return DISIR_STATUS_NO_MEMORY;
+
+    int i;
+    int written = 0;
+    int res = 0;
+    for (i = current_name_index; i >= 0; i--)
+    {
+        log_debug (1, "Adding reverse name: %s", reverse_name_index[i]);
+        res = snprintf (buffer, total_size - written, "%s", reverse_name_index[i]);
+        written += res;
+
+        if (reverse_name_index_index[i] != 0)
+        {
+            res = snprintf (buffer, total_size - written, "@%d", reverse_name_index_index[i]);
+            written += res;
+        }
+
+        if (i != 0)
+        {
+            res = snprintf (buffer, total_size - written, ".");
+            written += res;
+        }
+    }
+
+
+    *output = buffer;
+
+    return DISIR_STATUS_OK;
+}
+
 //! INTERNAL API
 enum disir_status
 dx_get_mold_equiv_type (struct disir_context *parent,

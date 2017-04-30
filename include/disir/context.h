@@ -265,6 +265,19 @@ enum disir_status dc_set_name (struct disir_context *context, const char *name, 
 enum disir_status dc_get_name (struct disir_context *context,
                                const char **name, int32_t *name_size);
 
+//! \brief Rescursively resolve the name from the context to the root.
+//!
+//! This allocates a buffer that is populated in the output parameter.
+//!
+//! \param[in] context The context to resolve.
+//! \param[out] output Allocated buffer with the resolved name.
+//!
+//! \return DISIR_STATUS_NO_MEMORY on allocation failure.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_resolve_root_name (struct disir_context *context, const char **output);
+
 //! \brief Add an introduced semantic version number to a context.
 //!
 //! \return DISIR_STATUS_EXISTS is returned if an introduced entry already exists.
