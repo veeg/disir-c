@@ -230,7 +230,7 @@ MoldReader::set_context_metadata (struct disir_context *context,
     status = dc_set_name (context, name.c_str(), name.size ());
     if (status != DISIR_STATUS_OK)
     {
-        dc_fatal_error (m_disir, "could not set name");
+        dc_fatal_error (context, "could not set name");
         return status;
     }
 
@@ -240,7 +240,7 @@ MoldReader::set_context_metadata (struct disir_context *context,
         auto value_type = attribute_key_to_disir_value (current[ATTRIBUTE_KEY_TYPE].asCString ());
         if (value_type == DISIR_VALUE_TYPE_UNKNOWN)
         {
-            dc_fatal_error (m_disir, "Undefined value");
+            dc_fatal_error (context, "Undefined value");
             return DISIR_STATUS_NOT_EXIST;
         }
 
@@ -283,7 +283,7 @@ MoldReader::unmarshal_restriction (struct disir_context *context, Json::Value& c
 
     if (current[ATTRIBUTE_KEY_TYPE].isNull ())
     {
-        dc_fatal_error (m_disir, "No restriction type");
+        dc_fatal_error (context, "No restriction type");
         return DISIR_STATUS_OK;
     }
 
@@ -291,7 +291,7 @@ MoldReader::unmarshal_restriction (struct disir_context *context, Json::Value& c
                                                         current[ATTRIBUTE_KEY_TYPE].asCString ());
     if (restriction_type == DISIR_RESTRICTION_UNKNOWN)
     {
-        dc_fatal_error (m_disir, "Unknown restriction type");
+        dc_fatal_error (context, "Unknown restriction type");
         return DISIR_STATUS_OK;
     }
 
@@ -353,7 +353,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
     case DISIR_RESTRICTION_EXC_VALUE_NUMERIC:
         if (current[ATTRIBUTE_KEY_VALUE].isNull () == true)
         {
-            dc_fatal_error (m_disir, "No value present");
+            dc_fatal_error (context, "No value present");
             return DISIR_STATUS_OK;
         }
         break;
@@ -361,7 +361,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         if (current[ATTRIBUTE_KEY_VALUE_MIN].isNull () == true
             && current[ATTRIBUTE_KEY_VALUE_MAX].isNull () == true)
         {
-            dc_fatal_error (m_disir, "No value present");
+            dc_fatal_error (context, "No value present");
             return DISIR_STATUS_OK;
         }
     case DISIR_RESTRICTION_UNKNOWN:
@@ -499,7 +499,7 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
 
     if (current[ATTRIBUTE_KEY_DEFAULTS].isNull ())
     {
-        dc_fatal_error (m_disir, "Missing default entries");
+        dc_fatal_error (context_keyval, "Missing default entries");
         return DISIR_STATUS_OK;
     }
 
@@ -578,14 +578,14 @@ MoldReader::unmarshal_introduced (struct disir_context *context, Json::Value& cu
     status = assert_json_value_type (current[ATTRIBUTE_KEY_INTRODUCED], Json::stringValue);
     if (status != DISIR_STATUS_OK)
     {
-        dc_fatal_error (m_disir, "Wrong type for introduced");
+        dc_fatal_error (context, "Wrong type for introduced");
         return DISIR_STATUS_OK;
     }
 
     status = dc_semantic_version_convert (current.asCString(), &intro);
     if (status != DISIR_STATUS_OK)
     {
-        dc_fatal_error (m_disir, "Semamtic version introduced is not formatted correctly");
+        dc_fatal_error (context, "Semamtic version introduced is not formatted correctly");
         return status;
     }
 
@@ -611,14 +611,14 @@ MoldReader::unmarshal_deprecated (struct disir_context *context, Json::Value& cu
 
     if (current[ATTRIBUTE_KEY_DEPRECATED].type () != Json::stringValue)
     {
-        dc_fatal_error (m_disir, "Semantic version depricated is not string");
+        dc_fatal_error (context, "Semantic version depricated is not string");
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 
     status = dc_semantic_version_convert (current[ATTRIBUTE_KEY_DEPRECATED].asCString (), &semver);
     if (status != DISIR_STATUS_OK)
     {
-        dc_fatal_error (m_disir, "Semantic version deprecated is not formated correctly");
+        dc_fatal_error (context, "Semantic version deprecated is not formated correctly");
         return status;
     }
 
