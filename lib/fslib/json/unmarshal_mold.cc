@@ -7,6 +7,7 @@
 // standard
 #include <iostream>
 #include <stdarg.h>
+#include <cstring>
 
 using namespace dio;
 
@@ -277,13 +278,13 @@ MoldReader::set_context_metadata (struct disir_context *context,
     }
 
     auto doc = current[ATTRIBUTE_KEY_DOCUMENTATION];
-    if (doc.empty ())
+    if (doc.isNull ())
     {
         // No documentation on this context exists
         return DISIR_STATUS_OK;
     }
 
-    status = dc_add_documentation (context, doc.asCString (), doc.size ());
+    status = dc_add_documentation (context, doc.asCString (), strlen (doc.asCString ()));
     if (status != DISIR_STATUS_OK)
     {
         disir_log_user (m_disir, "could not add documentation: %s",
