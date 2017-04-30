@@ -138,6 +138,7 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
         {
             // Success
             report->dr_diff_string[i][ret] = '\0';
+            log_debug (1, "Diff report: %s", report->dr_diff_string[i]);
             report->dr_entries += 1;
             break;
         }
