@@ -70,7 +70,7 @@ MoldReader::construct_mold (struct disir_mold **mold)
         status = dc_add_documentation (context_mold, doc.c_str (), doc.size ());
         if (status != DISIR_STATUS_OK)
         {
-            append_disir_error ("Could not add mold documentation");
+
             return status;
         }
     }
@@ -94,13 +94,6 @@ finalize:
         goto error;
     }
 
-    // If everything seemingly succeeded,
-    // however if there were errors we
-    if (m_errors.empty () == false)
-    {
-        populate_disir_with_errors ();
-        return DISIR_STATUS_INVALID_CONTEXT;
-    }
     return status;
 error:
     if (context_mold)
@@ -108,8 +101,6 @@ error:
         // delete
         dc_destroy (&context_mold);
     }
-
-    populate_disir_with_errors ();
 
     return status;
 }
