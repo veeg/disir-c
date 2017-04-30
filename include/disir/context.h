@@ -761,6 +761,26 @@ enum disir_status
 dc_find_elements (struct disir_context *context, const char *name,
                   struct disir_collection **collection);
 
+//! \brief Query for a context relative to parent
+//!
+//! \param[in] parent The context to query from.
+//! \param[in] name Query format to resolve.
+//! \param[out] out Output context to query for and return.
+//! \param[in] ... varadic arguments used for name argument.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_query_resolve_context (struct disir_context *parent, const char *name,
+                          struct disir_context **out, ...);
+
+//! \see dc_query_resolve_context
+//!
+//! Varatic argument version of dc_query_resolve_context
+enum disir_status
+dc_query_resolve_context_va (struct disir_context *parent, const char *name,
+                             struct disir_context **out, va_list args);
+
 //
 // KEYVAL related context API
 //

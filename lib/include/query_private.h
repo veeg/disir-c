@@ -34,6 +34,21 @@ enum disir_status
 dx_query_resolve_name (struct disir_context *parent, char *name, char *resolved,
                        char **next, int *index);
 
+//! \brief Resolve the parent context of the leaf node in the query.
+//!
+//! This function assumes that the leaf name query did not resolve to a valid context already.
+//! example:
+//!     "first@2.second@4.third@2"
+//!
+//!     If "first@2.second@4" exists, we are assumaing that the leaf context "third@2" does not
+//!     exist. But for us to be able to create this leaf context, "third@1" must exist.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dx_query_resolve_parent_context (struct disir_context *parent, struct disir_context **out,
+                                 char *keyval_name, const char *query, va_list args);
+
 
 #endif // _LIBDISIR_PRIVATE_QUERY_H
 
