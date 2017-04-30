@@ -251,7 +251,7 @@ MoldReader::set_context_attributes (struct disir_context *context,
     if (status != DISIR_STATUS_OK)
     {
         dc_fatal_error (context, "could not set name");
-        return status;
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     if (type == DISIR_CONTEXT_KEYVAL &&
@@ -268,14 +268,16 @@ MoldReader::set_context_attributes (struct disir_context *context,
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Keyval type is not of type string");
-            return DISIR_STATUS_OK;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
 
         auto value_type = attribute_key_to_disir_value (current[ATTRIBUTE_KEY_TYPE].asCString ());
         if (value_type == DISIR_VALUE_TYPE_UNKNOWN)
         {
-            dc_fatal_error (context, "Undefined value");
-            return DISIR_STATUS_OK;
+            dc_fatal_error (context, "Undefined type: %s",
+                            current[ATTRIBUTE_KEY_TYPE].asCString ());
+
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
 
         status = dc_set_value_type (context, value_type);
@@ -311,6 +313,13 @@ MoldReader::unmarshal_documentation (struct disir_context *context, Json::Value&
     {
         // No documentation on this context exists
         return DISIR_STATUS_OK;
+    }
+
+    status = assert_json_value_type (doc, Json::stringValue);
+    if (status != DISIR_STATUS_OK)
+    {
+       dc_fatal_error (context, "Documentation shall be of type string, instead have %s");
+       return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = dc_add_documentation (context, doc.asCString (), strlen (doc.asCString ()));
@@ -407,7 +416,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         if (current[ATTRIBUTE_KEY_VALUE].isNull ())
         {
             dc_fatal_error (context, "No value present");
-            return DISIR_STATUS_OK;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
         value = current[ATTRIBUTE_KEY_VALUE];
         break;
@@ -418,7 +427,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
             || current[ATTRIBUTE_KEY_VALUE_MAX].isNull ())
         {
             dc_fatal_error (context, "No value present");
-            return DISIR_STATUS_OK;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
         break;
     }
@@ -434,7 +443,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Wrong value type");
-            return DISIR_STATUS_OK;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
 
         status = dc_restriction_set_numeric (context, value.asInt64 ());
@@ -451,7 +460,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Wrong value type");
-            return DISIR_STATUS_OK;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
 
         status = dc_restriction_set_numeric (context, value.asInt64 ());
@@ -468,7 +477,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Wrong value type");
-            return DISIR_STATUS_OK;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
 
         status = dc_restriction_set_numeric (context, value.asDouble ());
@@ -491,7 +500,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Wrong value type");
-            return DISIR_STATUS_OK;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
 
         auto min = current[ATTRIBUTE_KEY_VALUE_MIN].asDouble ();
@@ -510,7 +519,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Wrong value type");
-            return DISIR_STATUS_OK;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
 
          status = dc_restriction_set_string (context, value.asCString ());
@@ -591,14 +600,14 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
     if (current[ATTRIBUTE_KEY_DEFAULTS].isNull ())
     {
         dc_fatal_error (context_keyval, "Missing default entries");
-        return DISIR_STATUS_OK;
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = assert_json_value_type (current[ATTRIBUTE_KEY_DEFAULTS], Json::arrayValue);
     if (status != DISIR_STATUS_OK)
     {
         dc_fatal_error (context_keyval, "Defaults should be of type array");
-        return DISIR_STATUS_OK;
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     defaults = current[ATTRIBUTE_KEY_DEFAULTS];
@@ -607,7 +616,7 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
     if (defaults.size () == 0)
     {
         dc_fatal_error (context_keyval, "Missing default entries");
-        return status;
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     for (unsigned int i = 0; i < defaults.size (); i++)
@@ -650,7 +659,6 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
             status = unmarshal_deprecated (context_default, def);
             if (status != DISIR_STATUS_OK)
             {
-
                 return status;
             }
         }
@@ -659,8 +667,6 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
         if (status != DISIR_STATUS_OK &&
             status != DISIR_STATUS_INVALID_CONTEXT)
         {
-                std::cerr << disir_status_string (status) << std::endl;
-
              disir_error_set (m_disir, "could not finalize defaul: %s",
                                         disir_status_string (status));
              goto error;
@@ -682,16 +688,16 @@ MoldReader::unmarshal_introduced (struct disir_context *context, Json::Value& cu
     enum disir_status status;
     struct semantic_version intro;
 
-    if (current[ATTRIBUTE_KEY_INTRODUCED].isNull () == true)
+    if (current[ATTRIBUTE_KEY_INTRODUCED].isNull ())
     {
-        return DISIR_STATUS_NOT_EXIST;
+        return DISIR_STATUS_OK;
     }
 
     status = assert_json_value_type (current[ATTRIBUTE_KEY_INTRODUCED], Json::stringValue);
     if (status != DISIR_STATUS_OK)
     {
         dc_fatal_error (context, "Wrong type for introduced");
-        return DISIR_STATUS_OK;
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = dc_semantic_version_convert (current[ATTRIBUTE_KEY_INTRODUCED].asCString(), &intro);
@@ -725,7 +731,7 @@ MoldReader::unmarshal_deprecated (struct disir_context *context, Json::Value& cu
     if (current[ATTRIBUTE_KEY_DEPRECATED].type () != Json::stringValue)
     {
         dc_fatal_error (context, "Semantic version depricated is not string");
-        return DISIR_STATUS_WRONG_VALUE_TYPE;
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = dc_semantic_version_convert (current[ATTRIBUTE_KEY_DEPRECATED].asCString (), &semver);
