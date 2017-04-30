@@ -287,6 +287,16 @@ MoldReader::set_context_attributes (struct disir_context *context,
         }
     }
 
+    // Only sections have introduced
+    if (type == DISIR_CONTEXT_SECTION)
+    {
+        status = unmarshal_introduced (context, current);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+    }
+
     status = unmarshal_deprecated (context, current);
     if (status != DISIR_STATUS_OK)
     {
