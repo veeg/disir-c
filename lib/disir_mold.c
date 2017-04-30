@@ -346,3 +346,44 @@ disir_mold_finished (struct disir_mold **mold)
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+disir_mold_valid (struct disir_mold *mold, struct disir_collection **collection)
+{
+    enum disir_status status;
+    struct disir_collection *col;
+
+    TRACE_ENTER ("mold (%p) collection (%p)", mold, collection);
+
+    col = NULL;
+    if (mold == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    if (collection)
+    {
+        col = dc_collection_create ();
+    }
+
+    status = dx_invalid_elements (mold->mo_context, col);
+
+    if (collection)
+    {
+        if (dc_collection_size (col))
+        {
+            *collection = col;
+        }
+        else
+        {
+            dc_collection_finished (&col);
+        }
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
