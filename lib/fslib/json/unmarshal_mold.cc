@@ -663,17 +663,18 @@ MoldReader::unmarshal_introduced (struct disir_context *context, Json::Value& cu
     status = dc_semantic_version_convert (current[ATTRIBUTE_KEY_INTRODUCED].asCString(), &intro);
     if (status != DISIR_STATUS_OK)
     {
+
         dc_fatal_error (context, "Semamtic version introduced is not formatted correctly");
         return status;
     }
 
-    return DISIR_STATUS_OK;
-
     status = dc_add_introduced (context, &intro);
     if (status != DISIR_STATUS_OK)
     {
+
         return status;
     }
+    return DISIR_STATUS_OK;
 }
 
 enum disir_status
