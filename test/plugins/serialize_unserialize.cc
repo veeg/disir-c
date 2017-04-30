@@ -25,6 +25,70 @@ class SerializeUnserializeTest : public ::testing::DisirTestTestPlugin,
                                  public ::testing::WithParamInterface<const char *>
 {
 public:
+    void serialize_unserialize_mold (const char *entry,
+                                     const char *suffix,
+                                     dio_serialize_mold func_serialize,
+                                     dio_unserialize_mold func_unserialize)
+    {
+        struct disir_mold *mold_original = NULL;
+        struct disir_mold *mold_parsed = NULL;
+        struct disir_context *context_mold1 = NULL;
+        struct disir_context *context_mold2 = NULL;
+        FILE *file = NULL;
+
+        log_test ("SerializeUnserialize mold %s", entry);
+
+        status = disir_mold_read (instance, "test", entry, &mold_original);
+        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        if (status != DISIR_STATUS_OK)
+        {
+            log_test ("mold_read failed: %s", disir_status_string (status));
+            goto out;
+        }
+
+        char filepath[4098];
+        snprintf (filepath, 4098, "/tmp/disir_plugin_serialize_unserialize_%s.%s", entry, suffix);
+        file = fopen (filepath, "w+");
+        EXPECT_TRUE (file != NULL);
+        if (file == NULL)
+        {
+            log_test ("Failed to open file...");
+            goto out;
+        }
+        status = func_serialize (instance, mold_original, file);
+        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        if (status != DISIR_STATUS_OK)
+            goto out;
+
+        fseek (file, 0, SEEK_SET);
+
+        status = func_unserialize (instance, file, &mold_parsed);
+        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        if (status != DISIR_STATUS_OK)
+            goto out;
+
+        context_mold1 = dc_mold_getcontext (mold_original);
+        context_mold2 = dc_mold_getcontext (mold_parsed);
+        EXPECT_TRUE (context_mold1 != NULL);
+        EXPECT_TRUE (context_mold2 != NULL);
+        if (context_mold1 == NULL || context_mold2 == NULL)
+            goto out;
+
+        status = dc_compare (context_mold1, context_mold2, NULL);
+        EXPECT_STATUS (DISIR_STATUS_OK, status)
+    out:
+        log_test ("compare serialize-unserialize mold out clause");
+        // Cleanup this entry and move to the next
+        if (file != NULL)
+        {
+            fclose (file);
+        }
+        dc_putcontext (&context_mold1);
+        dc_putcontext (&context_mold2);
+        disir_mold_finished (&mold_original);
+        disir_mold_finished (&mold_parsed);
+    }
+
     void serialize_unserialize_config (const char *entry,
                                        dio_serialize_config func_serialize,
                                        dio_unserialize_config func_unserialize)
@@ -113,6 +177,15 @@ TEST_P(SerializeUnserializeTest, config_json)
 
     ASSERT_NO_FATAL_FAILURE (
         serialize_unserialize_config (key, dio_json_serialize_config, dio_json_unserialize_config);
+    );
+}
+
+TEST_P(SerializeUnserializeTest, mold_json)
+{
+    const char *key= GetParam();
+
+    ASSERT_NO_FATAL_FAILURE (
+        serialize_unserialize_mold (key, "json", dio_json_serialize_mold, dio_json_unserialize_mold);
     );
 }
 
