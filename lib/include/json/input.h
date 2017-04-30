@@ -137,11 +137,10 @@ namespace dio
             //! \param[in] stream reference to the stream to read from
             //! \param[out] mold reference to where the constructed mold object is placed
             //!
-            //! \return DPLUGIN_STATUS_OK on success.
-            //! \return DPLUGIN_FATAL_ERROR on unrecoverable errors.
-            //! \return DPLUGIN_PARSE_ERROR if json object on has syntax errors.
+            //! \return DISIR_STATUS_OK on success.
             //!
-            enum dplugin_status unmarshal (std::istream& stream, struct disir_mold **mold);
+            enum disir_status
+            unmarshal (std::istream& stream, struct disir_mold **mold);
 
 
             //! \brief constructs a disir_mold object from a json file on filepath
@@ -156,7 +155,8 @@ namespace dio
             //! \return DPLUGIN_PARSE_ERROR if json object on filepath has syntax errors.
             //! \return DPLUGIN_IO_ERROR if file on filepath could not be read.
             //!
-            enum dplugin_status unmarshal (const char *filepath, struct disir_mold **mold);
+            enum disir_status
+            unmarshal (const char *filepath, struct disir_mold **mold);
 
         private:
             /* Members */
@@ -166,7 +166,8 @@ namespace dio
             /* Methods */
 
             //! \brief construct the disir_mold based on already parsed m_moldRoot
-            enum dplugin_status construct_mold (struct disir_mold **mold);
+            enum disir_status
+            construct_mold (struct disir_mold **mold);
 
             //! \brief recursively extract jsonValue to create mold object.
             //!
@@ -174,7 +175,8 @@ namespace dio
             //!
             //! \return DPLUGIN_STATUS_OK on success.
             //! \return DPLUGIN_
-            enum dplugin_status _unmarshal_mold (struct disir_context *parent_context,
+            enum disir_status
+            _unmarshal_mold (struct disir_context *parent_context,
                                                  Json::Value& parent);
 
             //! \brief reads the json config from disk, located at filepath.
@@ -213,20 +215,30 @@ namespace dio
             //! \return DPLUGIN_FATAL_ERROR if function needs to recover instantly
             //! from an error. Otherwise errors are added to disir instance.
             //!
-            enum dplugin_status unmarshal_defaults (struct disir_context *child_context,
-                                                    Json::OrderedValueIterator& it);
+            enum disir_status
+            unmarshal_defaults (struct disir_context *child_context,
+                                Json::Value& current);
 
             //! \brief set introduced and documentation on Mold, keyval or section object.
-            enum dplugin_status set_context_metadata (struct disir_context *context,
+            enum disir_status set_context_metadata (struct disir_context *context,
                                                       Json::OrderedValueIterator& json_context);
 
-            //! \brief Extracts information about a keyval (default)
-            enum dplugin_status fetch_default_data (struct disir_context *context_default,
-                                                    Json::ValueIterator& it);
-
             //! \brief get introduced version from json context object
-            enum dplugin_status get_version (std::string version,
-                                             struct semantic_version *semver);
+            enum disir_status unmarshal_introduced (struct disir_context *context,
+                                                    Json::Value& current);
+
+            enum disir_status unmarshal_deprecated (struct disir_context *context,
+                                                    Json::Value& current);
+
+            enum disir_status set_restriction_value (struct disir_context *context,
+                                                     Json::Value& current);
+
+            //! \brief unserializes all restriction attached to a context
+            enum disir_status unmarshal_restrictions (struct disir_context *context,
+                                                      Json::OrderedValueIterator& it);
+
+            enum disir_status unmarshal_restriction (struct disir_context *context,
+                                                     Json::Value& current);
     };
 
 }

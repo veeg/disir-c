@@ -197,6 +197,12 @@ JsonIO::populate_disir_with_errors ()
 }
 
 enum disir_status
+assert_json_value_type (Json::Value& value, Json::ValueType type)
+{
+ return (value.type () != type) ? DISIR_STATUS_OK : DISIR_STATUS_WRONG_VALUE_TYPE;
+}
+
+enum disir_status
 set_value (Json::Value& val, struct disir_context *context)
 {
     switch (val.type())

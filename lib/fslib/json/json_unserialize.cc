@@ -40,16 +40,10 @@ dio_json_unserialize_mold (struct disir_instance *instance,
 
     try
     {
-        enum dplugin_status pstatus;
         boost::fdistream file(fileno(input));
         dio::MoldReader reader (instance);
 
-        pstatus = reader.unmarshal (file, mold);
-        if (pstatus != DPLUGIN_STATUS_OK)
-        {
-            disir_log_user (instance, "JSON: unserialize_mold failed");
-            return DISIR_STATUS_INTERNAL_ERROR;
-        }
+        return reader.unmarshal (file, mold);
     }
     catch (std::exception& e)
     {
