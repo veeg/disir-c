@@ -126,12 +126,76 @@ MoldReader::value_is_keyval (Json::Value& val)
                                val[ATTRIBUTE_KEY_DEFAULTS].isArray ();
 }
 
+enum disir_status
+MoldReader::unmarshal_context (struct disir_context *parent_context,
+                                Json::OrderedValueIterator& current,
+                                enum disir_context_type type)
+{
+    struct disir_context *context = NULL;
+    enum disir_status status;
+
+    status = dc_begin (parent_context, type, &context);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    status = set_context_attributes (context, current, type);
+    if (status != DISIR_STATUS_OK &&
+        status != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        return status;
+    }
+
+    if (status == DISIR_STATUS_INVALID_CONTEXT)
+        goto finalize;
+
+    status = unmarshal_restrictions (context, current);
+    if (status != DISIR_STATUS_OK
+        && status != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        return status;
+    }
+
+    if (status == DISIR_STATUS_INVALID_CONTEXT)
+        goto finalize;
+
+    if (type == DISIR_CONTEXT_SECTION)
+    {
+        status = _unmarshal_mold (context, (*current)[ATTRIBUTE_KEY_ELEMENTS]);
+        if (status != DISIR_STATUS_OK &&
+            status != DISIR_STATUS_INVALID_CONTEXT)
+        {
+            return status;
+        }
+    }
+    else if  (type == DISIR_CONTEXT_KEYVAL)
+    {
+        status = unmarshal_defaults (context, *current);
+        if (status != DISIR_STATUS_OK &&
+            status != DISIR_STATUS_INVALID_CONTEXT)
+        {
+            return status;
+        }
+    }
+    if (status == DISIR_STATUS_INVALID_CONTEXT)
+        goto finalize;
+
+finalize:
+    status = dc_finalize (&context);
+    if (status != DISIR_STATUS_OK &&
+        status != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        return status;
+    }
+
+    return DISIR_STATUS_OK;
+}
+
 //! PRIVATE
 enum disir_status
 MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& parent)
 {
-    Json::Value child_node;
-    struct disir_context *child_context = NULL;
     enum disir_status status;
 
     status = DISIR_STATUS_OK;
@@ -140,70 +204,22 @@ MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& 
 
     for (; iter != parent.endOrdered(); ++iter)
     {
-        child_node = *iter;
         // if node is of tpe object and contains the keyval "elements", we interpret it
         // as a mold section
-        if (value_is_section (child_node))
+        if (value_is_section (*iter))
         {
-            status = dc_begin (parent_context, DISIR_CONTEXT_SECTION, &child_context);
+            status = unmarshal_context (parent_context, iter, DISIR_CONTEXT_SECTION);
             if (status != DISIR_STATUS_OK)
-            {
-                return status;
-            }
-
-            status = set_context_attributes (child_context, iter, DISIR_CONTEXT_SECTION);
-
-            if (status != DISIR_STATUS_OK)
-            {
-                return status;
-            }
-
-            status = unmarshal_restrictions (child_context, iter);
-            if (status != DISIR_STATUS_OK
-                && status != DISIR_STATUS_INVALID_CONTEXT)
-            {
-                return status;
-            }
-
-            status = _unmarshal_mold (child_context, (*iter)[ATTRIBUTE_KEY_ELEMENTS]);
-            if (status != DISIR_STATUS_OK
-                && status != DISIR_STATUS_INVALID_CONTEXT)
             {
                 return status;
             }
         }
         // if node is of type object and contains the keyval "default" we interpret it as
         // a mold keyval
-        else if (value_is_keyval (child_node))
+        else if (value_is_keyval (*iter))
         {
-            status = dc_begin (parent_context, DISIR_CONTEXT_KEYVAL, &child_context);
+            status = unmarshal_context (parent_context, iter, DISIR_CONTEXT_KEYVAL);
             if (status != DISIR_STATUS_OK)
-            {
-                return status;
-            }
-
-            status = set_context_attributes (child_context, iter, DISIR_CONTEXT_KEYVAL);
-            if (status != DISIR_STATUS_OK)
-            {
-                return status;
-            }
-
-            if (status != DISIR_STATUS_OK
-                && status != DISIR_STATUS_INVALID_CONTEXT)
-            {
-                return status;
-            }
-
-            status = unmarshal_defaults (child_context, *iter);
-            if (status != DISIR_STATUS_OK
-                && status != DISIR_STATUS_INVALID_CONTEXT)
-            {
-                return status;
-            }
-
-            status = unmarshal_restrictions (child_context, iter);
-            if (status != DISIR_STATUS_OK
-                && status != DISIR_STATUS_INVALID_CONTEXT)
             {
                 return status;
             }
@@ -212,15 +228,7 @@ MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& 
         {
             dc_fatal_error (parent_context,
                             "Could not resolve whether object is of type keyval or section");
-            return DISIR_STATUS_OK;
-        }
-
-        status = dc_finalize (&child_context);
-        if (status != DISIR_STATUS_OK
-            && status != DISIR_STATUS_INVALID_CONTEXT)
-        {
-
-            return status;
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
     }
 

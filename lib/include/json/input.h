@@ -245,11 +245,15 @@ namespace dio
             enum disir_status unmarshal_restrictions (struct disir_context *context,
                                                       Json::OrderedValueIterator& it);
 
-            enum disir_status unmarshal_restriction (struct disir_context *context,
+            enum disir_status unmarshal_restriction (struct disir_context *restriction,
                                                      Json::Value& current);
 
             enum disir_status unmarshal_documentation (struct disir_context *context,
                                                        Json::Value& current);
+
+            enum disir_status unmarshal_context (struct disir_context *parent_context,
+                                                  Json::OrderedValueIterator& current,
+                                                  enum disir_context_type type);
     };
 
 }
