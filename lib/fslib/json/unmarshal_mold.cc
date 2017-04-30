@@ -556,8 +556,11 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
 {
     struct disir_context *context_default = NULL;
     enum disir_status status;
+    enum disir_status error;
     Json::Value defaults;
+    Json::Value def;
 
+    error = DISIR_STATUS_OK;
     status = DISIR_STATUS_OK;
 
     if (current[ATTRIBUTE_KEY_DEFAULTS].isNull ())
@@ -566,19 +569,25 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
         return DISIR_STATUS_OK;
     }
 
+    status = assert_json_value_type (current[ATTRIBUTE_KEY_DEFAULTS], Json::arrayValue);
+    if (status != DISIR_STATUS_OK)
+    {
+        dc_fatal_error (context_keyval, "Defaults should be of type array");
+        return DISIR_STATUS_OK;
+    }
+
     defaults = current[ATTRIBUTE_KEY_DEFAULTS];
 
-    Json::OrderedValueIterator iter = defaults.beginOrdered ();
-
     // If there are no values in the array
-    if (iter == defaults.endOrdered ())
+    if (defaults.size () == 0)
     {
         dc_fatal_error (context_keyval, "Missing default entries");
         return status;
     }
 
-    for (; iter != defaults.endOrdered (); ++iter)
+    for (unsigned int i = 0; i < defaults.size (); i++)
     {
+        def = defaults[i];
         status = dc_begin (context_keyval, DISIR_CONTEXT_DEFAULT, &context_default);
         if (status != DISIR_STATUS_OK)
         {
@@ -587,31 +596,46 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
             return status;
         }
 
-        status = set_value ((*iter)[ATTRIBUTE_KEY_VALUE], context_keyval);
-        if (status != DISIR_STATUS_OK &&
-            status != DISIR_STATUS_INVALID_CONTEXT)
+        if (def[ATTRIBUTE_KEY_VALUE].isNull ())
         {
-            disir_log_user (m_disir, "Unable to set value on context: %s",
-                                   disir_status_string (status));
-            return status;
+            dc_fatal_error (context_default, "Default value is not present");
+            error = DISIR_STATUS_NOT_EXIST;
         }
 
-        status = unmarshal_introduced (context_keyval, (*iter));
-        if (status != DISIR_STATUS_OK)
+        // If value is not present
+        // error is set and we finalize context
+        // to notify about the error
+        if (error == DISIR_STATUS_OK)
         {
-            return status;
-        }
+            status = set_value (def[ATTRIBUTE_KEY_VALUE], context_default);
+            if (status != DISIR_STATUS_OK &&
+                status != DISIR_STATUS_INVALID_CONTEXT)
+            {
+                disir_log_user (m_disir, "Unable to set value on context: %s",
+                                       disir_status_string (status));
+                return status;
+            }
 
-        status = unmarshal_deprecated (context_keyval, (*iter));
-        if (status != DISIR_STATUS_OK)
-        {
-            return status;
+            status = unmarshal_introduced (context_default, def);
+            if (status != DISIR_STATUS_OK)
+            {
+                return status;
+            }
+
+            status = unmarshal_deprecated (context_default, def);
+            if (status != DISIR_STATUS_OK)
+            {
+
+                return status;
+            }
         }
 
         status = dc_finalize (&context_default);
         if (status != DISIR_STATUS_OK &&
             status != DISIR_STATUS_INVALID_CONTEXT)
         {
+                std::cerr << disir_status_string (status) << std::endl;
+
              disir_error_set (m_disir, "could not finalize defaul: %s",
                                         disir_status_string (status));
              goto error;
