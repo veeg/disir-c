@@ -75,12 +75,19 @@ MoldReader::construct_mold (struct disir_mold **mold)
         }
     }
 
+    if (m_moldRoot[ATTRIBUTE_KEY_MOLD].isNull ())
+    {
+        dc_fatal_error (context_mold, "No Mold present");
+        goto finalize;
+    }
+
     status = _unmarshal_mold (context_mold, m_moldRoot[ATTRIBUTE_KEY_MOLD]);
     if (status != DISIR_STATUS_OK)
     {
         goto error;
     }
 
+finalize:
     status = dc_mold_finalize (&context_mold, mold);
     if (status != DISIR_STATUS_OK)
     {
