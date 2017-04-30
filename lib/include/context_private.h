@@ -199,6 +199,10 @@ enum disir_status dx_get_mold_equiv_type (struct disir_context *parent,
 //!
 enum disir_status dx_validate_context (struct disir_context *context);
 
+//! \brief Retrieve all elements that are invalid.
+enum disir_status
+dx_invalid_elements (struct disir_context *context, struct disir_collection *collection);
+
 //! \brief Set the input message to the error string of context
 void
 dx_context_error_set (struct disir_context *context, const char *fmt_message, ...);

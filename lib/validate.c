@@ -621,3 +621,75 @@ out:
     return status;
 }
 
+//! INTERNAL API
+enum disir_status
+dx_invalid_elements (struct disir_context *context, struct disir_collection *collection)
+{
+    enum disir_status status;
+    enum disir_status invalid;
+    struct disir_collection *col;
+    struct disir_context *element;
+
+    invalid = (context->CONTEXT_STATE_INVALID == 1 ? DISIR_STATUS_INVALID_CONTEXT
+                                                   : DISIR_STATUS_OK);
+
+    // Handle the root specially
+    if (context == context->cx_root_context)
+    {
+        if (collection && (invalid == DISIR_STATUS_INVALID_CONTEXT))
+        {
+            dc_collection_push_context (collection, context);
+        }
+    }
+
+    status = dc_get_elements (context, &col);
+    if (status != DISIR_STATUS_OK)
+    {
+        log_error ("Failed to retrieve elements from context: %s",
+                    disir_status_string (status));
+    }
+
+    while (status == DISIR_STATUS_OK)
+    {
+        status = dc_collection_next (col, &element);
+        if (status == DISIR_STATUS_EXHAUSTED)
+        {
+            status = DISIR_STATUS_OK;
+            break;
+        }
+        if (status != DISIR_STATUS_OK)
+        {
+            log_error ("Failed to retrieve element from collection: %s",
+                       disir_status_string (status));
+            break;
+        }
+
+        status = dc_context_valid (element);
+        if (status == DISIR_STATUS_INVALID_CONTEXT)
+        {
+            if (collection)
+            {
+                dc_collection_push_context (collection, element);
+            }
+            invalid = status;
+        }
+
+        // Recurse the sections
+        if (dc_context_type (element) == DISIR_CONTEXT_SECTION)
+        {
+            status = dx_invalid_elements (element, collection);
+            if (status == DISIR_STATUS_INVALID_CONTEXT)
+            {
+                invalid = status;
+            }
+        }
+
+        dc_putcontext (&element);
+        status = DISIR_STATUS_OK;
+    }
+
+    dc_collection_finished (&col);
+
+    return (status == DISIR_STATUS_OK ? invalid : status);
+}
+
