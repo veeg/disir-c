@@ -305,7 +305,7 @@ MoldReader::unmarshal_restriction (struct disir_context *context, Json::Value& c
 {
     enum disir_value_type value_type;
     enum disir_status status;
-    struct disir_context *restriction;
+    struct disir_context *restriction = NULL;
 
     if (current[ATTRIBUTE_KEY_TYPE].isNull ())
     {
@@ -355,12 +355,20 @@ MoldReader::unmarshal_restriction (struct disir_context *context, Json::Value& c
         return status;
     }
 
-    status = set_restriction_value (context, current);
+    status = set_restriction_value (restriction, current);
     if (status != DISIR_STATUS_OK)
     {
         return status;
     }
-    return status;
+
+    status = dc_finalize (&restriction);
+    if (status != DISIR_STATUS_OK &&
+        status != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        return status;
+    }
+
+    return DISIR_STATUS_OK;
 }
 
 enum disir_status
