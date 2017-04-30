@@ -86,7 +86,7 @@ toml_serialize_keyval (struct disir_context *context, toml::Value* current, cons
             if (current->type () == toml::Value::Type::ARRAY_TYPE)
                 current->push ((toml::Value (boolean)));
             else
-                current->setChild (name, true);
+                current->setChild (name, boolean);
         }
         break;
     }
