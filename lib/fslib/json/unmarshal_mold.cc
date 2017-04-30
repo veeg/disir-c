@@ -660,7 +660,7 @@ MoldReader::unmarshal_introduced (struct disir_context *context, Json::Value& cu
         return DISIR_STATUS_OK;
     }
 
-    status = dc_semantic_version_convert (current.asCString(), &intro);
+    status = dc_semantic_version_convert (current[ATTRIBUTE_KEY_INTRODUCED].asCString(), &intro);
     if (status != DISIR_STATUS_OK)
     {
         dc_fatal_error (context, "Semamtic version introduced is not formatted correctly");
