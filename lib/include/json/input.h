@@ -247,6 +247,9 @@ namespace dio
 
             enum disir_status unmarshal_restriction (struct disir_context *context,
                                                      Json::Value& current);
+
+            enum disir_status unmarshal_documentation (struct disir_context *context,
+                                                       Json::Value& current);
     };
 
 }

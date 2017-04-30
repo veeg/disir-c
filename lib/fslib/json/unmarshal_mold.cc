@@ -276,11 +276,27 @@ MoldReader::set_context_attributes (struct disir_context *context,
             return status;
         }
     }
+
     status = unmarshal_deprecated (context, current);
     if (status != DISIR_STATUS_OK)
     {
         return status;
     }
+
+    status = unmarshal_documentation (context, current);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    return DISIR_STATUS_OK;
+}
+
+
+enum disir_status
+MoldReader::unmarshal_documentation (struct disir_context *context, Json::Value& current)
+{
+    enum disir_status status;
 
     auto doc = current[ATTRIBUTE_KEY_DOCUMENTATION];
     if (doc.isNull ())
@@ -296,8 +312,7 @@ MoldReader::set_context_attributes (struct disir_context *context,
                                  disir_status_string (status));
         return status;
     }
-
-    return DISIR_STATUS_OK;
+    return status;
 }
 
 enum disir_status
@@ -356,6 +371,12 @@ MoldReader::unmarshal_restriction (struct disir_context *context, Json::Value& c
     }
 
     status = set_restriction_value (restriction, current);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    status = unmarshal_documentation (restriction, current);
     if (status != DISIR_STATUS_OK)
     {
         return status;
