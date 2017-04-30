@@ -483,6 +483,8 @@ validate_context_validity (struct disir_context *context)
         else
         {
             // Nothing to check for a mold operation?
+            // TODO: Verify all restrictions
+            //  Any invalid restrictions shall put the context into an invalid state
         }
 
         if (invalid != DISIR_STATUS_INVALID_CONTEXT ||
