@@ -151,6 +151,7 @@ dx_section_create (struct disir_context *self)
     if (section == NULL)
         return NULL;
 
+    section->se_introduced.sv_major = 1;
     section->se_name.dv_type = DISIR_VALUE_TYPE_STRING;
     section->se_context = self;
     section->se_elements = dx_element_storage_create ();
