@@ -386,19 +386,25 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
     case DISIR_RESTRICTION_INC_ENTRY_MAX:
     case DISIR_RESTRICTION_EXC_VALUE_ENUM:
     case DISIR_RESTRICTION_EXC_VALUE_NUMERIC:
-        if (current[ATTRIBUTE_KEY_VALUE].isNull () == true)
+    {
+        if (current[ATTRIBUTE_KEY_VALUE].isNull ())
+        {
+            dc_fatal_error (context, "No value present");
+            return DISIR_STATUS_OK;
+        }
+        value = current[ATTRIBUTE_KEY_VALUE];
+        break;
+    }
+    case DISIR_RESTRICTION_EXC_VALUE_RANGE:
+    {
+        if (current[ATTRIBUTE_KEY_VALUE_MIN].isNull ()
+            || current[ATTRIBUTE_KEY_VALUE_MAX].isNull ())
         {
             dc_fatal_error (context, "No value present");
             return DISIR_STATUS_OK;
         }
         break;
-    case DISIR_RESTRICTION_EXC_VALUE_RANGE:
-        if (current[ATTRIBUTE_KEY_VALUE_MIN].isNull () == true
-            && current[ATTRIBUTE_KEY_VALUE_MAX].isNull () == true)
-        {
-            dc_fatal_error (context, "No value present");
-            return DISIR_STATUS_OK;
-        }
+    }
     case DISIR_RESTRICTION_UNKNOWN:
         break;
     }
@@ -417,20 +423,21 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         status = dc_restriction_set_numeric (context, value.asInt64 ());
         if (status != DISIR_STATUS_OK)
         {
+
             return status;
         }
         break;
     }
     case DISIR_RESTRICTION_INC_ENTRY_MAX:
     {
-        status = assert_json_value_type (current, Json::intValue);
+        status = assert_json_value_type (value, Json::intValue);
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Wrong value type");
             return DISIR_STATUS_OK;
         }
 
-        status = dc_restriction_set_numeric (context, current.asInt64 ());
+        status = dc_restriction_set_numeric (context, value.asInt64 ());
         if (status != DISIR_STATUS_OK)
         {
             return status;
@@ -516,7 +523,15 @@ MoldReader::unmarshal_restrictions (struct disir_context *context,
         return DISIR_STATUS_OK;
     }
 
-    auto restrictions = *it;
+    auto restrictions = (*it)[ATTRIBUTE_KEY_RESTRICTIONS];
+
+    status = assert_json_value_type (restrictions, Json::arrayValue);
+    if (status != DISIR_STATUS_OK)
+    {
+
+        dc_fatal_error (context, "Restrictions is not of type array");
+        return DISIR_STATUS_INVALID_CONTEXT;
+    }
 
     for (i = 0; i < restrictions.size (); i++)
     {
