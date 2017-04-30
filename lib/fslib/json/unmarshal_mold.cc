@@ -51,11 +51,10 @@ MoldReader::construct_mold (struct disir_mold **mold)
     struct disir_context *context_mold = NULL;
     enum disir_status status;
 
-    status = ASSERT_MEMBERS_PRESENT (m_disir, m_moldRoot,
-                                     ATTRIBUTE_KEY_MOLD, ATTRIBUTE_KEY_VERSION);
-    if (status != DISIR_STATUS_OK)
+    if (m_moldRoot[ATTRIBUTE_KEY_MOLD].isNull ())
     {
-        return status;
+        disir_error_set (m_disir, "No mold present");
+        return DISIR_STATUS_FS_ERROR;
     }
 
     status = dc_mold_begin (&context_mold);

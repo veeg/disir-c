@@ -70,37 +70,6 @@ JsonIO::read_json_from_file (const char *filepath, Json::Value& root)
     return DISIR_STATUS_OK;
 }
 
-
-enum dplugin_status
-object_members_check (Json::Value& object, ...)
-{
-    const char *variadic_type;
-    va_list ap;
-    va_start (ap, object);
-
-    try {
-        for (variadic_type = va_arg (ap, const char*);
-             variadic_type != NULL;
-             variadic_type = va_arg (ap, const char*))
-        {
-            // throws an exception if it does not exist
-            // or if Json::Value is not of type object nor
-            // array.
-            if(object[variadic_type].isNull())
-            {
-                return DPLUGIN_FATAL_ERROR;
-            }
-        }
-        va_end (ap);
-    }
-    catch (std::exception& e)
-    {
-        return DPLUGIN_FATAL_ERROR;
-    }
-    return DPLUGIN_STATUS_OK;
-}
-
-
 void
 JsonIO::append_disir_error (Json::OrderedValueIterator& object, const char *message, ...)
 {
