@@ -482,9 +482,30 @@ validate_context_validity (struct disir_context *context)
         }
         else
         {
-            // Nothing to check for a mold operation?
-            // TODO: Verify all restrictions
-            //  Any invalid restrictions shall put the context into an invalid state
+            struct disir_restriction *current_restriction;
+            current_restriction = context->cx_section->se_restrictions_inclusive_queue;
+            while (invalid == DISIR_STATUS_OK && current_restriction)
+            {
+                invalid = dx_validate_context (current_restriction->re_context);
+                if (invalid != DISIR_STATUS_OK)
+                {
+                    dx_context_transfer_logwarn (context, current_restriction->re_context);
+                    break;
+                }
+                current_restriction = current_restriction->next;
+            }
+            current_restriction = context->cx_section->se_restrictions_exclusive_queue;
+            while (invalid == DISIR_STATUS_OK && current_restriction)
+            {
+                invalid = dx_validate_context (current_restriction->re_context);
+                if (invalid != DISIR_STATUS_OK)
+                {
+                    dx_context_transfer_logwarn (context, current_restriction->re_context);
+                    break;
+                }
+                current_restriction = current_restriction->next;
+            }
+
         }
 
         if (invalid != DISIR_STATUS_INVALID_CONTEXT ||
@@ -528,7 +549,54 @@ validate_context_validity (struct disir_context *context)
                 dx_log_context (context, "Missing default entry for keyval.");
                 invalid = DISIR_STATUS_DEFAULT_MISSING;
             }
+
+            struct disir_default *current_default;
+            current_default = context->cx_keyval->kv_default_queue;
+            while (invalid == DISIR_STATUS_OK && current_default != NULL)
+            {
+                invalid = dx_validate_context (current_default->de_context);
+                if (invalid != DISIR_STATUS_OK)
+                {
+                    dx_context_transfer_logwarn (context, current_default->de_context);
+                    break;
+                }
+                current_default = current_default->next;
+            }
+
+            struct disir_restriction *current_restriction;
+            current_restriction = context->cx_keyval->kv_restrictions_inclusive_queue;
+            while (invalid == DISIR_STATUS_OK && current_restriction)
+            {
+                invalid = dx_validate_context (current_restriction->re_context);
+                if (invalid != DISIR_STATUS_OK)
+                {
+                    dx_context_transfer_logwarn (context, current_restriction->re_context);
+                    break;
+                }
+                current_restriction = current_restriction->next;
+            }
+            current_restriction = context->cx_keyval->kv_restrictions_exclusive_queue;
+            while (invalid == DISIR_STATUS_OK && current_restriction)
+            {
+                invalid = dx_validate_context (current_restriction->re_context);
+                if (invalid != DISIR_STATUS_OK)
+                {
+                    dx_context_transfer_logwarn (context, current_restriction->re_context);
+                    break;
+                }
+                current_restriction = current_restriction->next;
+            }
         }
+        break;
+    }
+    case DISIR_CONTEXT_DEFAULT:
+    {
+        // TODO: Add some validation to default context
+        break;
+    }
+    case DISIR_CONTEXT_RESTRICTION:
+    {
+        // TODO: Add some validation to restriction context
         break;
     }
     default:
@@ -554,7 +622,11 @@ dx_validate_context (struct disir_context *context)
     if (context->CONTEXT_STATE_FATAL)
     {
         log_debug_context (1, context, "in fatal state - not valid");
-        status = DISIR_STATUS_INVALID_CONTEXT;
+        status = DISIR_STATUS_FATAL_CONTEXT;
+        if (context->CONTEXT_STATE_CONSTRUCTING)
+        {
+            status = DISIR_STATUS_INVALID_CONTEXT;
+        }
         goto out;
     }
 
@@ -587,6 +659,7 @@ dx_validate_context (struct disir_context *context)
     // ELEMENTS_INVALID does NOT put the calling context into invalid state.
     else if (status == DISIR_STATUS_WRONG_VALUE_TYPE
              || status == DISIR_STATUS_DEFAULT_MISSING
+             || status == DISIR_STATUS_FATAL_CONTEXT
              || status == DISIR_STATUS_MOLD_MISSING
              || status == DISIR_STATUS_RESTRICTION_VIOLATED)
     {
