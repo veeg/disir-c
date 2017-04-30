@@ -12,6 +12,32 @@
 
 using namespace dio;
 
+struct cmp_str
+{
+   bool operator()(char const *a, char const *b)
+   {
+     return std::strcmp(a, b) < 0;
+   }
+};
+
+//! Used for unserialization of molds - maps string types
+//! to disir value types
+std::map<const char *, enum disir_value_type, cmp_str> attribute_disir_value_keys  = {
+    {"BOOLEAN", DISIR_VALUE_TYPE_BOOLEAN},
+    {"INTEGER", DISIR_VALUE_TYPE_INTEGER},
+    {"ENUM"   , DISIR_VALUE_TYPE_ENUM},
+    {"FLOAT"  , DISIR_VALUE_TYPE_FLOAT},
+    {"STRING" , DISIR_VALUE_TYPE_STRING}};
+
+//! Used for unserialization of molds - maps string types
+//! to disir restriction types
+std::map<const char *, enum disir_restriction_type, cmp_str> attribute_disir_restriction_keys  = {
+    {"MINIMUM_ENTRIES", DISIR_RESTRICTION_INC_ENTRY_MIN},
+    {"MAXIMUM_ENTRIES", DISIR_RESTRICTION_INC_ENTRY_MAX},
+    {"ENUM"           , DISIR_RESTRICTION_EXC_VALUE_ENUM},
+    {"RANGE"          , DISIR_RESTRICTION_EXC_VALUE_RANGE},
+    {"NUMERIC"        , DISIR_RESTRICTION_EXC_VALUE_NUMERIC}};
+
 JsonIO::JsonIO (struct disir_instance *disir)
 {
     m_disir = disir;
@@ -206,27 +232,30 @@ set_value (Json::Value& val, struct disir_context *context)
 }
 
 enum disir_value_type
-string_to_type (std::string type)
+attribute_key_to_disir_value (const char *type)
 {
-    if (type == "BOOLEAN")
+    try
     {
-        return DISIR_VALUE_TYPE_BOOLEAN;
+        return attribute_disir_value_keys.at (type);
     }
-    else if (type == "STRING")
-    {
-        return DISIR_VALUE_TYPE_STRING;
-    }
-    else if (type == "FLOAT")
-    {
-        return DISIR_VALUE_TYPE_FLOAT;
-    }
-    else if (type == "INTEGER")
-    {
-        return DISIR_VALUE_TYPE_INTEGER;
-    }
-    else
+    catch (std::out_of_range e)
     {
         return DISIR_VALUE_TYPE_UNKNOWN;
     }
 }
+
+enum disir_restriction_type
+attribute_key_to_disir_restriction (const char *type)
+{
+    try
+    {
+        return attribute_disir_restriction_keys.at (type);
+    }
+    catch (std::out_of_range e)
+    {
+        return DISIR_RESTRICTION_UNKNOWN;
+    }
+}
+
+
 
