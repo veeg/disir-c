@@ -3,6 +3,7 @@
 #include <iostream>
 #include <json/json.h>
 #include <disir/disir.h>
+#include <map>
 
 //! Attribute keys for json mold and config
 #define ATTRIBUTE_KEY_DOCUMENTATION "documentation"
@@ -30,7 +31,12 @@ object_members_check (struct disir_instance *intance, Json::Value& object, ...);
 enum disir_status set_value (Json::Value& val, struct disir_context *context);
 
 //! \brief resolve disir_value_type from its string representation
-enum disir_value_type string_to_type (std::string type);
+enum disir_value_type attribute_key_to_disir_value (const char *type);
+
+//! \brief resolve disir_restriction_type from its string representation
+enum disir_restriction_type attribute_key_to_disir_restriction (const char *type);
+
+enum disir_status assert_json_value_type (Json::Value& value, Json::ValueType type);
 
 
 namespace dio

@@ -49,7 +49,7 @@ ConfigWriter::marshal (struct disir_config *config, std::ostream& stream)
         goto end;
     }
 
-    status = _marshal_context (m_contextConfig, m_configRoot[CONFIG]);
+    status = _marshal_context (m_contextConfig, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
     if (status != DISIR_STATUS_OK)
     {
         goto end;
@@ -83,7 +83,7 @@ ConfigWriter::marshal (struct disir_config *config, std::string& output)
         goto end;
     }
 
-    status = _marshal_context (m_contextConfig, m_configRoot[CONFIG]);
+    status = _marshal_context (m_contextConfig, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
     if (status != DISIR_STATUS_OK)
     {
         goto end;
@@ -120,7 +120,7 @@ ConfigWriter::set_config_version (struct disir_context *context_config, Json::Va
         return DISIR_STATUS_INTERNAL_ERROR;
     }
 
-    root[VERSION] = buf;
+    root[ATTRIBUTE_KEY_VERSION] = buf;
 
     return status;
 }
