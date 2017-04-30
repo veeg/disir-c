@@ -211,6 +211,7 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL,
                                           DISIR_CONTEXT_CONFIG,
                                           DISIR_CONTEXT_SECTION,
+                                          DISIR_CONTEXT_RESTRICTION,
                                           DISIR_CONTEXT_MOLD);
     if (status != DISIR_STATUS_OK)
     {
@@ -233,6 +234,9 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
         break;
     case DISIR_CONTEXT_SECTION:
         doc_parent = &context->cx_section->se_documentation_queue;
+        break;
+    case DISIR_CONTEXT_RESTRICTION:
+        doc_parent = &context->cx_restriction->re_documentation_queue;
         break;
     default:
     {

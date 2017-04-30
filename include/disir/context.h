@@ -183,6 +183,7 @@ enum disir_status dc_context_valid (struct disir_context *context);
 //!     * GROUP
 //!     * CONFIG
 //!     * MOLD
+//!     * RESTRICTION
 //!
 //! \param context The input context to add documentation to.
 //! \param doc The documentation string
@@ -204,6 +205,7 @@ enum disir_status dc_add_documentation (struct disir_context *context,
 //!     * DISIR_CONTEXT_KEYVAL
 //!     * DISIR_CONTEXT_CONFIG
 //!     * DISIR_CONTEXT_MOLD
+//!     * DISIR_CONTEXT_RESTRICTION
 //!
 //! \param[in] context Input context to retrieve documentation for.
 //! \param[in] semver Matching documentation entry covered by this semantic verison number.
