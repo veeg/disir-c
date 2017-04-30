@@ -324,40 +324,29 @@ MoldReader::unmarshal_documentation (struct disir_context *context, Json::Value&
 }
 
 enum disir_status
-MoldReader::unmarshal_restriction (struct disir_context *context, Json::Value& current)
+MoldReader::unmarshal_restriction (struct disir_context *restriction, Json::Value& current)
 {
-    enum disir_value_type value_type;
     enum disir_status status;
-    struct disir_context *restriction = NULL;
 
     if (current[ATTRIBUTE_KEY_TYPE].isNull ())
     {
-        dc_fatal_error (context, "No restriction type");
-        return DISIR_STATUS_OK;
+        dc_fatal_error (restriction, "No restriction type");
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = assert_json_value_type (current[ATTRIBUTE_KEY_TYPE], Json::stringValue);
     if (status != DISIR_STATUS_OK)
     {
-        dc_fatal_error (context, "Restriction type should be of type string");
-        return DISIR_STATUS_OK;
+        dc_fatal_error (restriction, "Restriction type should be of type string");
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     auto restriction_type = attribute_key_to_disir_restriction (
                                                         current[ATTRIBUTE_KEY_TYPE].asCString ());
     if (restriction_type == DISIR_RESTRICTION_UNKNOWN)
     {
-        dc_fatal_error (context, "Unknown restriction type");
-        return DISIR_STATUS_OK;
-    }
-
-    // XXX: check return status
-    dc_get_value_type (context, &value_type);
-
-    status = dc_begin (context, DISIR_CONTEXT_RESTRICTION, &restriction);
-    if (status != DISIR_STATUS_OK)
-    {
-        return status;
+        dc_fatal_error (restriction, "Unknown restriction type");
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = unmarshal_introduced (restriction, current);
@@ -386,13 +375,6 @@ MoldReader::unmarshal_restriction (struct disir_context *context, Json::Value& c
 
     status = unmarshal_documentation (restriction, current);
     if (status != DISIR_STATUS_OK)
-    {
-        return status;
-    }
-
-    status = dc_finalize (&restriction);
-    if (status != DISIR_STATUS_OK &&
-        status != DISIR_STATUS_INVALID_CONTEXT)
     {
         return status;
     }
@@ -551,6 +533,7 @@ MoldReader::unmarshal_restrictions (struct disir_context *context,
 {
     uint32_t i;
     enum disir_status status;
+    struct disir_context *restriction = NULL;
 
     if ((*it)[ATTRIBUTE_KEY_RESTRICTIONS].isNull ())
     {
@@ -570,8 +553,22 @@ MoldReader::unmarshal_restrictions (struct disir_context *context,
 
     for (i = 0; i < restrictions.size (); i++)
     {
-        status = unmarshal_restriction (context, restrictions[i]);
+        status = dc_begin (context, DISIR_CONTEXT_RESTRICTION, &restriction);
         if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+
+        status = unmarshal_restriction (restriction, restrictions[i]);
+        if (status != DISIR_STATUS_OK &&
+            status != DISIR_STATUS_INVALID_CONTEXT)
+        {
+            return status;
+        }
+
+        status = dc_finalize (&restriction);
+        if (status != DISIR_STATUS_OK &&
+            status != DISIR_STATUS_INVALID_CONTEXT)
         {
             return status;
         }
