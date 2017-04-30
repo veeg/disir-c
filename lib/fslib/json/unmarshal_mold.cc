@@ -153,7 +153,8 @@ MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& 
                 return status;
             }
 
-            status = set_context_metadata (child_context, iter);
+            status = set_context_attributes (child_context, iter, DISIR_CONTEXT_SECTION);
+
             if (status != DISIR_STATUS_OK)
             {
                 return status;
@@ -183,7 +184,12 @@ MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& 
                 return status;
             }
 
-            status = set_context_metadata (child_context, iter);
+            status = set_context_attributes (child_context, iter, DISIR_CONTEXT_KEYVAL);
+            if (status != DISIR_STATUS_OK)
+            {
+                return status;
+            }
+
             if (status != DISIR_STATUS_OK
                 && status != DISIR_STATUS_INVALID_CONTEXT)
             {
@@ -224,8 +230,9 @@ MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& 
 }
 
 enum disir_status
-MoldReader::set_context_metadata (struct disir_context *context,
-                                  Json::OrderedValueIterator& parent)
+MoldReader::set_context_attributes (struct disir_context *context,
+                                    Json::OrderedValueIterator& parent,
+                                    enum disir_context_type type)
 {
     enum disir_status status;
     Json::Value current;

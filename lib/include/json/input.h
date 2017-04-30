@@ -227,8 +227,9 @@ namespace dio
                                 Json::Value& current);
 
             //! \brief set introduced and documentation on Mold, keyval or section object.
-            enum disir_status set_context_metadata (struct disir_context *context,
-                                                      Json::OrderedValueIterator& json_context);
+            enum disir_status set_context_attributes (struct disir_context *context,
+                                                      Json::OrderedValueIterator& json_context,
+                                                      enum disir_context_type type);
 
             //! \brief get introduced version from json context object
             enum disir_status unmarshal_introduced (struct disir_context *context,
