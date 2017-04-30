@@ -36,7 +36,6 @@ class InputOutputTest : public testing::JsonDioTestWrapper
         struct disir_context *context_config = NULL;
         struct disir_config *config = NULL;
         struct disir_context *context_mold = NULL;
-        enum dplugin_status pstatus;
         enum disir_status status;
 };
 

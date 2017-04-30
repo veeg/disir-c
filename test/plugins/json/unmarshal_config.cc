@@ -58,7 +58,6 @@ class UnMarshallConfigTest : public testing::JsonDioTestWrapper
         struct disir_context *context_config = NULL;
         struct disir_config *config = NULL;
         struct disir_collection *collection = NULL;
-        enum dplugin_status pstatus;
         enum disir_status status;
         dio::ConfigWriter *writer = NULL;
         dio::ConfigReader *reader = NULL;
@@ -204,8 +203,6 @@ TEST_F (UnMarshallConfigTest, parse_duplicate_keyvals)
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     ASSERT_EQ (2, dc_collection_size (collection));
-
-    ASSERT_EQ (DPLUGIN_STATUS_OK, pstatus);
 }
 
 TEST_F (UnMarshallConfigTest, parse_duplicate_sections)

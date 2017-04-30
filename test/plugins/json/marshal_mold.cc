@@ -41,7 +41,6 @@ class MarshallMoldTest : public testing::JsonDioTestWrapper
 TEST_F (MarshallMoldTest, marshal_mold_shall_match)
 {
   std::string json, expected_json;
-  enum dplugin_status status;
   Json::Value expected;
 
   ASSERT_TRUE (GetJsonMold (expected));
@@ -49,7 +48,7 @@ TEST_F (MarshallMoldTest, marshal_mold_shall_match)
   status = writer->marshal (mold, json);
   ASSERT_TRUE (compare_json_objects (expected_json, json));
   //ASSERT_JSON_STREQ (expected_json.c_str (), json.c_str ());
-  ASSERT_TRUE (status == DPLUGIN_STATUS_OK);
+  EXPECT_STATUS (DISIR_STATUS_OK, status);
 }
 
 TEST_F (MarshallMoldTest, invalid_mold_shall_fail)
@@ -59,7 +58,7 @@ TEST_F (MarshallMoldTest, invalid_mold_shall_fail)
 
     invalid_mold = NULL;
 
-    ASSERT_EQ (DPLUGIN_FATAL_ERROR, writer->marshal (invalid_mold, json));
+    EXPECT_STATUS (DISIR_STATUS_INTERNAL_ERROR, writer->marshal (invalid_mold, json));
 }
 
 TEST_F (MarshallMoldTest, DISABLED_tets)
