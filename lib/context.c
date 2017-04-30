@@ -116,7 +116,12 @@ context_remove_from_parent (struct disir_context **context)
     }
     case DISIR_CONTEXT_SECTION:
     {
-        storage = (*context)->cx_parent_context->cx_config->cf_elements;
+        storage = (*context)->cx_parent_context->cx_section->se_elements;
+        break;
+    }
+    case DISIR_CONTEXT_MOLD:
+    {
+        storage = (*context)->cx_parent_context->cx_mold->mo_elements;
         break;
     }
     default:
