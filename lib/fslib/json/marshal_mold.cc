@@ -14,95 +14,176 @@ MoldWriter::MoldWriter (struct disir_instance *disir) : JsonIO (disir)
 {
 }
 
-void
-MoldWriter::extract_context_metadata (struct disir_context *context, Json::Value& element)
+
+enum disir_status
+MoldWriter::serialize_deprecated (struct disir_context *context, Json::Value& current)
 {
     char buf[500];
-    const char *doc;
     enum disir_status status;
     struct semantic_version semver;
 
-    dc_get_introduced (context, &semver);
-
-    switch (dc_context_type (context))
+    status = dc_get_deprecated (context, &semver);
+    if (status != DISIR_STATUS_OK &&
+        status != DISIR_STATUS_WRONG_CONTEXT)
     {
-    case DISIR_CONTEXT_SECTION:
-        element[INTRODUCED] = dc_semantic_version_string (buf, 500, &semver);
-        break;
-    case DISIR_CONTEXT_KEYVAL:
-        element[TYPE]       = dc_value_type_string (context);
-        element[INTRODUCED] = dc_semantic_version_string (buf, 500, &semver);
-        break;
-    case DISIR_CONTEXT_MOLD:
-        element[VERSION] = dc_semantic_version_string (buf, 500, &semver);
-        break;
-    default:
-        break;
+        return status;
+    }
+    if (status == DISIR_STATUS_WRONG_CONTEXT)
+    {
+        return DISIR_STATUS_OK;
     }
 
-    status = dc_get_documentation (context, NULL, &doc, NULL);
-    if (status != DISIR_STATUS_INTERNAL_ERROR)
-    {
-        //! Doc is set only when present in context
-        element[DOCUMENTATION] = doc;
-    }
+    auto semver_string = dc_semantic_version_string (buf, 500, &semver);
+
+    current[ATTRIBUTE_KEY_DEPRECATED] = semver_string;
+
+    return status;
 }
 
-enum dplugin_status
+enum disir_status
+MoldWriter::serialize_introduced (struct disir_context *context, Json::Value& current)
+{
+    char buf[500];
+    enum disir_status status;
+    struct semantic_version semver;
+
+    status = dc_get_introduced (context, &semver);
+    if (status != DISIR_STATUS_OK &&
+        status != DISIR_STATUS_WRONG_CONTEXT)
+    {
+        return status;
+    }
+    if (status == DISIR_STATUS_WRONG_CONTEXT)
+    {
+        return DISIR_STATUS_OK;
+    }
+
+    auto semver_string = dc_semantic_version_string (buf, 500, &semver);
+
+    current[ATTRIBUTE_KEY_INTRODUCED] = semver_string;
+
+    return status;
+}
+
+enum disir_status
 MoldWriter::marshal (struct disir_mold *mold, std::string& mold_json)
 {
     struct disir_context *context_mold;
-    enum dplugin_status pstatus;
+    enum disir_status status;
     Json::StyledWriter writer;
     Json::Value root;
 
     context_mold = dc_mold_getcontext (mold);
     if (context_mold == NULL)
-        return DPLUGIN_FATAL_ERROR;
+    {
+        disir_error_set (m_disir, "Could not retrieve context mold from mold");
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
 
-    extract_context_metadata (context_mold, root);
+    status = serialize_attributes (context_mold, root, DISIR_CONTEXT_MOLD);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
 
-    pstatus = _marshal_mold_contexts (context_mold, root[MOLD]);
-    if (pstatus != DPLUGIN_STATUS_OK)
+    status = _serialize_mold_contexts (context_mold, root[ATTRIBUTE_KEY_MOLD]);
+    if (status != DISIR_STATUS_OK)
         goto end;
 
     mold_json = writer.writeOrdered (root);
 
 end:
     dc_putcontext (&context_mold);
-    return pstatus;
+    return status;
 }
 
-enum dplugin_status
+enum disir_status
 MoldWriter::marshal (struct disir_mold *mold, std::ostream& stream)
 {
     struct disir_context *context_mold;
-    enum dplugin_status pstatus;
+    enum disir_status status;
     Json::StyledWriter writer;
     Json::Value root;
 
     context_mold = dc_mold_getcontext (mold);
     if (context_mold == NULL)
-        return DPLUGIN_FATAL_ERROR;
+    {
+        disir_error_set (m_disir, "Could not retrieve context mold from mold");
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+    status = serialize_attributes (context_mold, root, DISIR_CONTEXT_MOLD);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
 
-    extract_context_metadata (context_mold, root);
-
-    pstatus = _marshal_mold_contexts (context_mold, root[MOLD]);
-    if (pstatus != DPLUGIN_STATUS_OK)
+    status = _serialize_mold_contexts (context_mold, root[ATTRIBUTE_KEY_MOLD]);
+    if (status != DISIR_STATUS_OK)
         goto end;
 
     stream << writer.writeOrdered (root);
 
 end:
     dc_putcontext (&context_mold);
-    return pstatus;
+    return status;
 }
 
-enum dplugin_status
-MoldWriter::marshal_mold_keyval (struct disir_context *context_keyval, Json::Value& keyval)
+enum disir_status
+MoldWriter::serialize_attributes (struct disir_context *context, Json::Value& current,
+                                  enum disir_context_type type)
 {
     enum disir_status status;
-    enum dplugin_status pstatus;
+    const char *doc;
+
+    switch (type)
+    {
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        status = serialize_deprecated (context, current);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+        current[ATTRIBUTE_KEY_TYPE] = dc_value_type_string (context);
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+    case DISIR_CONTEXT_DEFAULT:
+    case DISIR_CONTEXT_RESTRICTION:
+    {
+        status = serialize_deprecated (context, current);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+        status = serialize_introduced (context, current);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+        break;
+    }
+    case DISIR_CONTEXT_MOLD:
+    case DISIR_CONTEXT_CONFIG:
+    case DISIR_CONTEXT_FREE_TEXT:
+    case DISIR_CONTEXT_UNKNOWN:
+    case DISIR_CONTEXT_DOCUMENTATION:
+        break;
+    }
+
+    status = dc_get_documentation (context, NULL, &doc, NULL);
+    if (status == DISIR_STATUS_OK)
+    {
+        //! Doc is set only when present in context
+        current[ATTRIBUTE_KEY_DOCUMENTATION] = doc;
+    }
+    return DISIR_STATUS_OK;
+}
+
+enum disir_status
+MoldWriter::serialize_mold_keyval (struct disir_context *context_keyval, Json::Value& keyval)
+{
+    enum disir_status status;
     struct disir_collection *coll;
     struct disir_context *context;
     Json::Value defaults;
@@ -112,70 +193,215 @@ MoldWriter::marshal_mold_keyval (struct disir_context *context_keyval, Json::Val
     {
         disir_error_set (m_disir, "Could not acquire defualt context on keyval. Error (%s)",
                                    disir_status_string (status));
-        goto error;
+        goto out;
     }
-    //! Get introduced and documentation
-    extract_context_metadata (context_keyval, keyval);
+
+    status = serialize_attributes (context_keyval, keyval, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
 
     while (dc_collection_next (coll, &context)
             != DISIR_STATUS_EXHAUSTED)
     {
-        pstatus = get_default (context, defaults);
-        if (pstatus != DPLUGIN_STATUS_OK)
+        status = serialize_default (context, defaults);
+        if (status != DISIR_STATUS_OK)
         {
-            return DPLUGIN_FATAL_ERROR;
+            return status;
         }
 
         dc_putcontext (&context);
     }
 
-    keyval[DEFAULTS] = defaults;
-error:
+    status = serialize_restrictions (context_keyval, keyval);
+    if (status != DISIR_STATUS_OK)
+    {
+        goto out;
+    }
+
+    keyval[ATTRIBUTE_KEY_DEFAULTS] = defaults;
+out:
      dc_collection_finished (&coll);
 
-     return (status != DISIR_STATUS_OK ? DPLUGIN_FATAL_ERROR : DPLUGIN_STATUS_OK);
+     return status;
 }
 
-enum dplugin_status
-MoldWriter::_marshal_mold_contexts (struct disir_context *parent_context, Json::Value& parent)
+enum disir_status
+MoldWriter::serialize_restrictions (struct disir_context *context, Json::Value& current)
+{
+    enum disir_status status;
+    enum disir_restriction_type rtype;
+    struct disir_collection *collection;
+    struct disir_context *restriction;
+    enum disir_value_type value_type;
+    Json::Value restrictions = Json::arrayValue;
+
+    status = dc_restriction_collection (context, &collection);
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_NOT_EXIST)
+    {
+        disir_error_set (m_disir , "Error querying context for restrictions: %s",
+                                   disir_status_string (status));
+        return status;
+    }
+    if (status == DISIR_STATUS_NOT_EXIST)
+    {
+        return DISIR_STATUS_OK;
+    }
+
+    while (dc_collection_next (collection, &restriction) != DISIR_STATUS_EXHAUSTED)
+    {
+        Json::Value current_restriction;
+
+        status = serialize_attributes (restriction, current_restriction,
+                                       DISIR_CONTEXT_RESTRICTION);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+
+        status = dc_get_restriction_type (restriction, &rtype);
+        if (status !=  DISIR_STATUS_OK)
+        {
+
+            return status;
+        }
+
+        auto restriction_enum_string = dc_restriction_enum_string (rtype);
+
+        current_restriction[ATTRIBUTE_KEY_TYPE] = restriction_enum_string;
+
+        dc_get_value_type (context, &value_type);
+
+        switch (rtype)
+        {
+        case DISIR_RESTRICTION_INC_ENTRY_MIN:
+        case DISIR_RESTRICTION_INC_ENTRY_MAX:
+            value_type = DISIR_VALUE_TYPE_INTEGER;
+        case DISIR_RESTRICTION_EXC_VALUE_NUMERIC:
+        {
+            double value;
+
+            status = dc_restriction_get_numeric (restriction, &value);
+            if (status != DISIR_STATUS_OK)
+            {
+                return status;
+            }
+
+            if (value_type == DISIR_VALUE_TYPE_FLOAT)
+            {
+                current_restriction[ATTRIBUTE_KEY_VALUE] = value;
+            }
+            else
+            {
+                current_restriction[ATTRIBUTE_KEY_VALUE] = (Json::Int64)value;
+            }
+            break;
+        }
+        case DISIR_RESTRICTION_EXC_VALUE_RANGE:
+        {
+            double min, max;
+
+            status = dc_restriction_get_range (restriction, &min, &max);
+            if (status != DISIR_STATUS_OK)
+            {
+                return status;
+            }
+
+            if (value_type == DISIR_VALUE_TYPE_FLOAT)
+            {
+                current_restriction[ATTRIBUTE_KEY_VALUE_MIN] = min;
+                current_restriction[ATTRIBUTE_KEY_VALUE_MAX] = max;
+            }
+            else
+            {
+                current_restriction[ATTRIBUTE_KEY_VALUE_MIN] = (Json::Int64)min;
+                current_restriction[ATTRIBUTE_KEY_VALUE_MAX] = (Json::Int64)max;
+            }
+
+            break;
+        }
+        case DISIR_RESTRICTION_EXC_VALUE_ENUM:
+        {
+            const char *enum_value;
+
+            status = dc_restriction_get_string (restriction, &enum_value);
+            if (status != DISIR_STATUS_OK)
+            {
+
+                return status;
+            }
+
+            current_restriction[ATTRIBUTE_KEY_VALUE] = enum_value;
+
+            break;
+        }
+        case DISIR_RESTRICTION_UNKNOWN:
+            disir_error_set (m_disir, "Got unknown restriction type %s\n",
+                                       restriction_enum_string);
+
+            status = DISIR_STATUS_INVALID_CONTEXT;
+            break;
+        default:
+            break;
+        }
+
+        restrictions.append (current_restriction);
+
+        dc_putcontext(&restriction);
+    }
+
+    current[ATTRIBUTE_KEY_RESTRICTIONS] = restrictions;
+
+    return status;
+}
+
+enum disir_status
+MoldWriter::_serialize_mold_contexts (struct disir_context *parent_context, Json::Value& parent)
 {
     struct disir_collection *coll;
     struct disir_context *context;
     enum disir_status status;
-    enum dplugin_status pstatus;
     Json::Value child;
     const char *name;
     int32_t size;
 
-    pstatus = DPLUGIN_STATUS_OK;
+    status = DISIR_STATUS_OK;
 
     status = dc_get_elements (parent_context, &coll);
     if (status != DISIR_STATUS_OK)
     {
-        return DPLUGIN_FATAL_ERROR;
+        return status;
     }
 
     while (dc_collection_next (coll, &context)
             != DISIR_STATUS_EXHAUSTED)
     {
-        switch (dc_context_type (context)) {
+        switch (dc_context_type (context))
+        {
             case DISIR_CONTEXT_KEYVAL:
-                pstatus = marshal_mold_keyval (context, child);
-                if (pstatus != DPLUGIN_STATUS_OK)
+                status = serialize_mold_keyval (context, child);
+                if (status != DISIR_STATUS_OK)
                     goto end;
 
                 break;
             case DISIR_CONTEXT_SECTION:
-                extract_context_metadata (context, child);
+                status = serialize_attributes (context, child, DISIR_CONTEXT_SECTION);
+                if (status != DISIR_STATUS_OK)
+                {
+                    return status;
+                }
 
-                pstatus = _marshal_mold_contexts (context, child[ELEMENTS]);
-                if (pstatus != DPLUGIN_STATUS_OK)
+                status = serialize_restrictions (context, child);
+                if (status != DISIR_STATUS_OK)
+                {
+                    return status;
+                }
+
+                status = _serialize_mold_contexts (context, child[ATTRIBUTE_KEY_ELEMENTS]);
+                if (status != DISIR_STATUS_OK)
                     goto end;
 
-                break;
-            case DISIR_CONTEXT_RESTRICTION:
-                disir_error_set (m_disir, "marshaling of restrictions is not yet implemented");
-                goto end;
                 break;
             default:
                 disir_error_set (m_disir, "Got unrecognizable context object: %s",
@@ -200,30 +426,28 @@ end:
 
     dc_collection_finished (&coll);
 
-    return pstatus;
+    return status;
 }
 
 // Wraps libdisir dc_get_value to handle arbitrary value sizes
-enum dplugin_status
-MoldWriter::get_default (struct disir_context *context, Json::Value& defaults)
+enum disir_status
+MoldWriter::serialize_default (struct disir_context *context, Json::Value& defaults)
 {
     enum disir_status status;
     enum disir_value_type type;
-    struct semantic_version semver;
     int32_t size;
-    char sembuf[500];
     double floatval;
     int64_t intval;
     const char *stringval;
     uint8_t boolval;
     std::string buf;
-    Json::Value def;
+    Json::Value current;
 
     status = dc_get_value_type (context, &type);
     if (status != DISIR_STATUS_OK)
     {
         disir_error_set (m_disir, "Could not obtain context_value_type (%s)",
-                           disir_status_string (status));
+                                   disir_status_string (status));
         goto error;
     }
 
@@ -233,54 +457,54 @@ MoldWriter::get_default (struct disir_context *context, Json::Value& defaults)
             if (status != DISIR_STATUS_OK)
                 goto error;
 
-            def[VALUE] = stringval;
+            current[ATTRIBUTE_KEY_VALUE] = stringval;
             break;
         case DISIR_VALUE_TYPE_INTEGER:
             status = dc_get_value_integer (context, &intval);
             if (status != DISIR_STATUS_OK)
                 goto error;
 
-            def[VALUE] = (Json::Int64)intval;
+            current[ATTRIBUTE_KEY_VALUE] = (Json::Int64)intval;
             break;
         case DISIR_VALUE_TYPE_FLOAT:
             status = dc_get_value_float (context, &floatval);
             if (status != DISIR_STATUS_OK)
                 goto error;
 
-            def[VALUE] = floatval;
+            current[ATTRIBUTE_KEY_VALUE] = floatval;
             break;
         case DISIR_VALUE_TYPE_BOOLEAN:
             status = dc_get_value_boolean (context, &boolval);
             if  (status != DISIR_STATUS_OK)
                 goto error;
 
-            def[VALUE] = !!boolval;
+            current[ATTRIBUTE_KEY_VALUE] = !!boolval;
             break;
         case DISIR_VALUE_TYPE_ENUM:
             status = dc_get_value_enum (context, &stringval, &size);
             if (status != DISIR_STATUS_OK)
                 goto error;
 
-            def[VALUE] = stringval;
+            current[ATTRIBUTE_KEY_VALUE] = stringval;
             break;
         default:
             // HUH? Type not supported?
             disir_error_set (m_disir, "Got an unsupported disir value type");
-            return DPLUGIN_FATAL_ERROR;
     }
 
-    dc_get_introduced (context, &semver);
+    status = serialize_attributes (context, current, DISIR_CONTEXT_DEFAULT);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
 
-    //! Maybe an error check would be better
-    def[INTRODUCED] = dc_semantic_version_string (sembuf, 500, &semver);
+    defaults.append (current);
 
-    defaults.append (def);
-
-    return DPLUGIN_STATUS_OK;
+    return status;
 error:
     disir_error_set (m_disir, "Could not retrive keyval value (%s). Error: (%s)",
                                dc_value_type_string (context), disir_status_string (status));
-    return DPLUGIN_FATAL_ERROR;
+    return status;
 }
 
 

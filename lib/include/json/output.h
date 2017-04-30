@@ -86,6 +86,8 @@ namespace dio
        enum disir_status
        marshal_keyval (struct disir_context *context, Json::Value& parent);
 
+
+
        //! \brief sets the disir_config version
        enum disir_status
        set_config_version (struct disir_context *context_config,
@@ -96,10 +98,11 @@ namespace dio
        _marshal_context (struct disir_context *parent_context,
                                               Json::Value& parent);
 
-       //! \brief if a config has keyvals with identical names
-       //! under the same root, we enumerate their names.
-       std::string enumerate_keyname (Json::Value& node,
-                                      const std::string name);
+       //! \brief if a config has keyvals or sections with identical names
+       //! under the same root, we merge them into an array.
+       void serialize_duplicate_entries (Json::Value& parent,
+                                         Json::Value& child,
+                                         const std::string name);
     };
 
     // Class implementing outputting a
@@ -108,25 +111,18 @@ namespace dio
     {
     public:
        //! \brief
-       enum dplugin_status marshal (struct disir_mold *mold, std::string& mold_json);
+       enum disir_status marshal (struct disir_mold *mold, std::string& mold_json);
 
        //! \brief
-       enum dplugin_status marshal (struct disir_mold *mold, std::ostream& stream);
+       enum disir_status marshal (struct disir_mold *mold, std::ostream& stream);
 
        //! \brief Constructor
        MoldWriter (struct disir_instance *disir);
 
        virtual ~MoldWriter () {};
     private:
-
-     //! \brief Fetches introduced type and documentation from context
-     //!
-     //! - Type is only set on keyval
-     //!
-     //! \param[in] context can be section keyval or mold.
-     //! \param[in] element jsov value where data is inserted.
-     //!
-     void extract_context_metadata (struct disir_context *context, Json::Value& element);
+     enum disir_status serialize_introduced (struct disir_context *context, Json::Value& element);
+     enum disir_status serialize_deprecated (struct disir_context *context, Json::Value& element);
 
      //! \brief constructs a json representation of a disir_mold keyval object
      //!
@@ -136,8 +132,15 @@ namespace dio
      //! \return DISIR_STATUS_OK on success.
      //! \return DISIR_FATAL_ERROR on unrecoverable errors.
      //!
-     enum dplugin_status marshal_mold_keyval (struct disir_context *context_keyval,
-                                             Json::Value& keyval);
+     enum disir_status serialize_mold_keyval (struct disir_context *context_keyval,
+                                              Json::Value& keyval);
+
+     enum disir_status serialize_restrictions (struct disir_context *context,
+                                              Json::Value& restriction);
+
+     enum disir_status serialize_attributes (struct disir_context *context,
+                                            Json::Value& current,
+                                            enum disir_context_type type);
 
     //! \brief recursively marshals all mold child context
     //!
@@ -147,7 +150,7 @@ namespace dio
     //! \return DPLUGIN_STATUS_OK on success.
     //! \return DPLUGIN_FATAL_ERROR if unrecoverable errors occur.
     //!
-    enum dplugin_status _marshal_mold_contexts (struct disir_context *parent_context,
+    enum disir_status _serialize_mold_contexts (struct disir_context *parent_context,
                                                 Json::Value& parent);
 
     //! \brief creates a json object based on one default context
@@ -158,11 +161,10 @@ namespace dio
     //! \return DPLUGIN_STATUS_OK on success.
     //! \return DPLUGIN_FATAL_ERROR if name or value could not be retrieved from context.
     //!
-    enum dplugin_status get_default (struct disir_context *context, Json::Value& defaults);
+    enum disir_status serialize_default (struct disir_context *context, Json::Value& defaults);
 
 
        /* MEMBERS */
-
        struct disir_mold *m_mold;
     };
 }

@@ -38,16 +38,10 @@ dio_json_serialize_mold (struct disir_instance *instance,
 
     try
     {
-        enum dplugin_status pstatus;
         boost::fdostream file(fileno(output));
         dio::MoldWriter writer (instance);
 
-        pstatus = writer.marshal (mold, file);
-        if (pstatus != DPLUGIN_STATUS_OK)
-        {
-            disir_log_user (instance, "JSON: serialize_mold failed");
-            return DISIR_STATUS_INTERNAL_ERROR;
-        }
+        return writer.marshal (mold, file);
     }
     catch (std::exception& e)
     {
@@ -55,6 +49,5 @@ dio_json_serialize_mold (struct disir_instance *instance,
     }
 
     return DISIR_STATUS_OK;
-
 }
 

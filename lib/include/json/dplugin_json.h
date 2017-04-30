@@ -4,47 +4,26 @@
 #include <json/json.h>
 #include <disir/disir.h>
 
+//! Attribute keys for json mold and config
+#define ATTRIBUTE_KEY_DOCUMENTATION "documentation"
+#define ATTRIBUTE_KEY_INTRODUCED "introduced"
+#define ATTRIBUTE_KEY_DEPRECATED "deprecated"
+#define ATTRIBUTE_KEY_VERSION "version"
+#define ATTRIBUTE_KEY_ELEMENTS "elements"
+#define ATTRIBUTE_KEY_DEFAULTS "defaults"
+#define ATTRIBUTE_KEY_MOLD "mold"
+#define ATTRIBUTE_KEY_VALUE "value"
+#define ATTRIBUTE_KEY_VALUE_MIN "value_min"
+#define ATTRIBUTE_KEY_VALUE_MAX "value_max"
+#define ATTRIBUTE_KEY_TYPE "type"
+#define ATTRIBUTE_KEY_CONFIG "config"
+#define ATTRIBUTE_KEY_RESTRICTIONS "restrictions"
 
-//! Define in-plugin status codes
-//! TODO: Refactor plugin to only use enum disir_status codes instead
-enum dplugin_status
-{
-    //! Success
-    DPLUGIN_STATUS_OK = 0,
+enum disir_status
+object_members_check (struct disir_instance *intance, Json::Value& object, ...);
 
-    //! If a json file contains error
-    DPLUGIN_PARSE_ERROR,
-
-    //! Non-recoverable error
-    DPLUGIN_FATAL_ERROR,
-
-    //! Error returned on error
-    //! with disk interaction
-    DPLUGIN_IO_ERROR,
-
-    DPLUGIN_STATUS_FAILED,
-
-    //
-    DPLUGIN_STATUS_INVALID_CONTEXT,
-};
-
-
-//! Json keynames
-const char DOCUMENTATION[] = "doc";
-const char DEFAULTS[] = "defaults";
-const char INTRODUCED[] = "introduced";
-const char VERSION[] = "version";
-const char ELEMENTS[] = "elements";
-const char MOLD[] = "mold";
-const char VALUE[] = "value";
-const char TYPE[] = "type";
-const char CONFIG[] = "config";
-
-enum dplugin_status
-object_members_check (Json::Value& object, ...);
-
-#define MEMBERS_CHECK(object, ...) \
-        object_members_check (object, __VA_ARGS__, 0)
+#define ASSERT_MEMBERS_PRESENT(instance, object, ...) \
+        object_members_check (instance, object, __VA_ARGS__, 0)
 
 
 //! \brief helper function that resolves typeof val and sets context's value accordingly
