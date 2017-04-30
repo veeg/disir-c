@@ -654,7 +654,7 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
 
 //! PUBLIC API
 enum disir_status
-dc_resolve_root_name (struct disir_context *context, const char **output)
+dc_resolve_root_name (struct disir_context *context, char **output)
 {
     enum disir_status status;
     int total_size = 0;
@@ -666,7 +666,24 @@ dc_resolve_root_name (struct disir_context *context, const char **output)
     int32_t name_size;
     void *buffer;
 
-    // TODO: Reject contexts that are not KEYVALS or SECTIONS
+    TRACE_ENTER ("context (%p) output (%p)", context, output);
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto out;
+    }
+    if (output == NULL)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_SECTION);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        goto out;
+    }
 
     current_context = context;
     while (current_context != NULL)
@@ -675,7 +692,7 @@ dc_resolve_root_name (struct disir_context *context, const char **output)
         reverse_name_index_index[current_name_index] = -1;
 
         name_size = 0;
-        status = dc_get_name (context, &name, &name_size);
+        status = dc_get_name (current_context, &name, &name_size);
         if (status != DISIR_STATUS_OK)
         {
             name = "undefined";
@@ -691,17 +708,47 @@ dc_resolve_root_name (struct disir_context *context, const char **output)
         reverse_name_index[current_name_index] = name;
         if (reverse_name_index_index[current_name_index] == -1)
         {
-            // TODO: Goto parrent, find the index of our name in it
-            reverse_name_index_index[current_name_index] = 0;
+            int i = -1;
+            struct disir_collection *collection;
+            struct disir_context *queried;
+
+            status = dc_find_elements (current_context->cx_parent_context, name, &collection);
+            if (status != DISIR_STATUS_OK)
+                break;
+
+            do
+            {
+                status = dc_collection_next (collection, &queried);
+                if (status != DISIR_STATUS_OK && status != DISIR_STATUS_EXHAUSTED)
+                    break;
+
+                i += 1;
+                if (queried == current_context)
+                {
+                    reverse_name_index_index[current_name_index] = i;
+                    dc_putcontext (&queried);
+                    status = DISIR_STATUS_OK;
+                    break;
+                }
+
+                dc_putcontext (&queried);
+            } while (1);
+
+            dc_collection_finished (&collection);
+
+            // The context is not found in the parent..
+            if (status != DISIR_STATUS_OK)
+            {
+                break;
+            }
         }
 
-        if (current_context == current_context->cx_parent_context)
+        // Resolve parent name
+        current_context = current_context->cx_parent_context;
+        // This is a root context - ignore it
+        if (current_context->cx_parent_context == NULL)
         {
-            current_context = NULL;
-        }
-        else
-        {
-            current_context = current_context->cx_parent_context;
+            break;
         }
     }
 
@@ -716,26 +763,29 @@ dc_resolve_root_name (struct disir_context *context, const char **output)
     for (i = current_name_index; i >= 0; i--)
     {
         log_debug (1, "Adding reverse name: %s", reverse_name_index[i]);
-        res = snprintf (buffer, total_size - written, "%s", reverse_name_index[i]);
+        res = snprintf (buffer + written, total_size - written, "%s", reverse_name_index[i]);
         written += res;
 
         if (reverse_name_index_index[i] != 0)
         {
-            res = snprintf (buffer, total_size - written, "@%d", reverse_name_index_index[i]);
+            res = snprintf (buffer + written, total_size - written,
+                            "@%d", reverse_name_index_index[i]);
             written += res;
         }
 
         if (i != 0)
         {
-            res = snprintf (buffer, total_size - written, ".");
+            res = snprintf (buffer + written, total_size - written, ".");
             written += res;
         }
     }
 
 
     *output = buffer;
-
-    return DISIR_STATUS_OK;
+    status = DISIR_STATUS_OK;
+out:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
 }
 
 //! INTERNAL API

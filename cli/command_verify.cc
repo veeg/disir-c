@@ -177,7 +177,7 @@ CommandVerify::print_verify (enum disir_status status, const char *entry,
 {
     struct disir_collection *collection = NULL;
     struct disir_context *context = NULL;
-    const char *resolved_name = NULL;
+    char *resolved_name = NULL;
 
     if (status == DISIR_STATUS_OK)
     {
@@ -206,19 +206,29 @@ CommandVerify::print_verify (enum disir_status status, const char *entry,
                 }
 
                 status = dc_resolve_root_name (context, &resolved_name);
+                const char *name;
                 if (status != DISIR_STATUS_OK)
                 {
-                    resolved_name = "UNRESOLVED";
+                    name = "UNRESOLVED";
                 }
+                else
+                {
+                    name = resolved_name;
+                }
+
                 if (dc_context_error (context))
                 {
-                    std::cout << "               " << resolved_name << ": "
+                    std::cout << "               " << name << ": "
                               << dc_context_error (context) << std::endl;
                 }
                 else if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
                 {
-                    std::cout << "               " << resolved_name << ": "
+                    std::cout << "               " << name << ": "
                               << "(entry missing error)" << std::endl;
+                }
+                if (resolved_name != NULL)
+                {
+                    free (resolved_name);
                 }
                 dc_putcontext (&context);
             } while (1);

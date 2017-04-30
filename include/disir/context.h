@@ -278,7 +278,7 @@ enum disir_status dc_get_name (struct disir_context *context,
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-dc_resolve_root_name (struct disir_context *context, const char **output);
+dc_resolve_root_name (struct disir_context *context, char **output);
 
 //! \brief Add an introduced semantic version number to a context.
 //!
