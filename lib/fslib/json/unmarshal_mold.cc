@@ -189,6 +189,11 @@ finalize:
         return status;
     }
 
+    if (status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+        dc_putcontext (&context);
+    }
+
     return DISIR_STATUS_OK;
 }
 
@@ -591,6 +596,11 @@ MoldReader::unmarshal_restrictions (struct disir_context *context,
         {
             return status;
         }
+
+        if (status == DISIR_STATUS_INVALID_CONTEXT)
+        {
+            dc_putcontext (&restriction);
+        }
     }
     return status;
 }
@@ -680,6 +690,11 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
              disir_error_set (m_disir, "could not finalize defaul: %s",
                                         disir_status_string (status));
              goto error;
+        }
+
+        if (status == DISIR_STATUS_INVALID_CONTEXT)
+        {
+            dc_putcontext (&context_default);
         }
     }
 
