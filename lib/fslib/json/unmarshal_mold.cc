@@ -109,19 +109,22 @@ error:
 bool
 MoldReader::mold_has_documentation (Json::Value& mold_root)
 {
-    return mold_root[ATTRIBUTE_KEY_DOCUMENTATION].isString ();
+    return mold_root[ATTRIBUTE_KEY_DOCUMENTATION].isNull () == false &&
+           mold_root[ATTRIBUTE_KEY_DOCUMENTATION].isString ();
 }
 
 bool
 MoldReader::value_is_section (Json::Value& val)
 {
-    return val.isObject () && val[ATTRIBUTE_KEY_ELEMENTS].isObject ();
+    return val.isObject () && val [ATTRIBUTE_KEY_ELEMENTS].isNull () == false &&
+                              val[ATTRIBUTE_KEY_ELEMENTS].isObject ();
 }
 
 bool
 MoldReader::value_is_keyval (Json::Value& val)
 {
-    return val.isObject () && val[ATTRIBUTE_KEY_DEFAULTS].isArray ();
+    return val.isObject () &&  val [ATTRIBUTE_KEY_DEFAULTS].isNull () == false &&
+                               val[ATTRIBUTE_KEY_DEFAULTS].isArray ();
 }
 
 //! PRIVATE
@@ -202,13 +205,16 @@ MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& 
         }
         else
         {
-            continue;
+            dc_fatal_error (parent_context,
+                            "Could not resolve whether object is of type keyval or section");
+            return DISIR_STATUS_OK;
         }
 
         status = dc_finalize (&child_context);
         if (status != DISIR_STATUS_OK
             && status != DISIR_STATUS_INVALID_CONTEXT)
         {
+
             return status;
         }
     }
@@ -234,14 +240,28 @@ MoldReader::set_context_metadata (struct disir_context *context,
         return status;
     }
 
+    if (type == DISIR_CONTEXT_KEYVAL &&
+        current[ATTRIBUTE_KEY_TYPE].isNull ())
+    {
+        dc_fatal_error (context, "Keyval type is not present");
+        return DISIR_STATUS_INVALID_CONTEXT;
+    }
+
     // Only set type if it's not a section
     if(current[ATTRIBUTE_KEY_TYPE].isNull () == false)
     {
+        status = assert_json_value_type (current[ATTRIBUTE_KEY_TYPE], Json::stringValue);
+        if (status != DISIR_STATUS_OK)
+        {
+            dc_fatal_error (context, "Keyval type is not of type string");
+            return DISIR_STATUS_OK;
+        }
+
         auto value_type = attribute_key_to_disir_value (current[ATTRIBUTE_KEY_TYPE].asCString ());
         if (value_type == DISIR_VALUE_TYPE_UNKNOWN)
         {
             dc_fatal_error (context, "Undefined value");
-            return DISIR_STATUS_NOT_EXIST;
+            return DISIR_STATUS_OK;
         }
 
         status = dc_set_value_type (context, value_type);
@@ -284,6 +304,13 @@ MoldReader::unmarshal_restriction (struct disir_context *context, Json::Value& c
     if (current[ATTRIBUTE_KEY_TYPE].isNull ())
     {
         dc_fatal_error (context, "No restriction type");
+        return DISIR_STATUS_OK;
+    }
+
+    status = assert_json_value_type (current[ATTRIBUTE_KEY_TYPE], Json::stringValue);
+    if (status != DISIR_STATUS_OK)
+    {
+        dc_fatal_error (context, "Restriction type should be of type string");
         return DISIR_STATUS_OK;
     }
 
@@ -421,8 +448,14 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
     }
     case DISIR_RESTRICTION_EXC_VALUE_RANGE:
     {
-        if (assert_json_value_type (value, Json::intValue) != DISIR_STATUS_OK
-            || assert_json_value_type (value, Json::realValue) != DISIR_STATUS_OK)
+        if (assert_json_value_type (current[ATTRIBUTE_KEY_VALUE_MIN], Json::intValue)
+            != DISIR_STATUS_OK
+            || assert_json_value_type (current[ATTRIBUTE_KEY_VALUE_MAX], Json::intValue)
+               != DISIR_STATUS_OK
+            || assert_json_value_type (current[ATTRIBUTE_KEY_VALUE_MIN], Json::realValue)
+               != DISIR_STATUS_OK
+            || assert_json_value_type (current[ATTRIBUTE_KEY_VALUE_MAX], Json::realValue)
+               != DISIR_STATUS_OK)
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Wrong value type");
