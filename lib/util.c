@@ -21,6 +21,7 @@ const char *disir_status_strings[] = {
     "WRONG CONTEXT",
     "INVALID CONTEXT",
     "DESTROYED CONTEXT",
+    "FATAL CONTEXT",
     "BAD CONTEXT OBJECT",
     "NO MEMORY",
     "NO ERROR",

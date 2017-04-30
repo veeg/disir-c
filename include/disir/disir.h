@@ -29,6 +29,8 @@ enum disir_status
     DISIR_STATUS_INVALID_CONTEXT,
     //! The context object has been destroyed.
     DISIR_STATUS_DESTROYED_CONTEXT,
+    //! The context object was marked as fatal by the end user.
+    DISIR_STATUS_FATAL_CONTEXT,
     //! The context object has internal error state. Unrecoverable.
     DISIR_STATUS_BAD_CONTEXT_OBJECT,
     //! An allocation operation failed. Unrecoverable.
