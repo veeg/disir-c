@@ -84,6 +84,7 @@ set (_LIBDISIR_SOURCES
     "update.c"
     "validate.c"
     "compare.c"
+    "query.c"
     "${CMAKE_CURRENT_BINARY_DIR}/version.c"
     ${_LIBDISIR_3PARTY_LIB_SOURCES}
     ${FSLIB_SOURCES}
