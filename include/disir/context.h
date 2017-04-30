@@ -660,7 +660,6 @@ enum disir_status dc_get_value_boolean (struct disir_context *context, uint8_t *
 //! Supported input contexts are:
 //!     * DISIR_CONTEXT_DEFAULT
 //!     * DISIR_CONTEXT_DOCUMENTATION
-//!     * DISIR_CONTEXT_KEYVAL
 //!     * DISIR_CONTEXT_SECTION
 //!     * DISIR_CONTEXT_RESTRICTION
 //!     * DISIR_CONTEXT_MOLD
