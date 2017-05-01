@@ -257,14 +257,14 @@ MoldWriter::serialize_restrictions (struct disir_context *context, Json::Value& 
                                        DISIR_CONTEXT_RESTRICTION);
         if (status != DISIR_STATUS_OK)
         {
-            return status;
+            goto out;
         }
 
         status = dc_get_restriction_type (restriction, &rtype);
         if (status !=  DISIR_STATUS_OK)
         {
 
-            return status;
+            goto out;
         }
 
         auto restriction_enum_string = dc_restriction_enum_string (rtype);
@@ -305,7 +305,7 @@ MoldWriter::serialize_restrictions (struct disir_context *context, Json::Value& 
             status = dc_restriction_get_range (restriction, &min, &max);
             if (status != DISIR_STATUS_OK)
             {
-                return status;
+                goto out;
             }
 
             if (value_type == DISIR_VALUE_TYPE_FLOAT)
@@ -329,7 +329,7 @@ MoldWriter::serialize_restrictions (struct disir_context *context, Json::Value& 
             if (status != DISIR_STATUS_OK)
             {
 
-                return status;
+                goto out;
             }
 
             current_restriction[ATTRIBUTE_KEY_VALUE] = enum_value;
@@ -352,7 +352,8 @@ MoldWriter::serialize_restrictions (struct disir_context *context, Json::Value& 
     }
 
     current[ATTRIBUTE_KEY_RESTRICTIONS] = restrictions;
-
+out:
+    dc_collection_finished (&collection);
     return status;
 }
 
