@@ -255,8 +255,8 @@ MoldReader::set_context_attributes (struct disir_context *context,
     status = dc_set_name (context, name.c_str(), name.size ());
     if (status != DISIR_STATUS_OK)
     {
-        dc_fatal_error (context, "could not set name");
-        return DISIR_STATUS_INVALID_CONTEXT;
+        disir_log_user (m_disir, "Unable to set context name");
+        return status;
     }
 
     if (type == DISIR_CONTEXT_KEYVAL &&
