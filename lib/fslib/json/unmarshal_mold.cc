@@ -333,7 +333,7 @@ MoldReader::unmarshal_documentation (struct disir_context *context, Json::Value&
     status = assert_json_value_type (doc, Json::stringValue);
     if (status != DISIR_STATUS_OK)
     {
-       dc_fatal_error (context, "Documentation shall be of type string, instead have %s");
+       dc_fatal_error (context, "Documentation shall be of type string");
        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
