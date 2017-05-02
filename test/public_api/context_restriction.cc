@@ -74,7 +74,7 @@ TEST_F (ContextRestrictionMoldInclusiveRestrictionTest,
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_finalize (&context_restriction2);
-    ASSERT_STATUS (DISIR_STATUS_CONFLICTING_SEMVER, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
     ASSERT_TRUE (NULL != context_restriction2);
     error = dc_context_error (context_restriction2);
     ASSERT_STREQ ("introduced version conflicts with another MINIMUM_ENTRIES restriction.", error);
@@ -105,7 +105,7 @@ TEST_F (ContextRestrictionMoldInclusiveRestrictionTest,
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_finalize (&context_restriction2);
-    ASSERT_STATUS (DISIR_STATUS_CONFLICTING_SEMVER, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
     ASSERT_TRUE (NULL != context_restriction2);
     error = dc_context_error (context_restriction2);
     ASSERT_STREQ ("introduced version conflicts with another MAXIMUM_ENTRIES restriction.", error);
