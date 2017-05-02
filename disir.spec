@@ -38,8 +38,8 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr .
 %files
 %{_bindir}/disir
 %{_libdir}/*.so
-%{_libdir}/disir/plugins/dplugin_toml.so
-%{_libdir}/disir/plugins/dplugin_json.so
+%{_libdir}/disir/dplugin_toml.so
+%{_libdir}/disir/dplugin_json.so
 
 
 %files devel
