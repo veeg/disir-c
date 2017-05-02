@@ -212,7 +212,12 @@ validate_finalized_parent_constructing_child_violating_max_restriction (struct d
     max = 0;
     current_entries_count  = 0;
 
-    // Restriction will be violated - but we allow it.
+    // We are finalized - skip this check
+    if (child->CONTEXT_STATE_FINALIZED == 1)
+    {
+        return DISIR_STATUS_OK;
+    }
+    // The parent is not finalized - skip this check
     if (child->cx_parent_context->CONTEXT_STATE_FINALIZED == 0)
     {
         return DISIR_STATUS_OK;
