@@ -45,6 +45,20 @@ struct disir_restriction * dx_restriction_create (struct disir_context *parent);
 //! Free all resources belonging to disir_restriction structure (including itself)
 enum disir_status dx_restriction_destroy (struct disir_restriction **restriction);
 
+//! \brief Retrieve the restriction queue in parent associated with tthe input restriction context.
+//!
+//! This requires that the restriction has a type set on it.
+//!
+//! \param[in] context The restriction context to locate parent restriction queue.
+//! \param[out] queue Pointer to populate the parent restriction queue.
+//!
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if queue cannot be located in parent.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dx_restriction_get_queue (struct disir_context *context, struct disir_restriction ***queue);
+
+
 //! \brief Check KEYVAL context value type if within restriction bounds.
 //!
 //! \return DISIR_STATUS_OK if root context is not CONFIG.

@@ -151,93 +151,45 @@ dx_restriction_begin (struct disir_context *parent, struct disir_context **restr
 //! INTERNAL API
 //! Only called from dc_finalize
 enum disir_status
-dx_restriction_finalize (struct disir_context *restriction)
+dx_restriction_finalize (struct disir_context *context)
 {
     enum disir_status status;
-    struct disir_restriction *res;
     struct disir_restriction **queue;
-    const char *group;
 
-    status = CONTEXT_NULL_INVALID_TYPE_CHECK (restriction);
+    queue = NULL;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
         return status;
     }
-    res = restriction->cx_restriction;
 
-    group = dc_restriction_group_type (res->re_type);
-    if (dc_context_type (restriction->cx_parent_context) == DISIR_CONTEXT_KEYVAL)
-    {
-        if (strcmp ("INCLUSIVE", group) == 0)
-        {
-            queue = &restriction->cx_parent_context->cx_keyval->kv_restrictions_inclusive_queue;
-        }
-        else if (strcmp ("EXCLUSIVE", group) == 0)
-        {
-            queue = &restriction->cx_parent_context->cx_keyval->kv_restrictions_exclusive_queue;
-        }
-    }
-    else if (dc_context_type (restriction->cx_parent_context) == DISIR_CONTEXT_SECTION)
-    {
-        if (strcmp ("INCLUSIVE", group) == 0)
-        {
-            queue = &restriction->cx_parent_context->cx_section->se_restrictions_inclusive_queue;
-        }
-        else if (strcmp ("EXCLUSIVE", group) == 0)
-        {
-            queue = &restriction->cx_parent_context->cx_section->se_restrictions_exclusive_queue;
-        }
-    }
-    else
-    {
-        dx_log_context (restriction, "attempted finalized with unknown/unsupported type.");
-        return DISIR_STATUS_INTERNAL_ERROR;
-    }
+    // Validate
+    status = dx_validate_context (context);
 
-    // Validity check on the restriction
-    switch (res->re_type)
+    // Insert into parent
+    // queue
+    dx_restriction_get_queue (context, &queue);
+    if (queue && (status == DISIR_STATUS_OK || status == DISIR_STATUS_INVALID_CONTEXT))
     {
-    case DISIR_RESTRICTION_INC_ENTRY_MIN:
-    case DISIR_RESTRICTION_INC_ENTRY_MAX:
-    {
-        // Verify that the introduced version does not conflict wither other entries.
-        MQ_FOREACH (*queue,
-        {
-            if (entry->re_type == res->re_type)
-            {
-                if (dc_semantic_version_compare (&entry->re_introduced, &res->re_introduced) == 0)
-                {
-                    status = DISIR_STATUS_CONFLICTING_SEMVER;
-                }
-            }
-        });
-        break;
-    }
-    default:
-        // No validation required
-        break;
-    }
-
-    if (queue)
-    {
+        //struct disir_restriction *q = *queue;
         // Enqueue
-        MQ_ENQUEUE (*queue, res);
+        MQ_ENQUEUE (*queue, context->cx_restriction);
+        context->CONTEXT_STATE_IN_PARENT = 1;
     }
     else
     {
-        log_error_context (restriction, "unknown restriction type %s",
-                                        dc_restriction_context_string (restriction));
+        // We where not able to insert ourselves into the parent queue
+        // How do we indicate this error - if we return INVALID CONTEXT
+        // and the user putcontext on it, we are leaking a reference we cannot
+        // reach
+        status = DISIR_STATUS_WRONG_VALUE_TYPE;
+        log_error_context (context , "Unable to insert restriction type %s into parent.",
+                                     dc_restriction_context_string (context));
     }
 
-    if (status == DISIR_STATUS_CONFLICTING_SEMVER)
-    {
-        restriction->CONTEXT_STATE_INVALID = 1;
-        dx_context_error_set (restriction,
-                              "introduced version conflicts with another %s restriction.",
-                              dc_restriction_enum_string (res->re_type));
-    }
-
+    // Return validate status
     return status;
 }
 
@@ -334,6 +286,49 @@ dx_restriction_destroy (struct disir_restriction **restriction)
 
     free (tmp);
     *restriction = NULL;
+
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_restriction_get_queue (struct disir_context *context, struct disir_restriction ***queue)
+{
+    const char *group;
+
+    group = NULL;
+
+    if (context == NULL)
+        return DISIR_STATUS_INVALID_ARGUMENT;
+
+    // Check type - should be part of inclusive or exclusive groups
+    group = dc_restriction_group_type (context->cx_restriction->re_type);
+    if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_KEYVAL)
+    {
+        if (strcmp ("INCLUSIVE", group) == 0)
+        {
+            *queue = &context->cx_parent_context->cx_keyval->kv_restrictions_inclusive_queue;
+        }
+        else if (strcmp ("EXCLUSIVE", group) == 0)
+        {
+            *queue = &context->cx_parent_context->cx_keyval->kv_restrictions_exclusive_queue;
+        }
+    }
+    else if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_SECTION)
+    {
+        if (strcmp ("INCLUSIVE", group) == 0)
+        {
+            *queue = &context->cx_parent_context->cx_section->se_restrictions_inclusive_queue;
+        }
+        else if (strcmp ("EXCLUSIVE", group) == 0)
+        {
+            *queue = &context->cx_parent_context->cx_section->se_restrictions_exclusive_queue;
+        }
+    }
+    else
+    {
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
+    }
 
     return DISIR_STATUS_OK;
 }

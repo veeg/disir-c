@@ -12,6 +12,7 @@
 #include "section.h"
 #include "keyval.h"
 #include "mold.h"
+#include "mqueue.h"
 #include "log.h"
 #include "element_storage.h"
 #include "restriction.h"
@@ -298,6 +299,8 @@ validate_children (struct disir_context *context)
         // XXX: What if the last context was finalized? We should still validate, shant we?
         // Break out if a serious error occurred in last iteration
         if (status_validate != DISIR_STATUS_OK
+            && status_validate != DISIR_STATUS_CONFLICTING_SEMVER
+            && status_validate != DISIR_STATUS_ELEMENTS_INVALID
             && status_validate != DISIR_STATUS_INVALID_CONTEXT
             && status_validate != DISIR_STATUS_RESTRICTION_VIOLATED
             && status_validate != DISIR_STATUS_WRONG_VALUE_TYPE
@@ -432,6 +435,63 @@ validate_config_section (struct disir_context *section)
     return status;
 }
 
+//! STATIC API
+static enum disir_status
+validate_restriction (struct disir_context *context)
+{
+    enum disir_status status;
+    struct disir_restriction *res;
+    struct disir_restriction **queue;
+
+    queue = NULL;
+    res = context->cx_restriction;
+
+    // Validate that the restriction context got a valid type set (belongs to a group)
+    status = dx_restriction_get_queue (context, &queue);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    // Verify conflicting restrictions on the parent.
+    switch (res->re_type)
+    {
+    case DISIR_RESTRICTION_INC_ENTRY_MIN:
+        // FALL-THROUGH
+    case DISIR_RESTRICTION_INC_ENTRY_MAX:
+    {
+        // Verify that the introduced version does not conflict wither other entries.
+        MQ_FOREACH (*queue,
+        {
+            // Check that we compare the same type of restriction - and not our selves.
+            if (entry->re_type == res->re_type && entry->re_context != (void *)context)
+            {
+                // Check introduced does not conflict with any other entries
+                if (dc_semantic_version_compare (&entry->re_introduced, &res->re_introduced) == 0)
+                {
+                    log_debug (6, "introduced conflict (entry %p vs context %p)",
+                                  entry->re_context, context);
+                    dx_context_error_set (context,
+                                          "introduced version conflicts with" \
+                                          " another %s restriction.",
+                                          dc_restriction_enum_string (res->re_type));
+                    status = DISIR_STATUS_CONFLICTING_SEMVER;
+                    break;
+                }
+                // Deprecated cannot conflict
+            }
+        });
+
+        break;
+    }
+    default:
+        // No validation required
+        break;
+    }
+
+
+    return status;
+}
 
 //! STATIC API
 //!
@@ -510,15 +570,21 @@ validate_context_validity (struct disir_context *context)
                 }
                 current_restriction = current_restriction->next;
             }
-
         }
 
-        if (invalid != DISIR_STATUS_INVALID_CONTEXT ||
-            invalid != DISIR_STATUS_RESTRICTION_VIOLATED ||
-            invalid != DISIR_STATUS_MOLD_MISSING ||
-            invalid != DISIR_STATUS_WRONG_VALUE_TYPE)
+        // 'invalid' contains the status best representing the state
+        // this context can be in that is _not_ ok.
+        if (invalid != DISIR_STATUS_INVALID_CONTEXT
+            && invalid != DISIR_STATUS_RESTRICTION_VIOLATED
+            && invalid != DISIR_STATUS_MOLD_MISSING
+            && invalid != DISIR_STATUS_WRONG_VALUE_TYPE
+            && invalid != DISIR_STATUS_CONFLICTING_SEMVER
+            && invalid != DISIR_STATUS_OK
+            && invalid != DISIR_STATUS_FATAL_CONTEXT)
         {
             // Break out - something horrible happend
+            log_warn ("Something amis happend in section validation: %s",
+                       disir_status_string (invalid));
             break;
         }
 
@@ -601,7 +667,7 @@ validate_context_validity (struct disir_context *context)
     }
     case DISIR_CONTEXT_RESTRICTION:
     {
-        // TODO: Add some validation to restriction context
+        invalid = validate_restriction (context);
         break;
     }
     default:
@@ -666,6 +732,7 @@ dx_validate_context (struct disir_context *context)
              || status == DISIR_STATUS_DEFAULT_MISSING
              || status == DISIR_STATUS_FATAL_CONTEXT
              || status == DISIR_STATUS_MOLD_MISSING
+             || status == DISIR_STATUS_CONFLICTING_SEMVER
              || status == DISIR_STATUS_RESTRICTION_VIOLATED)
     {
         context->CONTEXT_STATE_INVALID = 1;
