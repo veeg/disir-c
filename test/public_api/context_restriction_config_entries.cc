@@ -130,7 +130,11 @@ public:
 TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
         finalizing_config_without_required_elements_yields_invalid_config)
 {
-    setup_testmold ("restriction_config_parent_keyval_min_entry");
+    ASSERT_NO_SETUP_FAILURE();
+
+    ASSERT_NO_FATAL_FAILURE (
+        setup_testmold ("restriction_config_parent_keyval_min_entry");
+    );
 
     // The element in this mold are required (non-zero entries)
     // Finalizing the config should yield DISIR_STATUS_CONTEXT_INVALID
@@ -149,7 +153,12 @@ TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
         finalizing_config_with_max_entries_violated_yields_invalid_config)
 {
     struct semantic_version semver;
-    setup_testmold ("restriction_config_parent_keyval_max_entry");
+
+    ASSERT_NO_SETUP_FAILURE();
+
+    ASSERT_NO_FATAL_FAILURE (
+        setup_testmold ("restriction_config_parent_keyval_max_entry");
+    );
 
     // Set config version to 1.0.0 - this sets max at 2
     semver.sv_major = 1;
@@ -199,8 +208,12 @@ TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
 TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
         finalizing_section_with_max_entries_violated_yields_invalid_config)
 {
+    ASSERT_NO_SETUP_FAILURE();
+
     struct semantic_version semver;
-    setup_testmold ("restriction_section_parent_keyval_max_entry");
+    ASSERT_NO_FATAL_FAILURE (
+        setup_testmold ("restriction_section_parent_keyval_max_entry");
+    );
 
     // Set config version to 1.0.0
     semver.sv_major = 1;
@@ -267,8 +280,12 @@ TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
 TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
         adding_keyval_to_config_parent_violating_max_restriction)
 {
+    ASSERT_NO_SETUP_FAILURE();
+
     // version 1.0.0
-    setup_testconfig ("restriction_config_parent_keyval_max_entry", NULL);
+    ASSERT_NO_FATAL_FAILURE (
+        setup_testconfig ("restriction_config_parent_keyval_max_entry", NULL);
+    );
 
     // version 1.0.0 has max 2 entries
     context_config = dc_config_getcontext (config);
@@ -311,8 +328,13 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
         race_finalizing_keyval_to_config_parent_violating_max_restriction)
 {
     struct disir_context *context_keyval2;
+
+    ASSERT_NO_SETUP_FAILURE();
+
     // version 1.0.0
-    setup_testconfig ("restriction_config_parent_keyval_max_entry", NULL);
+    ASSERT_NO_FATAL_FAILURE (
+        setup_testconfig ("restriction_config_parent_keyval_max_entry", NULL);
+    );
 
     // version 1.0.0 has max 2 entries
     context_config = dc_config_getcontext (config);
@@ -356,8 +378,12 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
 TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
         adding_section_to_config_parent_violating_max_restriction)
 {
+    ASSERT_NO_SETUP_FAILURE();
+
     // version 1.0.0
-    setup_testconfig ("restriction_config_parent_section_max_entry", NULL);
+    ASSERT_NO_FATAL_FAILURE (
+        setup_testconfig ("restriction_config_parent_section_max_entry", NULL);
+    );
 
     // version 1.0.0 has max 4 entries
     context_config = dc_config_getcontext (config);
@@ -397,8 +423,13 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
         race_finalizing_section_to_config_parent_violating_max_restriction)
 {
     struct disir_context *context_section2;
+
+    ASSERT_NO_SETUP_FAILURE();
+
     // version 1.0.0
-    setup_testconfig ("restriction_config_parent_section_max_entry", NULL);
+    ASSERT_NO_FATAL_FAILURE (
+        setup_testconfig ("restriction_config_parent_section_max_entry", NULL);
+    );
 
     // version 1.0.0 has max 4 entries
     context_config = dc_config_getcontext (config);
@@ -442,8 +473,12 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
 TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
         adding_keyval_to_section_parent_violating_max_restriction)
 {
+    ASSERT_NO_SETUP_FAILURE();
+
     // version 1.0.0
-    setup_testconfig ("restriction_section_parent_keyval_max_entry", NULL);
+    ASSERT_NO_FATAL_FAILURE (
+        setup_testconfig ("restriction_section_parent_keyval_max_entry", NULL);
+    );
     context_config = dc_config_getcontext (config);
 
     // Construct and finalize the section element.
