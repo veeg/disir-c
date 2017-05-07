@@ -271,20 +271,6 @@ disir_error_copy (struct disir_instance *instance,
 const char *
 disir_error (struct disir_instance *instance);
 
-//! \brief Validate the mold, checking for any contexts that are invalid.
-//!
-//! \param[in] mold Input mold to validate.
-//! \param[out] collection Populated collection of invalid contexts, if any.
-//!                        This parameter is optional. If NULL, no collection is returned.
-//!
-//! \return DISIR_STATUS_OK on success.
-//! \return DISIR_STATUS_INVALID_ARGUMENT if mold is NULL.
-//! \return DISIR_STATUS_INVALID_CONTEXT if mold contains invalid contexts. Collection is
-//!         (optionally) populated.
-//!
-enum disir_status
-disir_mold_valid (struct disir_mold *mold, struct disir_collection **collection);
-
 //! \brief Update the config 0bject to a new target version
 //!
 //! Update a config to a new semver version. The update state and progress is

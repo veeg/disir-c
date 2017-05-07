@@ -88,6 +88,20 @@ enum disir_status
 disir_mold_query (struct disir_instance *instance, const char *group_id,
                   const char *entry_id, struct disir_entry **entry);
 
+//! \brief Validate the mold, checking for any contexts that are invalid.
+//!
+//! \param[in] mold Input mold to validate.
+//! \param[out] collection Populated collection of invalid contexts, if any.
+//!                        This parameter is optional. If NULL, no collection is returned.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if mold is NULL.
+//! \return DISIR_STATUS_INVALID_CONTEXT if mold contains invalid contexts.
+//!     Collection is (optionally) populated.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_mold_valid (struct disir_mold *mold, struct disir_collection **collection);
+
 //! \brief Mark yourself finished with the mold object.
 //!
 //! \\param[in,out] mold Object to mark as finished. Turns the pointer to NULL
