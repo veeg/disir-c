@@ -120,11 +120,14 @@ CommandGenerate::handle_command (std::vector<std::string> &args)
         m_cli->verbose() << "Generating entries in user supplied list." << std::endl;
         for (const auto& entry : args::get (opt_entries))
         {
-            fslib_namespace_entry (entry.c_str(), namespace_entry);
+            const char *root = fslib_namespace_entry (entry.c_str(), namespace_entry);
 
             // Add entry to avalable set if it does not already exist, and
             // it is covered by a namespace mold
-            if (namespaces.count (namespace_entry) != 0 && configs.count (entry) == 0)
+            // Either the entry is covered by the top-level namespace (if it exists)
+            // or a subnamespace (which namespace_entry does not resolve
+            if ((root == NULL && namespaces.count ("/") == 1)
+                || (namespaces.count (namespace_entry) != 0 && configs.count (entry) == 0))
             {
                 m_cli->verbose() << "Adding entry " << entry << " to available set."
                                  << " (namespace entry)" << std::endl;
@@ -215,7 +218,7 @@ CommandGenerate::generate_entries (std::set<std::string>& entries)
         if (status != DISIR_STATUS_OK)
         {
             // Exit early - we cannot generate
-            std::cerr << "read error: ";
+            std::cerr << "mold read error: " << entry << std::endl;
             if (disir_error (m_cli->disir()) != NULL)
             {
                 std::cerr << disir_error (m_cli->disir()) << std::endl;
@@ -232,7 +235,7 @@ CommandGenerate::generate_entries (std::set<std::string>& entries)
         status = disir_generate_config_from_mold (mold, NULL, &config);
         if (status != DISIR_STATUS_OK)
         {
-            std::cerr << "generation error: ";
+            std::cerr << "generation error: " << entry << std::endl;
             if (disir_error (m_cli->disir()) != NULL)
             {
                 std::cerr << disir_error (m_cli->disir()) << std::endl;
@@ -250,7 +253,7 @@ CommandGenerate::generate_entries (std::set<std::string>& entries)
                                      entry.c_str(), config);
         if (status != DISIR_STATUS_OK)
         {
-            std::cerr << "write error: ";
+            std::cerr << "config write error: " << entry << std::endl;
             if (disir_error (m_cli->disir()) != NULL)
             {
                 std::cerr << disir_error (m_cli->disir()) << std::endl;
