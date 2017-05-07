@@ -39,8 +39,12 @@ fslib_plugin_config_read (struct disir_instance *instance,
         status = plugin->dp_mold_read (instance, plugin, entry_id, &resolved_mold);
         if (status != DISIR_STATUS_OK)
         {
-            // XXX - Change any of the error state?
-            // TODO: Handle invalid_context? Hmm
+            if (status == DISIR_STATUS_INVALID_CONTEXT)
+            {
+                // XXX: Another error perhaps?
+                status = DISIR_STATUS_MOLD_MISSING;
+                disir_error_set (instance, "mold is not valid. Cannot load config.");
+            }
             return status;
         }
     }
