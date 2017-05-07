@@ -117,11 +117,11 @@ ConfigReader::construct_config (struct disir_config **config)
      set_config_version (context_config, m_configRoot[VERSION]);
 
      status = build_config_from_json (context_config);
-     if (status != DISIR_STATUS_OK)
+     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
          goto error;
 
      status = dc_config_finalize (&context_config, config);
-     if (status != DISIR_STATUS_OK)
+     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
      {
          disir_log_user (m_disir, "could not finalize config context: %s",
                          disir_status_string (status));
@@ -253,7 +253,7 @@ ConfigReader::unmarshal_array (struct disir_context *parent, Json::Value& array,
     for (i = 0; i < array.size (); ++i)
     {
         status = unmarshal_type (parent, array[i], name);
-        if (status != DISIR_STATUS_OK)
+        if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
         {
             return status;
         }
@@ -289,7 +289,7 @@ ConfigReader::unmarshal_type (struct disir_context *context, Json::Value& value,
         }
 
         status = _unmarshal_node (child_context, value);
-        if (status != DISIR_STATUS_OK)
+        if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
         {
             // logged
             return status;
@@ -324,7 +324,7 @@ ConfigReader::unmarshal_type (struct disir_context *context, Json::Value& value,
     case Json::realValue:
     case Json::booleanValue:
         status = set_keyval (context, name, value);
-        if (status != DISIR_STATUS_OK)
+        if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
         {
             goto error;
         }
@@ -363,7 +363,7 @@ ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value
         auto name = iter.name ();
 
         status = unmarshal_type (parent_context, child_node, name);
-        if (status != DISIR_STATUS_OK)
+        if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
             goto error;
     }
 
