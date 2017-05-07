@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include <disir/disir.h>
-#include <disir/io.h>
 
 #include "disir_private.h"
 #include "log.h"

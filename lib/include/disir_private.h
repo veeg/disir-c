@@ -2,7 +2,6 @@
 #define _LIBDISIR_PRIVATE_DISIR_H
 
 #include <disir/disir.h>
-#include <disir/io.h>
 #include <disir/plugin.h>
 
 //! Internal plugin structure

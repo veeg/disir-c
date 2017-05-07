@@ -1,7 +1,6 @@
 #include <stdlib.h>
 
 #include <disir/disir.h>
-#include <disir/io.h>
 
 //! PUBLIC API
 enum disir_status

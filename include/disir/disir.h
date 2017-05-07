@@ -90,8 +90,10 @@ struct disir_update;
 struct disir_config;
 //! Forward declaration of the top-level context disir_mold
 struct disir_mold;
-
+//! Forward declare the collection object.
 struct disir_collection;
+//! Forward delcare the entry object.
+struct disir_entry;
 
 //! The different value types that may be held by differrent contexts.
 //! This enumeration also defines the explicit type of a DISIR_CONTEXT_KEYVAL.
@@ -135,13 +137,50 @@ enum disir_restriction_type
 
 #include <disir/util.h>
 #include <disir/config.h>
+#include <disir/mold.h>
 #include <disir/context.h>
 #include <disir/collection.h>
-#include <disir/io.h>
 #include <disir/libdisir.h>
 
 
+//! Disir Entry - holds information about single config/mold entries.
+struct disir_entry
+{
+    //! Name of this entry.
+    char                *de_entry_name;
+    union
+    {
+        uint64_t        de_attributes;
+        struct
+        {
+                        //! Entry is readbale by the user who queried this entry.
+            uint64_t    DE_READABLE                 : 1,
+                        //! Entry is writable by the user who queried this entry.
+                        DE_WRITABLE                 : 1,
+                        //! Entry is valid for all subentries of this namespace.
+                        DE_NAMESPACE_ENTRY          : 1,
+                                                    : 0;
+        };
+    };
+
+    //! Double-linked list pointers.
+    struct disir_entry *next, *prev;
+};
+
+
+//! \brief Free a entry structure returned by an API endpoint.
+//!
+//! \return DISIR_STATUS_OK.
+//!
+enum disir_status
+disir_entry_finished (struct disir_entry **entry);
+
 //! \brief Return a string representation of the disir status.
+//!
+//! \param[in] status Disir status enumerator to stringify.
+//!
+//! \return stringified version of the input status.
+//!
 const char *
 disir_status_string (enum disir_status status);
 
@@ -231,20 +270,6 @@ disir_error_copy (struct disir_instance *instance,
 //!
 const char *
 disir_error (struct disir_instance *instance);
-
-//! \brief Validate the config, checking for any contexts that are invalid.
-//!
-//! \param[in] config Input config to validate
-//! \param[out] collection Populated collection of invalid contexts, if any.
-//!                        This parameter is optional. If NULL, no collection is returned.
-//!
-//! \return DISIR_STATUS_OK on success.
-//! \return DISIR_STATUS_INVALID_ARGUMENT if config is NULL.
-//! \return DISIR_STATUS_INVALID_CONTEXT if config contains invalid contexts. Collection is
-//!         (optionally) populated.
-//!
-enum disir_status
-disir_config_valid (struct disir_config *config, struct disir_collection **collection);
 
 //! \brief Validate the mold, checking for any contexts that are invalid.
 //!
