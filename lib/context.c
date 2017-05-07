@@ -54,7 +54,6 @@ context_get_introduced_structure (struct disir_context *context,
     }
     case DISIR_CONTEXT_KEYVAL:
     case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:
         return DISIR_STATUS_INTERNAL_ERROR;
     // No default handler - let compiler warn us of  unhandled context
@@ -259,9 +258,6 @@ dc_destroy (struct disir_context **context)
     case DISIR_CONTEXT_RESTRICTION:
         status = dx_restriction_destroy (&((*context)->cx_restriction));
         break;
-    case DISIR_CONTEXT_FREE_TEXT:
-        dx_crash_and_burn ("%s - UNHANDLED CONTEXT TYPE: %s",
-                __FUNCTION__, dc_context_type_string (*context));
     case DISIR_CONTEXT_UNKNOWN:
         // Nothing to be done. We dont know what to do!
         break;
@@ -336,7 +332,6 @@ dc_begin (struct disir_context *parent, enum disir_context_type context_type,
         break;
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_MOLD:
-    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:
         dx_log_context (parent, "attempted to add context of unknown type( %d )", context_type);
         status = DISIR_STATUS_INVALID_ARGUMENT;
@@ -385,9 +380,8 @@ dc_finalize (struct disir_context **context)
         break;
     case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_FREE_TEXT:
         dx_crash_and_burn ("Context %s made to to switch it should never reach",
-                dc_context_type_string (*context));
+                            dc_context_type_string (*context));
         break;
     case DISIR_CONTEXT_KEYVAL:
         status = dx_keyval_finalize (*context);

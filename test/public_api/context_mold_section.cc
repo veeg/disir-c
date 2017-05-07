@@ -113,12 +113,6 @@ TEST_F (MoldSectionTest, begin_default_shall_fail)
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
 }
 
-TEST_F (MoldSectionTest, begin_free_text_shall_fail)
-{
-    status = dc_begin (context_section, DISIR_CONTEXT_FREE_TEXT, &context);
-    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
-}
-
 TEST_F (MoldSectionTest, begin_mold_shall_fail)
 {
     status = dc_begin (context_section, DISIR_CONTEXT_MOLD, &context);

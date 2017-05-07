@@ -141,17 +141,6 @@ TEST_F (ContextDefaultEmptyTest, DISABLED_default_begin_wrong_context_restrictio
     dx_context_destroy (&invalid);
 }
 
-TEST_F (ContextDefaultEmptyTest, default_begin_wrong_context_free_text)
-{
-    invalid = dx_context_create (DISIR_CONTEXT_FREE_TEXT);
-    ASSERT_TRUE (invalid != NULL);
-
-    status = dx_default_begin (invalid, &context);
-    ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
-
-    dx_context_destroy (&invalid);
-}
-
 TEST_F (ContextDefaultEmptyTest, default_begin_correct_context_keyval_invalid_root_context)
 {
     // Root context is not defined here (NULL)

@@ -23,7 +23,6 @@ const char *disir_context_type_string[] = {
     "DOCUMENTATION",
     "DEFAULT",
     "RESTRICTION",
-    "FREE TEXT",
     "UNKNOWN",
 };
 
@@ -126,9 +125,8 @@ uint32_t
 dx_context_type_is_toplevel (enum disir_context_type context_type)
 {
     if (
-        context_type == DISIR_CONTEXT_CONFIG    ||
-        context_type == DISIR_CONTEXT_MOLD      ||
-        context_type == DISIR_CONTEXT_FREE_TEXT
+        context_type == DISIR_CONTEXT_CONFIG ||
+        context_type == DISIR_CONTEXT_MOLD
        )
     {
         return 1;
@@ -532,9 +530,6 @@ dc_get_value_type (struct disir_context *context, enum disir_value_type *type)
         break;
     case DISIR_CONTEXT_KEYVAL:
         *type = context->cx_keyval->kv_value.dv_type;
-        break;
-    case DISIR_CONTEXT_FREE_TEXT:
-        *type = context->cx_value->dv_type;
         break;
     default:
         log_debug_context (0, context, "invoked but does not contain/handle type");

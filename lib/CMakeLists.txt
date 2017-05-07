@@ -68,7 +68,6 @@ set (_LIBDISIR_SOURCES
     "context_section.c"
     "context_documentation.c"
     "context_value.c"
-    "context_free_text.c"
     "context_restriction.c"
     "collection.c"
     "element_storage.c"

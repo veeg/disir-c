@@ -30,7 +30,6 @@ enum disir_context_type
     DISIR_CONTEXT_DOCUMENTATION,
     DISIR_CONTEXT_DEFAULT,
     DISIR_CONTEXT_RESTRICTION,
-    DISIR_CONTEXT_FREE_TEXT,
 
     //! Sentinel context - not a valid context.
     DISIR_CONTEXT_UNKNOWN, // Must be last entry in enumeration
@@ -201,18 +200,6 @@ enum disir_status dc_get_name (struct disir_context *context,
 //!
 enum disir_status
 dc_resolve_root_name (struct disir_context *context, char **output);
-
-//! \brief Construct a FREE_TEXT context to store a string
-//!
-//! Creates a free-standing context which holds a string value.
-//! The context is freed by the first dc_putcontext() invoked on it.
-//!
-//! \param[in] text String value to store in the allocated context
-//! \param[out] context Allocated context to store the string.
-//!
-//! \return DISIR_STATUS_OK on success.
-//!
-enum disir_status dc_free_text_create (const char *text, struct disir_context **context);
 
 // TODO: Find a proper place for this structure.
 //! XXX: Very simple container. Only a list of allocated strings.

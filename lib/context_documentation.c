@@ -64,7 +64,6 @@ dx_documentation_add (struct disir_context *parent, struct disir_documentation *
     case DISIR_CONTEXT_CONFIG:
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_DOCUMENTATION:
-    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:
     {
         // These types do not accept a documentation entry
@@ -131,7 +130,6 @@ dx_documentation_numentries (struct disir_context *context)
     case DISIR_CONTEXT_DEFAULT:
     case DISIR_CONTEXT_RESTRICTION:
     case DISIR_CONTEXT_DOCUMENTATION:
-    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:
     {
         // These types do not accept a documentation entry

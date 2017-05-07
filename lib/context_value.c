@@ -88,7 +88,6 @@ set_value_input_check (struct disir_context *context, enum disir_value_type type
     status = CONTEXT_TYPE_CHECK (context,
                                  DISIR_CONTEXT_DEFAULT,
                                  DISIR_CONTEXT_DOCUMENTATION,
-                                 DISIR_CONTEXT_FREE_TEXT,
                                  DISIR_CONTEXT_KEYVAL);
     if (status != DISIR_STATUS_OK)
     {
@@ -123,10 +122,6 @@ set_value_input_check (struct disir_context *context, enum disir_value_type type
     else if (dc_context_type (context) == DISIR_CONTEXT_DOCUMENTATION)
     {
         *storage = &context->cx_documentation->dd_value;
-    }
-    else if (dc_context_type (context) == DISIR_CONTEXT_FREE_TEXT)
-    {
-        *storage = context->cx_value;
     }
     else
     {
@@ -345,7 +340,7 @@ dc_get_value (struct disir_context *context, int32_t output_buffer_size,
         goto error;
     }
 
-    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL, DISIR_CONTEXT_FREE_TEXT);
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
     if (status != DISIR_STATUS_OK)
     {
         dx_log_context (context, "cannot get value from context type");
@@ -364,11 +359,6 @@ dc_get_value (struct disir_context *context, int32_t output_buffer_size,
         }
         status = dx_value_stringify (&context->cx_keyval->kv_value,
                                      output_buffer_size, output, output_size);
-        break;
-    }
-    case DISIR_CONTEXT_FREE_TEXT:
-    {
-        status = dx_value_stringify (context->cx_value, output_buffer_size, output, output_size);
         break;
     }
     default:
@@ -441,7 +431,6 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
     status = CONTEXT_TYPE_CHECK (context,
                                  DISIR_CONTEXT_KEYVAL,
                                  DISIR_CONTEXT_DOCUMENTATION,
-                                 DISIR_CONTEXT_FREE_TEXT,
                                  DISIR_CONTEXT_DEFAULT);
     if (status != DISIR_STATUS_OK)
     {
@@ -488,11 +477,6 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
     case DISIR_CONTEXT_DOCUMENTATION:
     {
         status = dx_value_get_string (&context->cx_documentation->dd_value, output, size);
-        break;
-    }
-    case DISIR_CONTEXT_FREE_TEXT:
-    {
-        status = dx_value_get_string (context->cx_value, output, size);
         break;
     }
     case DISIR_CONTEXT_DEFAULT:

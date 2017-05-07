@@ -165,7 +165,6 @@ MoldWriter::serialize_attributes (struct disir_context *context, Json::Value& cu
     }
     case DISIR_CONTEXT_MOLD:
     case DISIR_CONTEXT_CONFIG:
-    case DISIR_CONTEXT_FREE_TEXT:
     case DISIR_CONTEXT_UNKNOWN:
     case DISIR_CONTEXT_DOCUMENTATION:
         break;
