@@ -89,7 +89,7 @@ dc_collection_next (struct disir_collection *collection, struct disir_context **
     if (collection->cc_iterator_index > collection->cc_numentries - 1)
     {
         log_debug (9, "Collection iterator( %d ) exhausted (numentires: %d)",
-                collection->cc_iterator_index, collection->cc_numentries - 1);
+                   collection->cc_iterator_index, collection->cc_numentries - 1);
         return DISIR_STATUS_EXHAUSTED;
     }
 
@@ -122,7 +122,7 @@ dc_collection_reset (struct disir_collection *collection)
 
 //! INTERNAL API
 enum disir_status
-dx_collection_coalesce(struct disir_collection *collection)
+dx_collection_coalesce (struct disir_collection *collection)
 {
     struct disir_context *context;
     int32_t index;
@@ -141,7 +141,7 @@ dx_collection_coalesce(struct disir_collection *collection)
     probe = 1;
     invalid_entries_count = 0;
     iterator_moveback = 0;
-    while(index < collection->cc_numentries)
+    while (index < collection->cc_numentries)
     {
         context = collection->cc_collection[index];
         index++;
@@ -247,7 +247,7 @@ dc_collection_finished (struct disir_collection **collection)
     return DISIR_STATUS_OK;
 }
 
-//! INTERNAL API
+//! PUBLIC API
 enum disir_status
 dc_collection_push_context (struct disir_collection *collection, struct disir_context *context)
 {
