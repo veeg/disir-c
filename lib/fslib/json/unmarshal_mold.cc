@@ -82,7 +82,7 @@ MoldReader::construct_mold (struct disir_mold **mold)
     }
 
     status = _unmarshal_mold (context_mold, m_moldRoot[ATTRIBUTE_KEY_MOLD]);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         goto error;
     }
