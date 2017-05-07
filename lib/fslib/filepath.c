@@ -5,8 +5,8 @@
 
 //! FSLIB API
 enum disir_status
-fslib_resolve_filepath (struct disir_instance *instance, struct disir_plugin *plugin,
-                        const char *entry_id, char *filepath)
+fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_plugin *plugin,
+                               const char *entry_id, char *filepath)
 {
     int res;
 
@@ -15,6 +15,27 @@ fslib_resolve_filepath (struct disir_instance *instance, struct disir_plugin *pl
 
     res = snprintf (filepath, PATH_MAX, "%s/%s.%s",
                      plugin->dp_config_base_id, entry_id, plugin->dp_config_entry_type);
+
+    if (res >= PATH_MAX)
+    {
+        return DISIR_STATUS_INSUFFICIENT_RESOURCES;
+    }
+
+    return DISIR_STATUS_OK;
+}
+
+//! FSLIB API
+enum disir_status
+fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_plugin *plugin,
+                             const char *entry_id, char *filepath)
+{
+    int res;
+
+    // QUESTION: Dis-allow access to only '/' query?
+    // QUESTION: Dis-allow access to queries starting with /? That is reserved right?
+
+    res = snprintf (filepath, PATH_MAX, "%s/%s.%s",
+                     plugin->dp_mold_base_id, entry_id, plugin->dp_mold_entry_type);
 
     if (res >= PATH_MAX)
     {

@@ -30,7 +30,7 @@ dio_json_config_entries (struct disir_instance *instance,
                          struct disir_plugin *plugin,
                          struct disir_entry **entries)
 {
-    return fslib_query_entries (instance, plugin, NULL, entries);
+    return fslib_config_query_entries (instance, plugin, NULL, entries);
 }
 
 //! PLUGIN API
@@ -49,7 +49,8 @@ dio_json_mold_read (struct disir_instance *instance,
                     struct disir_plugin *plugin, const char *entry_id,
                     struct disir_mold **mold)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    return fslib_plugin_mold_read (instance, plugin, entry_id, mold,
+                                   dio_json_unserialize_mold);
 }
 
 //! PLUGIN API
@@ -58,7 +59,8 @@ dio_json_mold_write (struct disir_instance *instance,
                      struct disir_plugin *plugin, const char *entry_id,
                      struct disir_mold *mold)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    return fslib_plugin_mold_write (instance, plugin, entry_id,
+                                    mold, dio_json_serialize_mold);
 }
 
 //! PLUGIN API
@@ -67,7 +69,7 @@ dio_json_mold_entries (struct disir_instance *instance,
                        struct disir_plugin *plugin,
                        struct disir_entry **entries)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    return fslib_mold_query_entries (instance, plugin, NULL, entries);
 }
 
 //! PLUGIN API
@@ -77,6 +79,6 @@ dio_json_mold_query (struct disir_instance *instance,
                      const char *entry_id,
                      struct disir_entry **entry)
 {
-    return DISIR_STATUS_INTERNAL_ERROR;
+    return fslib_plugin_mold_query (instance, plugin, entry_id, entry);
 }
 

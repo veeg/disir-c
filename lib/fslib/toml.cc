@@ -29,7 +29,7 @@ dio_toml_config_entries (struct disir_instance *instance,
                          struct disir_plugin *plugin,
                          struct disir_entry **entries)
 {
-    return fslib_query_entries (instance, plugin, NULL, entries);
+    return fslib_config_query_entries (instance, plugin, NULL, entries);
 }
 
 // PLUGIN API
