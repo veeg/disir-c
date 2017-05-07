@@ -5,11 +5,53 @@
 extern "C"{
 #endif // __cplusplus
 
-#include <disir/context.h>
 
 //!
 //! This file exposes the low level Disir Config Context API.
 //!
+
+
+//! \brief Retrieve the context associated with an already constructed disir_config.
+//!
+//! This context may be used to manipulate or query the config object.
+//!
+//! \return NULL if config is NULL.
+//! \return context of type DISIR_CONTEXT_CONFIG.
+//!
+struct disir_context *
+dc_config_getcontext (struct disir_config *config);
+
+//! \brief Get the version number of this config.
+//!
+//! \param[in] config Input mold to retrieve semver for
+//! \param[out] semver Output structure populated with the semver of config.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if config or semver are NULL
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_config_get_version (struct disir_config *config, struct semantic_version *semver);
+
+//! \brief Begin construction of a CONFIG context based on the passed mold.
+//!
+//! \param[in] mold Input mold that this CONFIG object shall represent.
+//! \param[out] config Output CONFIG context object.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status dc_config_begin (struct disir_mold *mold, struct disir_context **config);
+
+//! \brief Finalize the construction of a DISIR_CONTEXT_CONFIG
+//!
+//! \param[in,out] context A CONFIG context to finalize. Will be sat to NULL on success.
+//! \param[out] config The CONFIG object to populated on success.
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if input context is not of type CONFIG.
+//! \return DISIR_STATUS_INVALID_CONTEXT if any part of the context is not valid.
+//! \return DISIR_STATUS_OK on success
+//!
+enum disir_status dc_config_finalize (struct disir_context **context,
+                                      struct disir_config **config);
 
 //! \brief Query the context for a heirarchical string keyval child.
 //!

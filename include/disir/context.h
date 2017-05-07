@@ -41,6 +41,7 @@ enum disir_context_type
 #include <disir/disir.h>
 #include <disir/collection.h>
 #include <disir/context/config.h>
+#include <disir/context/mold.h>
 #include <disir/context/restriction.h>
 #include <disir/context/value.h>
 #include <disir/context/version.h>
@@ -588,81 +589,6 @@ enum disir_status dc_add_keyval_boolean (struct disir_context *parent,
                                          const char *doc,
                                          struct semantic_version *semver,
                                          struct disir_context **output);
-
-//
-// Config related context API
-//
-
-//! \brief Retrieve the context associated with an already constructed disir_config.
-//!
-//! This context may be used to manipulate or query the config object.
-//!
-//! \return context of type DISIR_CONTEXT_CONFIG
-//!
-struct disir_context * dc_config_getcontext (struct disir_config *config);
-
-//! \brief Get the version number of this config.
-//!
-//! \param[in] config Input mold to retrieve semver for
-//! \param[out] semver Output structure populated with the semver of config.
-//!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if config or semver are NULL
-//! \return DISIR_STATUS_OK on success.
-//!
-enum disir_status
-dc_config_get_version (struct disir_config *config, struct semantic_version *semver);
-
-
-//! \brief Begin construction of a CONFIG context based on the passed mold.
-//!
-//! \param[in] mold Input mold that this CONFIG object shall represent.
-//! \param[out] config Output CONFIG context object.
-//!
-//! \return DISIR_STATUS_OK on success
-//!
-enum disir_status dc_config_begin (struct disir_mold *mold, struct disir_context **config);
-
-//! \brief Finalize the construction of a DISIR_CONTEXT_CONFIG
-//!
-//! \param[in,out] context A CONFIG context to finalize. Will be sat to NULL on success.
-//! \param[out] config The CONFIG object to populated on success.
-//!
-//! \return DISIRSTATUS_WRONG_CONTEXT if input context is not of type CONFIG.
-//! \return DISIR_STATUS_OK on success
-//!
-enum disir_status dc_config_finalize (struct disir_context **context,
-                                      struct disir_config **config);
-
-//
-// Schema related context API
-//
-
-//! Retrieve the context associated with an already constructed disir_mold.
-//! This context may be used to manipulate or query the mold object.
-struct disir_context * dc_mold_getcontext (struct disir_mold *mold);
-
-//! \brief Get the version number of this mold.
-//!
-//! \param[in] mold Input mold to retrieve semver for
-//! \param[out] semver Output structure populated with the semver of mold.
-//!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if mold or semver are NULL
-//! \return DISIR_STATUS_OK on success.
-//!
-enum disir_status
-dc_mold_get_version (struct disir_mold *mold, struct semantic_version *semver);
-
-//! Construct the DISIR_CONTEXT_MOLD
-enum disir_status dc_mold_begin (struct disir_context **mold);
-
-//! Finalize the construction of a DISIR_CONTEXT_MOLD, returning
-//! an allocated disir_mold object in the output parameter.
-//! If any unfinalized descendant contexts exists,
-//! DISIR_STATUS_CONTEXT_IN_WRONG_STATE will be returned.
-//! If the context supplied is not of type DISIR_CONTEXT_MOLD,
-//! status DISIR_STATUS_WRONG_CONTEXT will be returned.
-//! On success, DISIR_STATUS_OK is returned.
-enum disir_status dc_mold_finalize (struct disir_context **context, struct disir_mold **mold);
 
 //! \brief Construct a FREE_TEXT context to store a string
 //!
