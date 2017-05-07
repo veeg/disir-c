@@ -693,6 +693,7 @@ dx_validate_context (struct disir_context *context)
     if (context->CONTEXT_STATE_FATAL)
     {
         log_debug_context (1, context, "in fatal state - not valid");
+        context->CONTEXT_STATE_INVALID = 1;
         status = DISIR_STATUS_FATAL_CONTEXT;
         if (context->CONTEXT_STATE_CONSTRUCTING)
         {
