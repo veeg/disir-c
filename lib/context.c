@@ -124,9 +124,14 @@ context_remove_from_parent (struct disir_context **context)
         storage = (*context)->cx_parent_context->cx_mold->mo_elements;
         break;
     }
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        // The context here is a restriction - ignore
+        break;
+    }
     default:
     {
-        log_warn ("Unhandled context type for STATE_IN_PARENT: %s",
+        log_warn ("Unhandled context type for parent element container: %s",
                   dc_context_type_string ((*context)->cx_parent_context));
     }
     }
@@ -143,10 +148,15 @@ context_remove_from_parent (struct disir_context **context)
         name = (*context)->cx_section->se_name.dv_string;
         break;
     }
+    case DISIR_CONTEXT_RESTRICTION:
+    {
+        // Ignore - parent has no element storage of restrictions.
+        break;
+    }
     default:
     {
-        log_warn ("Unhandled context type for STATE_IN_PARENT: %s",
-                  dc_context_type_string ((*context)->cx_parent_context));
+        log_warn ("Unhandled context type to remove element from parent: %s",
+                  dc_context_type_string (*context));
     }
     }
 
@@ -207,6 +217,9 @@ dc_destroy (struct disir_context **context)
         // Already logged.
         return status;
     }
+
+
+    TRACE_ENTER ("%p", *context);
 
     // If context is destroyed, decrement and get-out-of-town
     if ((*context)->CONTEXT_STATE_DESTROYED)
@@ -271,6 +284,7 @@ dc_destroy (struct disir_context **context)
     // Take care of the users pointer. As an added service!
     *context = NULL;
 
+    TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
 

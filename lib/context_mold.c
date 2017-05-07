@@ -110,7 +110,7 @@ dc_mold_finalize (struct disir_context **context, struct disir_mold **mold)
         status = DISIR_STATUS_INTERNAL_ERROR;
     }
 
-    TRACE_EXIT ("*mold: %p", mold);
+    TRACE_EXIT ("status: %s, *mold: %p", disir_status_string (status), mold);
     return status;
 }
 

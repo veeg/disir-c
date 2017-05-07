@@ -56,6 +56,13 @@ disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plu
     PLUGIN_STRING_MEMBER_COPY (dp_config_entry_type);
     PLUGIN_STRING_MEMBER_COPY (dp_mold_entry_type);
 
+    log_info ("[register plugin] name: %s", internal->pi_plugin.dp_name);
+    log_info ("[register plugin] description: %s", internal->pi_plugin.dp_description);
+    log_info ("[register plugin] config_base_id: %s", internal->pi_plugin.dp_config_base_id);
+    log_info ("[register plugin] config_entry_type: %s", internal->pi_plugin.dp_config_entry_type);
+    log_info ("[register plugin] mold_base_id: %s", internal->pi_plugin.dp_mold_base_id);
+    log_info ("[register plugin] mold_entry_type: %s", internal->pi_plugin.dp_mold_entry_type);
+
     MQ_PUSH (instance->dio_plugin_queue, internal);
 
     return DISIR_STATUS_OK;
