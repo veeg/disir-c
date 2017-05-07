@@ -173,6 +173,10 @@ struct disir_plugin
     //! The base identifier used to resolve config entries.
     char            *dp_config_base_id;
 
+    //! Populated by disir.
+    //! The base identifier used to resolve mold entries.
+    char            *dp_mold_base_id;
+
     plugin_finished dp_plugin_finished;
 
     config_read     dp_config_read;

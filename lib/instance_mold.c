@@ -77,6 +77,14 @@ disir_libdisir_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
+    status = dc_add_keyval_string (context_section, "mold_base_id", "/etc/disir/configs",
+                                   "The base identifier used to resolve mold entries." \
+                                   " For filesystem based plugins, this will be the base" \
+                                   " directory path where mold definition entries are located.",
+                                   NULL, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
     status = dc_add_keyval_string (context_section, "plugin_filepath", "/usr/lib/disir/plugins/",
                                    "Filepath to specified I/O plugin shared library", NULL, NULL);
     if (status != DISIR_STATUS_OK)

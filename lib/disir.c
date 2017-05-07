@@ -23,7 +23,7 @@
 //! INTERNAL STATIC
 static enum disir_status
 load_plugin (struct disir_instance *instance, const char *plugin_filepath, const char *io_id,
-             const char *group_id, const char *config_base_id)
+             const char *group_id, const char *config_base_id, const char *mold_base_id)
 {
     enum disir_status status;
     void *handle;
@@ -54,7 +54,10 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
     // Populate the plugin object
     memset (&plugin, 0, sizeof (struct disir_plugin));
 
-    plugin.dp_config_base_id = strndup (config_base_id, 512);
+    if (config_base_id)
+        plugin.dp_config_base_id = strndup (config_base_id, 512);
+    if (mold_base_id)
+        plugin.dp_mold_base_id = strndup (mold_base_id, 512);
 
     status = dio_reg (instance, &plugin);
     if (status != DISIR_STATUS_OK)
@@ -65,6 +68,7 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
         goto error;
     }
 
+    // XXX: We are not exposing the config/mold_base_id to the public API - we should do this.
     status = disir_plugin_register (instance, &plugin, io_id, group_id);
     if (status != DISIR_STATUS_OK)
     {
@@ -107,6 +111,7 @@ load_plugins_from_config (struct disir_instance *instance, struct disir_config *
     const char *group_id;
     const char *io_id;
     const char *config_base_id;
+    const char *mold_base_id;
     int plugin_num;
 
     context = NULL;
@@ -134,11 +139,13 @@ load_plugins_from_config (struct disir_instance *instance, struct disir_config *
         group_id = NULL;
         io_id = NULL;
         config_base_id = NULL;
+        mold_base_id = NULL;
 
         dc_config_get_keyval_string (plugin, &plugin_filepath, "plugin_filepath");
         dc_config_get_keyval_string (plugin, &group_id, "group_id");
         dc_config_get_keyval_string (plugin, &io_id, "io_id");
         dc_config_get_keyval_string (plugin, &config_base_id, "config_base_id");
+        dc_config_get_keyval_string (plugin, &mold_base_id, "mold_base_id");
 
         // Check required keyvals to register plugin
         if (plugin_filepath == NULL || *plugin_filepath == '\0')
@@ -161,7 +168,9 @@ load_plugins_from_config (struct disir_instance *instance, struct disir_config *
         }
 
         // config_base_id may be optional to some plugins.
-        status = load_plugin (instance, plugin_filepath, io_id, group_id, config_base_id);
+        // mold_base_id may be optional to some plugins.
+        status = load_plugin (instance, plugin_filepath, io_id, group_id,
+                              config_base_id, mold_base_id);
         if (status != DISIR_STATUS_OK)
         {
             goto error;
