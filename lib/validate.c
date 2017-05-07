@@ -494,6 +494,46 @@ validate_restriction (struct disir_context *context)
 }
 
 //! STATIC API
+static enum disir_status
+validate_name (struct disir_context *context)
+{
+    enum disir_status status;
+    const char *name;
+    const char *c;
+
+    status = dc_get_name (context, &name, NULL);
+    if (status != DISIR_STATUS_OK)
+        return status;
+
+    // Deny names that are not a-z or _
+    c = name;
+    while (*c)
+    {
+        if (*c >= 'a' && *c <= 'z')
+        {
+            c++;
+            continue;
+        }
+        if (*c == '_')
+        {
+            c++;
+            continue;
+        }
+        if (*c >= '0' && *c <= '9')
+        {
+            c++;
+            continue;
+        }
+
+        status = DISIR_STATUS_RESTRICTION_VIOLATED;
+        dx_log_context (context, "name contains invalid character '%c'.", *c);
+        break;
+    }
+
+    return status;
+}
+
+//! STATIC API
 //!
 //! Check various conditions on the input context. Return codes indicate
 //! the nature of its invalidity. Will also check validity of child contexts.
@@ -540,10 +580,13 @@ validate_context_validity (struct disir_context *context)
     }
     case DISIR_CONTEXT_SECTION:
     {
+        invalid = validate_name (context);
+
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
             // Invoke config operation
-            invalid = validate_config_section (context);
+            status = validate_config_section (context);
+            invalid = (invalid != DISIR_STATUS_OK ? invalid : status);
         }
         else
         {
@@ -597,19 +640,23 @@ validate_context_validity (struct disir_context *context)
     }
     case DISIR_CONTEXT_KEYVAL:
     {
+        invalid = validate_name (context);
+
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
             // Invoke config operation
-            invalid = validate_config_keyval (context);
+            status = validate_config_keyval (context);
+            invalid = (invalid != DISIR_STATUS_OK ? invalid : status);
         }
         else if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_MOLD)
         {
             // Invoke mold operation
             // Cannot add without known type.
-            if (dx_value_type_sanify(context->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN)
+            if (invalid == DISIR_STATUS_OK &&
+                dx_value_type_sanify (context->cx_keyval->kv_value.dv_type) == DISIR_VALUE_TYPE_UNKNOWN)
             {
                 dx_log_context (context, "Missing type component for keyval.");
-                invalid = DISIR_STATUS_WRONG_VALUE_TYPE;;
+                invalid = DISIR_STATUS_WRONG_VALUE_TYPE;
             }
 
             // Additional restrictions apply for keyvals added to a root mold
