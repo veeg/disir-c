@@ -142,7 +142,7 @@ disir_mold_write (struct disir_instance *instance, const char *group_id,
     {
         if (plugin->pi_plugin.dp_mold_write)
         {
-            status = plugin->pi_plugin.dp_mold_write (instance, plugin->pi_plugin.dp_storage,
+            status = plugin->pi_plugin.dp_mold_write (instance, &plugin->pi_plugin,
                                                       entry_id, mold);
         }
         else
@@ -212,7 +212,7 @@ disir_mold_entries (struct disir_instance *instance,
             continue;
         }
 
-        status = entry->pi_plugin.dp_mold_entries (instance, entry->pi_plugin.dp_storage, &query);
+        status = entry->pi_plugin.dp_mold_entries (instance, &entry->pi_plugin, &query);
         if (status != DISIR_STATUS_OK)
         {
             log_debug (1, "Plugin '%s' queried for mold entries failed with status: %s",
