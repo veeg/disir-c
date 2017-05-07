@@ -32,8 +32,9 @@ struct semantic_version
 //! \return NULL if buffer is of insufficient size.
 //! \return buffer when the full string represention was populated into the buffer.
 //!
-char * dc_semantic_version_string (char *buffer, int32_t buffer_size,
-                                   struct semantic_version *semver);
+char *
+dc_semantic_version_string (char *buffer, int32_t buffer_size,
+                            struct semantic_version *semver);
 
 //! \brief Extract a semantic version number from input string and populate the output semver.
 //!
@@ -47,7 +48,8 @@ char * dc_semantic_version_string (char *buffer, int32_t buffer_size,
 //!     with the values it has already detected and parsed.
 //! \return DISRI_STATUS_OK on success
 //!
-enum disir_status dc_semantic_version_convert (const char *input, struct semantic_version *semver);
+enum disir_status
+dc_semantic_version_convert (const char *input, struct semantic_version *semver);
 
 //! \brief Populate the destination semver with the values of source semver
 //!
