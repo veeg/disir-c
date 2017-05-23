@@ -7,14 +7,6 @@ project (disir VERSION 0.1.0 LANGUAGES C CXX)
 include (CMakePackageConfigHelpers)
 include (GNUInstallDirs)
 
-add_custom_target (dist ALL
-  COMMAND git archive HEAD
-    -o ${PROJECT_NAME}-${PROJECT_VERSION}.tar.gz
-    --prefix=${PROJECT_NAME}-${PROJECT_VERSION}/
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  COMMENT "Creating repository tar.gz"
-)
-
 add_subdirectory (lib)
 add_subdirectory (plugins)
 add_subdirectory (doc)
