@@ -7,7 +7,7 @@
 //! PLUGIN API
 enum disir_status
 dio_json_config_read (struct disir_instance *instance,
-                      struct disir_plugin *plugin, const char *entry_id,
+                      struct disir_register_plugin *plugin, const char *entry_id,
                       struct disir_mold *mold, struct disir_config **config)
 {
     return fslib_plugin_config_read (instance, plugin, entry_id, mold,
@@ -17,7 +17,7 @@ dio_json_config_read (struct disir_instance *instance,
 //! PLUGIN API
 enum disir_status
 dio_json_config_write (struct disir_instance *instance,
-                       struct disir_plugin *plugin, const char *entry_id,
+                       struct disir_register_plugin *plugin, const char *entry_id,
                        struct disir_config *config)
 {
     return fslib_plugin_config_write (instance, plugin, entry_id,
@@ -27,7 +27,7 @@ dio_json_config_write (struct disir_instance *instance,
 //! PLUGIN API
 enum disir_status
 dio_json_config_entries (struct disir_instance *instance,
-                         struct disir_plugin *plugin,
+                         struct disir_register_plugin *plugin,
                          struct disir_entry **entries)
 {
     return fslib_config_query_entries (instance, plugin, NULL, entries);
@@ -36,7 +36,7 @@ dio_json_config_entries (struct disir_instance *instance,
 //! PLUGIN API
 enum disir_status
 dio_json_config_query (struct disir_instance *instance,
-                       struct disir_plugin *plugin,
+                       struct disir_register_plugin *plugin,
                        const char *entry_id,
                        struct disir_entry **entry)
 {
@@ -46,7 +46,7 @@ dio_json_config_query (struct disir_instance *instance,
 //! PLUGIN API
 enum disir_status
 dio_json_mold_read (struct disir_instance *instance,
-                    struct disir_plugin *plugin, const char *entry_id,
+                    struct disir_register_plugin *plugin, const char *entry_id,
                     struct disir_mold **mold)
 {
     return fslib_plugin_mold_read (instance, plugin, entry_id, mold,
@@ -56,7 +56,7 @@ dio_json_mold_read (struct disir_instance *instance,
 //! PLUGIN API
 enum disir_status
 dio_json_mold_write (struct disir_instance *instance,
-                     struct disir_plugin *plugin, const char *entry_id,
+                     struct disir_register_plugin *plugin, const char *entry_id,
                      struct disir_mold *mold)
 {
     return fslib_plugin_mold_write (instance, plugin, entry_id,
@@ -66,7 +66,7 @@ dio_json_mold_write (struct disir_instance *instance,
 //! PLUGIN API
 enum disir_status
 dio_json_mold_entries (struct disir_instance *instance,
-                       struct disir_plugin *plugin,
+                       struct disir_register_plugin *plugin,
                        struct disir_entry **entries)
 {
     return fslib_mold_query_entries (instance, plugin, NULL, entries);
@@ -75,7 +75,7 @@ dio_json_mold_entries (struct disir_instance *instance,
 //! PLUGIN API
 enum disir_status
 dio_json_mold_query (struct disir_instance *instance,
-                     struct disir_plugin *plugin,
+                     struct disir_register_plugin *plugin,
                      const char *entry_id,
                      struct disir_entry **entry)
 {

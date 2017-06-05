@@ -61,7 +61,7 @@ fslib_namespace_entry (const char *name, char *namespace_entry);
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_register_plugin *plugin,
                                const char *entry_id, char *filepath);
 
 //! \brief Resolve entry_id to plugin filepath for mold.
@@ -73,7 +73,7 @@ fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_plu
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_register_plugin *plugin,
                              const char *entry_id, char *filepath);
 
 //! \brief Resolve the complete mold entry for entry_id.
@@ -87,7 +87,7 @@ fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_plugi
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_register_plugin *plugin,
                              const char *entry_id, char *filepath,
                              struct stat *statbuf, int *namespace_entry);
 
@@ -107,48 +107,48 @@ fslib_stat_filepath (struct disir_instance *instance,
 //! \return DISIR_STATUS_OK regardless of query operation
 //!
 enum disir_status
-fslib_config_query_entries (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_config_query_entries (struct disir_instance *instance, struct disir_register_plugin *plugin,
                             const char *basedir, struct disir_entry **entries);
 
 //! \brief Generic recursive query implementation of mold_entries
 enum disir_status
-fslib_mold_query_entries (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_mold_query_entries (struct disir_instance *instance, struct disir_register_plugin *plugin,
                           const char *basedir, struct disir_entry **entries);
 
 //! \brief Generic filesystem based implementation of config_read
 enum disir_status
 fslib_plugin_config_read (struct disir_instance *instance,
-                          struct disir_plugin *plugin, const char *entry_id,
+                          struct disir_register_plugin *plugin, const char *entry_id,
                           struct disir_mold *mold, struct disir_config **config,
                           dio_unserialize_config func_unserialize);
 
 //! \brief Generic filesystem based implementation of mold_read
 enum disir_status
 fslib_plugin_mold_read (struct disir_instance *instance,
-                        struct disir_plugin *plugin, const char *entry_id,
+                        struct disir_register_plugin *plugin, const char *entry_id,
                         struct disir_mold **mold,
                         dio_unserialize_mold func_unserialize);
 
 //! \brief Generic filesystem based implementation of config_write
 enum disir_status
-fslib_plugin_config_write (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_plugin_config_write (struct disir_instance *instance, struct disir_register_plugin *plugin,
                            const char *entry_id, struct disir_config *config,
                            dio_serialize_config func_serialize);
 
 //! \brief Generic filesystem based implementation of mold_write
 enum disir_status
-fslib_plugin_mold_write (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_plugin_mold_write (struct disir_instance *instance, struct disir_register_plugin *plugin,
                          const char *entry_id, struct disir_mold *mold,
                          dio_serialize_mold func_serialize);
 
 //! \brief Generic filesystem based implementation of config_query
 enum disir_status
-fslib_plugin_config_query (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_plugin_config_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                            const char *entry_id, struct disir_entry **entry);
 
 //! \brief Generic filesystem based implementation of mold_query
 enum disir_status
-fslib_plugin_mold_query (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                          const char *entry_id, struct disir_entry **entry);
 
 

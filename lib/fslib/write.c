@@ -8,7 +8,7 @@
 
 //! FSLIB API
 enum disir_status
-fslib_plugin_config_write (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_plugin_config_write (struct disir_instance *instance, struct disir_register_plugin *plugin,
                            const char *entry_id, struct disir_config *config,
                            dio_serialize_config func_serialize)
 {
@@ -102,7 +102,7 @@ fslib_plugin_config_write (struct disir_instance *instance, struct disir_plugin 
 
 //! FSLIB API
 enum disir_status
-fslib_plugin_mold_write (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_plugin_mold_write (struct disir_instance *instance, struct disir_register_plugin *plugin,
                          const char *entry_id, struct disir_mold *mold,
                          dio_serialize_mold func_serialize)
 {

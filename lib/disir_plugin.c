@@ -18,11 +18,11 @@
 
 //! PUBLIC API
 enum disir_status
-disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plugin,
+disir_plugin_register (struct disir_instance *instance, struct disir_register_plugin *plugin,
                        const char *io_id, const char *group_id)
 {
     enum disir_status status;
-    struct disir_plugin_internal *internal;
+    struct disir_register_plugin_internal *internal;
 
     internal = NULL;
 
@@ -35,7 +35,7 @@ disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plu
 
     // TODO: Check version compatibility
 
-    internal = calloc (1, sizeof (struct disir_plugin_internal));
+    internal = calloc (1, sizeof (struct disir_register_plugin_internal));
     if (internal == NULL)
     {
         status = DISIR_STATUS_NO_MEMORY;

@@ -3,7 +3,7 @@
 
 
 extern "C" enum disir_status
-dio_register_plugin (struct disir_instance *instance, struct disir_plugin *plugin)
+dio_register_plugin (struct disir_instance *instance, struct disir_register_plugin *plugin)
 {
     plugin->dp_name = (char *) "TOML";
     plugin->dp_description = (char *) "A TOML config, JSON mold, filesystem based plugin";

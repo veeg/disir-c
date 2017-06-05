@@ -9,15 +9,15 @@ extern "C"{
 #include <stdlib.h>
 
 // Forward declare structure for typedef's below
-struct disir_plugin;
+struct disir_register_plugin;
 
 //! \brief Function signature for plugin to implement to register with Disir instance.
 typedef enum disir_status (*plugin_register) (struct disir_instance *instance,
-                                              struct disir_plugin *plugin);
+                                              struct disir_register_plugin *plugin);
 
 //! \brief Function signature for plugin to implement to cleanup loaded plugin state.
 typedef enum disir_status (*plugin_finished) (struct disir_instance *instance,
-                                              struct disir_plugin *plugin);
+                                              struct disir_register_plugin *plugin);
 
 
 //! \brief Function signature for plugin to implement reading config object.
@@ -35,7 +35,7 @@ typedef enum disir_status (*plugin_finished) (struct disir_instance *instance,
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*config_read) (struct disir_instance *instance,
-                                          struct disir_plugin *plugin,
+                                          struct disir_register_plugin *plugin,
                                           const char *entry_id,
                                           struct disir_mold *mold,
                                           struct disir_config **config);
@@ -50,7 +50,7 @@ typedef enum disir_status (*config_read) (struct disir_instance *instance,
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*config_write) (struct disir_instance *instance,
-                                           struct disir_plugin *plugin,
+                                           struct disir_register_plugin *plugin,
                                            const char *entry_id,
                                            struct disir_config *config);
 
@@ -66,7 +66,7 @@ typedef enum disir_status (*config_write) (struct disir_instance *instance,
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*config_entries) (struct disir_instance *instance,
-                                             struct disir_plugin *plugin,
+                                             struct disir_register_plugin *plugin,
                                              struct disir_entry **entries);
 
 //! \brief Function signature for plugin to implement querying of config entry's existence.
@@ -81,7 +81,7 @@ typedef enum disir_status (*config_entries) (struct disir_instance *instance,
 //! \return DISIR_STATUS_EXISTS if `entry_id` config is provided by plugin.
 //!
 typedef enum disir_status (*config_query) (struct disir_instance *instance,
-                                           struct disir_plugin *plugin,
+                                           struct disir_register_plugin *plugin,
                                            const char *entry_id,
                                            struct disir_entry **entry);
 
@@ -95,7 +95,7 @@ typedef enum disir_status (*config_query) (struct disir_instance *instance,
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*mold_read) (struct disir_instance *instance,
-                                        struct disir_plugin *plugin,
+                                        struct disir_register_plugin *plugin,
                                         const char *entry_id,
                                         struct disir_mold **mold);
 
@@ -109,7 +109,7 @@ typedef enum disir_status (*mold_read) (struct disir_instance *instance,
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*mold_write) (struct disir_instance *instance,
-                                         struct disir_plugin *plugin,
+                                         struct disir_register_plugin *plugin,
                                          const char *entry_id,
                                          struct disir_mold *mold);
 
@@ -125,7 +125,7 @@ typedef enum disir_status (*mold_write) (struct disir_instance *instance,
 //! \return DISIR_STATUS_OK on success.
 //!
 typedef enum disir_status (*mold_entries) (struct disir_instance *instance,
-                                           struct disir_plugin *plugin,
+                                           struct disir_register_plugin *plugin,
                                            struct disir_entry **entries);
 
 //! \brief Function signature for plugin to implement querying of mold entry's existence.
@@ -140,13 +140,13 @@ typedef enum disir_status (*mold_entries) (struct disir_instance *instance,
 //! \return DISIR_STATUS_EXISTS if `entry_id` mold is provided by plugin.
 //!
 typedef enum disir_status (*mold_query) (struct disir_instance *instance,
-                                         struct disir_plugin *plugin,
+                                         struct disir_register_plugin *plugin,
                                          const char *entry_id,
                                          struct disir_entry **entry);
 
 
 //! Disir Plugin - Plugins populate this structure to register itself with a Disir instance.
-struct disir_plugin
+struct disir_register_plugin
 {
     //! Identify the version of libdisir this plugin is atleast compatible with.
     uint32_t        dp_major_version;
@@ -191,7 +191,7 @@ struct disir_plugin
 
 //! \brief Register plugin with the libdisir instance
 //!
-//! Plugin must provide a disir_plugin structure that is populated with all
+//! Plugin must provide a disir_register_plugin structure that is populated with all
 //! information and callback provided by plugin. The `disir` instance will deep-copy the settings
 //! provided, so it is the callers responsibility to free the input structure, and any memory
 //! dynamically allocated within it.
@@ -204,7 +204,7 @@ struct disir_plugin
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_plugin_register (struct disir_instance *instance, struct disir_plugin *plugin,
+disir_plugin_register (struct disir_instance *instance, struct disir_register_plugin *plugin,
                        const char *io_id, const char *group_id);
 
 

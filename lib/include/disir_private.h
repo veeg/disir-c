@@ -5,7 +5,7 @@
 #include <disir/plugin.h>
 
 //! Internal plugin structure
-struct disir_plugin_internal
+struct disir_register_plugin_internal
 {
     //! Allocated dl_open handler (if registerd dynamically)
     void                *pi_dl_handler;
@@ -19,16 +19,16 @@ struct disir_plugin_internal
     char                *pi_group_id;
 
     //! Copy of plugin parameters this plugin registered itself with.
-    struct disir_plugin pi_plugin;
+    struct disir_register_plugin pi_plugin;
 
-    struct disir_plugin_internal *next, *prev;
+    struct disir_register_plugin_internal *next, *prev;
 };
 
 //! \brief The main libdisir instance structure. All I/O operations requires an instance of it.
 struct disir_instance
 {
     //! Double-linked list queue loaded plugins
-    struct disir_plugin_internal    *dio_plugin_queue;
+    struct disir_register_plugin_internal    *dio_plugin_queue;
 
     //! Active configuration based of libdisir_mold
     struct disir_config             *libdisir_config;

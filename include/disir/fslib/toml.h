@@ -21,28 +21,28 @@ extern "C"{
 //!
 enum disir_status
 dio_toml_config_read (struct disir_instance *instance,
-                      struct disir_plugin *plugin, const char *entry_id,
+                      struct disir_register_plugin *plugin, const char *entry_id,
                       struct disir_mold *mold, struct disir_config **config);
 
 //! \brief TOML implementation of config_write
 //!
 enum disir_status
 dio_toml_config_write (struct disir_instance *instance,
-                       struct disir_plugin *plugin, const char *entry_id,
+                       struct disir_register_plugin *plugin, const char *entry_id,
                        struct disir_config *config);
 
 //! \brief TOML imlementation of config_entries
 //!
 enum disir_status
 dio_toml_config_entries (struct disir_instance *instance,
-                         struct disir_plugin *plugin,
+                         struct disir_register_plugin *plugin,
                          struct disir_entry **entries);
 
 //! \brief TOML imlementation of config_query
 //!
 enum disir_status
 dio_toml_config_query (struct disir_instance *instance,
-                       struct disir_plugin *plugin,
+                       struct disir_register_plugin *plugin,
                        const char *entry_id,
                        struct disir_entry **entry);
 

@@ -2,7 +2,7 @@
 #include <disir/test.h>
 
 extern "C" enum disir_status
-dio_register_plugin (struct disir_instance *instance, struct disir_plugin *plugin)
+dio_register_plugin (struct disir_instance *instance, struct disir_register_plugin *plugin)
 {
     plugin->dp_name = (char *) "test";
     plugin->dp_description = (char *) "A collection of various molds to enumerate functionality in libdisir";

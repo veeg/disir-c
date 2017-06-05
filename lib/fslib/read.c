@@ -9,7 +9,7 @@
 //! FSLIB API
 enum disir_status
 fslib_plugin_config_read (struct disir_instance *instance,
-                          struct disir_plugin *plugin, const char *entry_id,
+                          struct disir_register_plugin *plugin, const char *entry_id,
                           struct disir_mold *mold, struct disir_config **config,
                           dio_unserialize_config func_unserialize)
 {
@@ -80,7 +80,7 @@ fslib_plugin_config_read (struct disir_instance *instance,
 //! FSLIB API
 enum disir_status
 fslib_plugin_mold_read (struct disir_instance *instance,
-                        struct disir_plugin *plugin, const char *entry_id,
+                        struct disir_register_plugin *plugin, const char *entry_id,
                         struct disir_mold **mold,
                         dio_unserialize_mold func_unserialize)
 {

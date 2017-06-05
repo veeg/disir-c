@@ -2,7 +2,7 @@
 #include <disir/fslib/json.h>
 
 extern "C" enum disir_status
-dio_register_plugin (struct disir_instance *disir, struct disir_plugin *plugin)
+dio_register_plugin (struct disir_instance *disir, struct disir_register_plugin *plugin)
 {
 
     plugin->dp_name = (char *) "JSON";

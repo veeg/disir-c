@@ -4,7 +4,7 @@
 
 
 extern "C" enum disir_status
-dio_register_plugin (struct disir_instance *instance, struct disir_plugin *plugin)
+dio_register_plugin (struct disir_instance *instance, struct disir_register_plugin *plugin)
 {
     plugin->dp_name = (char *) "JSON Config Test";
     plugin->dp_description = (char *) "JSON config, TEST mold";

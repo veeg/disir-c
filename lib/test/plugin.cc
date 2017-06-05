@@ -63,7 +63,7 @@ static std::map<std::string, output_mold> molds = {
 
 enum disir_status
 dio_test_config_read (struct disir_instance *instance,
-                      struct disir_plugin *plugin, const char *entry_id,
+                      struct disir_register_plugin *plugin, const char *entry_id,
                       struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
@@ -93,13 +93,13 @@ dio_test_config_read (struct disir_instance *instance,
 
 enum disir_status
 dio_test_config_entries (struct disir_instance *instance,
-                         struct disir_plugin *plugin, struct disir_entry **entries)
+                         struct disir_register_plugin *plugin, struct disir_entry **entries)
 {
     return dio_test_mold_entries (instance, plugin, entries);
 }
 
 enum disir_status
-dio_test_config_query (struct disir_instance *instance, struct disir_plugin *plugin,
+dio_test_config_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                        const char *entry_id, struct disir_entry **entry)
 {
     if (molds[entry_id] == NULL)
@@ -109,7 +109,7 @@ dio_test_config_query (struct disir_instance *instance, struct disir_plugin *plu
 }
 
 enum disir_status
-dio_test_mold_read (struct disir_instance *instance, struct disir_plugin *plugin,
+dio_test_mold_read (struct disir_instance *instance, struct disir_register_plugin *plugin,
                     const char *entry_id, struct disir_mold **mold)
 {
     enum disir_status status;
@@ -139,7 +139,7 @@ dio_test_mold_read (struct disir_instance *instance, struct disir_plugin *plugin
 
 enum disir_status
 dio_test_mold_entries (struct disir_instance *instance,
-                       struct disir_plugin *plugin, struct disir_entry **entries)
+                       struct disir_register_plugin *plugin, struct disir_entry **entries)
 {
     struct disir_entry *queue;
     struct disir_entry *entry;
@@ -170,7 +170,7 @@ dio_test_mold_entries (struct disir_instance *instance,
 
 
 enum disir_status
-dio_test_mold_query (struct disir_instance *instance, struct disir_plugin *plugin,
+dio_test_mold_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                      const char *entry_id, struct disir_entry **entry)
 {
     char namespace_entry[PATH_MAX];

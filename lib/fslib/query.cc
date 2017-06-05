@@ -11,7 +11,7 @@
 
 //! FSLIB API
 enum disir_status
-fslib_config_query_entries (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_config_query_entries (struct disir_instance *instance, struct disir_register_plugin *plugin,
                             const char *basedir, struct disir_entry **entries)
 {
     enum disir_status status;
@@ -95,7 +95,7 @@ fslib_config_query_entries (struct disir_instance *instance, struct disir_plugin
 
 //! FSLIB API
 enum disir_status
-fslib_mold_query_entries (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_mold_query_entries (struct disir_instance *instance, struct disir_register_plugin *plugin,
                           const char *basedir, struct disir_entry **entries)
 {
     DIR *directory;
@@ -188,7 +188,7 @@ fslib_mold_query_entries (struct disir_instance *instance, struct disir_plugin *
 
 //! FSLIB API
 enum disir_status
-fslib_plugin_config_query (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_plugin_config_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                            const char *entry_id, struct disir_entry **entry)
 {
     enum disir_status status;
@@ -237,7 +237,7 @@ fslib_plugin_config_query (struct disir_instance *instance, struct disir_plugin 
 
 //! FSLIB API
 enum disir_status
-fslib_plugin_mold_query (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                          const char *entry_id, struct disir_entry **entry)
 {
     enum disir_status status;
@@ -272,7 +272,7 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_plugin *p
 
 //! FSLIB API
 enum disir_status
-fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_register_plugin *plugin,
                              const char *entry_id, char *filepath,
                              struct stat *statbuf, int *namespace_entry)
 {

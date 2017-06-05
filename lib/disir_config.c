@@ -29,7 +29,7 @@ disir_config_read (struct disir_instance *instance, const char *group_id, const 
                    struct disir_mold *mold, struct disir_config **config)
 {
     enum disir_status status;
-    struct disir_plugin_internal *plugin;
+    struct disir_register_plugin_internal *plugin;
 
     plugin = NULL;
 
@@ -108,7 +108,7 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
                     struct disir_config *config)
 {
     enum disir_status status;
-    struct disir_plugin_internal *plugin;
+    struct disir_register_plugin_internal *plugin;
     int entry_id_length;
 
     plugin = NULL;
@@ -271,7 +271,7 @@ disir_config_query (struct disir_instance *instance, const char *group_id,
                     const char *entry_id, struct disir_entry **entry_internal)
 {
     enum disir_status status;
-    struct disir_plugin_internal *plugin;
+    struct disir_register_plugin_internal *plugin;
 
     if (instance == NULL || group_id == NULL || entry_id == NULL)
     {

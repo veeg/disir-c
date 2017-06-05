@@ -27,8 +27,8 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
 {
     enum disir_status status;
     void *handle;
-    struct disir_plugin plugin;
-    struct disir_plugin_internal *internal;
+    struct disir_register_plugin plugin;
+    struct disir_register_plugin_internal *internal;
     plugin_register dio_reg;
 
     // Attempt to load the filepath dynamically
@@ -52,7 +52,7 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
     }
 
     // Populate the plugin object
-    memset (&plugin, 0, sizeof (struct disir_plugin));
+    memset (&plugin, 0, sizeof (struct disir_register_plugin));
 
     if (config_base_id)
         plugin.dp_config_base_id = strndup (config_base_id, 512);
@@ -77,7 +77,7 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
 
     // Need to retrieve the registered internal plugin structure
     // to set the dl_handle and plugin filepath parameters.
-    // This is not handled as part of disir_plugin_register, because
+    // This is not handled as part of disir_register_plugin_register, because
     // that function is a public method that may register plugins in
     // different ways than we load them from disk.
     internal = MQ_TAIL (instance->dio_plugin_queue);
@@ -308,7 +308,7 @@ error:
 enum disir_status
 disir_instance_destroy (struct disir_instance **instance)
 {
-    struct disir_plugin_internal *plugin;
+    struct disir_register_plugin_internal *plugin;
 
     if (instance == NULL || *instance == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;

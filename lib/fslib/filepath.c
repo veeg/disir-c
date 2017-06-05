@@ -5,7 +5,7 @@
 
 //! FSLIB API
 enum disir_status
-fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_register_plugin *plugin,
                                const char *entry_id, char *filepath)
 {
     int res;
@@ -26,7 +26,7 @@ fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_plu
 
 //! FSLIB API
 enum disir_status
-fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_plugin *plugin,
+fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_register_plugin *plugin,
                              const char *entry_id, char *filepath)
 {
     int res;
