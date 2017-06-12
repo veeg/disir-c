@@ -191,10 +191,13 @@ enum disir_status
 dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
                     char *output, int32_t *output_size)
 {
+    enum disir_status status;
     int32_t size;
 
+    status = DISIR_STATUS_OK;
     switch (value->dv_type)
     {
+    case DISIR_VALUE_TYPE_ENUM:
     case DISIR_VALUE_TYPE_STRING:
     {
         size = value->dv_size;
@@ -227,15 +230,13 @@ dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
                 (value->dv_boolean ? "True" : "False"));
         break;
     }
-    case DISIR_VALUE_TYPE_ENUM:
     default:
     {
-        dx_crash_and_burn ("%s: %s not handled",
-                           __FUNCTION__, dx_value_type_string (value->dv_type));
+        status = DISIR_STATUS_INVALID_ARGUMENT;
     }
     }
 
-    return DISIR_STATUS_OK;
+    return status;
 }
 
 //! INTERNAL API
