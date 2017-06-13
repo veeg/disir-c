@@ -90,7 +90,7 @@ set (_LIBDISIR_SOURCES
     test/plugin.cc
 )
 
-set (PROJECT_SO_LIBRARY disir
+set (PROJECT_SO_LIBRARY disir_c
     CACHE INTERNAL "${PROJECT_NAME}: shared library" FORCE)
 # Define shared library
 add_library(${PROJECT_SO_LIBRARY} SHARED ${_LIBDISIR_SOURCES})

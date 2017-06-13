@@ -21,7 +21,7 @@ include_directories (
   ${CMAKE_SOURCE_DIR}/include
 )
 
-target_link_libraries (${CLI_TARGET} disir)
+target_link_libraries (${CLI_TARGET} ${PROJECT_SO_LIBRARY})
 
 install (
   PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/disir
