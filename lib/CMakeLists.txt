@@ -109,6 +109,7 @@ target_include_directories (${PROJECT_SO_LIBRARY} PUBLIC
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
 set_property (TARGET ${PROJECT_SO_LIBRARY} PROPERTY CXX_STANDARD 11)
 set_property (TARGET ${PROJECT_SO_LIBRARY} PROPERTY CXX_STANDARD_REQUIRED ON)
+set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES SOVERSION 0)
 
 add_definitions ("-Wall")
 add_definitions ("-Werror")
