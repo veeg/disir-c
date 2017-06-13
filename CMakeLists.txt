@@ -9,7 +9,6 @@ include (GNUInstallDirs)
 
 add_subdirectory (lib)
 add_subdirectory (plugins)
-add_subdirectory (doc)
 add_subdirectory (cli)
 
 enable_testing ()
