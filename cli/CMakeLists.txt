@@ -6,6 +6,7 @@ set (CLIDISIR_SOURCES
     "command_list.cc"
     "command_generate.cc"
     "command_verify.cc"
+    "command_dump.cc"
 )
 
 set (CLI_TARGET cli)
