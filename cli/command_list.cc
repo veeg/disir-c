@@ -18,8 +18,9 @@ CommandList::CommandList(void)
 int
 CommandList::handle_command (std::vector<std::string> &args)
 {
-    args::ArgumentParser parser ("list configuration files, molds or I/O plugins");
-    parser.helpParams.showTerminator = false;
+    args::ArgumentParser parser ("List available configuration entries.");
+
+    setup_parser (parser);
     parser.Prog ("disir list");
 
     args::HelpFlag help (parser, "help", "Display the list help menu and exit.",

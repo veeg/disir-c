@@ -10,6 +10,18 @@ Command::Command (std::string name)
 {
 }
 
+void
+Command::setup_parser (args::ArgumentParser& parser)
+{
+    parser.helpParams.progindent = 0;
+    parser.helpParams.progtailindent = 2;
+    parser.helpParams.descriptionindent = 2;
+    parser.helpParams.flagindent = 2;
+    parser.helpParams.eachgroupindent = 0;
+    parser.helpParams.helpindent = 28;
+    parser.helpParams.showTerminator = false;
+}
+
 int
 Command::list_configs (std::set<std::string>& list)
 {

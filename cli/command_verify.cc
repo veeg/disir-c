@@ -20,8 +20,9 @@ CommandVerify::CommandVerify(void)
 int
 CommandVerify::handle_command (std::vector<std::string> &args)
 {
-    args::ArgumentParser parser ("verify configs and molds");
-    parser.helpParams.showTerminator = false;
+    args::ArgumentParser parser ("Verify configuration entries and their associated molds.");
+
+    setup_parser (parser);
     parser.Prog ("disir verify");
 
     args::HelpFlag help (parser, "help", "Display the list help menu and exit.",

@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 
+#include <disir/cli/args.hxx>
 
 namespace disir
 {
@@ -27,6 +28,8 @@ namespace disir
 
         //! Return a set of available configs on the system
         int list_configs (std::set<std::string>& list);
+
+        void setup_parser (args::ArgumentParser& parser);
 
     // Variables
     protected:

@@ -80,19 +80,25 @@ Cli::parse_command_line_args (std::vector<std::string> &args)
     args::ArgumentParser parser ("Disir configuration entry management utility",
                                  os.str ());
     parser.Prog (m_program_name);
+    parser.helpParams.progindent = 0;
+    parser.helpParams.progtailindent = 2;
+    parser.helpParams.descriptionindent = 2;
+    parser.helpParams.flagindent = 2;
+    parser.helpParams.eachgroupindent = 0;
+    parser.helpParams.helpindent = 28;
     parser.helpParams.showTerminator = false;
     parser.ProglinePostfix ("[<args>]");
 
     // Add flags/arguments
-    args::Positional<std::string> command (parser, "COMMAND", "The disir command to execute.");
     args::HelpFlag opt_help (parser, "help", "Display this help menu and exit.",
                         args::Matcher{'h', "help"});
-    args::Flag opt_version (parser, "version", "show the disir version and exit.",
+    args::Flag opt_version (parser, "version", "Show the disir version and exit.",
                            args::Matcher{'v', "version"});
-    args::Flag opt_verbose (parser, "verbose", "enable verbose cli output.",
+    args::Flag opt_verbose (parser, "verbose", "Enable verbose cli output.",
                         args::Matcher{'V', "verbose"});
-    args::ValueFlag<std::string> opt_config (parser, "config", "libdisir config filepath",
+    args::ValueFlag<std::string> opt_config (parser, "PATH", "libdisir config filepath",
                                          args::Matcher{'c', "config"});
+    args::Positional<std::string> command (parser, "COMMAND", "The disir command to execute.");
 
     m_help_text = parser.Help();
 

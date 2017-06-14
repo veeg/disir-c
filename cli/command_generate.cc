@@ -22,13 +22,7 @@ CommandGenerate::handle_command (std::vector<std::string> &args)
     std::stringstream group_description;
 
     args::ArgumentParser parser ("Generate configuration entries to the system.");
-    parser.helpParams.progindent = 0;
-    parser.helpParams.progtailindent = 2;
-    parser.helpParams.descriptionindent = 2;
-    parser.helpParams.flagindent = 2;
-    parser.helpParams.eachgroupindent = 0;
-    parser.helpParams.helpindent = 28;
-    parser.helpParams.showTerminator = false;
+    setup_parser (parser);
     parser.Prog ("disir generate");
 
     args::HelpFlag help (parser, "help", "Display the generate help menu and exit.",
