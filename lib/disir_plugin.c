@@ -63,7 +63,7 @@ disir_plugin_register (struct disir_instance *instance, struct disir_register_pl
     log_info ("[register plugin] mold_base_id: %s", internal->pi_plugin.dp_mold_base_id);
     log_info ("[register plugin] mold_entry_type: %s", internal->pi_plugin.dp_mold_entry_type);
 
-    MQ_PUSH (instance->dio_plugin_queue, internal);
+    MQ_ENQUEUE (instance->dio_plugin_queue, internal);
 
     return DISIR_STATUS_OK;
 
