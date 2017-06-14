@@ -52,3 +52,32 @@ Command::list_configs (std::set<std::string>& list)
     return (0);
 }
 
+int
+Command::setup_group (std::string id)
+{
+    int code;
+    std::list<std::string> groups;
+
+    m_cli->list_groups (groups);
+
+    if (std::find (groups.begin(), groups.end(), id) == groups.end())
+    {
+        // invalid entry
+        std::cerr << "error: invalid group selected - " << id << std::endl;
+        std::cerr << "Select one of the following:" << std::endl;
+        for (auto& g : groups)
+        {
+            std::cerr << "  " << g << std::endl;
+        }
+
+        code = 1;
+    }
+    else
+    {
+        m_cli->group_id (id);
+        m_cli->verbose() << "Setting user-provided group id to: " << m_cli->group_id << std::endl;
+        code = 0;
+    }
+
+    return (code);
+}

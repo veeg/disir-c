@@ -18,6 +18,7 @@ CommandList::CommandList(void)
 int
 CommandList::handle_command (std::vector<std::string> &args)
 {
+    std::stringstream group_description;
     args::ArgumentParser parser ("List available configuration entries.");
 
     setup_parser (parser);
@@ -25,6 +26,10 @@ CommandList::handle_command (std::vector<std::string> &args)
 
     args::HelpFlag help (parser, "help", "Display the list help menu and exit.",
                          args::Matcher{'h', "help"});
+    group_description << "Specify the group to operate on. The loaded default is: "
+                      << m_cli->group_id();
+    args::ValueFlag<std::string> opt_group_id (parser, "NAME", group_description.str(),
+                                               args::Matcher{"group"});
 
     try
     {
@@ -48,7 +53,11 @@ CommandList::handle_command (std::vector<std::string> &args)
         return (1);
     }
 
-    // TODO: Expose group selection.
+    if (opt_group_id && setup_group (args::get(opt_group_id)))
+    {
+        return (1);
+    }
+
     std::set<std::string> list;
     if (list_configs(list))
     {

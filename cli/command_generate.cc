@@ -70,11 +70,6 @@ CommandGenerate::handle_command (std::vector<std::string> &args)
         return (1);
     }
 
-    if (opt_group_id)
-    {
-        m_cli->group_id (args::get (opt_group_id));
-    }
-
     if (opt_libdisir)
     {
         auto value = args::get (opt_libdisir);
@@ -90,6 +85,11 @@ CommandGenerate::handle_command (std::vector<std::string> &args)
     if (opt_force)
     {
         m_force = true;
+    }
+
+    if (opt_group_id && setup_group (args::get(opt_group_id)))
+    {
+        return (1);
     }
 
     std::set<std::string> entries_to_generate;

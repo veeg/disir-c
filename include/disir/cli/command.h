@@ -29,6 +29,8 @@ namespace disir
         //! Return a set of available configs on the system
         int list_configs (std::set<std::string>& list);
 
+        int setup_group (std::string);
+
         void setup_parser (args::ArgumentParser& parser);
 
     // Variables

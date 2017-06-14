@@ -7,6 +7,7 @@
 
 #include <disir/disir.h>
 #include <disir/version.h>
+#include <disir/plugin.h>
 
 #include <disir/cli/cli.h>
 #include <disir/cli/args.hxx>
@@ -218,6 +219,42 @@ Cli::initialize_disir ()
 
         std::cerr << "See logfile for more information." << std::endl;
         return (-1);
+    }
+
+    list_groups (m_groups);
+    if (m_groups.size() > 0)
+    {
+        m_group_id = std::string (m_groups.front());
+        verbose() << "Setting default group id to: " << m_group_id << std::endl;
+    }
+
+    return (0);
+}
+
+int
+Cli::list_groups (std::list<std::string>& list)
+{
+    enum disir_status status;
+    struct disir_plugin *plugins;
+    struct disir_plugin *next;
+    struct disir_plugin *current;
+
+    status = disir_plugin_registered (disir(), &plugins);
+    if (status != DISIR_STATUS_OK)
+        return (-1);
+
+    current = plugins;
+    while (current != NULL)
+    {
+        next = current->next;
+
+        if (std::find(list.begin(), list.end(), std::string(current->pl_group_id)) == list.end())
+        {
+            list.push_back (std::string(current->pl_group_id));
+        }
+
+        disir_plugin_finished (&current);
+        current = next;
     }
 
     return (0);

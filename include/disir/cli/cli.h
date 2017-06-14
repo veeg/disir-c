@@ -4,6 +4,7 @@
 #include <memory>
 #include <map>
 #include <ostream>
+#include <list>
 
 #include <disir/disir.h>
 
@@ -45,6 +46,9 @@ namespace disir
 
         std::ostream& verbose (void);
 
+        //! Return a set of available groups on the instance.
+        int list_groups (std::list<std::string>& list);
+
     private:
         // Actually marge the command line arguments
         // This will populate several CLI members
@@ -77,7 +81,9 @@ namespace disir
         std::string m_active_command = "";
 
         //! The group_id to operate on
-        std::string m_group_id = "test";
+        std::string m_group_id = "";
+
+        std::list<std::string> m_groups;
 
         //! Map of commands available
         std::map<std::string, std::shared_ptr<Command>> m_commands;

@@ -20,6 +20,7 @@ CommandVerify::CommandVerify(void)
 int
 CommandVerify::handle_command (std::vector<std::string> &args)
 {
+    std::stringstream group_description;
     args::ArgumentParser parser ("Verify configuration entries and their associated molds.");
 
     setup_parser (parser);
@@ -27,6 +28,11 @@ CommandVerify::handle_command (std::vector<std::string> &args)
 
     args::HelpFlag help (parser, "help", "Display the list help menu and exit.",
                          args::Matcher{'h', "help"});
+
+    group_description << "Specify the group to operate on. The loaded default is: "
+                      << m_cli->group_id();
+    args::ValueFlag<std::string> opt_group_id (parser, "NAME", group_description.str(),
+                                               args::Matcher{"group"});
 
     args::ValueFlag<std::string> opt_text_mold (parser, "TEXT MOLD",
                                                 "Verify mold from disk.",
@@ -101,7 +107,10 @@ CommandVerify::handle_command (std::vector<std::string> &args)
         return (0);
     }
 
-    // TODO: Expose group selection.
+    if (opt_group_id && setup_group (args::get(opt_group_id)))
+    {
+        return (1);
+    }
 
     // Get the set of entries to verify
     std::set<std::string> entries_to_verify;
