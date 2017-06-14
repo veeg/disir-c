@@ -189,6 +189,16 @@ struct disir_register_plugin
     mold_query      dp_mold_query;
 };
 
+//! Registered plugin with the instance
+struct disir_plugin
+{
+    //! Group id for this plugin
+    char *pl_group_id;
+
+    //! Linked-list of plugins
+    struct disir_plugin *next, *prev;
+};
+
 //! \brief Register plugin with the libdisir instance
 //!
 //! Plugin must provide a disir_register_plugin structure that is populated with all
@@ -206,6 +216,33 @@ struct disir_register_plugin
 enum disir_status
 disir_plugin_register (struct disir_instance *instance, struct disir_register_plugin *plugin,
                        const char *io_id, const char *group_id);
+
+//! \brief Query all registered plugins with the disir instance.
+//!
+//! The plugins parameter is populated with a double-linked list structure.
+//! Each instance is allocated for this request. The caller must take responsibility
+//! for calling disir_plugin_finished() on each instance in the linked list.
+//! Retrieve the next entry by accessing the next structure member. Once this
+//! member is NULL, no more plugins are available.
+//!
+//! \param[in] instance The disir instance to query all plugins from.
+//! \param[out] plugins The address which is populated with the first plugin structure.
+//!
+//! \return DISIR_STATUS_INVALID ARGUMENT if wither of the input arguments are NULL.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_plugin_registered (struct disir_instance *instance, struct disir_plugin **plugins);
+
+//! \brief Mark yourself finished with this plugin structure.
+//!
+//! This must be invoked on all entries returned in the double linked list of
+//! plugin members returned by disir_plugin_registerd()
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+disir_plugin_finished (struct disir_plugin **plugin);
 
 
 #ifdef __cplusplus

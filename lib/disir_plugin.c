@@ -92,3 +92,56 @@ error:
     return status;
 }
 
+// PUBLIC API
+enum disir_status
+disir_plugin_registered (struct disir_instance *instance, struct disir_plugin **plugins)
+{
+    enum disir_status status;
+    struct disir_register_plugin_internal *internal;
+    struct disir_plugin *head, *current;
+
+    TRACE_ENTER ("instance (%p) plugins (%p)", instance, plugins);
+    if (instance == NULL || plugins == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    head = NULL;
+    internal = instance->dio_plugin_queue;
+    do
+    {
+        if (internal == NULL)
+            break;
+
+        current = calloc (1, sizeof (struct disir_plugin));
+        if (current == NULL)
+            break;
+
+        current->pl_group_id = strdup (internal->pi_group_id);
+        MQ_ENQUEUE (head, current);
+
+        internal = internal->next;
+    } while (1);
+
+    *plugins = head;
+    status = DISIR_STATUS_OK;
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+// PUBLIC API
+enum disir_status
+disir_plugin_finished (struct disir_plugin **plugin)
+{
+    if (plugin && *plugin)
+    {
+        free ((*plugin)->pl_group_id);
+        free (*plugin);
+    }
+
+    return DISIR_STATUS_OK;
+}
