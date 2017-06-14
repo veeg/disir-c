@@ -57,6 +57,9 @@ disir_libdisir_mold (struct disir_mold **mold)
     status = dc_set_name (context_section, "plugin", strlen ("plugin"));
     if (status != DISIR_STATUS_OK)
         goto error;
+    status = dc_add_restriction_entries_max (context_section, 0, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
 
     status = dc_add_keyval_string (context_section, "group_id", "",
                                    "Which group this plugin shall identify with.", NULL, NULL);
