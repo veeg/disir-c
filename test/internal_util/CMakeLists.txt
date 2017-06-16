@@ -2,7 +2,7 @@ enable_testing()
 
 set (TESTS_INTERNAL_UTIL tests_internal_util)
 file (GLOB TESTS_INTERNAL_UTIL_SOURCES *.cc)
-list (APPEND TESTS_INTERNAL_UTIL_SOURCES "../test_helper.cc")
+list (APPEND TESTS_INTERNAL_UTIL_SOURCES "../test_helper.cc" "../gtest.cc")
 
 add_executable (${TESTS_INTERNAL_UTIL} ${TESTS_INTERNAL_UTIL_SOURCES})
 

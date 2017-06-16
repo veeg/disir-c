@@ -2,7 +2,7 @@ enable_testing()
 
 set (TESTS_PLUGIN_JSON tests_plugin_json)
 file (GLOB TESTS_PLUGIN_JSON_SOURCES *.cc)
-list (APPEND TESTS_PLUGIN_JSON_SOURCES "../../test_helper.cc")
+list (APPEND TESTS_PLUGIN_JSON_SOURCES "../../test_helper.cc" "../../gtest.cc")
 
 add_executable (${TESTS_PLUGIN_JSON} ${TESTS_PLUGIN_JSON_SOURCES})
 

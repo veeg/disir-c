@@ -30,6 +30,9 @@ add_definitions (-Werror=return-local-addr)
 # GCC > 4.9
 add_definitions (-Wdate-time)
 
+# TMP: MEOS
+set (CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} /usr/share/meos-pkgtools/cmake)
+
 add_subdirectory (lib)
 add_subdirectory (plugins)
 add_subdirectory (cli)

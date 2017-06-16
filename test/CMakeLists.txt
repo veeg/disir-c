@@ -1,6 +1,6 @@
 enable_testing()
 
-find_package(GTest REQUIRED)
+find_package(MEOSGTest REQUIRED)
 
 configure_file (test_helper.h.in test_helper.h)
 
