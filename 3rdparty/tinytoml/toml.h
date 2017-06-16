@@ -1242,7 +1242,7 @@ inline std::time_t Value::as_time_t() const
 }
 
 // For backwards compatability
-inline void Value::write(std::ostream* os, const std::string& _, int indent) const
+inline void Value::write(std::ostream* os, const std::string&, int indent) const
 {
     writeFormatted(os, (indent == -1 ? FORMAT_NONE : FORMAT_INDENT));
 }
