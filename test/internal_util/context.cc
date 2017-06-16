@@ -14,15 +14,26 @@ class ContextUtilTest : public testing::DisirTestWrapper
     void SetUp()
     {
         DisirLogCurrentTestEnter();
+
+        // Must supply a valid context enum to dx_context_create
+        context = dx_context_create (DISIR_CONTEXT_CONFIG);
+        ASSERT_TRUE (context != NULL);
+
     }
 
     void TearDown()
     {
+        if (context)
+        {
+            dx_context_destroy (&context);
+        }
+
         DisirLogCurrentTestExit ();
     }
 
 public:
     enum disir_status status;
+    struct disir_context *context = nullptr;
 };
 
 TEST_F (ContextUtilTest, type_check_invalid_input)
@@ -104,4 +115,33 @@ TEST_F (ContextUtilTest, type_check_multiple_correct_context)
     ASSERT_EQ (status, DISIR_STATUS_OK);
 }
 
+TEST_F (ContextUtilTest, context_type_invalid_context)
+{
+    //! Zero value
+    context->cx_type = (enum disir_context_type) 0;
+    ASSERT_EQ (dc_context_type (context), DISIR_CONTEXT_UNKNOWN);
+
+    //! Negative value
+    context->cx_type = (enum disir_context_type) -5;
+    ASSERT_EQ (dc_context_type (context), DISIR_CONTEXT_UNKNOWN);
+
+    // Random waay to high value
+    context->cx_type = (enum disir_context_type) 87634;
+    ASSERT_EQ (dc_context_type (context), DISIR_CONTEXT_UNKNOWN);
+}
+
+TEST_F (ContextUtilTest, context_type_string_invalid_context)
+{
+    //! Zero value
+    context->cx_type = (enum disir_context_type) 0;
+    ASSERT_STREQ (dc_context_type_string (context), "UNKNOWN");
+
+    //! Negative value
+    context->cx_type = (enum disir_context_type) -5;
+    ASSERT_STREQ (dc_context_type_string (context), "UNKNOWN");
+
+    // Random waay to high value
+    context->cx_type = (enum disir_context_type) 87634;
+    ASSERT_STREQ (dc_context_type_string (context), "UNKNOWN");
+}
 
