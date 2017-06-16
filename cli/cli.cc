@@ -339,7 +339,7 @@ Cli::no_matching_command (void)
     }
 }
 
-const bool
+bool
 Cli::report_related (const std::string& command_name, std::ostringstream& os)
 {
     int res;

@@ -66,7 +66,7 @@ namespace disir
         //! an appropriate error message and listing. Function returns true
         //! if no match is found, nothing is emitted to the output stream
         //! and false is returned.
-        const bool report_related (const std::string& command_name, std::ostringstream& os);
+        bool report_related (const std::string& command_name, std::ostringstream& os);
 
     public:
         //! Program name

@@ -296,7 +296,7 @@ CommandGenerate::available_configs (void)
         next = current->next;
 
         // Ignore namespace entries
-        if (current->DE_NAMESPACE_ENTRY)
+        if (current->flag.DE_NAMESPACE_ENTRY)
         {
             current = next;
             continue;
@@ -340,7 +340,7 @@ CommandGenerate::available_namespaces (void)
     {
         next = current->next;
 
-        if (current->DE_NAMESPACE_ENTRY)
+        if (current->flag.DE_NAMESPACE_ENTRY)
         {
             list.insert (std::string(current->de_entry_name));
         }

@@ -23,6 +23,8 @@ namespace disir
         //! Constructor - only subclasses can invoke
         Command (std::string name);
 
+        virtual ~Command () = default;
+
         //! This will be the function invoked to handle a particular command
         virtual int handle_command (std::vector<std::string> &args) = 0;
 
