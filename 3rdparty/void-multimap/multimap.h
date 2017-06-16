@@ -19,7 +19,7 @@ struct multimap_value_iterator;
 //!
 struct multimap *
 multimap_create (int (*cmpfunc) (const void *, const void *),
-        unsigned long (*hashfunc) (const void *));
+                 unsigned long (*hashfunc) (const void *));
 
 //! \brief Destroy the given hashmap.
 //!
@@ -29,8 +29,8 @@ multimap_create (int (*cmpfunc) (const void *, const void *),
 //! \return void
 //!
 void
-multimap_destroy (struct multimap *map, 
-                  void (*destroy_key) (void *), 
+multimap_destroy (struct multimap *map,
+                  void (*destroy_key) (void *),
                   void (*destroy_val) (void *));
 
 //! \brief Associate the given value with the given key.
@@ -44,7 +44,7 @@ multimap_destroy (struct multimap *map,
 //! \return 0 if mapping was successful, else a non-zero value is returned.
 //!
 int
-multimap_push_value (struct multimap *map, void *key, void *val);
+multimap_push_value (struct multimap *map, const void *key, void *val);
 
 //! \brief Get the first value associated with the given key.
 //!
@@ -55,7 +55,7 @@ multimap_push_value (struct multimap *map, void *key, void *val);
 //! \return First value that key is associated with if mapping exists, else NULL.
 //!
 void *
-multimap_get_first (struct multimap *map, void *key);
+multimap_get_first (struct multimap *map, const void *key);
 
 //! \brief Get a value iterator for a given key.
 //!
@@ -68,7 +68,7 @@ multimap_get_first (struct multimap *map, void *key);
 //! \return Iterator object for the given key.
 //!
 struct multimap_value_iterator *
-multimap_fetch (struct multimap *map, void *key);
+multimap_fetch (struct multimap *map, const void *key);
 
 //! \brief Get the value associated with the given key, and remove it from map.
 //!
@@ -80,7 +80,7 @@ multimap_fetch (struct multimap *map, void *key);
 //! \return Value that key is associated with if mapping exists, else NULL.
 //!
 void *
-multimap_remove_value (struct multimap *map, void *key, void (*free_key)(void *), void *value);
+multimap_remove_value (struct multimap *map, const void *key, void (*free_key)(void *), void *value);
 
 //! \brief Get number of elements in hash map.
 //!
@@ -97,12 +97,12 @@ multimap_size (struct multimap *map);
 //! \return Number of values stored with this key.
 //!
 int
-multimap_contains_key (struct multimap *map, void *key);
+multimap_contains_key (struct multimap *map, const void *key);
 
 //! \brief Retrieve the next value associated with the iterator
 //!
 //! The value returned MAY be destroyed between fetching the iterator
-//! and retrieving this value. 
+//! and retrieving this value.
 //!
 //! \param[in] iter Iterator associated with a given key
 //! \return Value currently pointed to by the iterator

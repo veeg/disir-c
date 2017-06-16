@@ -9,11 +9,14 @@
 #define INIT_NUM_BUCKETS 64 //!< Initial number of buckets
 #define INIT_VALUE_LIST_CAPACITY 8 //!< Initial capacity of each mapnodes value_list
 
+#define RM_CONST(t, exp) (t*)((char*)NULL + ((const char*)(exp) - (char*)NULL))
+
+
 //! \brief Data structure describing a list node in hash map.
 //!
 struct mapnode
 {
-  void *key;                //!< Key associated with element.
+  const void *key;          //!< Key associated with element.
   void **value_list;        //!< Dynamic array of Values for this key.
   int value_size;           //!< Number of elements present in the value_list
   int value_capacity;       //!< Capacity of the allocated value_list.
@@ -49,7 +52,7 @@ struct multimap_value_iterator
 //!  \return A new list node, or NULL if allocation was unsuccessful.
 //!
 static struct mapnode *
-new_node (void *key, void *value)
+new_node (const void *key, void *value)
 {
   struct mapnode *node;
 
@@ -106,7 +109,7 @@ delete_buckets (struct mapnode **buckets, int nbuckets,
       }
 
       if (free_key)
-        free_key (node->key);
+        free_key (RM_CONST(void, node->key));
 
       free (node->value_list);
       free (node);
@@ -163,7 +166,7 @@ resize_map (struct multimap *map)
 
 struct multimap *
 multimap_create (int (*cmpfunc) (const void *, const void *),
-            unsigned long (*hashfunc) (const void *))
+                 unsigned long (*hashfunc) (const void *))
 {
   struct multimap *map;
 
@@ -198,7 +201,7 @@ multimap_destroy (struct multimap *map, void (*free_key) (void *), void (*free_v
 }
 
 int
-multimap_push_value (struct multimap *map, void *key, void *value)
+multimap_push_value (struct multimap *map, const void *key, void *value)
 {
   unsigned long hash, idx;
   struct mapnode **node;
@@ -255,7 +258,7 @@ multimap_push_value (struct multimap *map, void *key, void *value)
 }
 
 void *
-multimap_get_first (struct multimap *map, void *key)
+multimap_get_first (struct multimap *map, const void *key)
 {
   unsigned long hash, idx;
   struct mapnode **node;
@@ -277,7 +280,7 @@ multimap_get_first (struct multimap *map, void *key)
 }
 
 struct multimap_value_iterator *
-multimap_fetch (struct multimap *map, void *key)
+multimap_fetch (struct multimap *map, const void *key)
 {
   unsigned long hash, idx;
   struct mapnode **node;
@@ -314,7 +317,7 @@ multimap_fetch (struct multimap *map, void *key)
 }
 
 void *
-multimap_remove_value(struct multimap *map, void *key, void (*free_key) (void *), void *value)
+multimap_remove_value(struct multimap *map, const void *key, void (*free_key) (void *), void *value)
 {
   int i, k;
   void *map_value;
@@ -360,7 +363,7 @@ multimap_remove_value(struct multimap *map, void *key, void (*free_key) (void *)
   if ((*node)->value_size == 0)
   {
     if (free_key)
-      free_key ((*node)->key);
+      free_key (RM_CONST(void, (*node)->key));
 
     tmp = (*node)->next;
     free ((*node)->value_list);
@@ -380,7 +383,7 @@ multimap_size (struct multimap *map)
 }
 
 int
-multimap_contains_key (struct multimap *map, void *key)
+multimap_contains_key (struct multimap *map, const void *key)
 {
   unsigned long hash, idx;
   struct mapnode **node;
