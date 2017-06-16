@@ -10,11 +10,6 @@ extern "C" {
 #include <disir/disir.h>
 #include <disir/context.h>
 
-// XXX: REmove me when/if we get the mold form config from API instead of stealing it from config
-extern "C" {
-#include "config.h"
-}
-
 #define CMAKE_BUILD_DIRECTORY "@CMAKE_BINARY_DIR@"
 #define CMAKE_SOURCE_DIRECTORY "@CMAKE_SOURCE_DIR@"
 #define CMAKE_PROJECT_SOURCE_DIR "@PROJECT_SOURCE_DIR@"

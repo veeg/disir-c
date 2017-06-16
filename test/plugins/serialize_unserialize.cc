@@ -5,6 +5,7 @@
 #include <disir/fslib/json.h>
 
 #include "log.h"
+#include "config.h"
 
 const char *molds[] = {
     "basic_keyval",

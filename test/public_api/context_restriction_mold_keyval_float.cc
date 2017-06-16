@@ -45,7 +45,7 @@ class ContextRestrictionMoldKeyvalFloatTest : public testing::Test
 public:
     enum disir_status status;
     const char *error;
-    struct disir_context *context = NULL;;
+    struct disir_context *context = NULL;
     struct disir_context *context_mold = NULL;
     struct disir_context *context_keyval = NULL;
     struct disir_context *context_restriction = NULL;

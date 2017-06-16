@@ -142,7 +142,7 @@ JsonDioTestWrapper::getMoldJson ()
 }
 
 int
-JsonDioTestWrapper::GenerateConfigFromJson (Json::Value& obj)
+JsonDioTestWrapper::GenerateConfigFromJson (Json::Value&)
 {
     return -1;
 }
