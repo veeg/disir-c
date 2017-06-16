@@ -1,9 +1,12 @@
 
-set_directory_properties (PROPERTIES PREFIX "")
+include_directories (
+  ${CMAKE_SOURCE_DIR}/include
+)
 
 macro (add_dplugin folder)
   add_library (dplugin_${folder} SHARED ${folder}/main.cc)
   set_target_properties (dplugin_${folder} PROPERTIES PREFIX "")
+
   link_libraries (${PROJECT_SO_LIBRARY})
   install (
     TARGETS dplugin_${folder}
