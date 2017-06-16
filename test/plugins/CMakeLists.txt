@@ -9,12 +9,6 @@ list (APPEND TESTS_PLUGIN_PLUGIN_SOURCES "../test_helper.cc")
 
 add_executable (${TESTS_PLUGIN_PLUGIN} ${TESTS_PLUGIN_PLUGIN_SOURCES})
 
-set_property (TARGET ${TESTS_PLUGIN_PLUGIN} PROPERTY CXX_STANDARD 11)
-set_property (TARGET ${TESTS_PLUGIN_PLUGIN} PROPERTY CXX_STANDARD_REQUIRED ON)
-
-add_definitions ("-Wall")
-add_definitions ("-Werror")
-
 include_directories (${LIBDISIR_TEST_INCLUDE_DIRS})
 include_directories (${CMAKE_SOURCE_DIR}/3rdparty/)
 include_directories (${CMAKE_SOURCE_DIR}/3rdparty/boost_fdstream)

@@ -11,12 +11,7 @@ set (CLIDISIR_SOURCES
 
 set (CLI_TARGET cli)
 add_executable (${CLI_TARGET} ${CLIDISIR_SOURCES})
-set_property (TARGET ${CLI_TARGET} PROPERTY CXX_STANDARD 11)
-set_property (TARGET ${CLI_TARGET} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_property (TARGET ${CLI_TARGET} PROPERTY OUTPUT_NAME disir)
-
-add_definitions ("-Wall")
-add_definitions ("-Werror")
 
 include_directories (
   ${CMAKE_SOURCE_DIR}/include

@@ -106,13 +106,10 @@ target_include_directories (${PROJECT_SO_LIBRARY} PUBLIC
   $<INSTALL_INTERFACE:include/>
 )
 
+# TODO: Do we need the fpic option?
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
-set_property (TARGET ${PROJECT_SO_LIBRARY} PROPERTY CXX_STANDARD 11)
-set_property (TARGET ${PROJECT_SO_LIBRARY} PROPERTY CXX_STANDARD_REQUIRED ON)
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES SOVERSION 0)
 
-add_definitions ("-Wall")
-add_definitions ("-Werror")
 # TODO: Add check for gcc > 4.9
 #add_definitions ("-fsanitize=undefined")
 #add_definitions ("-fsanitize=shift")

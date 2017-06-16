@@ -7,6 +7,29 @@ project (disir VERSION 0.1.0 LANGUAGES C CXX)
 include (CMakePackageConfigHelpers)
 include (GNUInstallDirs)
 
+set_property (GLOBAL PROPERTY C_STANDARD 11)
+set_property (GLOBAL PROPERTY CXX_STANDARD 14)
+set_property (GLOBAL PROPERTY CXX_STANDARD_REQUIRED ON)
+
+# Set generic compiler flags applicable to both C and C++
+add_definitions (-pedantic)
+add_definitions (-Werror)
+add_definitions (-Wall)
+add_definitions (-Wextra)
+add_definitions (-Wcast-qual)
+add_definitions (-Wcast-align)
+add_definitions (-Wvla)
+add_definitions (-Wstack-protector)
+add_definitions (-Wformat-security)
+add_definitions (-Wlogical-op)
+
+# Set C only compile flags
+set_property (GLOBAL APPEND PROPERTY COMPILE_FLAGS -Wmissing-prototypes -Wwrite-strings)
+# GCC > 4.8
+add_definitions (-Werror=return-local-addr)
+# GCC > 4.9
+add_definitions (-Wdate-time)
+
 add_subdirectory (lib)
 add_subdirectory (plugins)
 add_subdirectory (cli)
