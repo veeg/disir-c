@@ -75,7 +75,8 @@ Command::setup_group (std::string id)
     else
     {
         m_cli->group_id (id);
-        m_cli->verbose() << "Setting user-provided group id to: " << m_cli->group_id << std::endl;
+        m_cli->verbose() << "Setting user-provided group id to: "
+                         << m_cli->group_id() << std::endl;
         code = 0;
     }
 
