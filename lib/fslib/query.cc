@@ -70,9 +70,7 @@ fslib_config_query_entries (struct disir_instance *instance, struct disir_regist
 
                 entry = (struct disir_entry *) calloc (1, sizeof (struct disir_entry));
                 entry->de_entry_name = strdup(entry_name.c_str());
-                entry->DE_READABLE = mold_entry->DE_READABLE;
-                entry->DE_WRITABLE = mold_entry->DE_WRITABLE;
-                entry->DE_NAMESPACE_ENTRY = mold_entry->DE_NAMESPACE_ENTRY;
+                entry->de_attributes = mold_entry->de_attributes;
                 MQ_ENQUEUE (*entries, entry);
 
                 disir_entry_finished (&mold_entry);
@@ -147,7 +145,7 @@ fslib_mold_query_entries (struct disir_instance *instance, struct disir_register
                 std::string direntry (dp->d_name);
                 if (direntry.compare (0, direntry.size() - suffix.size(), "__directory") == 0)
                 {
-                    entry->DE_NAMESPACE_ENTRY = 1;
+                    entry->flag.DE_NAMESPACE_ENTRY = 1;
                     std::size_t found = entry_name.find_last_of('/');
                     if (found != std::string::npos)
                     {
@@ -160,13 +158,13 @@ fslib_mold_query_entries (struct disir_instance *instance, struct disir_register
                 }
                 else
                 {
-                    entry->DE_NAMESPACE_ENTRY = 0;
+                    entry->flag.DE_NAMESPACE_ENTRY = 0;
                 }
 
                 entry->de_entry_name = strdup(entry_name.c_str());
                 // TODO: stat entry to get READABLE and WRITABLE
-                entry->DE_READABLE = 1;
-                entry->DE_WRITABLE = 1;
+                entry->flag.DE_READABLE = 1;
+                entry->flag.DE_WRITABLE = 1;
                 MQ_ENQUEUE (*entries, entry);
             }
         }
@@ -260,9 +258,9 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_
         query_entry = (struct disir_entry *) calloc (1, sizeof (struct disir_entry));
         query_entry->de_entry_name = strdup(entry_id);
         // TODO: Get readable and writable from statbuf
-        query_entry->DE_READABLE = 1;
-        query_entry->DE_WRITABLE = 1;
-        query_entry->DE_NAMESPACE_ENTRY = namespace_entry;
+        query_entry->flag.DE_READABLE = 1;
+        query_entry->flag.DE_WRITABLE = 1;
+        query_entry->flag.DE_NAMESPACE_ENTRY = namespace_entry;
 
         *entry = query_entry;
     }

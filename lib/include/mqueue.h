@@ -84,7 +84,7 @@
 //! \return NULL if `q` is empty.
 //!
 #define MQ_DEQUEUE(q)                                                   \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) _ret;                                                 \
                                                                         \
         _ret = (q);                                                     \
@@ -145,7 +145,7 @@
 //! \return NULL if `q` is empty.
 //!
 #define MQ_UNTAIL(q)                                                    \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) _ret;                                                 \
                                                                         \
         if ((q) == NULL) {                                              \
@@ -246,7 +246,7 @@
 //! \return NULL if no matching entry was found nor removed.
 //!
 #define MQ_REMOVE_CONDITIONAL(q, expr)                                  \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) entry = (q);                                          \
                                                                         \
         while (entry != NULL) {                                         \
@@ -273,7 +273,7 @@
 //! \return int 1 if element `x` was removed from `q`.
 //!
 #define MQ_REMOVE_SAFE(q, x)                                            \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) _tmp = q;                                             \
         int _ret = 0;                                                   \
                                                                         \
@@ -301,7 +301,7 @@
 //! \return int position of `x` in `q` if it is contained within.
 //!
 #define MQ_CONTAINS(q, x)                                               \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) _tmp = (q);                                           \
         int _cnt = 0;                                                   \
                                                                         \
@@ -335,7 +335,7 @@
 //! \return NULL if no entry matched `expr`.
 //!
 #define MQ_FIND(q, expr)                                                \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) entry = (q);                                          \
                                                                         \
         while (entry != NULL) {                                         \
@@ -357,7 +357,7 @@
 //! \return NULL if `idx >= MQ_SIZE (q)
 //!
 #define MQ_FIND_IDX(q, idx)                                             \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) _tmp = (q);                                           \
         int _cnt = 0;                                                   \
                                                                         \
@@ -421,7 +421,7 @@
 //! \return typeof (q2) whose value is `q2` if `q1 is NULL and `q2` is not NULL
 //!
 #define MQ_CONCAT(q1, q2)                                               \
-    ({                                                                  \
+    __extension__({                                                     \
         if ((q1) == NULL) {                                             \
             (q1) = (q2);                                                \
         } else if ((q2)) {                                              \
@@ -443,7 +443,7 @@
 //! \return int number of elmeents in `q`.
 //!
 #define MQ_SIZE(q)                                                      \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) _tmp = (q);                                           \
         int _cnt = 0;                                                   \
                                                                         \
@@ -466,7 +466,7 @@
 //! \return int number of elmeents in `q` matching `cond`.
 //!
 #define MQ_SIZE_COND(q, expr)                                           \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) entry = (q);                                          \
         int _cnt = 0;                                                   \
         while (entry != NULL) {                                         \
@@ -540,7 +540,7 @@
 //! \return void
 //!
 #define MQ_FOREACH(q, expr)                                             \
-    ({                                                                  \
+    __extension__({                                                     \
         typeof(q) entry = (q);                                          \
                                                                         \
      while (entry != NULL) {                                            \

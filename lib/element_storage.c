@@ -7,6 +7,7 @@
 
 #include "context_private.h"
 #include "collection.h"
+#include "element_storage.h"
 #include "log.h"
 
 //!
@@ -43,7 +44,7 @@ struct disir_element_storage
 
 // String hashing function for the multimap
 // http://www.cse.yorku.ca/~oz/hash.html
-unsigned long djb2 (char *str)
+static unsigned long djb2 (char *str)
 {
     unsigned long hash = 5381;
     char c;
@@ -153,7 +154,7 @@ dx_element_storage_numentries (struct disir_element_storage *storage)
 //! Will increment context refcount.
 enum disir_status
 dx_element_storage_add (struct disir_element_storage *storage,
-                        const char * const name,
+                        const char * name,
                         struct disir_context *context)
 {
     enum disir_status status;
@@ -168,7 +169,7 @@ dx_element_storage_add (struct disir_element_storage *storage,
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    keys_in_map = multimap_contains_key (storage->es_map, (void *)name);
+    keys_in_map = multimap_contains_key (storage->es_map, name);
     if (keys_in_map == 0)
     {
         // Map does not contain a key with this name. Allocate space to store
@@ -180,7 +181,7 @@ dx_element_storage_add (struct disir_element_storage *storage,
 
     // Add to map - will check if it already exists or not.
     res = multimap_push_value (storage->es_map,
-            (keys_in_map ? (void *) name : key),
+            (keys_in_map ? name : key),
             context);
     if (res == (-ENOMEM))
     {
@@ -208,7 +209,7 @@ dx_element_storage_add (struct disir_element_storage *storage,
     return DISIR_STATUS_OK;;
 list_error:
     multimap_remove_value (storage->es_map,
-        (keys_in_map ? (void *)name : key),
+        (keys_in_map ? name : key),
         free, // Free's the allocated memory above, if removing last element with this key name.
         NULL);
 
@@ -227,7 +228,7 @@ dx_element_storage_remove (struct disir_element_storage *storage,
                            const char * const name,
                            struct disir_context *context)
 {
-    multimap_remove_value (storage->es_map, (void*)name, free, context);
+    multimap_remove_value (storage->es_map, name, free, context);
     if (list_remove (storage->es_list, context))
     {
         dx_context_decref (&context);
@@ -246,7 +247,7 @@ dx_element_storage_get (struct disir_element_storage *storage,
     struct disir_collection *col;
     struct multimap_value_iterator *iter;
 
-    iter = multimap_fetch (storage->es_map, (void *) name);
+    iter = multimap_fetch (storage->es_map, name);
     if (iter == NULL)
     {
         return DISIR_STATUS_NOT_EXIST;
@@ -358,7 +359,7 @@ dx_element_storage_get_first(struct disir_element_storage *storage,
 {
     struct disir_context *keyval;
 
-    keyval = multimap_get_first (storage->es_map, (void *) name);
+    keyval = multimap_get_first (storage->es_map, name);
     if (keyval == NULL)
     {
         return DISIR_STATUS_NOT_EXIST;

@@ -1,5 +1,5 @@
 
-enum disir_status
+static enum disir_status
 restriction_config_parent_section_max_entry (struct disir_mold **mold)
 {
     enum disir_status status;

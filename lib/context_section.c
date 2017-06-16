@@ -104,7 +104,7 @@ dx_section_finalize (struct disir_context *section)
     }
     default:
     {
-        dx_crash_and_burn ("%s: %s not supported - Impossible", __FUNCTION__,
+        dx_crash_and_burn ("%s: %s not supported - Impossible", __func__,
                            dc_context_type_string (section->cx_parent_context));
     }
     }

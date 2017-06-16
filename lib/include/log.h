@@ -63,54 +63,53 @@ void dx_log_disir_va (enum disir_log_level dll,
                 const char *fmt_message, ...);
 
 
-#define _log_disir_full(level, severity, context, instance, log_context, prefix, message, ...) \
+#define _log_disir_full(level, severity, context, instance, log_context, prefix, ...) \
     dx_log_disir_va (level, \
                  severity, \
                  context, \
                  instance, \
                  log_context, \
                  __FILE__, \
-                 __FUNCTION__, \
+                 __func__, \
                  __LINE__, \
                  prefix, \
-                 message, \
                  ##__VA_ARGS__)
 
 // Hide away some details for log_disir
-#define _log_disir_level(level, message, ...) \
-    _log_disir_full (level, 0, NULL, NULL, 0, NULL, message, ##__VA_ARGS__)
-#define _log_disir_level_context(level, severity, context, message, ...) \
-    _log_disir_full (level, severity, context, NULL, 0, NULL, message, ##__VA_ARGS__)
-#define _log_disir_level_debug(severity, message, ...) \
-    _log_disir_full (DISIR_LOG_LEVEL_DEBUG, severity, NULL, NULL, 0, NULL, message, ##__VA_ARGS__)
+#define _log_disir_level(level, ...) \
+    _log_disir_full (level, 0, NULL, NULL, 0, NULL, ##__VA_ARGS__)
+#define _log_disir_level_context(level, severity, context, ...) \
+    _log_disir_full (level, severity, context, NULL, 0, NULL, ##__VA_ARGS__)
+#define _log_disir_level_debug(severity, ...) \
+    _log_disir_full (DISIR_LOG_LEVEL_DEBUG, severity, NULL, NULL, 0, NULL, ##__VA_ARGS__)
 
 
-#define log_fatal_context(context, message, ...) \
-    _log_disir_level_context (DISIR_LOG_LEVEL_FATAL, 0, context, message, ##__VA_ARGS__)
-#define log_error_context(context, message, ...) \
-    _log_disir_level_context (DISIR_LOG_LEVEL_WARNING, 0, context, message, ##__VA_ARGS__)
-#define log_warn_context(context, message, ...) \
-    _log_disir_level_context (DISIR_LOG_LEVEL_ERROR, 0, context, message, ##__VA_ARGS__)
-#define log_info_context(context, message, ...) \
-    _log_disir_level_context (DISIR_LOG_LEVEL_INFO, 0, context, message, ##__VA_ARGS__)
-#define log_debug_context(severity, context, message, ...) \
-    _log_disir_level_context(DISIR_LOG_LEVEL_DEBUG, severity, context, message, ##__VA_ARGS__)
+#define log_fatal_context(context, ...) \
+    _log_disir_level_context (DISIR_LOG_LEVEL_FATAL, 0, context, ##__VA_ARGS__)
+#define log_error_context(context, ...) \
+    _log_disir_level_context (DISIR_LOG_LEVEL_WARNING, 0, context, ##__VA_ARGS__)
+#define log_warn_context(context, ...) \
+    _log_disir_level_context (DISIR_LOG_LEVEL_ERROR, 0, context, ##__VA_ARGS__)
+#define log_info_context(context, ...) \
+    _log_disir_level_context (DISIR_LOG_LEVEL_INFO, 0, context, ##__VA_ARGS__)
+#define log_debug_context(severity, context, ...) \
+    _log_disir_level_context(DISIR_LOG_LEVEL_DEBUG, severity, context, ##__VA_ARGS__)
 
 //! Log at different log levels
-#define log_fatal(message, ...) _log_disir_level(DISIR_LOG_LEVEL_FATAL, message, ##__VA_ARGS__)
-#define log_error(message, ...) _log_disir_level(DISIR_LOG_LEVEL_ERROR, message, ##__VA_ARGS__)
-#define log_warn(message, ...) _log_disir_level(DISIR_LOG_LEVEL_WARNING, message, ##__VA_ARGS__)
-#define log_test(message, ...) _log_disir_level(DISIR_LOG_LEVEL_TEST, message, ##__VA_ARGS__)
-#define log_info(message, ...) _log_disir_level(DISIR_LOG_LEVEL_INFO, message, ##__VA_ARGS__)
-#define log_debug(severity, message, ...) _log_disir_level_debug(severity, message, ##__VA_ARGS__)
-#define TRACE_ENTER(message, ...) _log_disir_level(DISIR_LOG_LEVEL_TRACE_ENTER, message, ##__VA_ARGS__)
-#define TRACE_EXIT(message, ...) _log_disir_level(DISIR_LOG_LEVEL_TRACE_EXIT, message, ##__VA_ARGS__)
+#define log_fatal(...) _log_disir_level(DISIR_LOG_LEVEL_FATAL, ##__VA_ARGS__)
+#define log_error(...) _log_disir_level(DISIR_LOG_LEVEL_ERROR, ##__VA_ARGS__)
+#define log_warn(...) _log_disir_level(DISIR_LOG_LEVEL_WARNING, ##__VA_ARGS__)
+#define log_test(...) _log_disir_level(DISIR_LOG_LEVEL_TEST, ##__VA_ARGS__)
+#define log_info(...) _log_disir_level(DISIR_LOG_LEVEL_INFO, ##__VA_ARGS__)
+#define log_debug(severity, ...) _log_disir_level_debug(severity, ##__VA_ARGS__)
+#define TRACE_ENTER(...) _log_disir_level(DISIR_LOG_LEVEL_TRACE_ENTER, ##__VA_ARGS__)
+#define TRACE_EXIT(...) _log_disir_level(DISIR_LOG_LEVEL_TRACE_EXIT, ##__VA_ARGS__)
 
 
 // Log specially to context
 // Will issue a DISIR_LOG_LEVEL_ERROR log entry to stream.
-#define dx_log_context(context, message, ...) \
-    _log_disir_full(DISIR_LOG_LEVEL_ERROR, 0, context, NULL, 1, NULL, message, ##__VA_ARGS__)
+#define dx_log_context(context, ...) \
+    _log_disir_full(DISIR_LOG_LEVEL_ERROR, 0, context, NULL, 1, NULL, ##__VA_ARGS__)
 
 
 //! Crash and burn.. Output message on stderr before it aborts.

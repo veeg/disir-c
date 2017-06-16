@@ -73,7 +73,7 @@ dx_log_format (enum disir_log_level dll, int severity, const char *prefix,
     char buffer[512];
     size_t time_written;
     int res;
-    int buffer_size;
+    size_t buffer_size;
     FILE *stream;
     time_t now;
     struct tm *utctime;
@@ -139,7 +139,7 @@ dx_log_format (enum disir_log_level dll, int severity, const char *prefix,
     utctime = gmtime (&now);
 
     time_written = strftime (buffer, buffer_size, "[%Y-%m-%d %H:%M:%S]", utctime);
-    if (time_written >= buffer_size || time_written <= 0)
+    if (time_written >= buffer_size || time_written == 0)
     {
         dx_crash_and_burn ("strftime returned: %d - not within buffer size: %d",
             time_written, buffer_size);
@@ -171,7 +171,7 @@ dx_log_format (enum disir_log_level dll, int severity, const char *prefix,
             (prefix != NULL ? prefix : ""),
             (prefix != NULL ? " " : "")
             );
-    if (res >= buffer_size - time_written || res < 0)
+    if (res >= (int)(buffer_size - time_written) || res < 0)
     {
         // Buffer not large enough, or encoding error..
         dx_crash_and_burn ("snprintf() returned res: %d - size: %d",
@@ -321,6 +321,7 @@ dx_log_disir (enum disir_log_level dll,
     char enter_string[] = "ENTER";
     char exit_string[] = "EXIT";
 
+    (void) &file;
     prefix = NULL;
     suffix = NULL;
 
@@ -358,7 +359,7 @@ dx_log_disir (enum disir_log_level dll,
                 "", "",
                 function,
                 line);
-        if (res > 0 || res < 255)
+        if (res > 0 && res < 255)
         {
             suffix_buffer[res] = '\0';
             suffix = suffix_buffer;
@@ -371,7 +372,7 @@ dx_log_disir (enum disir_log_level dll,
         res = snprintf (suffix_buffer, 255, "%s %s: ",
                         (dll == DISIR_LOG_LEVEL_TRACE_ENTER ? enter_string : exit_string),
                         function);
-        if (res > 0 || res < 255)
+        if (res > 0 && res < 255)
         {
             suffix_buffer[res] = '\0';
             prefix = suffix_buffer;

@@ -487,7 +487,7 @@ dc_set_value_type (struct disir_context *context, enum disir_value_type type)
     }
     default:
     {
-        dx_crash_and_burn ("%s: %s not handled", __FUNCTION__, dc_context_type_string (context));
+        dx_crash_and_burn ("%s: %s not handled", __func__, dc_context_type_string (context));
         return DISIR_STATUS_INTERNAL_ERROR; // not reached
     }
     }

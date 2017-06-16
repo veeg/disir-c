@@ -176,7 +176,7 @@ dx_default_destroy (struct disir_default **def)
             else
             {
                 log_fatal ("%s - default context (%p) has parent context (%p) type %s. Impossible",
-                            __FUNCTION__, context, context->cx_parent_context,
+                            __func__, context, context->cx_parent_context,
                             dc_context_type_string (context->cx_parent_context));
             }
         }
@@ -547,7 +547,7 @@ dc_get_default (struct disir_context *context, struct semantic_version *semver,
     else
     {
         log_fatal ("%s - context type '%s' slipped through guard.",
-                   __FUNCTION__, dc_context_type_string (context));
+                   __func__, dc_context_type_string (context));
         return DISIR_STATUS_INTERNAL_ERROR;
     }
 

@@ -81,7 +81,7 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
 {
     va_list args;
     int i;
-    size_t n = 128;
+    int n = 128;
     int ret = 0;
     void *moved = NULL;
 
@@ -535,14 +535,14 @@ compare_all_elements (struct disir_context *lhs, struct disir_context *rhs,
         dc_putcontext (&element);
 
         // Entry already handled. Skip it.
-        if (multimap_contains_key (map, (void *) name))
+        if (multimap_contains_key (map, name))
         {
             dc_putcontext (&element);
             continue;
         }
 
         // Mark name as already handled
-        multimap_push_value (map, (void *) name, (void *)1);
+        multimap_push_value (map, name, (void *)1);
 
         // Kick off a sub-search between lhs and rhs on name.
         // Store already mapped entries in map.
@@ -591,7 +591,7 @@ compare_all_elements (struct disir_context *lhs, struct disir_context *rhs,
         dc_putcontext (&element);
 
         // Entry exists in lhs - skip it
-        if (multimap_contains_key (map, (void *) name))
+        if (multimap_contains_key (map, name))
         {
             dc_putcontext (&element);
             continue;

@@ -1,4 +1,5 @@
-enum disir_status
+
+static enum disir_status
 restriction_config_parent_keyval_max_entry (struct disir_mold **mold)
 {
     enum disir_status status;

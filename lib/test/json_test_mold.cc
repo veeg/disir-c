@@ -1,6 +1,6 @@
 
 
-enum disir_status
+static enum disir_status
 json_test_mold (struct disir_mold **mold)
 {
     enum disir_status status;

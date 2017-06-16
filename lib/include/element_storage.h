@@ -51,7 +51,7 @@ dx_element_storage_numentries (struct disir_element_storage *storage);
 //!
 enum disir_status
 dx_element_storage_add (struct disir_element_storage *storage,
-                        const char * const name,
+                        const char *name,
                         struct disir_context *context);
 
 //! \brief Remove a context from the element storage

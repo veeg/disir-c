@@ -33,6 +33,21 @@ dc_restriction_collection (struct disir_context *context, struct disir_collectio
 const char *
 dc_restriction_enum_string (enum disir_restriction_type restriction);
 
+//! \brief Return enum type of the matched input string.
+//!
+//! \return DISIR_RESTRICTION_UNKNOWN if string does not match a known type.
+//! \return matched restriction enum on success.
+//!
+enum disir_restriction_type
+dc_restriction_string_to_enum (const char *string);
+
+//! \brief Return a string representation of the group this restriction belongs to.
+//!
+//! \return Stringified group type of restriction.
+//!
+const char *
+dc_restriction_group_type (enum disir_restriction_type restriction);
+
 //! \brief Return a string representation of the restriction type of the restriction context.
 //!
 //! \return 'INVALID' if context is NULL or not of type DISIR_CONTEXT_RESTRICTION

@@ -238,7 +238,7 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
         break;
     default:
     {
-        dx_crash_and_burn ("%s: %s unhandled", __FUNCTION__, dc_context_type_string (context));
+        dx_crash_and_burn ("%s: %s unhandled", __func__, dc_context_type_string (context));
     }
     }
 
@@ -425,7 +425,7 @@ dx_documentation_destroy (struct disir_documentation **documentation)
         default:
         {
             log_fatal ("%s - context (%p) parent (%p) type '%s' not handled.",
-                       __FUNCTION__, context, context->cx_parent_context,
+                       __func__, context, context->cx_parent_context,
                        dc_context_type_string (context->cx_parent_context));
         }
         }

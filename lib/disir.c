@@ -41,7 +41,8 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
     }
 
     dlerror();
-    dio_reg = dlsym (handle, "dio_register_plugin");
+    // See man dlopen example section
+    *(void **) (&dio_reg) = dlsym (handle, "dio_register_plugin");
     if (dio_reg == NULL)
     {
         disir_error_set (instance,
@@ -63,7 +64,7 @@ load_plugin (struct disir_instance *instance, const char *plugin_filepath, const
     if (status != DISIR_STATUS_OK)
     {
         // Regardless of the error supplied by the plugin, we return PLUGIN_ERROR
-        log_error ("Plugin '%d' failed to register: %s", disir_status_string (status));
+        log_error ("Plugin '%s' failed to register: %s", io_id, disir_status_string (status));
         status = DISIR_STATUS_PLUGIN_ERROR;
         goto error;
     }
@@ -100,7 +101,7 @@ error:
 }
 
 //! INTERNAL STATIC
-enum disir_status
+static enum disir_status
 load_plugins_from_config (struct disir_instance *instance, struct disir_config *config)
 {
     enum disir_status status;

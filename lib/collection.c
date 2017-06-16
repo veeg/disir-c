@@ -219,7 +219,7 @@ dc_collection_create (void)
 enum disir_status
 dc_collection_finished (struct disir_collection **collection)
 {
-    uint32_t index;
+    int index;
     struct disir_context *context;
 
     if (collection == NULL || *collection == NULL)

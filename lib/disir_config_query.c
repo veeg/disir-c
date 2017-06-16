@@ -244,10 +244,14 @@ error:
     return status;
 }
 
+/*
 enum disir_status
 disir_config_get_keyval_integer (struct disir_config *config, int64_t *value,
                                  const char *name, ...)
 {
+    (void) &config;
+    (void) &value;
+    (void) &name;
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
@@ -255,6 +259,9 @@ enum disir_status
 disir_config_set_keyval_integer (struct disir_config *config, int64_t value,
                                  const char *name, ...)
 {
+    (void) &config;
+    (void) &value;
+    (void) &name;
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
@@ -262,6 +269,9 @@ enum disir_status
 disir_config_get_keyval_float (struct disir_config *config, double value,
                                const char *name, ...)
 {
+    (void) &config;
+    (void) &value;
+    (void) &name;
     return DISIR_STATUS_INTERNAL_ERROR;
 }
 
@@ -270,8 +280,12 @@ enum disir_status
 disir_config_set_keyval_float (struct disir_config *config, double value,
                                const char *name, ...)
 {
+    (void) &config;
+    (void) &value;
+    (void) &name;
     return DISIR_STATUS_INTERNAL_ERROR;
 }
+*/
 
 //! PUBLIC API: high-level
 enum disir_status

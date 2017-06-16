@@ -94,7 +94,8 @@ context_get_deprecated_structure (struct disir_context *context,
     return DISIR_STATUS_OK;
 }
 
-void
+//! STATIC API
+static void
 context_remove_from_parent (struct disir_context **context)
 {
     struct disir_element_storage *storage = NULL;
@@ -164,41 +165,6 @@ context_remove_from_parent (struct disir_context **context)
     {
         dx_element_storage_remove (storage, name, *context);
     }
-}
-
-//! PUBLIC API
-enum disir_status
-dc_printerror (struct disir_context *context, char *buffer,
-               int32_t buffer_size, int32_t *bytes_written)
-{
-    int32_t min_bytes;
-
-    if (context == NULL || buffer == NULL)
-    {
-        return DISIR_STATUS_INVALID_ARGUMENT;
-    }
-
-    if (context->cx_error_message == NULL ||
-        context->cx_error_message_size == 0)
-    {
-        return DISIR_STATUS_NO_ERROR;
-    }
-
-    // XXX Null terminating character is not considered
-    // FOR THE MOMENT.
-
-    if (buffer_size < context->cx_error_message_size)
-    {
-        min_bytes = buffer_size;
-    }
-    else
-    {
-        min_bytes = context->cx_error_message_size;
-    }
-
-    memcpy (buffer, context->cx_error_message, min_bytes);
-
-    return DISIR_STATUS_OK;
 }
 
 //! PUBLIC API
@@ -368,7 +334,7 @@ dc_finalize (struct disir_context **context)
     if (dx_context_type_is_toplevel ((*context)->cx_type))
     {
         dx_log_context (*context, "Cannot call %s() on top-level context( %s )",
-                        __FUNCTION__, dc_context_type_string (*context));
+                        __func__, dc_context_type_string (*context));
         return DISIR_STATUS_WRONG_CONTEXT;
     }
 
@@ -435,7 +401,7 @@ dc_finalize (struct disir_context **context)
             }
             if (context_get_deprecated_structure (*context, &deprecated) == DISIR_STATUS_OK)
             {
-                if (deprecated->sv_major != -1)
+                if (deprecated->sv_major != 0)
                     dx_mold_update_version ((*context)->cx_root_context->cx_mold, deprecated);
             }
             // TODO: Add similar test to deprecated as is done for introduced
@@ -640,7 +606,7 @@ dc_get_name (struct disir_context *context, const char **name, int32_t *name_siz
     default:
     {
         log_fatal ("%s context %s slipped through guard.",
-                   __FUNCTION__, dc_context_type_string (context));
+                   __func__, dc_context_type_string (context));
         status = DISIR_STATUS_WRONG_CONTEXT;
     }
     }
@@ -672,7 +638,7 @@ dc_resolve_root_name (struct disir_context *context, char **output)
     struct disir_context *current_context = NULL;
     const char *name = NULL;
     int32_t name_size;
-    void *buffer;
+    char *buffer;
 
     TRACE_ENTER ("context (%p) output (%p)", context, output);
 
@@ -1277,7 +1243,7 @@ dc_get_elements (struct disir_context *context, struct disir_collection **collec
     default:
     {
         dx_crash_and_burn ("%s: %s not handled/implemented/supported",
-                           __FUNCTION__, dc_context_type_string (context));
+                           __func__, dc_context_type_string (context));
     }
     }
 

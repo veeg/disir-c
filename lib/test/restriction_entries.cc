@@ -1,5 +1,5 @@
 
-enum disir_status
+static enum disir_status
 restriction_entries (struct disir_mold **mold)
 {
     enum disir_status status;

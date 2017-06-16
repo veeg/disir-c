@@ -20,6 +20,7 @@ disir_log_user (struct disir_instance *instance, const char *message, ...)
     va_list args;
 
     // TODO: disir argument not error checked. its not USED anyway.. (yet)
+    (void) &instance;
     if (message == NULL)
         return;
 

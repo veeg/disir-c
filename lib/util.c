@@ -67,7 +67,7 @@ dc_semantic_version_string (char *buffer, int32_t buffer_size, struct semantic_v
     if (buffer == NULL || semver == NULL)
     {
         log_warn ("%s invoked with NULL pointer(s) (buffer %p, semver: %p)",
-                  __FUNCTION__, buffer, semver);
+                  __func__, buffer, semver);
         return NULL;
     }
 
@@ -289,7 +289,7 @@ dx_value_copy (struct disir_value *destination, struct disir_value *source)
         return dx_value_set_boolean (destination, source->dv_boolean);
         break;
     case DISIR_VALUE_TYPE_UNKNOWN:
-        dx_crash_and_burn ("%s unhandled", __FUNCTION__);
+        dx_crash_and_burn ("%s unhandled", __func__);
         break;
     }
 

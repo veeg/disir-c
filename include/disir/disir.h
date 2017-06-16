@@ -150,17 +150,17 @@ struct disir_entry
     char                *de_entry_name;
     union
     {
-        uint64_t        de_attributes;
+        unsigned int    de_attributes;
         struct
         {
-                        //! Entry is readbale by the user who queried this entry.
-            uint64_t    DE_READABLE                 : 1,
-                        //! Entry is writable by the user who queried this entry.
-                        DE_WRITABLE                 : 1,
-                        //! Entry is valid for all subentries of this namespace.
-                        DE_NAMESPACE_ENTRY          : 1,
-                                                    : 0;
-        };
+                        //! Entry is readbale by the user who queried this entry
+            unsigned int DE_READABLE                    : 1,
+                         //! Entry is writable by the user who queried this entry.
+                         DE_WRITABLE                    : 1,
+                         //! Entry is valid for all subentries of this namespace.
+                         DE_NAMESPACE_ENTRY             : 1,
+                                                        : 0;
+        } flag;
     };
 
     //! Double-linked list pointers.

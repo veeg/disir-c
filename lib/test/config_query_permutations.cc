@@ -1,5 +1,5 @@
 
-enum disir_status
+static enum disir_status
 config_query_permutations (struct disir_mold **mold)
 {
     enum disir_status status;

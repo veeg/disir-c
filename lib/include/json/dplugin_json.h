@@ -45,6 +45,8 @@ namespace dio
         //!
         JsonIO (struct disir_instance *disir);
 
+        virtual ~JsonIO () = default;
+
         //! \brief reads a file from filepath and parses it into the json value object
         //!
         //! \param[in] filepath path to where the file resides

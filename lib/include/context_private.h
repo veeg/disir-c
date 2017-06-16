@@ -17,14 +17,14 @@ struct disir_context
 
     //! States this context can be in.
     union {
-        uint64_t        cx_state;
+        unsigned int    cx_state;
         struct {
-            uint64_t    CONTEXT_STATE_CONSTRUCTING              : 1,
-                        CONTEXT_STATE_FINALIZED                 : 2,
-                        CONTEXT_STATE_INVALID                   : 3,
-                        CONTEXT_STATE_FATAL                     : 4,
-                        CONTEXT_STATE_DESTROYED                 : 5,
-                        CONTEXT_STATE_IN_PARENT                 : 6,
+            unsigned int CONTEXT_STATE_CONSTRUCTING             : 1,
+                         CONTEXT_STATE_FINALIZED                : 2,
+                         CONTEXT_STATE_INVALID                  : 3,
+                         CONTEXT_STATE_FATAL                    : 4,
+                         CONTEXT_STATE_DESTROYED                : 5,
+                         CONTEXT_STATE_IN_PARENT                : 6,
                                                                 : 0;
         };
     };
@@ -78,12 +78,12 @@ struct disir_context
 //! Check if the passed disir_context pointer is non-NULL,
 //! is not of type DISIR_CONTEXT_UNKNOWN and its state is not INVALID.
 #define CONTEXT_NULL_INVALID_TYPE_CHECK(context) \
-    dx_context_sp_full_check_log_error (context, __FUNCTION__)
+    dx_context_sp_full_check_log_error (context, __func__)
 
 //! \see CONTEXT_NULL_INVALID_TYPE_CHECK
 //! Input a disir_context double pointers instead.
 #define CONTEXT_DOUBLE_NULL_INVALID_TYPE_CHECK(context) \
-    dx_context_dp_full_check_log_error (context, __FUNCTION__)
+    dx_context_dp_full_check_log_error (context, __func__)
 
 
 //

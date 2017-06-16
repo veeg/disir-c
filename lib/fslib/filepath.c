@@ -10,6 +10,7 @@ fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_reg
 {
     int res;
 
+    (void) &instance;
     // QUESTION: Dis-allow access to only '/' query?
     // QUESTION: Dis-allow access to queries starting with /? That is reserved right?
 
@@ -31,6 +32,7 @@ fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_regis
 {
     int res;
 
+    (void) &instance;
     // QUESTION: Dis-allow access to only '/' query?
     // QUESTION: Dis-allow access to queries starting with /? That is reserved right?
 

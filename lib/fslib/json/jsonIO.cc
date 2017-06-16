@@ -140,7 +140,7 @@ JsonIO::add_error (const char *prefix, const char *message, va_list args)
 
     if (prefix)
     {
-        bytes = sprintf (buf, prefix);
+        bytes = sprintf (buf, "%s", prefix);
     }
 
     bytes = vsprintf (&buf[bytes], message, args);

@@ -70,6 +70,9 @@ dio_test_config_read (struct disir_instance *instance,
     output_mold func_mold;
     char namespace_entry[PATH_MAX];
 
+    (void) &instance;
+    (void) &plugin;
+
     func_mold = molds[std::string(entry_id)];
     if (func_mold == NULL)
     {
@@ -102,6 +105,10 @@ enum disir_status
 dio_test_config_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                        const char *entry_id, struct disir_entry **entry)
 {
+    (void) &instance;
+    (void) &plugin;
+    (void) &entry;
+
     if (molds[entry_id] == NULL)
         return DISIR_STATUS_NOT_EXIST;
     else
@@ -115,6 +122,10 @@ dio_test_mold_read (struct disir_instance *instance, struct disir_register_plugi
     enum disir_status status;
     output_mold func_mold;
     char namespace_entry[PATH_MAX];
+
+    (void) &instance;
+    (void) &plugin;
+    (void) &entry_id;
 
     func_mold = molds[entry_id];
     if (func_mold == NULL)
@@ -144,6 +155,10 @@ dio_test_mold_entries (struct disir_instance *instance,
     struct disir_entry *queue;
     struct disir_entry *entry;
 
+    (void) &instance;
+    (void) &plugin;
+
+
     queue = NULL;
 
     for (auto i = molds.begin(); i != molds.end(); ++i)
@@ -153,11 +168,11 @@ dio_test_mold_entries (struct disir_instance *instance,
             continue;
 
         entry->de_entry_name = strdup (i->first.c_str());
-        entry->DE_READABLE = 1;
-        entry->DE_WRITABLE = 1;
+        entry->flag.DE_READABLE = 1;
+        entry->flag.DE_WRITABLE = 1;
         if (i->first.back() == '/')
         {
-            entry->DE_NAMESPACE_ENTRY = 1;
+            entry->flag.DE_NAMESPACE_ENTRY = 1;
         }
         MQ_ENQUEUE (queue, entry);
     }
@@ -167,13 +182,14 @@ dio_test_mold_entries (struct disir_instance *instance,
     return DISIR_STATUS_OK;
 }
 
-
-
 enum disir_status
 dio_test_mold_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                      const char *entry_id, struct disir_entry **entry)
 {
     char namespace_entry[PATH_MAX];
+
+    (void) &instance;
+    (void) &plugin;
 
     if (entry_id == NULL)
         return DISIR_STATUS_INTERNAL_ERROR;;
@@ -199,11 +215,11 @@ dio_test_mold_query (struct disir_instance *instance, struct disir_register_plug
             return DISIR_STATUS_NO_MEMORY;
 
         (*entry)->de_entry_name = strdup (name.c_str());
-        (*entry)->DE_READABLE = 1;
-        (*entry)->DE_WRITABLE = 1;
+        (*entry)->flag.DE_READABLE = 1;
+        (*entry)->flag.DE_WRITABLE = 1;
         if (name.back() == '/')
         {
-            (*entry)->DE_NAMESPACE_ENTRY = 1;
+            (*entry)->flag.DE_NAMESPACE_ENTRY = 1;
         }
     }
 
