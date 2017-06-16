@@ -72,10 +72,10 @@ dc_semantic_version_string (char *buffer, int32_t buffer_size, struct semantic_v
     }
 
     res = snprintf (buffer, buffer_size,
-            "%d.%d.%d", semver->sv_major, semver->sv_minor, semver->sv_patch);
+            "%u.%u.%u", semver->sv_major, semver->sv_minor, semver->sv_patch);
     if (res < 0 || res >= buffer_size)
     {
-        log_warn ("Insufficient buffer( %p ) size( %d ) to copy semver (%d.%d.%d) - Res: %d",
+        log_warn ("Insufficient buffer( %p ) size( %d ) to copy semver (%u.%u.%u) - Res: %d",
                     buffer, buffer_size, semver->sv_major, semver->sv_minor,
                     semver->sv_patch, res);
         return NULL;
@@ -98,7 +98,7 @@ dc_semantic_version_compare (struct semantic_version *s1, struct semantic_versio
     if (res == 0)
         res = s1->sv_patch - s2->sv_patch;
 
-    log_debug (8, "s1 (%d.%d.%d) vs s2 (%d.%d.%d) res (%d)",
+    log_debug (8, "s1 (%u.%u.%u) vs s2 (%u.%u.%u) res (%d)",
                     s1->sv_major, s1->sv_minor, s1->sv_patch,
                     s2->sv_major, s2->sv_minor, s2->sv_patch, res);
 
@@ -114,7 +114,7 @@ dc_semantic_version_set (struct semantic_version *destination, struct semantic_v
         return;
     }
 
-    log_debug (5, "setting semver (%p) to %d.%d.%d from source (%p)",
+    log_debug (5, "setting semver (%p) to %u.%u.%u from source (%p)",
                destination,
                source->sv_major, source->sv_minor, source->sv_patch,
                source);
@@ -423,7 +423,7 @@ dx_value_get_float (struct disir_value *value, double *output_double)
     }
     if (value->dv_type != DISIR_VALUE_TYPE_FLOAT)
     {
-        log_debug (0, "invoked with non-float value type %s (%d)",
+        log_debug (0, "invoked with non-float value type %s (t%d)",
                    dx_value_type_string (value->dv_type), value->dv_type);
         return DISIR_STATUS_WRONG_VALUE_TYPE;
     }

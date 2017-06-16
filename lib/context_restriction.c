@@ -207,7 +207,7 @@ dx_restriction_create (struct disir_context *context)
 
     restriction->re_context = context;
     restriction->re_introduced.sv_major = 1;
-    restriction->re_deprecated.sv_major = UINT_MAX;
+    restriction->re_deprecated.sv_major = 0;
     restriction->re_type = DISIR_RESTRICTION_UNKNOWN;
 
     return restriction;
@@ -1104,6 +1104,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
         // Is restriction valid for this version of the config
         if (dc_semantic_version_compare (config_version, &entry->re_introduced) < 0)
         {
+            log_debug (9, "queue entry introduced later than config. Skipping");
             restriction_entries_oor += 1;
             // XXX MQ_FOREACH does not increment entry if continue is used
             entry = entry->next;
