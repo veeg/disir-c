@@ -1,0 +1,599 @@
+= Disir JSON back-end specification
+Vegard Sandenge
+Issue 0/1-draft
+
+This document describes the JSON back-end specification.
+The specification itself is numbered with issue and revision.
+Within each issue, there will be no breaking changes to the specification.
+Each revision of an issue only contains clarifying additions or non-breaking
+changes to the specification.
+
+NOTE: This issue is *NOT* stable. Any changes done between revisions on
+issue 0 may be breaking.
+
+== Introduction
+
+The Disir JSON back-end specification is intended to define the JSON
+serialization/deserialization format to represent a mold and config entry
+from the Disir Core specification, in the JSON file format.
+
+It is intended to be used as an implementation for the Disir Org specification,
+providing the system with a way to install mold entries, write config entries and
+serialize/deserialize the config entries to an archive.
+
+This specification provides 4 different definitions, see separate sections for more details:
+
+* config entry: the primary key-value only file format.
+* mold entry: the definition of all elements in the config entry with the file format.
+* mold namespace entry: The way to express namespaces from Disir Org.
+* mold namespace override entry: Mechanism to override default values from the mold
+namespace entry for the resulting config namespace entry.
+
+
+=== Motivation
+
+The following properties are sough after when defining a serialization back-end:
+
+. Easily editable by humans through a text editor.
+. Provide a suitable way of defining a mold namespace entry.
+. Allow the definition of a mold namespace override entry, which changes
+the default value of a key-value pair from the mold namespace entry.
+
+== Overview and definitions
+
+The `mold namespace override entry` is entirely a construct of this specification;
+the Disir Org API only resolves a complete mold. This allows the system to provide
+multiple default entries with different values than from the mold namespace entry,
+without installing config entries. This fulfills the rule of thumb to not interfere
+with the users config entries.
+
+The serialization_id as defined by Disir Org for this back-end is "JSON".
+
+== Configuration entry
+
+The Disir Org implementation must provide a `config_base_id`, which is a file path,
+based on group_id. The file system location of the config entry is a join
+of this config_base_id and the entry_id, with the file extension `.json`.
+
+.Disk location example: config_base_id = /etc/disir/config/, entry_id = user/homescreen
+----
+/etc/disir/config/user/homescreen.json
+----
+
+The most bare-boned config entry looks like this:
+
+[[source, JSON]]
+----
+{}
+----
+
+That is, it is an empty, valid JSON serialization. This will fallback to default version, with
+no keys provided.
+
+=== Version
+
+To specify which version of the mold entry this config entry was last synced with,
+the `version` string key present at global scope, with a string value made up of exactly
+non-negative integers, separated by a dot (`.`).
+
+[[source, JSON]]
+----
+{
+    "version" : "1.5"
+}
+----
+
+=== Config
+
+To indicate that this is a valid config entry representation, the expression of
+key-value pairs is not done in global scope, but rather within the JSON Object which
+is a value of the key `config` string key in global scope.
+
+[[source, JSON]]
+----
+{
+    "config" : {
+        ...
+    }
+}
+----
+
+=== Key-value pair
+
+To express key-value pairs in the config entry, each key is represented with a
+string JSON key in the current scope. The JSON value of this key mimics the value type
+of the key-value pair as defined by the mold.
+That is, if the mold entry defines this key-value
+as either String or Enum, the JSON value type is also a String.
+If the key-value type is boolean, the JSON value type is boolean.
+If the key-value type is float, the JSON value type is float,
+and finally, if the key-value type is numeric, the JSON value type is numeric.
+
+If the maximum number of entries of this key-value is greater than 1 for the current
+version, the value shall be represented as a JSON Array type, where each element
+of the array represent the index of multiple entries for this key, where the value
+is the equivalent JSON value as described above.
+
+.Example: Each key-value type with maximum 1 entry.
+[[source, JSON]]
+----
+{
+    "config" : {
+        "key_boolean" : True,
+        "key_float" : 3.14,
+        "key_integer" : 42,
+        "key_string" : "Bring",
+        "key_enum" : "Icecream"
+    }
+}
+----
+
+.Example: Integer key-value type with 3 instances of the same key.
+[[source, JSON]]
+----
+{
+    "config" : {
+        "open_ports" : [3660, 9000, 9001]
+    }
+}
+----
+
+=== Section
+
+To express a section in the config entry, each section name is represented with a
+string JSON key in the current scope. The JSON value is a JSON Object which opens up
+a new scope that may again contain key-value pairs or sections.
+
+If the maximum number of entries of this section is greater than 1 for the current version,
+the value shall be a JSON Array type, where each element
+of the array represents the index of multiple entries for this section. The value
+for each element in the array is the JSON Object.
+
+.Example: Section with maximum 1 entry.
+[[source, JSON]]
+----
+{
+    "config" : {
+        "section_test" : {
+            "key_boolean" : True,
+            "key_integer" : 42,
+            "section_nested" : {
+                "key_enum" : "Icecream"
+            }
+        }
+    }
+}
+----
+
+.Example: Section with 2 instances of the same section.
+[[source, JSON]]
+----
+{
+    "config" : {
+        "section_test" : [{
+            "key_boolean" : True,
+            "key_integer" : 42
+        },
+        {
+            "key_float" : 3.14,
+            "key_string" : "Bring"
+        }
+        ]
+    }
+}
+----
+
+== Mold entry
+
+The Disir Org implementation must provide a `mold_base_id`, which is a file path,
+based on group_id. The file system location of the mold entry is a join
+of this mold_base_id and the entry_id, with the file extension `.json`.
+
+.Disk location example: mold_base_id = /etc/disir/mold/, entry_id = user/homescreen
+----
+/etc/disir/mold/user/homescreen.json
+----
+
+The most bare-boned mold entry looks like this:
+
+[[source, JSON]]
+----
+{
+    "mold" : {
+    }
+}
+----
+
+That is, it is an almost empty JSON object with a single key "mold", containing
+an object.
+This will fallback to default version, with no elements provided.
+This is however, not so useful. To define a element on the root of the mold,
+simply add a key to the mold with the name of the element, where the value
+is another object.
+
+[[source, JSON]]
+----
+{
+    "mold" : {
+        "system_name" : {
+            ...
+        }
+    }
+}
+----
+
+The contents of this element determines whether or not it is a keyval or a section.
+
+=== Keyval
+
+The available keys in the JSON object for a keyval are as follows:
+
+[horizontal]
+"type":: String representation of the keyval value type it represents.
+The following mapping is done for each value type to a string value:
+* Integer: "INTEGER"
+* Float: "FLOAT"
+* Boolean: "BOOLEAN"
+* String: "STRING"
+* Enum: "ENUM"
+
+"documentation":: String of the documentation property for the keyval.
+
+"restrictions":: See the dedicated subsection.
+
+"introduced":: A string representation of the introduced version property of the keyval.
+This entry is optional. If it is not present, the default version is assumed.
+It MUST contain ONE dot (.), separating two non-negative integers.
+
+"deprecated":: A string representation of the deprecated property of the keyval.
+This entry should NOT be present unless the element is deprecated.
+It MUST contain ONE dot (.), separating two non-negative integers.
+
+"defaults":: An array of objects, where each object has the following keys
+and their described values:
+* "value" : A JSON object of the same type described by the "type" field above.
+* "introduced" : A string representation of which version this entry in the array
+holds the value derived to the config entry.
+This entry is optional, If it is not present, the default version is assumed.
+If present the value MUST contain ONE dot (.), separating two non-negative integers.
+
+.Example: Mold entry with a single keyval.
+[[source, JSON]]
+----
+{
+    "mold" : {
+        "system_name" : {
+            "type" : "STRING",
+            "documentation" : "The product name",
+            "defaults" : [{
+                "value" : "System"
+            }]
+        }
+    }
+}
+----
+
+=== Section
+
+The available keys in the JSON object for a section are as follows:
+
+[horizontal]
+"documentation":: String of the documentation property for the section.
+
+"restrictions":: See the dedicated subsection.
+
+"introduced":: A string representation of the introduced version property of the section.
+This entry is optional. If it is not present, the default version is assumed.
+It MUST contain ONE dot (.), separating two non-negative integers.
+
+"deprecated":: A string representation of the deprecated property of the section.
+This entry should NOT be present unless the element is deprecated.
+It MUST contain ONE dot (.), separating two non-negative integers.
+
+"elements":: The presence of this key indicate that the element is a section.
+Its value must be an object, which contains keys two represent elements within this section.
+All values of these keys must be another object, where either the object represent a
+keyval or section.
+
+.Example: Mold entry with a single section.
+[[source, JSON]]
+----
+{
+    "mold" : {
+        "ship" : {
+            "documentation" : "Container for all things cargo ship!",
+            "introduced" : "1.4",
+            "restrictions" : [{
+                "type" : "MAXIMUM_ENTRIES",
+                "value" : 0
+            }],
+            "elements" : {
+                ...
+            }
+        }
+    }
+}
+----
+
+=== Restrictions
+
+The restrictions key can be present on both keyval and section elements.
+It is optional in both cases.
+Its value is required be an array of objects, where each object
+has the following keys, and their described values.
+
+[horizontal]
+"type":: The type property of the restriction.
+The following mapping is done for each type to a string value.
+* RESTRICTION_EXCLUSIVE_VALUE_ENUM: "ENUM"
+* RESTRICTION_EXCLUSIVE_VALUE_RANGE: "RANGE"
+* RESTRICTION_EXCLUSIVE_VALUE_NUMERIC: "NUMERIC"
+* RESTRICTION_INCLUSIVE_ENTRY_MIN: "MINIMUM_ENTRIES"
+* RESTRICTION_INCLUSIVE_ENTRY_MAX: "MAXIMUM_ENTRIES"
+
+"documentation":: A string of the documentation property of the restriction.
+
+"introduced":: A string representation of the introduced version property of the restriction.
+It MUST contain ONE dot (.), separating two non-negative integers.
+
+"deprecated":: A string representation of the deprecated property of the restriction.
+It MUST contain ONE dot (.), separating two non-negative integers.
+
+"value":: The native JSON type of the restriction as described by the value property of
+the restriction. Mismatched types results in an invalid document.
+For RESTRICTION_EXCLUSIVE_VALUE_RANGE, the value is an array with two values,
+each of the JSON type determined by the keyval type.
+
+.Example: RESTRICTION_INCLUSIVE_ENTRY_MIN
+[[source, JSON]]
+----
+{
+    ...
+
+    "restrictions" : [
+      {
+        "type" : "MINIMUM_ENTRIES",
+        "introduced" : "1.5",
+        "value" : 3
+      }
+    ]
+
+    ...
+}
+----
+
+.Example: RESTRICTION_INCLUSIVE_ENTRY_MAX
+[[source, JSON]]
+----
+{
+    ...
+
+    restrictions : [
+      {
+        "type" : "MAXIMUM_ENTRIES",
+        "value" : 8
+      }
+    ]
+
+    ...
+}
+----
+
+.Example: RESTRICTION_EXCLUSIVE_VALUE_ENUM
+[[source, JSON]]
+----
+{
+    ...
+
+    restrictions : [
+      {
+        "type" : "ENUM",
+        "value" : "LOS",
+        "documentation" : "Trigger the operation when the schedule hits Loss of Signal."
+      },
+      {
+        "type" : "ENUM",
+        "value" : "Equinox",
+        "documentation" : "Trigger the operation when the plane of the Earths equator passes through the center of the Sun."
+      }
+    ]
+
+    ...
+}
+----
+
+.Example: RESTRICTION_EXCLUSIVE_VALUE_NUMERIC
+[[source, JSON]]
+----
+{
+    ...
+
+    restrictions : [
+      {
+        "type" : "NUMERIC",
+        "value" : 1,
+        "deprecated" : "1.6",
+        "documentation" : "Only a single viterbi encoder is used."
+      },
+      {
+        "type" : "NUMERIC",
+        "value" : 2,
+        "introduced" : "1.2",
+        "documentation" : "Use two viterbi encoder instead of one. Double up!"
+      },
+      {
+        "type" : "NUMERIC",
+        "value" : 8,
+        "introduced" : "1.4",
+        "documentation" : "All eight viterbi encoders are used! Full stream!"
+      }
+    ]
+
+    ...
+}
+----
+
+
+.Example: RESTRICTION_EXCLUSIVE_VALUE_RANGE
+[[source, JSON]]
+----
+{
+    ...
+
+    restrictions : [
+      {
+        "type" : "RANGE",
+        "value" : [3.14, 42.2],
+        "documentation" : "The lower end of the spectrum."
+      },
+      {
+        "type" : "RANGE",
+        "value" : [359.0, 1487.6],
+        "introduced" : "1.2",
+        "documentation" : "The higher end of the spectrum."
+      }
+    ]
+
+    ...
+}
+----
+
+
+== Mold namespace entry
+
+The mold namespace entry fulfills the namespace requirement in Disir Org.
+
+There is no file format differences between a mold namespace entry and
+a mold entry. The provided mold_base_id from Disir Org still makes up
+the base file system path.
+However, the entry_id of a mold namespace entry always ends in a forward-slash (/),
+which makes the joined mold_base_id and entry_id a directory.
+To signify that we have a namespace entry within this directory, we
+write the file named `__namespace.json`. in this directory.
+
+.Disk location example: mold_base_id = /etc/disir/mold/, entry_id = pictures/
+----
+/etc/disir/mold/pictures/__namespace.json
+----
+
+== Mold namespace override entry
+
+Given a mold namespace entry, we may generate an arbitrary number of config namespace
+entries from this mold. However, they will all produce the same content of the config,
+since they are derived from the same mold. As mandated by Disir Org, we cannot
+as a system provider install config entries, as they are the users' property.
+So, in order to derive different config entries from the same base mold namespace entry,
+we introduce an override file that changes the defaults listed in the
+mold namespace entry for a single entry_id.
+
+This file is located just as any ordinary mold entry, but we require that a
+mold namespace entry file also exists in the same directory as ourselves for
+this to be valid.
+
+.Disk location example: mold_base_id = /etc/disir/mold/, entry_id = pictures/cat
+----
+/etc/disir/mold/pictures/__namespace.json
+/etc/disir/mold/pictures/cat.json
+----
+
+In order to stay faithful to the history of the mold entry, and be able to
+incorporate changes made in the mold namespace entry, we must apply overrides
+to the fully parsed mold namespace entry at sync point with regard to the version
+of the various elements in the mold namespace entry. So, we version all changes
+in the mold namespace override entry, and sync version numbers between the
+mold namespace override entry and the mod namespace entry.
+
+Example: The key 'product' in the mold namespace entry has the default value
+'corn' at the namespace version "1.5". We decide to provide a mold namespace override
+entry and apply a sync point between version "1.5" of the mold namespace entry and version
+"1.0" of the mold namespace override entry. The key 'product' is thus marked
+in the mold namespace override entry with a new value 'starch' at mold namespace override version
+"1.0". If we now generate a config entry at version "1.3", the value of the key 'product'
+would be 'corn', whilst if we generate a config entry at version "1.5", the value would
+be 'starch'. If however, the mold namespace entry updated with a new default at version
+"1.6", with the value 'butter', generating a config entry version "1.6" will result in
+the key 'product' having the value 'butter'.
+
+Each version identifier in the mold namespace override entry must be matched
+with a sync version of the mold namespace entry.
+
+The root JSON object of the contains the following keys:
+
+[horizontal]
+"sync":: An array of objects, where each object contains the following keys:
+* "namespace": A string representation of the version number of the mold namespace entry
+to apply overrides for.
+* "override": A string representation of the version number of the mold
+namespace override entry document that keys within
+this document use apply the overrides synced with the mold namespace entry version of this object.
+
+"override":: An object where each key is the name resolution scheme
+defined in Disir Core to address any element, infinitely nested. The value
+of this key is either another object, or an array of such objects,
+containing the following keys:
+* "value": A value of equivalent value type of that keyval type the key overrides.
+This is the new default value for this synced version.
+* "version": The version of this mold namespace override entry of which to apply
+this override. The value of this version number must be present in the sync array above
+as the value of the "override" key.
+
+----
+{
+    "sync" : [
+      {"namespace" : "1.5", "override" : "1.0"}
+    ]
+    "override" : {
+        "product" : {
+            "version : "1.0",
+            "value" : "starch"
+        }
+    }
+}
+----
+
+
+If the override key contains an array of objects, each object must have an
+unique version among all objects within the array.
+
+.Example: array of objects to override single key.
+[[source, JSON]]
+----
+{
+    "sync" : [
+      {"namespace" : "1.5", "override" : "1.0"}
+      {"namespace" : "1.6", "override" : "1.1"}
+    ]
+    "override" : {
+        "product" : [{
+            "version : "1.0",
+            "value" : "starch"
+        },
+        {
+            "version : "1.1",
+            "value" : "acorn"
+        }]
+    }
+}
+----
+
+
+.Example: Full example containing multiple sync points and nested key override
+[[source, JSON]]
+----
+{
+    "sync" : [
+        {"namespace" : "1.5", "override" : "1.0"},
+        {"namespace" : "1.7", "override" : "1.1"}
+    ],
+    "override" : {
+        "section_test.key_boolean" : {
+            "version" : "1.0",
+            "value" : False
+        },
+        "key_integer" : {
+            "version" : "1.1",
+            "value" : 62
+        }
+    }
+}
+----
