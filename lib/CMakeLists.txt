@@ -48,10 +48,10 @@ set (FSLIB_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_unserialize.cc"
 
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/jsonIO.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/marshal_config.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/unmarshal_config.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/marshal_mold.cc"
-  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/unmarshal_mold.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_serialize_config.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_unserialize_config.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_serialize_mold.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_unserialize_mold.cc"
 
 )
 

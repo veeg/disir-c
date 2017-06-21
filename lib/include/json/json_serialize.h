@@ -26,11 +26,11 @@ namespace dio
        //! \return DPLUGIN_FATAL_ERROR on unrecoverable errors.
        //!
        enum disir_status
-       marshal (struct disir_config *config, std::string& output);
+       serialize (struct disir_config *config, std::string& output);
 
        //! \brief Marshal a disir_config object to JSON, writing it to the ostream
        enum disir_status
-       marshal (struct disir_config *config, std::ostream& stream);
+       serialize (struct disir_config *config, std::ostream& stream);
 
 
     private:
@@ -84,7 +84,7 @@ namespace dio
        //!  generates a new config_keyval object.
        //!
        enum disir_status
-       marshal_keyval (struct disir_context *context, Json::Value& parent);
+       serialize_keyval (struct disir_context *context, Json::Value& parent);
 
 
 
@@ -95,7 +95,7 @@ namespace dio
 
        //! \brief recursive function that extracts an entire config starting from root
        enum disir_status
-       _marshal_context (struct disir_context *parent_context,
+       _serialize_context (struct disir_context *parent_context,
                                               Json::Value& parent);
 
        //! \brief if a config has keyvals or sections with identical names
@@ -111,10 +111,10 @@ namespace dio
     {
     public:
        //! \brief
-       enum disir_status marshal (struct disir_mold *mold, std::string& mold_json);
+       enum disir_status serialize (struct disir_mold *mold, std::string& mold_json);
 
        //! \brief
-       enum disir_status marshal (struct disir_mold *mold, std::ostream& stream);
+       enum disir_status serialize (struct disir_mold *mold, std::ostream& stream);
 
        //! \brief Constructor
        MoldWriter (struct disir_instance *disir);
@@ -123,6 +123,8 @@ namespace dio
     private:
      enum disir_status serialize_introduced (struct disir_context *context, Json::Value& element);
      enum disir_status serialize_deprecated (struct disir_context *context, Json::Value& element);
+    enum disir_status
+    serialize_version (struct disir_context *context, Json::Value& current);
 
      //! \brief constructs a json representation of a disir_mold keyval object
      //!

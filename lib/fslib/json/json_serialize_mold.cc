@@ -1,6 +1,6 @@
 // JSON private
 #include "json/dplugin_json.h"
-#include "json/output.h"
+#include "json/json_serialize.h"
 
 // public
 #include <disir/disir.h>
@@ -13,7 +13,6 @@ using namespace dio;
 MoldWriter::MoldWriter (struct disir_instance *disir) : JsonIO (disir)
 {
 }
-
 
 enum disir_status
 MoldWriter::serialize_deprecated (struct disir_context *context, Json::Value& current)
@@ -66,7 +65,7 @@ MoldWriter::serialize_introduced (struct disir_context *context, Json::Value& cu
 }
 
 enum disir_status
-MoldWriter::marshal (struct disir_mold *mold, std::string& mold_json)
+MoldWriter::serialize (struct disir_mold *mold, std::string& mold_json)
 {
     struct disir_context *context_mold;
     enum disir_status status;
@@ -98,7 +97,7 @@ end:
 }
 
 enum disir_status
-MoldWriter::marshal (struct disir_mold *mold, std::ostream& stream)
+MoldWriter::serialize (struct disir_mold *mold, std::ostream& stream)
 {
     struct disir_context *context_mold;
     enum disir_status status;

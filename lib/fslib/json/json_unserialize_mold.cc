@@ -1,5 +1,4 @@
-// JSON private
-#include "json/input.h"
+#include "json/json_unserialize.h"
 
 // public
 #include <disir/disir.h>
@@ -16,7 +15,7 @@ MoldReader::MoldReader (struct disir_instance *disir) : JsonIO (disir) {}
 
 //! PUBLIC
 enum disir_status
-MoldReader::unmarshal (const char *filepath, struct disir_mold **mold)
+MoldReader::unserialize (const char *filepath, struct disir_mold **mold)
 {
     enum disir_status status;
 
@@ -31,7 +30,7 @@ MoldReader::unmarshal (const char *filepath, struct disir_mold **mold)
 
 //! PUBLIC
 enum disir_status
-MoldReader::unmarshal (std::istream& stream, struct disir_mold **mold)
+MoldReader::unserialize (std::istream& stream, struct disir_mold **mold)
 {
     Json::Reader reader;
 
@@ -75,7 +74,7 @@ MoldReader::construct_mold (struct disir_mold **mold)
         goto finalize;
     }
 
-    status = _unmarshal_mold (context_mold, m_moldRoot[ATTRIBUTE_KEY_MOLD]);
+    status = _unserialize_mold (context_mold, m_moldRoot[ATTRIBUTE_KEY_MOLD]);
     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         goto error;
@@ -121,7 +120,7 @@ MoldReader::value_is_keyval (Json::Value& val)
 }
 
 enum disir_status
-MoldReader::unmarshal_context (struct disir_context *parent_context,
+MoldReader::unserialize_context (struct disir_context *parent_context,
                                 Json::OrderedValueIterator& current,
                                 enum disir_context_type type)
 {
@@ -144,7 +143,7 @@ MoldReader::unmarshal_context (struct disir_context *parent_context,
     if (status == DISIR_STATUS_INVALID_CONTEXT)
         goto finalize;
 
-    status = unmarshal_restrictions (context, current);
+    status = unserialize_restrictions (context, current);
     if (status != DISIR_STATUS_OK
         && status != DISIR_STATUS_INVALID_CONTEXT)
     {
@@ -156,7 +155,7 @@ MoldReader::unmarshal_context (struct disir_context *parent_context,
 
     if (type == DISIR_CONTEXT_SECTION)
     {
-        status = _unmarshal_mold (context, (*current)[ATTRIBUTE_KEY_ELEMENTS]);
+        status = _unserialize_mold (context, (*current)[ATTRIBUTE_KEY_ELEMENTS]);
         if (status != DISIR_STATUS_OK &&
             status != DISIR_STATUS_INVALID_CONTEXT)
         {
@@ -165,7 +164,7 @@ MoldReader::unmarshal_context (struct disir_context *parent_context,
     }
     else if  (type == DISIR_CONTEXT_KEYVAL)
     {
-        status = unmarshal_defaults (context, *current);
+        status = unserialize_defaults (context, *current);
         if (status != DISIR_STATUS_OK &&
             status != DISIR_STATUS_INVALID_CONTEXT)
         {
@@ -193,7 +192,7 @@ finalize:
 
 //! PRIVATE
 enum disir_status
-MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& parent)
+MoldReader::_unserialize_mold (struct disir_context *parent_context, Json::Value& parent)
 {
     enum disir_status status;
 
@@ -207,7 +206,7 @@ MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& 
         // as a mold section
         if (value_is_section (*iter))
         {
-            status = unmarshal_context (parent_context, iter, DISIR_CONTEXT_SECTION);
+            status = unserialize_context (parent_context, iter, DISIR_CONTEXT_SECTION);
             if (status != DISIR_STATUS_OK)
             {
                 return status;
@@ -217,7 +216,7 @@ MoldReader::_unmarshal_mold (struct disir_context *parent_context, Json::Value& 
         // a mold keyval
         else if (value_is_keyval (*iter))
         {
-            status = unmarshal_context (parent_context, iter, DISIR_CONTEXT_KEYVAL);
+            status = unserialize_context (parent_context, iter, DISIR_CONTEXT_KEYVAL);
             if (status != DISIR_STATUS_OK)
             {
                 return status;
@@ -289,20 +288,20 @@ MoldReader::set_context_attributes (struct disir_context *context,
     // Only sections have introduced
     if (type == DISIR_CONTEXT_SECTION)
     {
-        status = unmarshal_introduced (context, current);
+        status = unserialize_introduced (context, current);
         if (status != DISIR_STATUS_OK)
         {
             return status;
         }
     }
 
-    status = unmarshal_deprecated (context, current);
+    status = unserialize_deprecated (context, current);
     if (status != DISIR_STATUS_OK)
     {
         return status;
     }
 
-    status = unmarshal_documentation (context, current);
+    status = unserialize_documentation (context, current);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -313,7 +312,7 @@ MoldReader::set_context_attributes (struct disir_context *context,
 
 
 enum disir_status
-MoldReader::unmarshal_documentation (struct disir_context *context, Json::Value& current)
+MoldReader::unserialize_documentation (struct disir_context *context, Json::Value& current)
 {
     enum disir_status status;
 
@@ -342,7 +341,7 @@ MoldReader::unmarshal_documentation (struct disir_context *context, Json::Value&
 }
 
 enum disir_status
-MoldReader::unmarshal_restriction (struct disir_context *restriction, Json::Value& current)
+MoldReader::unserialize_restriction (struct disir_context *restriction, Json::Value& current)
 {
     enum disir_status status;
 
@@ -367,13 +366,13 @@ MoldReader::unmarshal_restriction (struct disir_context *restriction, Json::Valu
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
-    status = unmarshal_introduced (restriction, current);
+    status = unserialize_introduced (restriction, current);
     if (status != DISIR_STATUS_OK)
     {
         return status;
     }
 
-    status = unmarshal_deprecated (restriction, current);
+    status = unserialize_deprecated (restriction, current);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -391,7 +390,7 @@ MoldReader::unmarshal_restriction (struct disir_context *restriction, Json::Valu
         return status;
     }
 
-    status = unmarshal_documentation (restriction, current);
+    status = unserialize_documentation (restriction, current);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -546,7 +545,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
 }
 
 enum disir_status
-MoldReader::unmarshal_restrictions (struct disir_context *context,
+MoldReader::unserialize_restrictions (struct disir_context *context,
                                     Json::OrderedValueIterator& it)
 {
     uint32_t i;
@@ -577,7 +576,7 @@ MoldReader::unmarshal_restrictions (struct disir_context *context,
             return status;
         }
 
-        status = unmarshal_restriction (restriction, restrictions[i]);
+        status = unserialize_restriction (restriction, restrictions[i]);
         if (status != DISIR_STATUS_OK &&
             status != DISIR_STATUS_INVALID_CONTEXT)
         {
@@ -600,7 +599,7 @@ MoldReader::unmarshal_restrictions (struct disir_context *context,
 }
 
 enum disir_status
-MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Value& current)
+MoldReader::unserialize_defaults (struct disir_context *context_keyval, Json::Value& current)
 {
     struct disir_context *context_default = NULL;
     enum disir_status status;
@@ -664,13 +663,13 @@ MoldReader::unmarshal_defaults (struct disir_context *context_keyval, Json::Valu
                 return status;
             }
 
-            status = unmarshal_introduced (context_default, def);
+            status = unserialize_introduced (context_default, def);
             if (status != DISIR_STATUS_OK)
             {
                 return status;
             }
 
-            status = unmarshal_deprecated (context_default, def);
+            status = unserialize_deprecated (context_default, def);
             if (status != DISIR_STATUS_OK)
             {
                 return status;
@@ -702,7 +701,7 @@ error:
 }
 
 enum disir_status
-MoldReader::unmarshal_introduced (struct disir_context *context, Json::Value& current)
+MoldReader::unserialize_introduced (struct disir_context *context, Json::Value& current)
 {
     enum disir_status status;
     struct semantic_version intro;
@@ -737,7 +736,7 @@ MoldReader::unmarshal_introduced (struct disir_context *context, Json::Value& cu
 }
 
 enum disir_status
-MoldReader::unmarshal_deprecated (struct disir_context *context, Json::Value& current)
+MoldReader::unserialize_deprecated (struct disir_context *context, Json::Value& current)
 {
     enum disir_status status;
     struct semantic_version semver;
