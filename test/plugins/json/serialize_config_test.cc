@@ -1,5 +1,5 @@
 #include "test_json.h"
-#include "json/output.h"
+#include "json/json_serialize.h"
 
 class MarshallConfigTest : public testing::JsonDioTestWrapper
 {
@@ -90,7 +90,7 @@ TEST_F(MarshallConfigTest, no_keyval_context)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-    auto status = writer->marshal (config, json);
+    auto status = writer->serialize (config, json);
     EXPECT_STATUS (status, DISIR_STATUS_OK);
 
     // Checking if we got a valid json string
@@ -171,7 +171,7 @@ TEST_F(MarshallConfigTest, marshall_section_shall_pass)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-    auto status = writer->marshal (config, json);
+    auto status = writer->serialize (config, json);
     EXPECT_STATUS (status,DISIR_STATUS_OK);
     ASSERT_STREQ (expected.c_str(), json.c_str());
 }
@@ -183,7 +183,7 @@ TEST_F(MarshallConfigTest, empty_config_shall_fail)
 
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    ASSERT_FALSE (writer->marshal (config, empty) != DISIR_STATUS_OK);
+    ASSERT_FALSE (writer->serialize (config, empty) != DISIR_STATUS_OK);
 }
 /*
 {
@@ -262,7 +262,7 @@ TEST_F(MarshallConfigTest, marshall_all_types)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-    ASSERT_TRUE (writer->marshal(config, json) == DISIR_STATUS_OK);
+    ASSERT_TRUE (writer->serialize (config, json) == DISIR_STATUS_OK);
     ASSERT_STREQ (expected.c_str(), json.c_str());
 }
 
@@ -304,7 +304,7 @@ TEST_F (MarshallConfigTest, duplicate_keyvals_shall_succeed)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
-    ASSERT_TRUE (writer->marshal (config, json) == DISIR_STATUS_OK);
+    ASSERT_TRUE (writer->serialize (config, json) == DISIR_STATUS_OK);
 
     ASSERT_JSON_STREQ (expected.c_str (), json.c_str ());
 }
@@ -341,7 +341,7 @@ TEST_F (MarshallConfigTest, duplicate_sections_shall_succeed)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
-    ASSERT_TRUE (writer->marshal (config, json) == DISIR_STATUS_OK);
+    ASSERT_TRUE (writer->serialize (config, json) == DISIR_STATUS_OK);
 
     ASSERT_JSON_STREQ (expected.c_str (), json.c_str ());
 }
@@ -368,7 +368,7 @@ TEST_F (MarshallConfigTest, context_without_value_shall_succeed)
     status = dc_config_finalize (&context_config, &config);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
-    auto status = writer->marshal (config, json);
+    auto status = writer->serialize (config, json);
     ASSERT_EQ (DISIR_STATUS_OK, status);
 
     dc_putcontext (&context_keyval);

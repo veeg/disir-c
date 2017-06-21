@@ -1,7 +1,6 @@
 #include "test_json.h"
-#include "json/input.h"
-#include "json/output.h"
-
+#include "json/json_serialize.h"
+#include "json/json_unserialize.h"
 
 class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 {
@@ -56,17 +55,8 @@ class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 
 TEST_F (UnMarshallMoldTest, read_mold_shall_succeed)
 {
-    status = reader->unmarshal (m_moldjsonPath.c_str(), &mold);
-}
-
-TEST_F (UnMarshallMoldTest, assert_output)
-{
-    std::string actual;
-    status = reader->unmarshal (m_moldjsonPath.c_str(), &mold);
-
-    status = writer->marshal (mold, actual);
-    ASSERT_TRUE (compare_json_objects (getMoldJson(), actual));
-
+    status = reader->unserialize (m_moldjsonPath.c_str(), &mold);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
 }
 
 TEST_F (UnMarshallMoldTest, crash_on_absent_mold_version)
@@ -74,7 +64,8 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_mold_version)
     std::string path (m_jsonPath);
     path += "no_version_mold.json";
 
-    status = reader->unmarshal (path.c_str (), &mold);
+    status = reader->unserialize (path.c_str (), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
 
 TEST_F (UnMarshallMoldTest, crash_on_absent_defaults)
@@ -82,7 +73,8 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_defaults)
     std::string path (m_jsonPath);
     path += "unpresent_mold_defaults.json";
 
-    status = reader->unmarshal (path.c_str (), &mold);
+    status = reader->unserialize (path.c_str (), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
 
 TEST_F (UnMarshallMoldTest, crash_on_absent_type)
@@ -90,7 +82,8 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_type)
     std::string path (m_jsonPath);
     path += "no_type_mold.json";
 
-    status = reader->unmarshal (path.c_str (), &mold);
+    status = reader->unserialize (path.c_str (), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
 
 TEST_F (UnMarshallMoldTest, crash_on_absent_introduced)
@@ -98,7 +91,8 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_introduced)
     std::string path (m_jsonPath);
     path += "no_version_mold.json";
 
-    status = reader->unmarshal (path.c_str (), &mold);
+    status = reader->unserialize (path.c_str (), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
 
 TEST_F (UnMarshallMoldTest, crash_on_absent_elements)
@@ -106,32 +100,7 @@ TEST_F (UnMarshallMoldTest, crash_on_absent_elements)
     std::string path (m_jsonPath);
     path += "absent_elements.json";
 
-    status = reader->unmarshal (path.c_str (), &mold);
-}
-
-TEST_F (UnMarshallMoldTest, integer_value_conversion)
-{
-
-
-}
-
-TEST_F (UnMarshallMoldTest, correct_documentation)
-{
-    enum disir_status status;
-    std::string path (m_jsonPath);
-    const char *doc;
-
-    path += "mold_documentation.json";
-
-    status = reader->unmarshal (path.c_str (), &mold);
-    EXPECT_STATUS (DISIR_STATUS_OK, status);
-
-    context_mold = dc_mold_getcontext (mold);
-    ASSERT_TRUE (context_mold != NULL);
-
-    status = dc_get_documentation (context_mold, NULL, &doc, NULL);
-    ASSERT_EQ (DISIR_STATUS_OK, status);
-
-    ASSERT_STREQ ("this is a mold documentation", doc);
+    status = reader->unserialize (path.c_str (), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
 
