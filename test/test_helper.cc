@@ -74,7 +74,7 @@ testing::DisirTestTestPlugin::SetUpTestCase ()
 
     char path[2048];
     strcpy (path, CMAKE_BUILD_DIRECTORY);
-    strcat (path, "/plugins/test/dplugin_test.so");
+    strcat (path, "/plugins/dplugin_test.so");
     s = dc_config_set_keyval_string (context_section, path, "plugin_filepath");
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
