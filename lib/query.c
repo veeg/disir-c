@@ -293,7 +293,9 @@ dc_query_resolve_context_va (struct disir_context *parent, const char *name,
         return status;
     }
 
-    status = CONTEXT_TYPE_CHECK (parent, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SECTION);
+    status = CONTEXT_TYPE_CHECK (parent, DISIR_CONTEXT_MOLD,
+                                         DISIR_CONTEXT_CONFIG,
+                                         DISIR_CONTEXT_SECTION);
     if (status != DISIR_STATUS_OK)
     {
         // Already logged
