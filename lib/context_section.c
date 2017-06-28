@@ -228,12 +228,7 @@ dx_section_destroy (struct disir_section **section)
     dx_element_storage_destroy (&(*section)->se_elements);
 
     // Destroy all restrictions
-    while ((restriction = MQ_POP ((*section)->se_restrictions_inclusive_queue)))
-    {
-        context = restriction->re_context;
-        dc_destroy (&context);
-    }
-    while ((restriction = MQ_POP ((*section)->se_restrictions_exclusive_queue)))
+    while ((restriction = MQ_POP ((*section)->se_restrictions_queue)))
     {
         context = restriction->re_context;
         dc_destroy (&context);

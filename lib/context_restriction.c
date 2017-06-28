@@ -88,6 +88,18 @@ dc_restriction_string_to_enum (const char *string)
 
     return DISIR_RESTRICTION_UNKNOWN;
 }
+//
+//! INTERNAL_API
+enum disir_restriction_type
+dx_restriction_type_sanify (enum disir_restriction_type type)
+{
+    if (type >= DISIR_RESTRICTION_UNKNOWN || type <= 0)
+    {
+        return DISIR_RESTRICTION_UNKNOWN;
+    }
+
+    return type;
+}
 
 //! INTERNAL API
 //! Only called from dc_begin
@@ -221,7 +233,6 @@ dx_restriction_destroy (struct disir_restriction **restriction)
     struct disir_context *context;
     struct disir_restriction **queue;
     struct disir_documentation *doc;
-    const char *group;
 
     queue = NULL;
 
@@ -237,28 +248,13 @@ dx_restriction_destroy (struct disir_restriction **restriction)
     {
         if (context->cx_parent_context->CONTEXT_STATE_DESTROYED == 0)
         {
-            group = dc_restriction_group_type (context->cx_restriction->re_type);
             if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_KEYVAL)
             {
-                if (strcmp ("INCLUSIVE", group) == 0)
-                {
-                    queue = &context->cx_parent_context->cx_keyval->kv_restrictions_inclusive_queue;
-                }
-                else if (strcmp ("EXCLUSIVE", group) == 0)
-                {
-                    queue = &context->cx_parent_context->cx_keyval->kv_restrictions_exclusive_queue;
-                }
+                queue = &context->cx_parent_context->cx_keyval->kv_restrictions_queue;
             }
             else if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_SECTION)
             {
-                if (strcmp ("INCLUSIVE", group) == 0)
-                {
-                    queue = &context->cx_parent_context->cx_section->se_restrictions_inclusive_queue;
-                }
-                else if (strcmp ("EXCLUSIVE", group) == 0)
-                {
-                    queue = &context->cx_parent_context->cx_section->se_restrictions_exclusive_queue;
-                }
+                queue = &context->cx_parent_context->cx_section->se_restrictions_queue;
             }
             else
             {
@@ -269,10 +265,6 @@ dx_restriction_destroy (struct disir_restriction **restriction)
             if (queue)
             {
                 MQ_REMOVE_SAFE (*queue, tmp);
-            }
-            else
-            {
-                log_warn_context (context, "unknown restriction group type: %s", group);
             }
         }
     }
@@ -294,36 +286,16 @@ dx_restriction_destroy (struct disir_restriction **restriction)
 enum disir_status
 dx_restriction_get_queue (struct disir_context *context, struct disir_restriction ***queue)
 {
-    const char *group;
-
-    group = NULL;
-
     if (context == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
-    // Check type - should be part of inclusive or exclusive groups
-    group = dc_restriction_group_type (context->cx_restriction->re_type);
     if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_KEYVAL)
     {
-        if (strcmp ("INCLUSIVE", group) == 0)
-        {
-            *queue = &context->cx_parent_context->cx_keyval->kv_restrictions_inclusive_queue;
-        }
-        else if (strcmp ("EXCLUSIVE", group) == 0)
-        {
-            *queue = &context->cx_parent_context->cx_keyval->kv_restrictions_exclusive_queue;
-        }
+        *queue = &context->cx_parent_context->cx_keyval->kv_restrictions_queue;
     }
     else if (dc_context_type (context->cx_parent_context) == DISIR_CONTEXT_SECTION)
     {
-        if (strcmp ("INCLUSIVE", group) == 0)
-        {
-            *queue = &context->cx_parent_context->cx_section->se_restrictions_inclusive_queue;
-        }
-        else if (strcmp ("EXCLUSIVE", group) == 0)
-        {
-            *queue = &context->cx_parent_context->cx_section->se_restrictions_exclusive_queue;
-        }
+        *queue = &context->cx_parent_context->cx_section->se_restrictions_queue;
     }
     else
     {
@@ -1055,7 +1027,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
     struct disir_restriction **queue;
     struct semantic_version *config_version;
     int exclusive_fulfilled = 0;
-    int restriction_entries_oor = 0;
+    int restriction_entries_inactive = 0;
     double value;
 
     char allowed_values[RESTRICTION_ENTRIES_BUFFER_SIZE];
@@ -1095,17 +1067,25 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
     }
     }
 
-    queue = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_exclusive_queue;
+    queue = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_queue;
     config_version = &context->cx_root_context->cx_config->cf_version;
 
     MQ_FOREACH (*queue,
     {
+        if (entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MIN ||
+            entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MAX)
+        {
+            restriction_entries_inactive += 1;
+            entry = entry->next;
+            continue;
+        }
+
         log_debug (10, "queue entry (%p), next (%p), prev (%p)", entry, entry->next, entry->prev);
         // Is restriction valid for this version of the config
         if (dc_semantic_version_compare (config_version, &entry->re_introduced) < 0)
         {
             log_debug (9, "queue entry introduced later than config. Skipping");
-            restriction_entries_oor += 1;
+            restriction_entries_inactive += 1;
             // XXX MQ_FOREACH does not increment entry if continue is used
             entry = entry->next;
             continue;
@@ -1223,11 +1203,11 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
     }
 
     // Entry did not fulfill the exclusive restrictions. Get out' here!
-    if (exclusive_fulfilled == 0 && MQ_SIZE (*queue) > restriction_entries_oor)
+    if (exclusive_fulfilled == 0 && MQ_SIZE (*queue) > restriction_entries_inactive)
     {
         log_debug (4, "Exclusive restriction(s) violated."
                       " Out of range (%d) vs entires (%d)",
-                      restriction_entries_oor, MQ_SIZE (*queue));
+                      restriction_entries_inactive, MQ_SIZE (*queue));
 
         switch (dc_value_type (context))
         {
@@ -1256,7 +1236,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
     if (exclusive_fulfilled == 0 &&
         status != DISIR_STATUS_RESTRICTION_VIOLATED &&
         dc_value_type (context) == DISIR_VALUE_TYPE_ENUM &&
-        MQ_SIZE(*queue) == restriction_entries_oor)
+        MQ_SIZE(*queue) == restriction_entries_inactive)
     {
         log_debug (4, "Missing enum restrictions. Keyval considered invalid.");
         dx_context_error_set (context, "Enum requires atleast one value restriction.");
@@ -1294,11 +1274,11 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
     {
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
-            q = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_inclusive_queue;
+            q = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_queue;
         }
         else
         {
-            q = &context->cx_section->se_restrictions_inclusive_queue;
+            q = &context->cx_section->se_restrictions_queue;
         }
         break;
     }
@@ -1306,11 +1286,11 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
     {
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
-            q = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_inclusive_queue;
+            q = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_queue;
         }
         else
         {
-            q = &context->cx_keyval->kv_restrictions_inclusive_queue;
+            q = &context->cx_keyval->kv_restrictions_queue;
         }
         break;
     }
@@ -1396,8 +1376,7 @@ enum disir_status
 dc_restriction_collection (struct disir_context *context, struct disir_collection **collection)
 {
     enum disir_status status;
-    struct disir_restriction **exc;
-    struct disir_restriction **inc;
+    struct disir_restriction **rcol;
     struct disir_collection *col;
 
     TRACE_ENTER ("");
@@ -1427,13 +1406,11 @@ dc_restriction_collection (struct disir_context *context, struct disir_collectio
     {
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
-            inc = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_inclusive_queue;
-            exc = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_exclusive_queue;
+            rcol = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_queue;
         }
         else
         {
-            inc = &context->cx_section->se_restrictions_inclusive_queue;
-            exc = &context->cx_section->se_restrictions_exclusive_queue;
+            rcol = &context->cx_section->se_restrictions_queue;
         }
         break;
     }
@@ -1441,13 +1418,11 @@ dc_restriction_collection (struct disir_context *context, struct disir_collectio
     {
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
-            inc = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_inclusive_queue;
-            exc = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_exclusive_queue;
+            rcol = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_queue;
         }
         else
         {
-            inc = &context->cx_keyval->kv_restrictions_inclusive_queue;
-            exc = &context->cx_keyval->kv_restrictions_exclusive_queue;
+            rcol = &context->cx_keyval->kv_restrictions_queue;
         }
         break;
     }
@@ -1464,12 +1439,7 @@ dc_restriction_collection (struct disir_context *context, struct disir_collectio
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    MQ_FOREACH (*inc,
-    {
-        dc_collection_push_context (col, entry->re_context);
-    });
-
-    MQ_FOREACH (*exc,
+    MQ_FOREACH (*rcol,
     {
         dc_collection_push_context (col, entry->re_context);
     });

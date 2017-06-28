@@ -417,12 +417,7 @@ dx_keyval_destroy (struct disir_keyval **keyval)
     }
 
     // Destroy all restrictions
-    while ((restriction = MQ_POP ((*keyval)->kv_restrictions_inclusive_queue)))
-    {
-        context = restriction->re_context;
-        dc_destroy (&context);
-    }
-    while ((restriction = MQ_POP ((*keyval)->kv_restrictions_exclusive_queue)))
+    while ((restriction = MQ_POP ((*keyval)->kv_restrictions_queue)))
     {
         context = restriction->re_context;
         dc_destroy (&context);

@@ -31,6 +31,9 @@ struct disir_restriction
     struct disir_restriction    *prev;
 };
 
+//! Sanify restriction type enum, making sure within the define enum scope.
+//! returns DISIR_RESTRICTION_TYPE_UNKNOWN if it is not.
+enum disir_restriction_type dx_restriction_type_sanify (enum disir_restriction_type type);
 
 //! Only called from dc_begin
 enum disir_status dx_restriction_begin (struct disir_context *parent,
