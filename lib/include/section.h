@@ -25,8 +25,7 @@ struct disir_section
     //! Element storage for this section.
     struct disir_element_storage        *se_elements;
 
-    struct disir_restriction            *se_restrictions_inclusive_queue;
-    struct disir_restriction            *se_restrictions_exclusive_queue;
+    struct disir_restriction            *se_restrictions_queue;
 };
 
 //! Construct a DISIR_CONTEXT_SECTION as a child of parent.

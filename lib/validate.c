@@ -446,6 +446,13 @@ validate_restriction (struct disir_context *context)
     queue = NULL;
     res = context->cx_restriction;
 
+    // check if type is set
+    if (dx_restriction_type_sanify (res->re_type) == DISIR_RESTRICTION_UNKNOWN)
+    {
+       dx_log_context (context, "Missing type component for restriction.");
+       return DISIR_STATUS_INVALID_CONTEXT;
+    }
+
     // Validate that the restriction context got a valid type set (belongs to a group)
     status = dx_restriction_get_queue (context, &queue);
     if (status != DISIR_STATUS_OK)
@@ -591,18 +598,7 @@ validate_context_validity (struct disir_context *context)
         else
         {
             struct disir_restriction *current_restriction;
-            current_restriction = context->cx_section->se_restrictions_inclusive_queue;
-            while (invalid == DISIR_STATUS_OK && current_restriction)
-            {
-                invalid = dx_validate_context (current_restriction->re_context);
-                if (invalid != DISIR_STATUS_OK)
-                {
-                    dx_context_transfer_logwarn (context, current_restriction->re_context);
-                    break;
-                }
-                current_restriction = current_restriction->next;
-            }
-            current_restriction = context->cx_section->se_restrictions_exclusive_queue;
+            current_restriction = context->cx_section->se_restrictions_queue;
             while (invalid == DISIR_STATUS_OK && current_restriction)
             {
                 invalid = dx_validate_context (current_restriction->re_context);
@@ -682,18 +678,7 @@ validate_context_validity (struct disir_context *context)
             }
 
             struct disir_restriction *current_restriction;
-            current_restriction = context->cx_keyval->kv_restrictions_inclusive_queue;
-            while (invalid == DISIR_STATUS_OK && current_restriction)
-            {
-                invalid = dx_validate_context (current_restriction->re_context);
-                if (invalid != DISIR_STATUS_OK)
-                {
-                    dx_context_transfer_logwarn (context, current_restriction->re_context);
-                    break;
-                }
-                current_restriction = current_restriction->next;
-            }
-            current_restriction = context->cx_keyval->kv_restrictions_exclusive_queue;
+            current_restriction = context->cx_keyval->kv_restrictions_queue;
             while (invalid == DISIR_STATUS_OK && current_restriction)
             {
                 invalid = dx_validate_context (current_restriction->re_context);

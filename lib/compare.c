@@ -719,16 +719,8 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
                 break;
             }
 
-            status = compare_restriction_queue (lhs->cx_keyval->kv_restrictions_inclusive_queue,
-                                                rhs->cx_keyval->kv_restrictions_inclusive_queue,
-                                                report);
-            if (status != DISIR_STATUS_OK)
-            {
-                break;
-            }
-
-            status = compare_restriction_queue (lhs->cx_keyval->kv_restrictions_exclusive_queue,
-                                                rhs->cx_keyval->kv_restrictions_exclusive_queue,
+            status = compare_restriction_queue (lhs->cx_keyval->kv_restrictions_queue,
+                                                rhs->cx_keyval->kv_restrictions_queue,
                                                 report);
             if (status != DISIR_STATUS_OK)
             {
@@ -773,16 +765,8 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
                 break;
             }
 
-            status = compare_restriction_queue (lhs->cx_section->se_restrictions_inclusive_queue,
-                                                rhs->cx_section->se_restrictions_inclusive_queue,
-                                                report);
-            if (status != DISIR_STATUS_OK)
-            {
-                break;
-            }
-
-            status = compare_restriction_queue (lhs->cx_section->se_restrictions_exclusive_queue,
-                                                rhs->cx_section->se_restrictions_exclusive_queue,
+            status = compare_restriction_queue (lhs->cx_section->se_restrictions_queue,
+                                                rhs->cx_section->se_restrictions_queue,
                                                 report);
             if (status != DISIR_STATUS_OK)
             {

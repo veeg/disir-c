@@ -36,8 +36,7 @@ struct disir_keyval
     //! Whether or not this keyval entry is disabled.
     uint32_t                    kv_disabled;
 
-    struct disir_restriction    *kv_restrictions_inclusive_queue;
-    struct disir_restriction    *kv_restrictions_exclusive_queue;
+    struct disir_restriction    *kv_restrictions_queue;
 };
 
 //! Construct a DISIR_CONTEXT_KEYVAL as a child of parent.
