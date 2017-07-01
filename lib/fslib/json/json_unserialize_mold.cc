@@ -151,9 +151,6 @@ MoldReader::unserialize_context (struct disir_context *parent_context,
         return status;
     }
 
-    if (status == DISIR_STATUS_INVALID_CONTEXT)
-        goto finalize;
-
     if (type == DISIR_CONTEXT_SECTION)
     {
         status = _unserialize_mold (context, (*current)[ATTRIBUTE_KEY_ELEMENTS]);
