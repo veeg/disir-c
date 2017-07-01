@@ -339,10 +339,6 @@ ConfigWriter::_serialize_context (struct disir_context *parent_context, Json::Va
                 }
                 break;
             default:
-                // should not happen
-                // Informing disir about the error
-                append_disir_error ("Config contained unsupported context (%s)",
-                                     dc_context_type_string (child_context));
                 break;
         }
         dc_putcontext (&child_context);

@@ -151,8 +151,6 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
         semver.sv_major = 1;
         semver.sv_minor = 0;
         semver.sv_patch = 0;
-
-        append_disir_error ("Absent config version, it is set to default \"1.0.0\"");
     }
     else
     {
@@ -164,8 +162,6 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
             semver.sv_major = 1;
             semver.sv_minor = 0;
             semver.sv_patch = 0;
-
-            append_disir_error ("Unparseable config version, it is set to default \"1.0.0\"");
         }
     }
 
@@ -202,8 +198,6 @@ ConfigReader::set_keyval (struct disir_context *parent_context,
     if (status != DISIR_STATUS_OK &&
         status != DISIR_STATUS_NOT_EXIST)
     {
-        append_disir_error ("Could not set name on context Keyval with name (%s): %s",
-                           disir_status_string (status), name.c_str ());
         goto error;
     }
 
@@ -222,8 +216,6 @@ ConfigReader::set_keyval (struct disir_context *parent_context,
     if (status != DISIR_STATUS_OK &&
         status != DISIR_STATUS_INVALID_CONTEXT)
     {
-        append_disir_error ("could not finalize context: %s",
-                           disir_status_string (status));
         goto error;
     }
 
@@ -330,9 +322,6 @@ ConfigReader::unserialize_type (struct disir_context *context, Json::Value& valu
         }
         break;
     default:
-        // if object is unparsable, its name is logged
-        append_disir_error ("Got unrecognized json object with name %s",
-                name.c_str ());
         break;
     }
     return status;
@@ -369,7 +358,6 @@ ConfigReader::_unserialize_node (struct disir_context *parent_context, Json::Val
 
     return status;
 error:
-
     return status;
 }
 
