@@ -360,7 +360,8 @@ MoldReader::unserialize_restriction (struct disir_context *restriction, Json::Va
                                                         current[ATTRIBUTE_KEY_TYPE].asCString ());
     if (restriction_type == DISIR_RESTRICTION_UNKNOWN)
     {
-        dc_fatal_error (restriction, "Unknown restriction type");
+        dc_fatal_error (restriction, "Unknown restriction type: %s",
+                                      current[ATTRIBUTE_KEY_TYPE].asCString ());
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
@@ -421,7 +422,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
     {
         if (current[ATTRIBUTE_KEY_VALUE].isNull ())
         {
-            dc_fatal_error (context, "No value present");
+            dc_fatal_error (context, "No restriction value present");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
         value = current[ATTRIBUTE_KEY_VALUE];
@@ -429,15 +430,21 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
     }
     case DISIR_RESTRICTION_EXC_VALUE_RANGE:
     {
-        if (current[ATTRIBUTE_KEY_VALUE_MIN].isNull ()
-            || current[ATTRIBUTE_KEY_VALUE_MAX].isNull ())
+
+        if (current[ATTRIBUTE_KEY_VALUE_MIN].isNull ())
         {
-            dc_fatal_error (context, "No value present");
+            dc_fatal_error (context, "No restriction value_min present");
+            return DISIR_STATUS_INVALID_CONTEXT;
+        }
+        if (current[ATTRIBUTE_KEY_VALUE_MAX].isNull ())
+        {
+            dc_fatal_error (context, "No restriction value_max present");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
         break;
     }
     case DISIR_RESTRICTION_UNKNOWN:
+
         break;
     }
 
@@ -448,7 +455,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         status = assert_json_value_type (value, Json::intValue);
         if (status != DISIR_STATUS_OK)
         {
-            dc_fatal_error (context, "Wrong value type");
+            dc_fatal_error (context, "Wrong value type for inclusive entry min");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
 
@@ -465,7 +472,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         status = assert_json_value_type (value, Json::intValue);
         if (status != DISIR_STATUS_OK)
         {
-            dc_fatal_error (context, "Wrong value type");
+            dc_fatal_error (context, "Wrong value type for inclusive entry max");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
 
@@ -482,7 +489,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
             || assert_json_value_type (value, Json::realValue) != DISIR_STATUS_OK)
         if (status != DISIR_STATUS_OK)
         {
-            dc_fatal_error (context, "Wrong value type");
+            dc_fatal_error (context, "Wrong value type exclusive value numeric");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
 
@@ -505,7 +512,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
                != DISIR_STATUS_OK)
         if (status != DISIR_STATUS_OK)
         {
-            dc_fatal_error (context, "Wrong value type");
+            dc_fatal_error (context, "Wrong value type for exclusive value range");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
 
@@ -524,7 +531,7 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         status = assert_json_value_type (value, Json::stringValue);
         if (status != DISIR_STATUS_OK)
         {
-            dc_fatal_error (context, "Wrong value type");
+            dc_fatal_error (context, "Wrong value type fro exclusive value enum");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
 
@@ -746,7 +753,7 @@ MoldReader::unserialize_deprecated (struct disir_context *context, Json::Value& 
 
     if (current[ATTRIBUTE_KEY_DEPRECATED].type () != Json::stringValue)
     {
-        dc_fatal_error (context, "Semantic version depricated is not string");
+        dc_fatal_error (context, "Semantic version deprecated is not of type string");
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
