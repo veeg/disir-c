@@ -30,6 +30,23 @@ MoldReader::unserialize (const char *filepath, struct disir_mold **mold)
 
 //! PUBLIC
 enum disir_status
+MoldReader::unserialize (std::string mold_json, struct disir_mold **mold)
+{
+    Json::Reader reader;
+
+    bool success = reader.parse (mold_json, m_moldRoot);
+    if (!success)
+    {
+        disir_error_set (m_disir, "Parse error: %s",
+                                  reader.getFormattedErrorMessages().c_str());
+        return DISIR_STATUS_FS_ERROR;
+    }
+
+    return construct_mold (mold);
+}
+
+//! PUBLIC
+enum disir_status
 MoldReader::unserialize (std::istream& stream, struct disir_mold **mold)
 {
     Json::Reader reader;

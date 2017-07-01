@@ -149,6 +149,8 @@ namespace dio
             enum disir_status
             unserialize (std::istream& stream, struct disir_mold **mold);
 
+            enum disir_status
+            unserialize (std::string mold_json, struct disir_mold **mold);
 
             //! \brief constructs a disir_mold object from a json file on filepath
             //!
