@@ -108,15 +108,16 @@ MoldReader::mold_has_documentation (Json::Value& mold_root)
 bool
 MoldReader::value_is_section (Json::Value& val)
 {
-    return val.isObject () && val [ATTRIBUTE_KEY_ELEMENTS].isNull () == false &&
-                              val[ATTRIBUTE_KEY_ELEMENTS].isObject ();
+    return val.isObject () && val [ATTRIBUTE_KEY_ELEMENTS].isNull () == false;
 }
 
 bool
 MoldReader::value_is_keyval (Json::Value& val)
 {
-    return val.isObject () &&  val [ATTRIBUTE_KEY_DEFAULTS].isNull () == false &&
-                               val[ATTRIBUTE_KEY_DEFAULTS].isArray ();
+    return val.isObject () &&
+           ((val [ATTRIBUTE_KEY_DEFAULTS].isNull () == false &&
+           val[ATTRIBUTE_KEY_DEFAULTS].isArray ()) ||
+           val[ATTRIBUTE_KEY_TYPE].isNull () == false);
 }
 
 enum disir_status
