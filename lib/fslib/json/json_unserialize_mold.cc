@@ -786,7 +786,7 @@ MoldReader::unserialize_deprecated (struct disir_context *context, Json::Value& 
     if (status != DISIR_STATUS_OK)
     {
         dc_fatal_error (context, "Semantic version deprecated is not formated correctly");
-        return status;
+        return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = dc_add_deprecated (context, &semver);
