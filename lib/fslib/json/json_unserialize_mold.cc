@@ -170,6 +170,14 @@ MoldReader::unserialize_context (struct disir_context *parent_context,
 
     if (type == DISIR_CONTEXT_SECTION)
     {
+        status = assert_json_value_type ((*current)[ATTRIBUTE_KEY_ELEMENTS], Json::objectValue);
+        if (status != DISIR_STATUS_OK)
+        {
+            dc_fatal_error (context, "Section elements must be of type object");
+            status = DISIR_STATUS_INVALID_CONTEXT;
+            goto finalize;
+        }
+
         status = _unserialize_mold (context, (*current)[ATTRIBUTE_KEY_ELEMENTS]);
         if (status != DISIR_STATUS_OK &&
             status != DISIR_STATUS_INVALID_CONTEXT)
