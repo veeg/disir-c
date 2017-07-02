@@ -30,6 +30,63 @@ JsonDioTestWrapper::GetJsonObject (Json::Value& root, std::string path)
 }
 
 bool
+JsonDioTestWrapper::assert_invalid_context (struct disir_mold *mold, const char *name,
+                                            const char *context_type, const char *errormsg)
+{
+    enum disir_status status;
+    struct disir_context *context;
+    struct disir_collection *collection;
+    const char *context_name;
+    status = disir_mold_valid (mold, &collection);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    status = DISIR_STATUS_NOT_EXIST;
+
+    while (dc_collection_next (collection, &context) != DISIR_STATUS_EXHAUSTED)
+    {
+        if (strcmp (dc_context_type_string (context), context_type) == 0 &&
+            ((dc_context_error (context) == NULL && errormsg == NULL) ||
+            (errormsg != NULL && strcmp (dc_context_error (context), errormsg) == 0)))
+        {
+            if (name != NULL)
+            {
+                dc_get_name (context, &context_name, NULL);
+                if (strcmp (context_name, name) != 0)
+                    continue;
+
+                status = DISIR_STATUS_OK;
+            }
+            else
+            {
+                status = DISIR_STATUS_OK;
+            }
+            goto out;
+        }
+    }
+    // FALL-THROUGH
+out:
+    dc_collection_finished (&collection);
+
+    return (DISIR_STATUS_OK == status);
+}
+
+int
+JsonDioTestWrapper::invalid_context_count (struct disir_mold *mold)
+{
+    enum disir_status status;
+    struct disir_collection *collection;
+
+    status = disir_mold_valid (mold, &collection);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    auto invalid_contexts = dc_collection_size (collection);
+
+    dc_collection_finished (&collection);
+
+    return invalid_contexts;
+}
+
+bool
 JsonDioTestWrapper::compare_json_objects (std::string a, std::string b)
 {
     Json::Reader reader;

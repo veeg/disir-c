@@ -4,7 +4,9 @@ static enum disir_status
 json_test_mold (struct disir_mold **mold)
 {
     enum disir_status status;
+    struct semantic_version semver;
     struct disir_context *context_mold = NULL;
+    struct disir_context *context_keyval = NULL;
     struct disir_context *context_section = NULL;
     struct disir_context *context_section_nested = NULL;
 
@@ -12,7 +14,19 @@ json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context_mold, "test1", "1", "test keyval", NULL, NULL);
+    status = dc_add_keyval_string (context_mold, "test1", "1", "test keyval", NULL, &context_keyval);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_add_restriction_entries_max (context_keyval, 4, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_add_restriction_entries_min (context_keyval, 2, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_putcontext (&context_keyval);
     if (status != DISIR_STATUS_OK)
         goto error;
 
@@ -20,12 +34,32 @@ json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_integer (context_mold, "integer", (uint64_t)123, "integer doc",
-                                    NULL, NULL);
+    status = dc_add_keyval_integer (context_mold, "integer", (uint64_t)2, "integer doc",
+                                    NULL, &context_keyval);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_float (context_mold, "float", (double)12.123, "floatdoc", NULL, NULL);
+    status = dc_add_restriction_value_numeric (context_keyval, 1, NULL, NULL, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_add_restriction_value_numeric (context_keyval, 2, NULL, NULL, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_putcontext (&context_keyval);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_add_keyval_float (context_mold, "float", (double)12.12, "floatdoc", NULL, &context_keyval);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_add_restriction_value_range (context_keyval, 10.0, 15.15, NULL, NULL, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_putcontext (&context_keyval);
     if (status != DISIR_STATUS_OK)
         goto error;
 
@@ -63,6 +97,17 @@ json_test_mold (struct disir_mold **mold)
         goto error;
 
     status = dc_add_keyval_string (context_section, "k3", "k3value", "k3value doc", NULL, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_add_restriction_entries_max (context_section, 4, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+    semver.sv_major = 2;
+    semver.sv_minor = 0;
+    semver.sv_patch = 0;
+
+    status = dc_add_restriction_entries_max (context_section, 2, &semver);
     if (status != DISIR_STATUS_OK)
         goto error;
 

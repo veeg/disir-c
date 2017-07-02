@@ -1,6 +1,8 @@
 #include "test_json.h"
 #include "json/json_serialize.h"
 #include "json/json_unserialize.h"
+#include <tuple>
+#include <set>
 
 class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 {
@@ -10,6 +12,20 @@ class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 
         reader = new dio::MoldReader (instance);
         writer = new dio::MoldWriter (instance);
+
+        status = disir_mold_read (instance, "test", "json_test_mold", &mold);
+        EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+        std::string json_mold_string;
+        Json::Reader json_reader;
+
+        status = writer->serialize (mold, json_mold_string);
+        EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+        bool success = json_reader.parse (json_mold_string, json_mold);
+        ASSERT_TRUE (success);
+
+        disir_mold_finished (&mold);
 
         DisirLogTestBodyEnter();
     }
@@ -46,6 +62,8 @@ class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 
     public:
         struct disir_mold *mold = NULL;
+        Json::Value json_mold;
+        Json::StyledWriter json_writer;
         struct disir_context *context_config = NULL;
         struct disir_config *config = NULL;
         struct disir_context *context_mold = NULL;
@@ -59,48 +77,309 @@ TEST_F (UnMarshallMoldTest, read_mold_shall_succeed)
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 }
 
-TEST_F (UnMarshallMoldTest, crash_on_absent_mold_version)
+TEST_F (UnMarshallMoldTest, invalid_context_on_missing_defaults)
 {
-    std::string path (m_jsonPath);
-    path += "no_version_mold.json";
+    ASSERT_NO_THROW (
+        Json::Value& keyval = json_mold["mold"]["test1"];
+        keyval["defaults"] = Json::nullValue;
+    );
 
-    status = reader->unserialize (path.c_str (), &mold);
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL", "Missing default entries");
 }
 
-TEST_F (UnMarshallMoldTest, crash_on_absent_defaults)
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_defaults_type)
 {
-    std::string path (m_jsonPath);
-    path += "unpresent_mold_defaults.json";
+    ASSERT_NO_THROW (
+        Json::Value& keyval = json_mold["mold"]["test1"];
+        keyval["defaults"] = 1;
+    );
 
-    status = reader->unserialize (path.c_str (), &mold);
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL", "Defaults should be of type array");
 }
 
-TEST_F (UnMarshallMoldTest, crash_on_absent_type)
+TEST_F (UnMarshallMoldTest, invalid_context_on_missing_default_value)
 {
-    std::string path (m_jsonPath);
-    path += "no_type_mold.json";
+    ASSERT_NO_THROW (
+        Json::Value& def = json_mold["mold"]["test1"]["defaults"];
+        def[0]["value"] = Json::nullValue;
+    );
 
-    status = reader->unserialize (path.c_str (), &mold);
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL", "Default value is not present");
 }
 
-TEST_F (UnMarshallMoldTest, crash_on_absent_introduced)
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_documentation_type)
 {
-    std::string path (m_jsonPath);
-    path += "no_version_mold.json";
+    ASSERT_NO_THROW (
+        Json::Value& doc = json_mold["mold"]["test1"]["documentation"];
+        doc = 1;
+    );
 
-    status = reader->unserialize (path.c_str (), &mold);
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL", "Documentation shall be of type string");
 }
 
-TEST_F (UnMarshallMoldTest, crash_on_absent_elements)
+TEST_F (UnMarshallMoldTest, invalid_context_on_absent_keyval_type)
 {
-    std::string path (m_jsonPath);
-    path += "absent_elements.json";
+    ASSERT_NO_THROW (
+        json_mold["mold"]["test1"]["type"] = Json::nullValue;
+    );
 
-    status = reader->unserialize (path.c_str (), &mold);
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL", "Keyval type is not present");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_keyval_type)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["test1"]["type"] = 1;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
+                                        "Keyval type is not of type string");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_deprecated_type)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["test1"]["deprecated"] = 1;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
+                                        "Semantic version deprecated is not of type string");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_deprecated_format)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["test1"]["deprecated"] = "wrong_format";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
+                                        "Semantic version deprecated is not formated correctly");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_elements_type)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["section_name"]["elements"] = "wrong_type";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "section_name", "SECTION",
+                                        "Section elements must be of type object");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_ements_type)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["section_name"]["elements"] = "wrong_type";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "section_name", "SECTION",
+                                        "Section elements must be of type object");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_keyval_nor_section)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["section_name"] = Json::objectValue;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 1);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD",
+                                        "Could not resolve whether object is of type keyval or section");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_restriction_object)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["test1"]["restrictions"] = "wrong_type";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
+                                        "Restrictions is not of type array");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_restriction_type)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["test1"]["restrictions"];
+        restrictions[0]["type"] = "invalid_type";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
+                                        "Unknown restriction type: invalid_type");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["test1"]["restrictions"];
+        restrictions[0]["value"] = Json::nullValue;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
+                                        "No restriction value present");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_min)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["float"]["restrictions"];
+        restrictions[0]["value_min"] = Json::nullValue;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
+                                        "No restriction value_min present");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_max)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["float"]["restrictions"];
+        restrictions[0]["value_max"] = Json::nullValue;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
+                                        "No restriction value_max present");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_min_type)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["integer"]["restrictions"];
+        restrictions[0]["type"] = "invalid";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "integer", "KEYVAL",
+                                        "Unknown restriction type: invalid");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_unresolvable_top_level_type)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["section_name"] = Json::nullValue;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 1);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD",
+                                        "Could not resolve whether object is of type keyval or section");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_section_elements_wrong_type)
+{
+    ASSERT_NO_THROW (
+        json_mold["mold"]["section_name"]["elements"] = "invalid type";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "section_name", "SECTION",
+                                        "Section elements must be of type object");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_error_override_missing_defaults)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["test1"]["restrictions"];
+        restrictions[0]["value"] = Json::nullValue;
+        json_mold["mold"]["test1"]["defaults"] = Json::nullValue;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
+                                        "Missing default entries");
 }
 
