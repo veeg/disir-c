@@ -1,6 +1,6 @@
 #include "test_json.h"
-#include "json/input.h"
-#include "json/output.h"
+#include "json/json_unserialize.h"
+#include "json/json_serialize.h"
 
 class InputOutputTest : public testing::JsonDioTestWrapper
 {

@@ -1,5 +1,5 @@
 // JSON private
-#include "json/input.h"
+#include "json/json_unserialize.h"
 
 // 3party
 #include "fdstream.hpp"
@@ -20,7 +20,7 @@ dio_json_unserialize_config (struct disir_instance *instance, FILE *input,
         boost::fdistream file(fileno(input));
         dio::ConfigReader reader (instance, mold);
 
-        return reader.unmarshal (config, file);
+        return reader.unserialize (config, file);
     }
     catch (std::exception& e)
     {
@@ -43,7 +43,7 @@ dio_json_unserialize_mold (struct disir_instance *instance,
         boost::fdistream file(fileno(input));
         dio::MoldReader reader (instance);
 
-        return reader.unmarshal (file, mold);
+        return reader.unserialize (file, mold);
     }
     catch (std::exception& e)
     {

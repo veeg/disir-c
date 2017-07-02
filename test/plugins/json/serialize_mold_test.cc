@@ -1,5 +1,5 @@
 #include "test_json.h"
-#include "json/output.h"
+#include "json/json_serialize.h"
 
 
 class MarshallMoldTest : public testing::JsonDioTestWrapper
@@ -45,7 +45,7 @@ TEST_F (MarshallMoldTest, marshal_mold_shall_match)
 
   ASSERT_TRUE (GetJsonMold (expected));
   expected_json = getJsonString (expected);
-  status = writer->marshal (mold, json);
+  status = writer->serialize (mold, json);
   ASSERT_TRUE (compare_json_objects (expected_json, json));
   //ASSERT_JSON_STREQ (expected_json.c_str (), json.c_str ());
   EXPECT_STATUS (DISIR_STATUS_OK, status);
@@ -58,7 +58,7 @@ TEST_F (MarshallMoldTest, invalid_mold_shall_fail)
 
     invalid_mold = NULL;
 
-    EXPECT_STATUS (DISIR_STATUS_INTERNAL_ERROR, writer->marshal (invalid_mold, json));
+    EXPECT_STATUS (DISIR_STATUS_INTERNAL_ERROR, writer->serialize (invalid_mold, json));
 }
 
 TEST_F (MarshallMoldTest, DISABLED_tets)

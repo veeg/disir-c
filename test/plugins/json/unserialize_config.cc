@@ -1,6 +1,6 @@
 #include "test_json.h"
-#include "json/input.h"
-#include "json/output.h"
+#include "json/json_serialize.h"
+#include "json/json_unserialize.h"
 
 class UnMarshallConfigTest : public testing::JsonDioTestWrapper
 {
@@ -74,11 +74,11 @@ TEST_F(UnMarshallConfigTest, unmarshal_succeed)
     result = Jwriter.writeOrdered (root);
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, m_configjsonPath.c_str ());
+        status = reader->unserialize (&config, m_configjsonPath.c_str ());
     });
 
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    ASSERT_TRUE (writer->marshal (config, expected) == DISIR_STATUS_OK);
+    ASSERT_TRUE (writer->serialize (config, expected) == DISIR_STATUS_OK);
     ASSERT_STREQ (result.c_str(), expected.c_str());
 }
 
@@ -88,7 +88,7 @@ TEST_F(UnMarshallConfigTest, version_should_be_correct)
     struct semantic_version actual;
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, std::string ("{\"version\" : \"1.0.0\"}"));
+        status = reader->unserialize (&config, std::string ("{\"version\" : \"1.0.0\"}"));
     });
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
@@ -111,7 +111,7 @@ TEST_F(UnMarshallConfigTest, no_version_should_result_standard)
     struct semantic_version actual;
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, std::string ("{\"noversion\" : \"1.0.0\"}"));
+        status = reader->unserialize (&config, std::string ("{\"noversion\" : \"1.0.0\"}"));
     });
 
     EXPECT_STATUS (DISIR_STATUS_OK, status);
@@ -134,7 +134,7 @@ TEST_F(UnMarshallConfigTest, unmarshal_returns_parse_error)
     std::string invalid ("invalid_json");
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, invalid);
+        status = reader->unserialize (&config, invalid);
     });
     EXPECT_STATUS (DISIR_STATUS_FS_ERROR, status);
 }
@@ -144,7 +144,7 @@ TEST_F(UnMarshallConfigTest, return_error_on_invalid_path)
     std::string output_s;
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, "fake");
+        status = reader->unserialize (&config, "fake");
     });
     EXPECT_STATUS (DISIR_STATUS_FS_ERROR, status);
 }
@@ -156,7 +156,7 @@ TEST_F (UnMarshallConfigTest, invalid_context_on_wrong_value)
     filepath += "wrong_value_in_config.json";
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, filepath.c_str ());
+        status = reader->unserialize (&config, filepath.c_str ());
     });
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
@@ -168,7 +168,7 @@ TEST_F (UnMarshallConfigTest, invalid_context_on_wrong_key)
     filepath += "wrong_name.json";
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, filepath.c_str ());
+        status = reader->unserialize (&config, filepath.c_str ());
     });
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }
@@ -180,7 +180,7 @@ TEST_F (UnMarshallConfigTest, DISABLED_invalid_context_section_on_wrong_key)
     filepath += "fake_section.json";
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unserialize (&config, filepath.c_str());
     });
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
@@ -194,7 +194,7 @@ TEST_F (UnMarshallConfigTest, parse_duplicate_keyvals)
     filepath += "duplicate_keyvals.json";
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unserialize (&config, filepath.c_str());
     });
 
     context_config = dc_config_getcontext (config);
@@ -212,7 +212,7 @@ TEST_F (UnMarshallConfigTest, parse_duplicate_sections)
     filepath += "duplicate_sections.json";
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unserialize (&config, filepath.c_str());
     });
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
@@ -232,7 +232,7 @@ TEST_F (UnMarshallConfigTest, invalid_section_shall_succeed)
     filepath += "invalid_section.json";
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unserialize (&config, filepath.c_str());
     });
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
@@ -247,7 +247,7 @@ TEST_F (UnMarshallConfigTest, float_value_conversion)
     std::string path (m_jsonPath);
     path += "reference_config.json";
 
-     reader->unmarshal (&config, path.c_str ());
+     reader->unserialize (&config, path.c_str ());
 
      context_config = dc_config_getcontext (config);
      ASSERT_TRUE (context_config != NULL);
@@ -272,7 +272,7 @@ TEST_F (UnMarshallConfigTest, invalid_keyval_on_invalid_parent)
     filepath += "invalid_child_on_invalid_section.json";
 
     EXPECT_NO_THROW ({
-        status = reader->unmarshal (&config, filepath.c_str());
+        status = reader->unserialize (&config, filepath.c_str());
     });
     EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 }

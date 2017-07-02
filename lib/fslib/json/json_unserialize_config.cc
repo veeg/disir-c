@@ -1,5 +1,5 @@
 // JSON private
-#include "json/input.h"
+#include "json/json_unserialize.h"
 
 // public
 #include <disir/disir.h>
@@ -54,7 +54,7 @@ ConfigReader::read_config_version (struct semantic_version *semver, const char *
 
 //! PUBLIC
 enum disir_status
-ConfigReader::unmarshal (struct disir_config **config, std::istream& stream)
+ConfigReader::unserialize (struct disir_config **config, std::istream& stream)
 {
     Json::Reader reader;
     bool success = reader.parse (stream, m_configRoot);
@@ -71,7 +71,7 @@ ConfigReader::unmarshal (struct disir_config **config, std::istream& stream)
 
 //! PUBLIC
 enum disir_status
-ConfigReader::unmarshal (struct disir_config **config, const std::string Json)
+ConfigReader::unserialize (struct disir_config **config, const std::string Json)
 {
     Json::Reader reader;
 
@@ -88,7 +88,7 @@ ConfigReader::unmarshal (struct disir_config **config, const std::string Json)
 
 //! PUBLIC
 enum disir_status
-ConfigReader::unmarshal (struct disir_config **config, const char *filepath)
+ConfigReader::unserialize (struct disir_config **config, const char *filepath)
 {
     enum disir_status status;
 
@@ -151,8 +151,6 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
         semver.sv_major = 1;
         semver.sv_minor = 0;
         semver.sv_patch = 0;
-
-        append_disir_error ("Absent config version, it is set to default \"1.0.0\"");
     }
     else
     {
@@ -164,8 +162,6 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
             semver.sv_major = 1;
             semver.sv_minor = 0;
             semver.sv_patch = 0;
-
-            append_disir_error ("Unparseable config version, it is set to default \"1.0.0\"");
         }
     }
 
@@ -176,7 +172,7 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
 enum disir_status
 ConfigReader::build_config_from_json (struct disir_context *context_config)
 {
-    return _unmarshal_node (context_config, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
+    return _unserialize_node (context_config, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
 }
 
 //! PRIVATE
@@ -202,8 +198,6 @@ ConfigReader::set_keyval (struct disir_context *parent_context,
     if (status != DISIR_STATUS_OK &&
         status != DISIR_STATUS_NOT_EXIST)
     {
-        append_disir_error ("Could not set name on context Keyval with name (%s): %s",
-                           disir_status_string (status), name.c_str ());
         goto error;
     }
 
@@ -222,8 +216,6 @@ ConfigReader::set_keyval (struct disir_context *parent_context,
     if (status != DISIR_STATUS_OK &&
         status != DISIR_STATUS_INVALID_CONTEXT)
     {
-        append_disir_error ("could not finalize context: %s",
-                           disir_status_string (status));
         goto error;
     }
 
@@ -245,14 +237,14 @@ error:
 
 
 enum disir_status
-ConfigReader::unmarshal_array (struct disir_context *parent, Json::Value& array, std::string& name)
+ConfigReader::unserialize_array (struct disir_context *parent, Json::Value& array, std::string& name)
 {
     enum disir_status status;
     unsigned int i;
 
     for (i = 0; i < array.size (); ++i)
     {
-        status = unmarshal_type (parent, array[i], name);
+        status = unserialize_type (parent, array[i], name);
         if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
         {
             return status;
@@ -262,7 +254,7 @@ ConfigReader::unmarshal_array (struct disir_context *parent, Json::Value& array,
 }
 
 enum disir_status
-ConfigReader::unmarshal_type (struct disir_context *context, Json::Value& value, std::string& name)
+ConfigReader::unserialize_type (struct disir_context *context, Json::Value& value, std::string& name)
 {
    struct disir_context *child_context = NULL;
    enum disir_status status;
@@ -288,7 +280,7 @@ ConfigReader::unmarshal_type (struct disir_context *context, Json::Value& value,
             goto error;
         }
 
-        status = _unmarshal_node (child_context, value);
+        status = _unserialize_node (child_context, value);
         if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
         {
             // logged
@@ -312,7 +304,7 @@ ConfigReader::unmarshal_type (struct disir_context *context, Json::Value& value,
         }
         break;
     case Json::arrayValue:
-        status = unmarshal_array (context, value, name);
+        status = unserialize_array (context, value, name);
         if (status != DISIR_STATUS_OK)
         {
             // logged
@@ -330,9 +322,6 @@ ConfigReader::unmarshal_type (struct disir_context *context, Json::Value& value,
         }
         break;
     default:
-        // if object is unparsable, its name is logged
-        append_disir_error ("Got unrecognized json object with name %s",
-                name.c_str ());
         break;
     }
     return status;
@@ -346,7 +335,7 @@ error:
 
 //! PRIVATE
 enum disir_status
-ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value& parent)
+ConfigReader::_unserialize_node (struct disir_context *parent_context, Json::Value& parent)
 {
     enum disir_status status;
     Json::Value child_node;
@@ -362,14 +351,13 @@ ConfigReader::_unmarshal_node (struct disir_context *parent_context, Json::Value
 
         auto name = iter.name ();
 
-        status = unmarshal_type (parent_context, child_node, name);
+        status = unserialize_type (parent_context, child_node, name);
         if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
             goto error;
     }
 
     return status;
 error:
-
     return status;
 }
 

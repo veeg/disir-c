@@ -23,12 +23,12 @@ namespace dio
 
         //! \brief Read a disir_config from a istream
         enum disir_status
-        unmarshal (struct disir_config **config, std::istream& stream);
+        unserialize (struct disir_config **config, std::istream& stream);
 
 
         //! \brief reads a disir_config from a json file
         enum disir_status
-        unmarshal (struct disir_config **config, const std::string Json);
+        unserialize (struct disir_config **config, const std::string Json);
 
         //! \brief Generates a disir_config object from json
         //!
@@ -40,7 +40,7 @@ namespace dio
         //! \return DPLUGIN_PARSE_ERROR if json file has syntax errors.
         //!
         enum disir_status
-        unmarshal (struct disir_config **config, const char *filepath);
+        unserialize (struct disir_config **config, const char *filepath);
 
         //! \brief  Parses the config on path and returns its semantic version
         //!
@@ -79,10 +79,10 @@ namespace dio
                     Json::Value& keyval);
 
         enum disir_status
-        unmarshal_type (struct disir_context *context , Json::Value& value, std::string& name);
+        unserialize_type (struct disir_context *context , Json::Value& value, std::string& name);
 
         enum disir_status
-        unmarshal_array (struct disir_context *parent, Json::Value& array,
+        unserialize_array (struct disir_context *parent, Json::Value& array,
                          std::string& name);
 
         //! \brief if duplicate keynames are postfixed, this function removes
@@ -93,7 +93,7 @@ namespace dio
         //! The parameter is of type iterator and not Value to provide the function with
         //! the keyname
         enum disir_status
-        unmarshal_keyval_entry (struct disir_context *parent_context,
+        unserialize_keyval_entry (struct disir_context *parent_context,
                                 Json::OrderedValueIterator& keyval_entry);
 
         //! \brief main function that handles the conversion from json to
@@ -110,7 +110,7 @@ namespace dio
         //!
         //!
         enum disir_status
-        _unmarshal_node (struct disir_context *parent_context,
+        _unserialize_node (struct disir_context *parent_context,
                          Json::Value& parent);
 
         //! \brief Resolves whether node is of type section
@@ -147,8 +147,10 @@ namespace dio
             //! \return DISIR_STATUS_OK on success.
             //!
             enum disir_status
-            unmarshal (std::istream& stream, struct disir_mold **mold);
+            unserialize (std::istream& stream, struct disir_mold **mold);
 
+            enum disir_status
+            unserialize (std::string mold_json, struct disir_mold **mold);
 
             //! \brief constructs a disir_mold object from a json file on filepath
             //!
@@ -163,7 +165,7 @@ namespace dio
             //! \return DPLUGIN_IO_ERROR if file on filepath could not be read.
             //!
             enum disir_status
-            unmarshal (const char *filepath, struct disir_mold **mold);
+            unserialize (const char *filepath, struct disir_mold **mold);
 
         private:
             /* Members */
@@ -183,7 +185,7 @@ namespace dio
             //! \return DPLUGIN_STATUS_OK on success.
             //! \return DPLUGIN_
             enum disir_status
-            _unmarshal_mold (struct disir_context *parent_context,
+            _unserialize_mold (struct disir_context *parent_context,
                                                  Json::Value& parent);
 
             //! \brief reads the json config from disk, located at filepath.
@@ -223,7 +225,7 @@ namespace dio
             //! from an error. Otherwise errors are added to disir instance.
             //!
             enum disir_status
-            unmarshal_defaults (struct disir_context *child_context,
+            unserialize_defaults (struct disir_context *child_context,
                                 Json::Value& current);
 
             //! \brief set introduced and documentation on Mold, keyval or section object.
@@ -232,26 +234,26 @@ namespace dio
                                                       enum disir_context_type type);
 
             //! \brief get introduced version from json context object
-            enum disir_status unmarshal_introduced (struct disir_context *context,
+            enum disir_status unserialize_introduced (struct disir_context *context,
                                                     Json::Value& current);
 
-            enum disir_status unmarshal_deprecated (struct disir_context *context,
+            enum disir_status unserialize_deprecated (struct disir_context *context,
                                                     Json::Value& current);
 
             enum disir_status set_restriction_value (struct disir_context *context,
                                                      Json::Value& current);
 
             //! \brief unserializes all restriction attached to a context
-            enum disir_status unmarshal_restrictions (struct disir_context *context,
+            enum disir_status unserialize_restrictions (struct disir_context *context,
                                                       Json::OrderedValueIterator& it);
 
-            enum disir_status unmarshal_restriction (struct disir_context *restriction,
+            enum disir_status unserialize_restriction (struct disir_context *restriction,
                                                      Json::Value& current);
 
-            enum disir_status unmarshal_documentation (struct disir_context *context,
+            enum disir_status unserialize_documentation (struct disir_context *context,
                                                        Json::Value& current);
 
-            enum disir_status unmarshal_context (struct disir_context *parent_context,
+            enum disir_status unserialize_context (struct disir_context *parent_context,
                                                   Json::OrderedValueIterator& current,
                                                   enum disir_context_type type);
     };

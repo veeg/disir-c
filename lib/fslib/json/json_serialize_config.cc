@@ -1,5 +1,5 @@
 // JSON private
-#include "json/output.h"
+#include "json/json_serialize.h"
 
 // public
 #include <disir/disir.h>
@@ -27,7 +27,7 @@ ConfigWriter::~ConfigWriter ()
 }
 
 enum disir_status
-ConfigWriter::marshal (struct disir_config *config, std::ostream& stream)
+ConfigWriter::serialize (struct disir_config *config, std::ostream& stream)
 {
     enum disir_status status;
     Json::StyledWriter writer;
@@ -49,7 +49,7 @@ ConfigWriter::marshal (struct disir_config *config, std::ostream& stream)
         goto end;
     }
 
-    status = _marshal_context (m_contextConfig, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
+    status = _serialize_context (m_contextConfig, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
     if (status != DISIR_STATUS_OK)
     {
         goto end;
@@ -63,7 +63,7 @@ end:
 }
 
 enum disir_status
-ConfigWriter::marshal (struct disir_config *config, std::string& output)
+ConfigWriter::serialize (struct disir_config *config, std::string& output)
 {
     enum disir_status status;
     Json::StyledWriter writer;
@@ -83,7 +83,7 @@ ConfigWriter::marshal (struct disir_config *config, std::string& output)
         goto end;
     }
 
-    status = _marshal_context (m_contextConfig, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
+    status = _serialize_context (m_contextConfig, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
     if (status != DISIR_STATUS_OK)
     {
         goto end;
@@ -278,7 +278,7 @@ error:
 }
 
 enum disir_status
-ConfigWriter::marshal_keyval (struct disir_context *context, Json::Value& node)
+ConfigWriter::serialize_keyval (struct disir_context *context, Json::Value& node)
 {
     enum disir_status status;
     std::string name;
@@ -292,7 +292,7 @@ ConfigWriter::marshal_keyval (struct disir_context *context, Json::Value& node)
 }
 
 enum disir_status
-ConfigWriter::_marshal_context (struct disir_context *parent_context, Json::Value& parent)
+ConfigWriter::_serialize_context (struct disir_context *parent_context, Json::Value& parent)
 {
     struct disir_collection *collection;
     struct disir_context *child_context;
@@ -318,7 +318,7 @@ ConfigWriter::_marshal_context (struct disir_context *parent_context, Json::Valu
         {
             case DISIR_CONTEXT_SECTION:
 
-                status = _marshal_context (child_context, child);
+                status = _serialize_context (child_context, child);
                 if (status != DISIR_STATUS_OK)
                 {
                     goto end;
@@ -332,17 +332,13 @@ ConfigWriter::_marshal_context (struct disir_context *parent_context, Json::Valu
                 }
                 break;
             case DISIR_CONTEXT_KEYVAL:
-                status = marshal_keyval (child_context, parent);
+                status = serialize_keyval (child_context, parent);
                 if (status != DISIR_STATUS_OK)
                 {
                     goto end;
                 }
                 break;
             default:
-                // should not happen
-                // Informing disir about the error
-                append_disir_error ("Config contained unsupported context (%s)",
-                                     dc_context_type_string (child_context));
                 break;
         }
         dc_putcontext (&child_context);

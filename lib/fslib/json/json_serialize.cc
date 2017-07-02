@@ -1,5 +1,5 @@
 // JSON private
-#include "json/output.h"
+#include "json/json_serialize.h"
 
 // 3party
 #include "fdstream.hpp"
@@ -21,7 +21,7 @@ dio_json_serialize_config (struct disir_instance *instance,
         boost::fdostream file(fileno(output));
         dio::ConfigWriter writer (NULL);
 
-         return writer.marshal (config, file);
+         return writer.serialize (config, file);
     }
     catch (std::exception& e)
     {
@@ -41,7 +41,7 @@ dio_json_serialize_mold (struct disir_instance *instance,
         boost::fdostream file(fileno(output));
         dio::MoldWriter writer (instance);
 
-        return writer.marshal (mold, file);
+        return writer.serialize (mold, file);
     }
     catch (std::exception& e)
     {
