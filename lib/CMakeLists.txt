@@ -110,20 +110,8 @@ target_include_directories (${PROJECT_SO_LIBRARY} PUBLIC
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES SOVERSION 0)
 
-# TODO: Add check for gcc > 4.9
-#add_definitions ("-fsanitize=undefined")
-#add_definitions ("-fsanitize=shift")
-#add_definitions ("-fsanitize=integer-divide-by-zero")
-#add_definitions ("-fsanitize=unreachable")
-#add_definitions ("-fsanitize=vla-bound")
-#add_definitions ("-fsanitize=null")
-#add_definitions ("-fsanitize=return")
-#add_definitions ("-fsanitize=signed-integer-overflow")
-
 # We require DL_LIBS for your loading plugin functionality.
 target_link_libraries (${PROJECT_SO_LIBRARY} ${CMAKE_DL_LIBS})
-# TODO: Add check for gcc > 4.9
-#target_link_libraries (${PROJECT_SO_LIBRARY} ubsan)
 
 install (TARGETS ${PROJECT_SO_LIBRARY}
     EXPORT ${EXPORT_TARGET}
