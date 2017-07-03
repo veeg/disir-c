@@ -201,7 +201,12 @@ dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
     case DISIR_VALUE_TYPE_STRING:
     {
         size = value->dv_size;
-        *output_size = size;
+
+        if (output_size)
+        {
+            *output_size = size;
+        }
+
         if (size >= output_buffer_size)
         {
             // Set size to be output_buffer_size - 1,
