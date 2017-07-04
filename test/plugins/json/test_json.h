@@ -5,6 +5,7 @@
 
 #include <json/json.h>
 #include <fstream>
+#include <iostream>
 
 #define ASSERT_JSON_STREQ(a,b)                  \
 {                                               \
@@ -43,7 +44,7 @@
 
 namespace testing
 {
-    class JsonDioTestWrapper : public testing::DisirTestTestPlugin
+    class JsonDioTestWrapper : public testing::DisirTestWrapper
     {
         protected:
             const std::string m_configjsonPath
@@ -54,12 +55,24 @@ namespace testing
 
             const std::string m_jsonPath = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/json/";
 
+            const std::string m_override_entries_path
+                = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/override_test_data/";
+
             bool _compare_json_objects (Json::Value& objOne, Json::Value& objTwo);
 
             // Variables
-            enum disir_status status = DISIR_STATUS_OK;
+            enum disir_status status;
+            std::map<std::string, struct disir_mold*> m_override_reference_molds;
+            const std::string m_mold_base_dir = "/tmp/json_test/mold/";
 
         public:
+            static void SetUpTestCase ();
+            static void TearDownTestCase ();
+
+            static struct disir_instance   *instance;
+            static struct disir_mold    *libdisir_mold;
+            static struct disir_config  *libdisir_config;
+
             //! \breif compares two json strings
             bool compare_json_objects (std::string a, std::string b);
 
@@ -72,6 +85,15 @@ namespace testing
 
             int
             invalid_context_count (struct disir_mold *mold);
+
+            void read_override_mold_references ();
+            void teardown_override_mold_references ();
+
+            void copy_override_file (const char *namespace_entry, const char *name);
+
+            void emplace_mold (const char *namespace_entry, const char *name);
+            void emplace_mold_from_string (const char *namespace_entry, const char *name,
+                                           std::string& mold);
 
             std::string getMoldJson ();
 
