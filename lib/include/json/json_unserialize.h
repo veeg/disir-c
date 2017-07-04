@@ -3,6 +3,10 @@
 
 #include "dplugin_json.h"
 #include <json/json.h>
+#include "json/json_mold_override.h"
+
+// cpp standard
+#include <memory>
 
 namespace dio
 {
@@ -135,7 +139,7 @@ namespace dio
             //! \brief Constructor
             MoldReader (struct disir_instance *disir);
 
-            virtual ~MoldReader () {};
+            virtual ~MoldReader ();
 
             //! \brief construct a disir_mold from the JSON formatted data read from stream
             //!
@@ -167,10 +171,26 @@ namespace dio
             enum disir_status
             unserialize (const char *filepath, struct disir_mold **mold);
 
+            //! \brief set mold override
+            enum disir_status
+            set_mold_override (std::istream& stream);
+
+            //! \brief check if a given json mold is a
+            //! namespace override entry
+            enum disir_status
+            is_override_mold_entry (std::istream& entry);
+
         private:
             /* Members */
             struct disir_context *context_mold;
             Json::Value m_moldRoot;
+            // True if override entry is provided
+            bool override_mold_entries = false;
+            // Instance of the override parser and applyer
+            MoldOverride m_override_reader;
+
+            bool
+            override_mold_is_set () { return override_mold_entries; }
 
             /* Methods */
 
