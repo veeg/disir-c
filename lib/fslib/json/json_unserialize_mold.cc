@@ -13,6 +13,37 @@ using namespace dio;
 //! Contructor
 MoldReader::MoldReader (struct disir_instance *disir) : JsonIO (disir) {}
 
+MoldReader::~MoldReader ()
+{
+
+}
+
+enum disir_status
+MoldReader::set_mold_override (std::istream& entry)
+{
+    auto status = m_override_reader.parse_mold_override_entry (m_disir, entry);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    override_mold_entries = true;
+
+    return status;
+}
+
+enum disir_status
+MoldReader::is_override_mold_entry (std::istream& entry)
+{
+    auto status = m_override_reader.parse_mold_override_entry (m_disir, entry);
+    if (status == DISIR_STATUS_OK)
+    {
+        return DISIR_STATUS_EXISTS;
+    }
+
+    return status;
+}
+
 //! PUBLIC
 enum disir_status
 MoldReader::unserialize (const char *filepath, struct disir_mold **mold)
@@ -95,6 +126,14 @@ MoldReader::construct_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         goto error;
+    }
+
+    // Don't bother applying override if namespace mold is invalid
+    if (override_mold_is_set () && status != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        status = m_override_reader.apply_overrides (context_mold);
+        if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
+            goto error;
     }
 
 finalize:

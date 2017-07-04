@@ -52,6 +52,7 @@ set (FSLIB_SOURCES
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_unserialize_config.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_serialize_mold.cc"
   "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_unserialize_mold.cc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/fslib/json/json_mold_namespace_override.cc"
 
 )
 

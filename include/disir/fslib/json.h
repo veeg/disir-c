@@ -96,6 +96,9 @@ enum disir_status
 dio_json_unserialize_mold (struct disir_instance *instance,
                            FILE *input, struct disir_mold **mold);
 
+enum disir_status
+dio_json_unserialize_mold_filepath (struct disir_instance *instance,
+                                    const char *filepath, struct disir_mold **mold);
 
 #ifdef __cplusplus
 }

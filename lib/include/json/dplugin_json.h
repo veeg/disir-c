@@ -20,8 +20,16 @@
 #define ATTRIBUTE_KEY_CONFIG "config"
 #define ATTRIBUTE_KEY_RESTRICTIONS "restrictions"
 
+//! Attribute keys for mold override
+#define ATTRIBUTE_KEY_SYNC "sync"
+#define ATTRIBUTE_KEY_OVERRIDE "override"
+#define ATTRIBUTE_KEY_NAMESPACE "namespace"
+
 //! \brief helper function that resolves typeof val and sets context's value accordingly
 enum disir_status set_value (Json::Value& val, struct disir_context *context);
+
+enum disir_status add_value_default (struct disir_context *contexts, Json::Value& value,
+                                     struct semantic_version *semver);
 
 //! \brief resolve disir_value_type from its string representation
 enum disir_value_type attribute_key_to_disir_value (const char *type);

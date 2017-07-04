@@ -76,9 +76,34 @@ assert_json_value_type (Json::Value& value, Json::ValueType type)
  return (value.type () == type) ? DISIR_STATUS_OK : DISIR_STATUS_WRONG_VALUE_TYPE;
 }
 
+enum Json::ValueType
+disir_value_to_json_value (enum disir_value_type type)
+{
+    switch (type)
+    {
+    case DISIR_VALUE_TYPE_INTEGER:
+        return Json::intValue;
+    case DISIR_VALUE_TYPE_FLOAT:
+        return Json::realValue;
+    case DISIR_VALUE_TYPE_BOOLEAN:
+        return Json::booleanValue;
+    case DISIR_VALUE_TYPE_ENUM:
+        return Json::stringValue;
+    case DISIR_VALUE_TYPE_STRING:
+        return Json::stringValue;
+    default:
+        return Json::nullValue;
+    }
+}
+
 enum disir_status
 set_value (Json::Value& val, struct disir_context *context)
 {
+    if (disir_value_to_json_value (dc_value_type (context)) != val.type())
+    {
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
+    }
+
     switch (val.type())
     {
         case Json::intValue:
@@ -99,13 +124,38 @@ set_value (Json::Value& val, struct disir_context *context)
                         val.asString().c_str(), val.asString().size());
             }
         case Json::arrayValue:
-            return DISIR_STATUS_WRONG_VALUE_TYPE;
         case Json::uintValue:
-            return DISIR_STATUS_WRONG_VALUE_TYPE;
         case Json::objectValue:
-            return DISIR_STATUS_WRONG_VALUE_TYPE;
         case Json::nullValue:
+        default:
             return DISIR_STATUS_WRONG_VALUE_TYPE;
+    }
+}
+
+enum disir_status
+add_value_default (struct disir_context *context, Json::Value& value,
+                   struct semantic_version *semver)
+{
+    if (disir_value_to_json_value (dc_value_type (context)) != value.type())
+    {
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
+    }
+
+    switch (value.type())
+    {
+        case Json::intValue:
+            return dc_add_default_integer (context, value.asInt64(), semver);
+        case Json::booleanValue:
+            return dc_add_default_boolean (context, (uint8_t)value.asInt64(), semver);
+        case Json::realValue:
+            return dc_add_default_float (context, (double)value.asDouble(), semver);
+        case Json::stringValue:
+            return dc_add_default_string (context, value.asString().c_str(),
+                                                   value.asString().size(), semver);
+        case Json::arrayValue:
+        case Json::uintValue:
+        case Json::objectValue:
+        case Json::nullValue:
         default:
             return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
@@ -136,6 +186,4 @@ attribute_key_to_disir_restriction (const char *type)
         return DISIR_RESTRICTION_UNKNOWN;
     }
 }
-
-
 
