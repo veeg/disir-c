@@ -18,7 +18,8 @@ target_link_libraries (${TESTS_PLUGIN_JSON} ${PROJECT_SO_LIBRARY})
 target_link_libraries (${TESTS_PLUGIN_JSON} ${GTEST_BOTH_LIBRARIES})
 # TODO: Why pthread not part of gtest?? (it is on fedora)
 target_link_libraries (${TESTS_PLUGIN_JSON} pthread)
+# cpp experimental filesystem
+target_link_libraries (${TESTS_PLUGIN_JSON} stdc++fs)
 
 add_test (LibDisirPluginJSONTest ${TESTS_PLUGIN_JSON})
-
 
