@@ -14,10 +14,10 @@ struct disir_mold
     //! Count of how many ADT structure pointers the user posesses.
     int                             mo_reference_count;
 
-    //! Semantic version of this mold.
-    //! This value is determined by the highest semantic version number found
+    //! Version of this mold.
+    //! This value is determined by the highest version number found
     //! in any of the child contexts contained within the mold.
-    struct semantic_version         mo_version;
+    struct disir_version            mo_version;
 
     //! Storage of element entries, either DISIR_CONTEXT_KEYVAL or DISIR_CONTEXT_SECTION.
     struct disir_element_storage    *mo_elements;
@@ -34,16 +34,16 @@ struct disir_mold *dx_mold_create (struct disir_context *context);
 //! Destroy the passed struct disir_mold
 enum disir_status dx_mold_destroy (struct disir_mold **mold);
 
-//! \brief Conditionally update the version number of the mold if input semver is greater.
+//! \brief Conditionally update the version number of the mold if input version is greater.
 //!
 //! \param mold Input mold to update the version number of
-//! \param semver Input semver to update mold with, if greater
+//! \param version Input version to update mold with, if greater
 //!
-//! \return DISIR__STATUS_INVALID_ARGUMENT if mold or semver are NULL
+//! \return DISIR__STATUS_INVALID_ARGUMENT if mold or version are NULL
 //! \return DISIR_STATUS_OK on success
 //!
-enum disir_status dx_mold_update_version (struct disir_mold *mold,
-                                            struct semantic_version *semver);
+enum disir_status
+dx_mold_update_version (struct disir_mold *mold, struct disir_version *version);
 
 #endif // _LIBDISIR_PRIVATE_MOLD_H
 

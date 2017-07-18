@@ -18,7 +18,7 @@ struct disir_keyval
 
     //! Version this keyval entry was deprecated
     //! Value of 0.0.0 means it is NOT deprecated.
-    struct semantic_version     kv_deprecated;
+    struct disir_version        kv_deprecated;
 
     //! Default entry queue
     struct disir_default        *kv_default_queue;

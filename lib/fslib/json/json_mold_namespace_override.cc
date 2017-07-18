@@ -181,8 +181,8 @@ MoldOverride::validate_override_entry (struct disir_instance *instance, Json::Va
 
 //! PRIVATE
 enum disir_status
-MoldOverride::string_to_semantic_version (Json::Value& current, const char *attribute_key,
-                                          struct semantic_version *semver)
+MoldOverride::string_to_disir_version (Json::Value& current, const char *attribute_key,
+                                          struct disir_version *version)
 {
     enum disir_status status;
 
@@ -192,7 +192,7 @@ MoldOverride::string_to_semantic_version (Json::Value& current, const char *attr
         return DISIR_STATUS_FS_ERROR;
     }
 
-    status = dc_semantic_version_convert (current[attribute_key].asCString(), semver);
+    status = dc_version_convert (current[attribute_key].asCString(), version);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -205,8 +205,8 @@ enum disir_status
 MoldOverride::parse_override_sync_mapping (Json::Value& sync_entries, syncmap& mapping)
 {
     enum disir_status status;
-    struct semantic_version semver_override;
-    struct semantic_version semver_namespace;
+    struct disir_version version_override;
+    struct disir_version version_namespace;
 
     status = DISIR_STATUS_OK;
 
@@ -215,19 +215,19 @@ MoldOverride::parse_override_sync_mapping (Json::Value& sync_entries, syncmap& m
         auto namespace_version = sync_entries[i][ATTRIBUTE_KEY_NAMESPACE];
         auto override_version = sync_entries[i][ATTRIBUTE_KEY_OVERRIDE];
 
-        status = dc_semantic_version_convert (namespace_version.asCString(), &semver_namespace);
+        status = dc_version_convert (namespace_version.asCString(), &version_namespace);
         if (status != DISIR_STATUS_OK)
         {
             return status;
         }
 
-        status = dc_semantic_version_convert (override_version.asCString(), &semver_override);
+        status = dc_version_convert (override_version.asCString(), &version_override);
         if (status != DISIR_STATUS_OK)
         {
             return status;
         }
 
-        mapping.insert (std::make_pair (semver_override, semver_namespace));
+        mapping.insert (std::make_pair (version_override, version_namespace));
     }
 
     return status;
@@ -238,20 +238,20 @@ enum disir_status
 MoldOverride::populate_mold_entry_override (Json::Value& current, std::string name,
                                             syncmap& override_mapping)
 {
-    struct semantic_version semver;
+    struct disir_version version;
     auto mold_entry_override = std::unique_ptr<struct mold_entry_override>
                                               (new struct mold_entry_override);
 
     mold_entry_override->mo_name = name;
 
-    auto status = string_to_semantic_version (current, ATTRIBUTE_KEY_VERSION, &semver);
+    auto status = string_to_disir_version (current, ATTRIBUTE_KEY_VERSION, &version);
     if (status != DISIR_STATUS_OK)
     {
         return status;
     }
 
     // Check if we have matching entry in sync
-    auto found = override_mapping.find (semver);
+    auto found = override_mapping.find (version);
     if (found != override_mapping.end())
     {
         mold_entry_override->mo_version = found->second;
@@ -325,12 +325,12 @@ MoldOverride::parse_mold_overrides (Json::Value& root)
 //! PRIVATE
 enum disir_status
 MoldOverride::retrieve_highest_default_version (struct disir_context *context,
-                                                struct semantic_version *highest_semver)
+                                                struct disir_version *highest_version)
 {
    enum disir_status status;
    struct disir_collection *collection;
    struct disir_context *context_default = NULL;
-   struct semantic_version semver;
+   struct disir_version version;
 
    status = dc_get_default_contexts (context, &collection);
    if (status != DISIR_STATUS_OK)
@@ -338,23 +338,22 @@ MoldOverride::retrieve_highest_default_version (struct disir_context *context,
         return status;
    }
 
-   highest_semver->sv_patch = 0;
-   highest_semver->sv_minor = 0;
-   highest_semver->sv_major = 0;
+   highest_version->sv_minor = 0;
+   highest_version->sv_major = 0;
 
    // Go through all defaults and determine which
    // one has the highest version
    while (dc_collection_next (collection, &context_default)
           != DISIR_STATUS_EXHAUSTED)
     {
-        status = dc_get_introduced (context_default, &semver);
+        status = dc_get_introduced (context_default, &version);
         if (status != DISIR_STATUS_OK)
             goto out;
 
-        auto eq = dc_semantic_version_compare (&semver, highest_semver);
+        auto eq = dc_version_compare (&version, highest_version);
         if (eq >= 0)
         {
-            *highest_semver = semver;
+            *highest_version = version;
         }
         dc_putcontext (&context_default);
     }
@@ -370,13 +369,13 @@ out:
 
 enum disir_status
 MoldOverride::set_value_existing_default (struct disir_context *context_keyval,
-                                          struct semantic_version *semver_target,
+                                          struct disir_version *version_target,
                                           Json::Value& value)
 {
    enum disir_status status;
    struct disir_collection *collection;
    struct disir_context *context_default = NULL;
-   struct semantic_version semver;
+   struct disir_version version;
 
    status = dc_get_default_contexts (context_keyval, &collection);
    if (status != DISIR_STATUS_OK)
@@ -384,15 +383,15 @@ MoldOverride::set_value_existing_default (struct disir_context *context_keyval,
         return status;
    }
 
-   // Go through all defaults and find a default with matching semver
+   // Go through all defaults and find a default with matching version
    while (dc_collection_next (collection, &context_default)
           != DISIR_STATUS_EXHAUSTED)
     {
-        status = dc_get_introduced (context_default, &semver);
+        status = dc_get_introduced (context_default, &version);
         if (status != DISIR_STATUS_OK)
             goto out;
 
-        if (dc_semantic_version_compare (&semver, semver_target) == 0)
+        if (dc_version_compare (&version, version_target) == 0)
         {
             status = set_value (value, context_default);
             if (status != DISIR_STATUS_OK)
@@ -412,10 +411,10 @@ out:
 
 enum disir_status
 MoldOverride::apply_override (struct disir_context *context_mold, struct mold_entry_override *entry,
-                              struct semantic_version *mold_version)
+                              struct disir_version *mold_version)
 {
     enum disir_status status;
-    struct semantic_version highest_default;
+    struct disir_version highest_default;
     struct disir_context *context_keyval = NULL;
     int eq;
 
@@ -436,21 +435,21 @@ MoldOverride::apply_override (struct disir_context *context_mold, struct mold_en
         goto out;
 
     // Override version cannot be higher than the mold version
-    if (dc_semantic_version_compare (&entry->mo_version, mold_version) > 0)
+    if (dc_version_compare (&entry->mo_version, mold_version) > 0)
     {
         char mbuf[100];
         char kbuf[100];
         dc_fatal_error (context_mold,  "keyval '%s' override version (%s) is higher than "
                                         "namespace mold version (%s)",
                                         entry->mo_name.c_str(),
-                                        dc_semantic_version_string (kbuf, 100, &entry->mo_version),
-                                        dc_semantic_version_string (mbuf, 100, mold_version));
+                                        dc_version_string (kbuf, 100, &entry->mo_version),
+                                        dc_version_string (mbuf, 100, mold_version));
         status = DISIR_STATUS_INVALID_CONTEXT;
         goto out;
     }
 
     // mo_version contains which version to override (equal or lower)
-    eq = dc_semantic_version_compare (&entry->mo_version, &highest_default);
+    eq = dc_version_compare (&entry->mo_version, &highest_default);
     if (eq > 0)
     {
         status = add_value_default (context_keyval, entry->mo_value, &entry->mo_version);
@@ -480,7 +479,7 @@ enum disir_status
 MoldOverride::apply_overrides (struct disir_context *context_mold)
 {
     enum disir_status status;
-    struct semantic_version mold_version;
+    struct disir_version mold_version;
 
     status = dc_get_introduced (context_mold, &mold_version);
     if (status != DISIR_STATUS_OK)

@@ -20,7 +20,7 @@
 
 static enum disir_status
 context_get_introduced_structure (struct disir_context *context,
-                                  struct semantic_version **introduced)
+                                  struct disir_version **introduced)
 {
     if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
     {
@@ -65,7 +65,7 @@ context_get_introduced_structure (struct disir_context *context,
 //! STATIC API
 static enum disir_status
 context_get_deprecated_structure (struct disir_context *context,
-                                  struct semantic_version **deprecated)
+                                  struct disir_version **deprecated)
 {
     if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_MOLD)
     {
@@ -393,8 +393,8 @@ dc_finalize (struct disir_context **context)
             // XXX: Handle versions much be done more elegantly
             // XXX: Currently, we may still have dangling versions persistet to mold
             // XXX: event though they may be deleted (finalized child, destroy constructing parent)
-            struct semantic_version *introduced;
-            struct semantic_version *deprecated;
+            struct disir_version *introduced;
+            struct disir_version *deprecated;
             if (context_get_introduced_structure (*context, &introduced) == DISIR_STATUS_OK)
             {
                 dx_mold_update_version ((*context)->cx_root_context->cx_mold, introduced);
@@ -884,9 +884,9 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
 
 //! PUBLIC API
 enum disir_status
-dc_add_introduced (struct disir_context *context, struct semantic_version *semver)
+dc_add_introduced (struct disir_context *context, struct disir_version *version)
 {
-    struct semantic_version *introduced;
+    struct disir_version *introduced;
     enum disir_status status;
     char buffer[32];
 
@@ -900,9 +900,9 @@ dc_add_introduced (struct disir_context *context, struct semantic_version *semve
         // Already logged
         return status;
     }
-    if (semver == NULL)
+    if (version == NULL)
     {
-        log_debug (0, "invoked with semver NULL pointer.");
+        log_debug (0, "invoked with version NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -927,13 +927,12 @@ dc_add_introduced (struct disir_context *context, struct semantic_version *semve
     status = context_get_introduced_structure (context, &introduced);
     if (status == DISIR_STATUS_OK)
     {
-        introduced->sv_major = semver->sv_major;
-        introduced->sv_minor = semver->sv_minor;
-        introduced->sv_patch = semver->sv_patch;
+        introduced->sv_major = version->sv_major;
+        introduced->sv_minor = version->sv_minor;
 
         log_debug_context (6, context, "adding introduced to root(%s): %s",
                                        dc_context_type_string (context->cx_root_context),
-                                       dc_semantic_version_string (buffer, 32, semver));
+                                       dc_version_string (buffer, 32, version));
     }
     else if (status == DISIR_STATUS_WRONG_CONTEXT)
     {
@@ -947,13 +946,13 @@ dc_add_introduced (struct disir_context *context, struct semantic_version *semve
 
 //! PUBLIC API
 enum disir_status
-dc_add_deprecated (struct disir_context *context, struct semantic_version *semver)
+dc_add_deprecated (struct disir_context *context, struct disir_version *version)
 {
     enum disir_status status;
-    struct semantic_version *deprecated;
+    struct disir_version *deprecated;
     char buffer[32];
 
-    TRACE_ENTER ("context (%p) semver (%p)", context, semver);
+    TRACE_ENTER ("context (%p) version (%p)", context, version);
 
     deprecated = NULL;
     status = DISIR_STATUS_OK;
@@ -965,9 +964,9 @@ dc_add_deprecated (struct disir_context *context, struct semantic_version *semve
         // Already logged
         return status;
     }
-    if (semver == NULL)
+    if (version == NULL)
     {
-        log_debug (0, "invoked with semver NULL pointer.");
+        log_debug (0, "invoked with version NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -986,13 +985,12 @@ dc_add_deprecated (struct disir_context *context, struct semantic_version *semve
     status = context_get_deprecated_structure (context, &deprecated);
     if (status == DISIR_STATUS_OK)
     {
-        deprecated->sv_major = semver->sv_major;
-        deprecated->sv_minor = semver->sv_minor;
-        deprecated->sv_patch = semver->sv_patch;
+        deprecated->sv_major = version->sv_major;
+        deprecated->sv_minor = version->sv_minor;
 
         log_debug_context (6, context, "adding deprecated to root(%s): %s",
                                        dc_context_type_string (context->cx_root_context),
-                                       dc_semantic_version_string (buffer, 32, semver));
+                                       dc_version_string (buffer, 32, version));
     }
     else if (status == DISIR_STATUS_WRONG_CONTEXT)
     {
@@ -1007,11 +1005,11 @@ dc_add_deprecated (struct disir_context *context, struct semantic_version *semve
 
 //! PUBLIC API
 enum disir_status
-dc_get_version (struct disir_context *context, struct semantic_version *semver)
+dc_get_version (struct disir_context *context, struct disir_version *version)
 {
     enum disir_status status;
 
-    TRACE_ENTER ("context: %p, semver: %p", context, semver);
+    TRACE_ENTER ("context: %p, version: %p", context, version);
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
@@ -1020,9 +1018,9 @@ dc_get_version (struct disir_context *context, struct semantic_version *semver)
         return status;
     }
 
-    if (semver == NULL)
+    if (version == NULL)
     {
-        log_debug (0, "invoked with semver NULL pointer.");
+        log_debug (0, "invoked with version NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -1035,11 +1033,11 @@ dc_get_version (struct disir_context *context, struct semantic_version *semver)
 
     if (dc_context_type (context) == DISIR_CONTEXT_CONFIG)
     {
-        dc_semantic_version_set (semver, &context->cx_config->cf_version);
+        dc_version_set (version, &context->cx_config->cf_version);
     }
     else if (dc_context_type (context) == DISIR_CONTEXT_MOLD)
     {
-        dc_semantic_version_set (semver, &context->cx_mold->mo_version);
+        dc_version_set (version, &context->cx_mold->mo_version);
     }
     else
     {
@@ -1053,11 +1051,11 @@ dc_get_version (struct disir_context *context, struct semantic_version *semver)
 
 //! PUBLIC API
 enum disir_status
-dc_set_version (struct disir_context *context, struct semantic_version *semver)
+dc_set_version (struct disir_context *context, struct disir_version *version)
 {
     enum disir_status status;
 
-    TRACE_ENTER ("context: %p, semver: %p", context, semver);
+    TRACE_ENTER ("context: %p, version: %p", context, version);
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
     if (status != DISIR_STATUS_OK)
@@ -1066,9 +1064,9 @@ dc_set_version (struct disir_context *context, struct semantic_version *semver)
         return status;
     }
 
-    if (semver == NULL)
+    if (version == NULL)
     {
-        log_debug (0, "invoked with semver NULL pointer.");
+        log_debug (0, "invoked with version NULL pointer.");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -1082,17 +1080,17 @@ dc_set_version (struct disir_context *context, struct semantic_version *semver)
     if (dc_context_type (context) == DISIR_CONTEXT_CONFIG)
     {
         // TODO: Verify that the mold context is still valid. Extract into variable
-        if (dc_semantic_version_compare (
-                &context->cx_config->cf_mold->mo_version, semver) < 0)
+        if (dc_version_compare (
+                &context->cx_config->cf_mold->mo_version, version) < 0)
         {
             dx_log_context (context, "Cannot set version to CONFIG whose MOLD is lower.");
             return DISIR_STATUS_CONFLICTING_SEMVER;
         }
-        dc_semantic_version_set (&context->cx_config->cf_version, semver);
+        dc_version_set (&context->cx_config->cf_version, version);
     }
     else if (dc_context_type (context) == DISIR_CONTEXT_MOLD)
     {
-        dc_semantic_version_set (&context->cx_mold->mo_version, semver);
+        dc_version_set (&context->cx_mold->mo_version, version);
     }
     else
     {
@@ -1106,9 +1104,9 @@ dc_set_version (struct disir_context *context, struct semantic_version *semver)
 
 //! PUBLIC API
 enum disir_status
-dc_get_introduced (struct disir_context *context, struct semantic_version *semver)
+dc_get_introduced (struct disir_context *context, struct disir_version *version)
 {
-    struct semantic_version *introduced;
+    struct disir_version *introduced;
     enum disir_status status;
 
     introduced = NULL;
@@ -1121,9 +1119,9 @@ dc_get_introduced (struct disir_context *context, struct semantic_version *semve
         // Already logged.
         return status;
     }
-    if (semver == NULL)
+    if (version == NULL)
     {
-        log_debug (0, "invoked with semver NULL pointer");
+        log_debug (0, "invoked with version NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -1143,9 +1141,8 @@ dc_get_introduced (struct disir_context *context, struct semantic_version *semve
     }
     else if (status == DISIR_STATUS_OK)
     {
-        semver->sv_major = introduced->sv_major;
-        semver->sv_minor = introduced->sv_minor;
-        semver->sv_patch = introduced->sv_patch;
+        version->sv_major = introduced->sv_major;
+        version->sv_minor = introduced->sv_minor;
     }
 
     return status;
@@ -1153,9 +1150,9 @@ dc_get_introduced (struct disir_context *context, struct semantic_version *semve
 
 //! PUBLIC API
 enum disir_status
-dc_get_deprecated (struct disir_context *context, struct semantic_version *semver)
+dc_get_deprecated (struct disir_context *context, struct disir_version *version)
 {
-    struct semantic_version *deprecated;
+    struct disir_version *deprecated;
     enum disir_status status;
 
     deprecated = NULL;
@@ -1168,9 +1165,9 @@ dc_get_deprecated (struct disir_context *context, struct semantic_version *semve
         // Already logged.
         return status;
     }
-    if (semver == NULL)
+    if (version == NULL)
     {
-        log_debug (0, "invoked with semver NULL pointer");
+        log_debug (0, "invoked with version NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -1190,9 +1187,8 @@ dc_get_deprecated (struct disir_context *context, struct semantic_version *semve
     }
     else if (status == DISIR_STATUS_OK)
     {
-        semver->sv_major = deprecated->sv_major;
-        semver->sv_minor = deprecated->sv_minor;
-        semver->sv_patch = deprecated->sv_patch;
+        version->sv_major = deprecated->sv_major;
+        version->sv_minor = deprecated->sv_minor;
     }
 
     return status;

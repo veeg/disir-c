@@ -24,7 +24,7 @@
 static enum disir_status
 generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
                                           struct disir_context *config_parent,
-                                          struct semantic_version *semver)
+                                          struct disir_version *version)
 {
     enum disir_status status;
     struct disir_collection *collection;
@@ -47,7 +47,7 @@ generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
     {
 
         status = dx_restriction_entries_value (equiv, DISIR_RESTRICTION_INC_ENTRY_MIN,
-                                               semver, &min_entries);
+                                               version, &min_entries);
         if (status != DISIR_STATUS_OK)
         {
             // XXX
@@ -85,10 +85,10 @@ generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
 
             if (dc_context_type (equiv) == DISIR_CONTEXT_KEYVAL)
             {
-                // Get default entry matching semver
+                // Get default entry matching version
                 //
 
-                dx_default_get_active (equiv, semver, &def);
+                dx_default_get_active (equiv, version, &def);
 
                 status = dx_value_copy (&context->cx_keyval->kv_value, &def->de_value);
                 if (status != DISIR_STATUS_OK)
@@ -100,7 +100,7 @@ generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
             else if (dc_context_type (equiv) == DISIR_CONTEXT_SECTION)
             {
                 // Send down parent and context -
-                generate_config_from_mold_recursive_step (equiv, context, semver);
+                generate_config_from_mold_recursive_step (equiv, context, version);
             }
 
             status = dc_finalize (&context);
@@ -126,15 +126,15 @@ error:
 
 //! PUBLIC API
 enum disir_status
-disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
+disir_generate_config_from_mold (struct disir_mold *mold, struct disir_version *config_version,
                                  struct disir_config **config)
 {
     enum disir_status status;
     struct disir_context *config_context;
     char buffer[512];
-    struct semantic_version version;
+    struct disir_version version;
 
-    TRACE_ENTER ("mold: %p, semver: %p", mold, semver);
+    TRACE_ENTER ("mold: %p, version: %p", mold, config_version);
 
     if (mold == NULL)
     {
@@ -152,7 +152,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
     }
 
     // Set version to config.
-    if (semver == NULL)
+    if (config_version == NULL)
     {
         status = dc_get_version (mold->mo_context, &version);
         if (status != DISIR_STATUS_OK)
@@ -163,7 +163,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
     }
     else
     {
-        dc_semantic_version_set (&version, semver);
+        dc_version_set (&version, config_version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged ?
@@ -177,7 +177,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
         return status;
     }
 
-    generate_config_from_mold_recursive_step (mold->mo_context, config_context, semver);
+    generate_config_from_mold_recursive_step (mold->mo_context, config_context, &version);
 
     status = dc_config_finalize (&config_context, config);
     if (status != DISIR_STATUS_OK)
@@ -186,16 +186,16 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_versio
         goto error;
     }
 
-    if (semver)
+    if (config_version)
     {
-        dc_semantic_version_set (&(*config)->cf_version, semver);
+        dc_version_set (&(*config)->cf_version, config_version);
     }
     else
     {
-        dc_semantic_version_set (&(*config)->cf_version, &mold->mo_version);
+        dc_version_set (&(*config)->cf_version, &mold->mo_version);
     }
     log_debug (6, "sat config version to: %s",
-               dc_semantic_version_string (buffer, 32, &(*config)->cf_version));
+               dc_version_string (buffer, 32, &(*config)->cf_version));
 
     TRACE_EXIT ("config: %p", *config);
     return DISIR_STATUS_OK;

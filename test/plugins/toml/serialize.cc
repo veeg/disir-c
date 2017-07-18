@@ -31,7 +31,7 @@ public:
         DisirTestTestPlugin::TearDown ();
     }
 
-    void setup_testconfig (const char *entry, struct semantic_version *semver)
+    void setup_testconfig (const char *entry, struct disir_version *semver)
     {
         status = disir_mold_read (instance, "test", entry, &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);

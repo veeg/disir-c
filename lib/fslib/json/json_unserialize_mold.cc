@@ -773,7 +773,7 @@ enum disir_status
 MoldReader::unserialize_introduced (struct disir_context *context, Json::Value& current)
 {
     enum disir_status status;
-    struct semantic_version intro;
+    struct disir_version intro;
 
     if (current[ATTRIBUTE_KEY_INTRODUCED].isNull ())
     {
@@ -787,7 +787,7 @@ MoldReader::unserialize_introduced (struct disir_context *context, Json::Value& 
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
-    status = dc_semantic_version_convert (current[ATTRIBUTE_KEY_INTRODUCED].asCString(), &intro);
+    status = dc_version_convert (current[ATTRIBUTE_KEY_INTRODUCED].asCString(), &intro);
     if (status != DISIR_STATUS_OK)
     {
 
@@ -808,7 +808,7 @@ enum disir_status
 MoldReader::unserialize_deprecated (struct disir_context *context, Json::Value& current)
 {
     enum disir_status status;
-    struct semantic_version semver;
+    struct disir_version version;
 
     if (current[ATTRIBUTE_KEY_DEPRECATED].isNull ())
     {
@@ -821,14 +821,14 @@ MoldReader::unserialize_deprecated (struct disir_context *context, Json::Value& 
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
-    status = dc_semantic_version_convert (current[ATTRIBUTE_KEY_DEPRECATED].asCString (), &semver);
+    status = dc_version_convert (current[ATTRIBUTE_KEY_DEPRECATED].asCString (), &version);
     if (status != DISIR_STATUS_OK)
     {
         dc_fatal_error (context, "Semantic version deprecated is not formated correctly");
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
-    status = dc_add_deprecated (context, &semver);
+    status = dc_add_deprecated (context, &version);
     if (status != DISIR_STATUS_OK)
     {
         return status;

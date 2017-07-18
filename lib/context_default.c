@@ -105,18 +105,18 @@ dx_default_finalize (struct disir_context *default_context)
     // TODO: Verify that the default respect the restrictions on the parent keyval
 
     exists = MQ_SIZE_COND (*queue,
-            (dc_semantic_version_compare (&entry->de_introduced, &def->de_introduced) == 0));
+            (dc_version_compare (&entry->de_introduced, &def->de_introduced) == 0));
     if (exists)
     {
         dx_log_context (default_context,
                         "already contains a default entry with semantic version: %s",
-                        dc_semantic_version_string (buffer, 32, &def->de_introduced));
+                        dc_version_string (buffer, 32, &def->de_introduced));
         status = DISIR_STATUS_CONFLICTING_SEMVER;
     }
     else
     {
         MQ_ENQUEUE_CONDITIONAL (*queue, def,
-            (dc_semantic_version_compare (&entry->de_introduced, &def->de_introduced) > 0));
+            (dc_version_compare (&entry->de_introduced, &def->de_introduced) > 0));
         status = DISIR_STATUS_OK;
     }
 
@@ -191,7 +191,7 @@ dx_default_destroy (struct disir_default **def)
 //! PUBLIC API
 enum disir_status
 dc_add_default (struct disir_context *parent, const char *value,
-                int32_t value_size, struct semantic_version *semver)
+                int32_t value_size, struct disir_version *version)
 {
     enum disir_status status;
     enum disir_value_type type;
@@ -228,7 +228,7 @@ dc_add_default (struct disir_context *parent, const char *value,
     {
     case DISIR_VALUE_TYPE_STRING:
     {
-        status = dc_add_default_string (parent, value, value_size, semver);
+        status = dc_add_default_string (parent, value, value_size, version);
         break;
     }
     case DISIR_VALUE_TYPE_INTEGER:
@@ -240,7 +240,7 @@ dc_add_default (struct disir_context *parent, const char *value,
             status = DISIR_STATUS_INVALID_ARGUMENT;
             break;
         }
-        status = dc_add_default_integer (parent, parsed_integer, semver);
+        status = dc_add_default_integer (parent, parsed_integer, version);
         break;
     }
     case DISIR_VALUE_TYPE_FLOAT:
@@ -252,13 +252,13 @@ dc_add_default (struct disir_context *parent, const char *value,
             status = DISIR_STATUS_INVALID_ARGUMENT;
             break;
         }
-        status = dc_add_default_float (parent, parsed_double, semver);
+        status = dc_add_default_float (parent, parsed_double, version);
         break;
     }
     case DISIR_VALUE_TYPE_BOOLEAN:
     {
         // TODO: extract boolean from input string.
-        //status = dc_add_default_boolean (parent, parsed_boolean, semver);
+        //status = dc_add_default_boolean (parent, parsed_boolean, version);
         log_fatal_context (parent, "Cannot add value type boolean: not implemented");
         status = DISIR_STATUS_INTERNAL_ERROR;
         break;
@@ -283,7 +283,7 @@ dc_add_default (struct disir_context *parent, const char *value,
 //! PUBLIC API
 enum disir_status
 dc_add_default_string (struct disir_context *parent, const char *value,
-                       int32_t value_size, struct semantic_version *semver)
+                       int32_t value_size, struct disir_version *version)
 {
     enum disir_status status;
     struct disir_context *def;
@@ -304,9 +304,9 @@ dc_add_default_string (struct disir_context *parent, const char *value,
         goto error;
     }
 
-    if (semver)
+    if (version)
     {
-        status = dc_add_introduced(def, semver);
+        status = dc_add_introduced(def, version);
         if (status != DISIR_STATUS_OK)
         {
             // already logged
@@ -334,7 +334,7 @@ error:
 //! PUBLIC API
 enum disir_status
 dc_add_default_integer (struct disir_context *parent, int64_t value,
-                        struct semantic_version *semver)
+                        struct disir_version *version)
 {
     enum disir_status status;
     struct disir_context *def;
@@ -355,9 +355,9 @@ dc_add_default_integer (struct disir_context *parent, int64_t value,
         goto error;
     }
 
-    if (semver)
+    if (version)
     {
-        status = dc_add_introduced(def, semver);
+        status = dc_add_introduced(def, version);
         if (status != DISIR_STATUS_OK)
         {
             // already logged
@@ -385,7 +385,7 @@ error:
 
 //! PUBLIC API
 enum disir_status
-dc_add_default_float (struct disir_context *parent, double value, struct semantic_version *semver)
+dc_add_default_float (struct disir_context *parent, double value, struct disir_version *version)
 {
     enum disir_status status;
     struct disir_context *def;
@@ -406,9 +406,9 @@ dc_add_default_float (struct disir_context *parent, double value, struct semanti
         goto error;
     }
 
-    if (semver)
+    if (version)
     {
-        status = dc_add_introduced(def, semver);
+        status = dc_add_introduced(def, version);
         if (status != DISIR_STATUS_OK)
         {
             // already logged
@@ -437,7 +437,7 @@ error:
 //! PUBLIC API
 enum disir_status
 dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
-                        struct semantic_version *semver)
+                        struct disir_version *version)
 {
     enum disir_status status;
     struct disir_context *def;
@@ -462,9 +462,9 @@ dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
         goto error;
     }
 
-    if (semver)
+    if (version)
     {
-        status = dc_add_introduced(def, semver);
+        status = dc_add_introduced(def, version);
         if (status != DISIR_STATUS_OK)
         {
             // already logged
@@ -493,7 +493,7 @@ error:
 
 //! PUBLIC API
 enum disir_status
-dc_get_default (struct disir_context *context, struct semantic_version *semver,
+dc_get_default (struct disir_context *context, struct disir_version *version,
                 int32_t output_buffer_size, char *output, int32_t *output_string_size)
 {
     enum disir_status status;
@@ -538,7 +538,7 @@ dc_get_default (struct disir_context *context, struct semantic_version *semver,
             return DISIR_STATUS_INTERNAL_ERROR;
         }
 
-        dx_default_get_active (keyval, semver, &def);
+        dx_default_get_active (keyval, version, &def);
     }
     else if (dc_context_type (context) == DISIR_CONTEXT_DEFAULT)
     {
@@ -605,7 +605,7 @@ dc_get_default_contexts (struct disir_context *context, struct disir_collection 
 
 //! INTERNAL API
 void
-dx_default_get_active (struct disir_context *keyval, struct semantic_version *semver,
+dx_default_get_active (struct disir_context *keyval, struct disir_version *version,
                        struct disir_default **def)
 {
     struct disir_default *current;
@@ -615,10 +615,10 @@ dx_default_get_active (struct disir_context *keyval, struct semantic_version *se
         // We cant really do anything - everything is empty.
         current = NULL;
     }
-    else if (semver)
+    else if (version)
     {
         current = MQ_FIND (keyval->cx_keyval->kv_default_queue,
-                (dc_semantic_version_compare (&entry->de_introduced, semver) > 0));
+                (dc_version_compare (&entry->de_introduced, version) > 0));
         if (current != NULL && current->prev != MQ_TAIL (keyval->cx_keyval->kv_default_queue))
         {
             current = current->prev;

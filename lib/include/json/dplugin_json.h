@@ -29,7 +29,7 @@
 enum disir_status set_value (Json::Value& val, struct disir_context *context);
 
 enum disir_status add_value_default (struct disir_context *contexts, Json::Value& value,
-                                     struct semantic_version *semver);
+                                     struct disir_version *version);
 
 //! \brief resolve disir_value_type from its string representation
 enum disir_value_type attribute_key_to_disir_value (const char *type);

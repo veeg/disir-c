@@ -196,7 +196,7 @@ TEST_F (CompareTest, mold_context_mold_documentation_content_differ)
 TEST_F (CompareTest, mold_context_mold_documentation_introduced_differ)
 {
     struct disir_context *context_documentation;
-    struct semantic_version semver;
+    struct disir_version version;
 
     ASSERT_NO_SETUP_FAILURE();
 
@@ -212,10 +212,9 @@ TEST_F (CompareTest, mold_context_mold_documentation_introduced_differ)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_set_value_string (context_documentation, "test_doc", strlen ("test_doc"));
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-    semver.sv_major = 1;
-    semver.sv_minor = 1;
-    semver.sv_patch = 0;
-    status = dc_add_introduced (context_documentation, &semver);
+    version.sv_major = 1;
+    version.sv_minor = 1;
+    status = dc_add_introduced (context_documentation, &version);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_finalize (&context_documentation);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
@@ -267,7 +266,7 @@ TEST_F (CompareTest, mold_context_mold_documentation_one_missing)
 
 TEST_F (CompareTest, mold_context_default_one_missing)
 {
-    struct semantic_version semver;
+    struct disir_version version;
     struct disir_context *context_keyval;
 
     ASSERT_NO_SETUP_FAILURE();
@@ -288,10 +287,9 @@ TEST_F (CompareTest, mold_context_default_one_missing)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     // Add an extra default to keyval in mold2
-    semver.sv_major = 1;
-    semver.sv_minor = 2;
-    semver.sv_patch = 2;
-    dc_add_default_boolean (context_keyval, 1, &semver);
+    version.sv_major = 1;
+    version.sv_minor = 2;
+    dc_add_default_boolean (context_keyval, 1, &version);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     dc_putcontext (&context_keyval);
 
@@ -316,7 +314,7 @@ TEST_F (CompareTest, mold_context_default_one_missing)
 
 TEST_F (CompareTest, mold_context_default_introduced_differ)
 {
-    struct semantic_version semver;
+    struct disir_version version;
 
     ASSERT_NO_SETUP_FAILURE();
 
@@ -332,10 +330,9 @@ TEST_F (CompareTest, mold_context_default_introduced_differ)
 
     status = dc_add_keyval_boolean (context_mold1, "boolean", 0, "doc", NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-    semver.sv_major = 1;
-    semver.sv_minor = 2;
-    semver.sv_patch = 2;
-    status = dc_add_keyval_boolean (context_mold2, "boolean", 0, "doc", &semver, NULL);
+    version.sv_major = 1;
+    version.sv_minor = 2;
+    status = dc_add_keyval_boolean (context_mold2, "boolean", 0, "doc", &version, NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     status = dc_mold_finalize (&context_mold1, &mold1);
@@ -389,7 +386,7 @@ TEST_F (CompareTest, mold_context_section_restriction_one_missing)
 {
     struct disir_context *context_section1;
     struct disir_context *context_section2;
-    struct semantic_version semver;
+    struct disir_version version;
 
     ASSERT_NO_SETUP_FAILURE();
 
@@ -406,14 +403,13 @@ TEST_F (CompareTest, mold_context_section_restriction_one_missing)
     status = dc_set_name (context_section2, "testsection", strlen ("testsection"));
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
-    semver.sv_major = 1;
-    semver.sv_minor = 1;
-    semver.sv_patch = 5;
+    version.sv_major = 1;
+    version.sv_minor = 1;
     // Add equal restriction with different introduced
-    status = dc_add_restriction_entries_min (context_section1, 4, &semver);
+    status = dc_add_restriction_entries_min (context_section1, 4, &version);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-    semver.sv_minor = 2;
-    status = dc_add_restriction_entries_min (context_section2, 4, &semver);
+    version.sv_minor = 2;
+    status = dc_add_restriction_entries_min (context_section2, 4, &version);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     // Conflict on introduced
@@ -500,5 +496,5 @@ TEST_F (CompareTest, mold_context_section_restriction_type_differ)
 
 // TODO: mold_context_mold_documentation_multiple_entries_match
 // TODO: mold_context_mold_documentation_multiple_entries_one_differ
-// XXX: For the above missing tests, we should update dc_add_documentation to include semver
+// XXX: For the above missing tests, we should update dc_add_documentation to include version
 

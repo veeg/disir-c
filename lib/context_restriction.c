@@ -704,14 +704,14 @@ dc_restriction_get_numeric (struct disir_context *context, double *value)
 //! PUBLIC API
 enum disir_status
 dc_add_restriction_value_range (struct disir_context *parent, double min, double max,
-                                const char *doc, struct semantic_version *semver,
+                                const char *doc, struct disir_version *version,
                                 struct disir_context **output)
 {
     enum disir_status status;
     struct disir_context *context_restriction;
 
-    TRACE_ENTER ("parent (%p), min (%f), max (%f) doc (%s), semver (%p), output (%p)",
-                 parent, min, max, doc, semver, output);
+    TRACE_ENTER ("parent (%p), min (%f), max (%f) doc (%s), version (%p), output (%p)",
+                 parent, min, max, doc, version, output);
 
 
     status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
@@ -735,9 +735,9 @@ dc_add_restriction_value_range (struct disir_context *parent, double min, double
         goto error;
     }
 
-    if (semver)
+    if (version)
     {
-        status = dc_add_introduced (context_restriction, semver);
+        status = dc_add_introduced (context_restriction, version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -783,14 +783,14 @@ error:
 //! PUBLIC API
 enum disir_status
 dc_add_restriction_value_numeric (struct disir_context *parent, double value, const char *doc,
-                                  struct semantic_version *semver,
+                                  struct disir_version *version,
                                   struct disir_context **output)
 {
     enum disir_status status;
     struct disir_context *context_restriction;
 
-    TRACE_ENTER ("parent (%p), value (%f), doc (%s), semver (%p), output (%p)",
-                 parent, value, doc, semver, output);
+    TRACE_ENTER ("parent (%p), value (%f), doc (%s), version (%p), output (%p)",
+                 parent, value, doc, version, output);
 
     status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
     if (status != DISIR_STATUS_OK)
@@ -813,9 +813,9 @@ dc_add_restriction_value_numeric (struct disir_context *parent, double value, co
         goto error;
     }
 
-    if (semver)
+    if (version)
     {
-        status = dc_add_introduced (context_restriction, semver);
+        status = dc_add_introduced (context_restriction, version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -861,14 +861,14 @@ error:
 //! PUBLIC API
 enum disir_status
 dc_add_restriction_value_enum (struct disir_context *parent, const char *value, const char *doc,
-                               struct semantic_version *semver,
+                               struct disir_version *version,
                                struct disir_context **output)
 {
     enum disir_status status;
     struct disir_context *context_restriction;
 
-    TRACE_ENTER ("parent (%p), value (%s), doc (%s), semver (%p), output (%p)",
-                 parent, value, doc, semver, output);
+    TRACE_ENTER ("parent (%p), value (%s), doc (%s), version (%p), output (%p)",
+                 parent, value, doc, version, output);
 
     status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
     if (status != DISIR_STATUS_OK)
@@ -891,9 +891,9 @@ dc_add_restriction_value_enum (struct disir_context *parent, const char *value, 
         goto error;
     }
 
-    if (semver)
+    if (version)
     {
-        status = dc_add_introduced (context_restriction, semver);
+        status = dc_add_introduced (context_restriction, version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -942,15 +942,15 @@ error:
 //! STATIC API
 static enum disir_status
 add_restriction_entries_min_max (struct disir_context *parent, int64_t value,
-                                    struct semantic_version *semver,
+                                    struct disir_version *version,
                                     enum disir_restriction_type type)
 
 {
     enum disir_status status;
     struct disir_context *context_restriction;
 
-    TRACE_ENTER ("parent (%p), value (%d), semver (%p), type (%s)",
-                 parent, value, semver, dc_restriction_enum_string (type));
+    TRACE_ENTER ("parent (%p), value (%d), version (%p), type (%s)",
+                 parent, value, version, dc_restriction_enum_string (type));
 
     status = dc_begin (parent, DISIR_CONTEXT_RESTRICTION, &context_restriction);
     if (status != DISIR_STATUS_OK)
@@ -973,9 +973,9 @@ add_restriction_entries_min_max (struct disir_context *parent, int64_t value,
         goto error;
     }
 
-    if (semver)
+    if (version)
     {
-        status = dc_add_introduced (context_restriction, semver);
+        status = dc_add_introduced (context_restriction, version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -1004,17 +1004,17 @@ error:
 //! PUBLIC API
 enum disir_status
 dc_add_restriction_entries_min (struct disir_context *parent, int64_t min,
-                                struct semantic_version *semver)
+                                struct disir_version *version)
 {
-    return add_restriction_entries_min_max (parent, min, semver, DISIR_RESTRICTION_INC_ENTRY_MIN);
+    return add_restriction_entries_min_max (parent, min, version, DISIR_RESTRICTION_INC_ENTRY_MIN);
 }
 
 //! PUBLIC API
 enum disir_status
 dc_add_restriction_entries_max (struct disir_context *parent, int64_t max,
-                                struct semantic_version *semver)
+                                struct disir_version *version)
 {
-    return add_restriction_entries_min_max (parent, max, semver, DISIR_RESTRICTION_INC_ENTRY_MAX);
+    return add_restriction_entries_min_max (parent, max, version, DISIR_RESTRICTION_INC_ENTRY_MAX);
 }
 
 //! INTERNAL API
@@ -1025,7 +1025,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
 {
     enum disir_status status;
     struct disir_restriction **queue;
-    struct semantic_version *config_version;
+    struct disir_version *config_version;
     int exclusive_fulfilled = 0;
     int restriction_entries_inactive = 0;
     double value;
@@ -1082,7 +1082,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
 
         log_debug (10, "queue entry (%p), next (%p), prev (%p)", entry, entry->next, entry->prev);
         // Is restriction valid for this version of the config
-        if (dc_semantic_version_compare (config_version, &entry->re_introduced) < 0)
+        if (dc_version_compare (config_version, &entry->re_introduced) < 0)
         {
             log_debug (9, "queue entry introduced later than config. Skipping");
             restriction_entries_inactive += 1;
@@ -1250,7 +1250,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
 //! INTERNAL API
 enum disir_status
 dx_restriction_entries_value (struct disir_context *context, enum disir_restriction_type type,
-                              struct semantic_version *semver, int *output)
+                              struct disir_version *version, int *output)
 {
     enum disir_status status;
     struct disir_restriction **q;
@@ -1302,15 +1302,15 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
     }
 
     // Find target version from config, if not supplied
-    if (semver == NULL)
+    if (version == NULL)
     {
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
-            semver = &context->cx_root_context->cx_config->cf_version;
+            version = &context->cx_root_context->cx_config->cf_version;
         }
         else
         {
-            semver = &context->cx_root_context->cx_mold->mo_version;
+            version = &context->cx_root_context->cx_mold->mo_version;
         }
     }
 
@@ -1320,7 +1320,7 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
         if (entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MIN ||
             entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MAX)
         {
-            diff = dc_semantic_version_compare  (&entry->re_introduced, semver);
+            diff = dc_version_compare  (&entry->re_introduced, version);
             // entry is newer than target version
             if (diff > 0)
             {

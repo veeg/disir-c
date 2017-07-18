@@ -10,9 +10,9 @@ struct disir_restriction
     struct disir_context        *re_context;
 
     //! Version this restriction entry was introduced.
-    struct semantic_version     re_introduced;
+    struct disir_version        re_introduced;
     //! Version this restriction entry was deprecated.
-    struct semantic_version     re_deprecated;
+    struct disir_version        re_deprecated;
 
     //! Documentation for this restriction.
     struct disir_documentation  *re_documentation_queue;
@@ -83,7 +83,7 @@ enum disir_status dx_restriction_exclusive_value_check (struct disir_context *co
 //!
 //! \param[in] context The input context to check.
 //! \param[in] type The restriction type, either INC_ENTRY_MAX or INC_ENTRY_MIN, to retrieve.
-//! \param[in] semver Optional supplied version to check fromm. If not supplied, the latest
+//! \param[in] version Optional supplied version to check fromm. If not supplied, the latest
 //!             entry is used.
 //! \param[out] output Populated with the output value of MAX or MIN, as determined by `type`.
 //!
@@ -94,7 +94,7 @@ enum disir_status dx_restriction_exclusive_value_check (struct disir_context *co
 //!
 enum disir_status
 dx_restriction_entries_value (struct disir_context *context, enum disir_restriction_type type,
-                              struct semantic_version *semver, int *output);
+                              struct disir_version *version, int *output);
 
 
 #endif // _LIBDISIR_PRIVATE_RESTRICTION_H

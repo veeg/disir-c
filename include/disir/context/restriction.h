@@ -197,7 +197,7 @@ dc_restriction_set_numeric (struct disir_context *context, double value);
 //!
 enum disir_status
 dc_add_restriction_value_numeric (struct disir_context *parent, double value, const char *doc,
-                                  struct semantic_version *semver,
+                                  struct disir_version *version,
                                   struct disir_context **output);
 
 //! \brief Add a DISIR_RESTRICTION_EXC_VALUE_RANGE restriction to parent.
@@ -217,7 +217,7 @@ dc_add_restriction_value_numeric (struct disir_context *parent, double value, co
 //!
 enum disir_status
 dc_add_restriction_value_range (struct disir_context *parent, double min, double max,
-                                const char * doc, struct semantic_version *semver,
+                                const char * doc, struct disir_version *version,
                                 struct disir_context **output);
 
 //! \brief Add a DISIR_RESTRICTION_EXC_VALUE_ENUM restriction to parent.
@@ -237,7 +237,7 @@ dc_add_restriction_value_range (struct disir_context *parent, double min, double
 //!
 enum disir_status
 dc_add_restriction_value_enum (struct disir_context *parent, const char *value, const char *doc,
-                               struct semantic_version *semver,
+                               struct disir_version *version,
                                struct disir_context **output);
 
 //! \brief Add a DISIR_RESTRICTION_INC_ENTRY_MIN restriction to parent.
@@ -250,7 +250,7 @@ dc_add_restriction_value_enum (struct disir_context *parent, const char *value, 
 //!
 enum disir_status
 dc_add_restriction_entries_min (struct disir_context *parent, int64_t min,
-                                struct semantic_version *semver);
+                                struct disir_version *version);
 
 //! \brief Add a DISIR_RESTRICTION_INC_ENTRY_MIN restriction to parent.
 //!
@@ -262,7 +262,7 @@ dc_add_restriction_entries_min (struct disir_context *parent, int64_t min,
 //!
 enum disir_status
 dc_add_restriction_entries_max (struct disir_context *parent, int64_t max,
-                                struct semantic_version *semver);
+                                struct disir_version *version);
 
 
 #ifdef __cplusplus

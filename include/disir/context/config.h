@@ -23,14 +23,14 @@ dc_config_getcontext (struct disir_config *config);
 
 //! \brief Get the version number of this config.
 //!
-//! \param[in] config Input mold to retrieve semver for
-//! \param[out] semver Output structure populated with the semver of config.
+//! \param[in] config Input mold to retrieve version for
+//! \param[out] version Output structure populated with the version of config.
 //!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if config or semver are NULL
+//! \return DISIR_STATUS_INVALID_ARGUMENT if config or version are NULL
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-dc_config_get_version (struct disir_config *config, struct semantic_version *semver);
+dc_config_get_version (struct disir_config *config, struct disir_version *version);
 
 //! \brief Begin construction of a CONFIG context based on the passed mold.
 //!

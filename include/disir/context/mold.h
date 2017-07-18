@@ -19,14 +19,14 @@ dc_mold_getcontext (struct disir_mold *mold);
 
 //! \brief Get the version number of this mold.
 //!
-//! \param[in] mold Input mold to retrieve semver for
-//! \param[out] semver Output structure populated with the semver of mold.
+//! \param[in] mold Input mold to retrieve version for
+//! \param[out] version Output structure populated with the version of mold.
 //!
-//! \return DISIR_STATUS_INVALID_ARGUMENT if mold or semver are NULL
+//! \return DISIR_STATUS_INVALID_ARGUMENT if mold or version are NULL
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-dc_mold_get_version (struct disir_mold *mold, struct semantic_version *semver);
+dc_mold_get_version (struct disir_mold *mold, struct disir_version *version);
 
 //! TODO: Rework api doc
 //! Construct the DISIR_CONTEXT_MOLD.

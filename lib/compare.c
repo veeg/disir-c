@@ -176,13 +176,13 @@ compare_default_queues (struct disir_default *lhs, struct disir_default *rhs,
 
     // Check introduced version
     int res;
-    res = dc_semantic_version_compare (&lhs->de_introduced, &rhs->de_introduced);
+    res = dc_version_compare (&lhs->de_introduced, &rhs->de_introduced);
     if (res != 0)
     {
         char lhsbuf[100];
         char rhsbuf[100];
-        dc_semantic_version_string (lhsbuf, 100, &lhs->de_introduced);
-        dc_semantic_version_string (rhsbuf, 100, &rhs->de_introduced);
+        dc_version_string (lhsbuf, 100, &lhs->de_introduced);
+        dc_version_string (rhsbuf, 100, &rhs->de_introduced);
         dx_diff_report_add (report, "Default differ in version (%s vs %s)",
                                     lhsbuf, rhsbuf);
 
@@ -232,13 +232,13 @@ compare_documentation_queues (struct disir_documentation *lhs, struct disir_docu
 
     // Check introduced version
     int res;
-    res = dc_semantic_version_compare (&lhs->dd_introduced, &rhs->dd_introduced);
+    res = dc_version_compare (&lhs->dd_introduced, &rhs->dd_introduced);
     if (res != 0)
     {
         char lhsbuf[100];
         char rhsbuf[100];
-        dc_semantic_version_string (lhsbuf, 100, &lhs->dd_introduced);
-        dc_semantic_version_string (rhsbuf, 100, &rhs->dd_introduced);
+        dc_version_string (lhsbuf, 100, &lhs->dd_introduced);
+        dc_version_string (rhsbuf, 100, &rhs->dd_introduced);
         dx_diff_report_add (report, "Documentation differ in version (%s vs %s)",
                                     lhsbuf, rhsbuf);
 
@@ -289,13 +289,13 @@ compare_restriction_queue (struct disir_restriction *lhs, struct disir_restricti
     }
 
     // Check introduced version
-    res = dc_semantic_version_compare (&lhs->re_introduced, &rhs->re_introduced);
+    res = dc_version_compare (&lhs->re_introduced, &rhs->re_introduced);
     if (res != 0)
     {
         char lhsbuf[100];
         char rhsbuf[100];
-        dc_semantic_version_string (lhsbuf, 100, &lhs->re_introduced);
-        dc_semantic_version_string (rhsbuf, 100, &rhs->re_introduced);
+        dc_version_string (lhsbuf, 100, &lhs->re_introduced);
+        dc_version_string (rhsbuf, 100, &rhs->re_introduced);
         dx_diff_report_add (report, "Restriction differ in introduced (%s vs %s)",
                                     lhsbuf, rhsbuf);
 
@@ -303,13 +303,13 @@ compare_restriction_queue (struct disir_restriction *lhs, struct disir_restricti
     }
 
     // Check deprecated version
-    res = dc_semantic_version_compare (&lhs->re_deprecated, &rhs->re_deprecated);
+    res = dc_version_compare (&lhs->re_deprecated, &rhs->re_deprecated);
     if (res != 0)
     {
         char lhsbuf[100];
         char rhsbuf[100];
-        dc_semantic_version_string (lhsbuf, 100, &lhs->re_deprecated);
-        dc_semantic_version_string (rhsbuf, 100, &rhs->re_deprecated);
+        dc_version_string (lhsbuf, 100, &lhs->re_deprecated);
+        dc_version_string (rhsbuf, 100, &rhs->re_deprecated);
         dx_diff_report_add (report, "Restriction differ in deprecated (%s vs %s)",
                                     lhsbuf, rhsbuf);
 

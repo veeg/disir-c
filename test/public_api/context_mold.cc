@@ -227,40 +227,38 @@ TEST_F (ContextMoldTest, get_documentation)
 
 TEST_F (ContextMoldTest, get_version_default)
 {
-    struct semantic_version input;
-    struct semantic_version output;
+    struct disir_version input;
+    struct disir_version output;
 
     // Setup
     input.sv_major = 1;
     input.sv_minor = 0;
-    input.sv_patch = 0;
     status = dc_mold_finalize (&context_mold, &mold);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     // Expect mold to have default version
     status = dc_mold_get_version (mold, &output);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    ASSERT_EQ (0, dc_semantic_version_compare (&input, &output));
+    ASSERT_EQ (0, dc_version_compare (&input, &output));
 }
 
 TEST_F (ContextMoldTest, get_introduced)
 {
-    struct semantic_version input;
-    struct semantic_version output;
+    struct disir_version input;
+    struct disir_version output;
 
     input.sv_major = 1;
     input.sv_minor = 0;
-    input.sv_patch = 0;
 
     // Expect mold to have default version
     status = dc_get_introduced (context_mold, &output);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    ASSERT_EQ (0, dc_semantic_version_compare (&input, &output));
+    ASSERT_EQ (0, dc_version_compare (&input, &output));
 }
 
 TEST_F (ContextMoldTest, add_introduced_shall_fail)
 {
-    struct semantic_version input;
+    struct disir_version input;
 
     // Expect mold to have default version
     status = dc_add_introduced (context_mold, &input);
@@ -270,13 +268,12 @@ TEST_F (ContextMoldTest, add_introduced_shall_fail)
 
 TEST_F (ContextMoldTest, get_version_greater_than_default)
 {
-    struct semantic_version input;
-    struct semantic_version output;
+    struct disir_version input;
+    struct disir_version output;
 
     // Setup
     input.sv_major = 2;
     input.sv_minor = 5;
-    input.sv_patch = 1;
 
     // Setup mold with keyval whose semver is non-default
     status = dc_add_keyval_string (context_mold, "test_keyval", "defval", "keyval_doc",
@@ -288,18 +285,17 @@ TEST_F (ContextMoldTest, get_version_greater_than_default)
     // Expect mold to have version of added keyval
     status = dc_mold_get_version (mold, &output);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    ASSERT_EQ (0, dc_semantic_version_compare (&input, &output));
+    ASSERT_EQ (0, dc_version_compare (&input, &output));
 }
 
 TEST_F (ContextMoldTest, get_introduced_higher_than_default)
 {
-    struct semantic_version input;
-    struct semantic_version output;
+    struct disir_version input;
+    struct disir_version output;
 
     // Setup
     input.sv_major = 2;
     input.sv_minor = 5;
-    input.sv_patch = 1;
 
     // Setup mold with keyval whose semver is non-default
     status = dc_add_keyval_string (context_mold, "test_keyval", "defval", "keyval_doc",
@@ -309,7 +305,7 @@ TEST_F (ContextMoldTest, get_introduced_higher_than_default)
     // Expect mold to have version of added keyval
     status = dc_get_introduced (context_mold, &output);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    ASSERT_EQ (0, dc_semantic_version_compare (&input, &output));
+    ASSERT_EQ (0, dc_version_compare (&input, &output));
 }
 
 TEST_F (ContextMoldTest, get_elements)
@@ -348,14 +344,13 @@ TEST_F (ContextMoldTest, get_elements)
 
 TEST_F (ContextMoldTest, destroying_constructing_element_shall_not_update_mold_version)
 {
-    struct semantic_version semver;
-    struct semantic_version queried;
+    struct disir_version semver;
+    struct disir_version queried;
     int res;
     struct disir_context *context_section;
 
     semver.sv_major = 2;
     semver.sv_minor = 2;
-    semver.sv_patch = 0;
 
      status = dc_add_keyval_string (context_mold, "keyval1",
                                    "keyval1_value", "keyval1_doc", &semver, NULL);
@@ -376,6 +371,6 @@ TEST_F (ContextMoldTest, destroying_constructing_element_shall_not_update_mold_v
 
     // Query version from mold - should be 2.2.0
     semver.sv_major = 2;
-    res = dc_semantic_version_compare (&semver, &queried);
+    res = dc_version_compare (&semver, &queried);
     ASSERT_EQ (res, 0);
 }

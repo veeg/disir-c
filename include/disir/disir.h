@@ -297,7 +297,7 @@ disir_error (struct disir_instance *instance);
 //!
 enum disir_status
 disir_update_config (struct disir_config *config,
-                     struct semantic_version *target, struct disir_update **update);
+                     struct disir_version *target, struct disir_update **update);
 
 //! \brief Get the conflicting keyval and altenative values for a conflict in update
 //!

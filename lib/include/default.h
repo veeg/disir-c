@@ -12,7 +12,7 @@ struct disir_default
 
     //! Version this default entry was introduced.
     //! NOTE: A default entry may not be deprecated, only superseeded by another default.
-    struct semantic_version     de_introduced;
+    struct disir_version        de_introduced;
 
     //! The value associated with this default entry.
     struct disir_value          de_value;
@@ -36,17 +36,17 @@ struct disir_default *dx_default_create (struct disir_context *parent);
 enum disir_status dx_default_destroy (struct disir_default **def);
 
 
-//! \brief Query a keyval context, whose root is mold, for the active default entry for semver.
+//! \brief Query a keyval context, whose root is mold, for the active default entry for version.
 //!
 //! Internal function - No input validation is performed.
 //!
 //! \param[in] keyval Context KEYVAL whose root must be MOLD.
-//! \param[in] semver Version to retrieve active default entry for. NULL indicates the greatest.
+//! \param[in] version Version to retrieve active default entry for. NULL indicates the greatest.
 //! \param[out] Ouput structure pointer populated with matching entry. NULL if no default entries
 //!     on keyval context.
 //!
 void
-dx_default_get_active (struct disir_context *keyval, struct semantic_version *semver,
+dx_default_get_active (struct disir_context *keyval, struct disir_version *version,
                        struct disir_default **def);
 
 

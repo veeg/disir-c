@@ -18,8 +18,8 @@ struct disir_config
     //! The version of a config shall always represent a snapshot
     //! of its mold, with appropriate modifications. Version cannot
     //! be greater than its mold version.
-    //! The version is by default 1.0.0.
-    struct semantic_version         cf_version;
+    //! The version is by default 1.0
+    struct disir_version            cf_version;
 
     //! Storage of element entries, either:
     //!     * DISIR_CONTEXT_KEYVAL

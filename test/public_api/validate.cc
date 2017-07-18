@@ -218,17 +218,15 @@ TEST_F (ValidateTest, generate_config_restriction_min_entries)
 TEST_F (ValidateTest, generate_config_version_is_sat_correctly)
 {
     struct disir_config *config;
-    struct semantic_version semver;
-    struct semantic_version queried;
+    struct disir_version version;
+    struct disir_version queried;
     int diff;
 
     setup_testmold ("basic_version_difference");
-    semver.sv_major = 3;
-    semver.sv_minor = 0;
-    semver.sv_patch = 0;
+    version.sv_major = 3;
+    version.sv_minor = 0;
     queried.sv_major = 0;
     queried.sv_minor = 0;
-    queried.sv_patch = 0;
     // TODO: Create a mold that contains simple keyvals that only differ in introduced version.
 
     // This should generate a config with version 3.0.0
@@ -236,30 +234,30 @@ TEST_F (ValidateTest, generate_config_version_is_sat_correctly)
     EXPECT_STATUS (DISIR_STATUS_OK, status);
     status = dc_config_get_version (config, &queried);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    diff = dc_semantic_version_compare (&semver, &queried);
+    diff = dc_version_compare (&version, &queried);
     EXPECT_EQ (0, diff);
     // cleanup
     disir_config_finished (&config);
 
     // This should generate a config with version 2.0.0
-    semver.sv_major = 2;
-    status = disir_generate_config_from_mold (mold, &semver, &config);
+    version.sv_major = 2;
+    status = disir_generate_config_from_mold (mold, &version, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
     status = dc_config_get_version (config, &queried);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    diff = dc_semantic_version_compare (&semver, &queried);
+    diff = dc_version_compare (&version, &queried);
     EXPECT_EQ (0, diff);
     // cleanup
     disir_config_finished (&config);
 
     // This should generate a config with version 2.5.0
-    semver.sv_major = 2;
-    semver.sv_minor = 5;
-    status = disir_generate_config_from_mold (mold, &semver, &config);
+    version.sv_major = 2;
+    version.sv_minor = 5;
+    status = disir_generate_config_from_mold (mold, &version, &config);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
     status = dc_config_get_version (config, &queried);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
-    diff = dc_semantic_version_compare (&semver, &queried);
+    diff = dc_version_compare (&version, &queried);
     EXPECT_EQ (0, diff);
      // cleanup
     disir_config_finished (&config);

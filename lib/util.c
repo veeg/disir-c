@@ -61,23 +61,22 @@ disir_status_string (enum disir_status status)
 
 //! PUBLIC API
 char *
-dc_semantic_version_string (char *buffer, int32_t buffer_size, struct semantic_version *semver)
+dc_version_string (char *buffer, int32_t buffer_size, struct disir_version *version)
 {
     int res;
-    if (buffer == NULL || semver == NULL)
+    if (buffer == NULL || version == NULL)
     {
-        log_warn ("%s invoked with NULL pointer(s) (buffer %p, semver: %p)",
-                  __func__, buffer, semver);
+        log_warn ("%s invoked with NULL pointer(s) (buffer %p, version: %p)",
+                  __func__, buffer, version);
         return NULL;
     }
 
     res = snprintf (buffer, buffer_size,
-            "%u.%u.%u", semver->sv_major, semver->sv_minor, semver->sv_patch);
+            "%u.%u", version->sv_major, version->sv_minor);
     if (res < 0 || res >= buffer_size)
     {
-        log_warn ("Insufficient buffer( %p ) size( %d ) to copy semver (%u.%u.%u) - Res: %d",
-                    buffer, buffer_size, semver->sv_major, semver->sv_minor,
-                    semver->sv_patch, res);
+        log_warn ("Insufficient buffer( %p ) size( %d ) to copy version (%u.%u) - Res: %d",
+                    buffer, buffer_size, version->sv_major, version->sv_minor, res);
         return NULL;
     }
 
@@ -86,7 +85,7 @@ dc_semantic_version_string (char *buffer, int32_t buffer_size, struct semantic_v
 
 //! PUBLIC API
 int
-dc_semantic_version_compare (struct semantic_version *s1, struct semantic_version *s2)
+dc_version_compare (struct disir_version *s1, struct disir_version *s2)
 {
     int res;
 
@@ -95,50 +94,45 @@ dc_semantic_version_compare (struct semantic_version *s1, struct semantic_versio
     res = s1->sv_major - s2->sv_major;
     if (res == 0)
         res = s1->sv_minor - s2->sv_minor;
-    if (res == 0)
-        res = s1->sv_patch - s2->sv_patch;
 
-    log_debug (8, "s1 (%u.%u.%u) vs s2 (%u.%u.%u) res (%d)",
-                    s1->sv_major, s1->sv_minor, s1->sv_patch,
-                    s2->sv_major, s2->sv_minor, s2->sv_patch, res);
+    log_debug (8, "s1 (%u.%u) vs s2 (%u.%u) res (%d)",
+                    s1->sv_major, s1->sv_minor,
+                    s2->sv_major, s2->sv_minor, res);
 
     return res;
 }
 
 //! PUBLIC API
 void
-dc_semantic_version_set (struct semantic_version *destination, struct semantic_version *source)
+dc_version_set (struct disir_version *destination, struct disir_version *source)
 {
     if (destination == NULL || source == NULL)
     {
         return;
     }
 
-    log_debug (5, "setting semver (%p) to %u.%u.%u from source (%p)",
-               destination,
-               source->sv_major, source->sv_minor, source->sv_patch,
-               source);
+    log_debug (5, "setting version (%p) to %u.%u from source (%p)",
+                  destination, source->sv_major, source->sv_minor, source);
 
     destination->sv_major = source->sv_major;
     destination->sv_minor = source->sv_minor;
-    destination->sv_patch = source->sv_patch;
 }
 
 //! PUBLIC API
 enum disir_status
-dc_semantic_version_convert (const char *input, struct semantic_version *semver)
+dc_version_convert (const char *input, struct disir_version *version)
 {
     long int parsed_integer;
     char *endptr;
     const char *start;
 
-    if (input == NULL || semver == NULL)
+    if (input == NULL || version == NULL)
     {
-        log_debug (0, "invoked with NULL pointer(s). input: %p, semver: %p", input, semver);
+        log_debug (0, "invoked with NULL pointer(s). input: %p, version: %p", input, version);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    log_debug (3, "Converting semver input: %s", input);
+    log_debug (3, "Converting version input: %s", input);
 
     // Get Major version
     start = input;
@@ -153,7 +147,7 @@ dc_semantic_version_convert (const char *input, struct semantic_version *semver)
         log_debug (6, "missing period seperator after major");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    semver->sv_major = parsed_integer;
+    version->sv_major = parsed_integer;
 
     // Get minor version
     endptr++;
@@ -164,23 +158,7 @@ dc_semantic_version_convert (const char *input, struct semantic_version *semver)
         log_debug (6, "no int parsed");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
-    if (*endptr != '.')
-    {
-        log_debug (6, "missing period seperator after minor");
-        return DISIR_STATUS_INVALID_ARGUMENT;
-    }
-    semver->sv_minor = parsed_integer;
-
-    // Get minor version
-    endptr++;
-    start = endptr;
-    parsed_integer = strtol (start, &endptr, 10);
-    if (start == endptr)
-    {
-        log_debug (6, "no int parsed");
-        return DISIR_STATUS_INVALID_ARGUMENT;
-    }
-    semver->sv_patch = parsed_integer;
+    version->sv_minor = parsed_integer;
 
     return DISIR_STATUS_OK;
 }

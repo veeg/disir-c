@@ -13,7 +13,7 @@ extern "C"{
 
 //! \brief Add a documentation string to an entry.
 //!
-//! This will have the default introduced semver.
+//! This will have the default introduced version.
 //! This is a shortcut between opening a new context,
 //! adding value before finalizing it.
 //!
@@ -35,13 +35,13 @@ extern "C"{
 enum disir_status
 dc_add_documentation (struct disir_context *context, const char *doc, int32_t doc_size);
 
-//! \brief Get the documentation entry for a given semver on the context.
+//! \brief Get the documentation entry for a given version on the context.
 //!
 //! NOTE: This is currently the only method for retrieving the documentation
 //!     of a context.
 //!
-//! Retrieve a specific documentation entry valid for the input semantic version number
-//! given. If semver is NULL, the highest version is picked.
+//! Retrieve a specific documentation entry valid for the input version number
+//! given. If version is NULL, the highest version is picked.
 //! Supported context types are:
 //!     * DISIR_CONTEXT_SECTION
 //!     * DISIR_CONTEXT_KEYVAL
@@ -50,8 +50,8 @@ dc_add_documentation (struct disir_context *context, const char *doc, int32_t do
 //!     * DISIR_CONTEXT_RESTRICTION
 //!
 //! \param[in] context Input context to retrieve documentation for.
-//! \param[in] semver Matching documentation entry covered by this semantic verison number.
-//!     NULL indicates the greatest (semver) documentation entry.
+//! \param[in] version Matching documentation entry covered by this verison number.
+//!     NULL indicates the greatest (version) documentation entry.
 //! \param[out] doc Output pointer the documentation constant will be populated to.
 //! \param[out] doc_size Size of the documentation string, in bytes. Optional; May be NULL
 //!
@@ -60,7 +60,7 @@ dc_add_documentation (struct disir_context *context, const char *doc, int32_t do
 //! \return DISIR_STATUS_OK if doc is popualted with documentation string of context.
 //!
 enum disir_status
-dc_get_documentation (struct disir_context *context, struct semantic_version *semver,
+dc_get_documentation (struct disir_context *context, struct disir_version *version,
                       const char **doc, int32_t *doc_size);
 
 //! \brief Shortcut to add a KEYVAL string entry to a parent context.
@@ -75,14 +75,14 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
 //!             Caller must take care to use dc_putcontext () when he is done.
 //!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
-//!     the input semver 'semver'.
+//!     the input version 'version'.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
 enum disir_status
 dc_add_keyval_string (struct disir_context *parent,
                       const char *name, const char *def,
-                      const char *doc, struct semantic_version *semver,
+                      const char *doc, struct disir_version *version,
                       struct disir_context **output);
 
 
@@ -102,14 +102,14 @@ dc_add_keyval_string (struct disir_context *parent,
 //!             Caller must take care to use dc_putcontext () when he is done.
 //!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
-//!     the input semver 'semver'.
+//!     the input version 'version'.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
 enum disir_status
 dc_add_keyval_enum (struct disir_context *parent,
                     const char *name, const char *def,
-                    const char *doc, struct semantic_version *semver,
+                    const char *doc, struct disir_version *version,
                     struct disir_context **output);
 
 //! \brief Shortcut to add a KEYVAL integer entry to a parent context.
@@ -124,14 +124,14 @@ dc_add_keyval_enum (struct disir_context *parent,
 //!             Caller must take care to use dc_putcontext () when he is done.
 //!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
-//!     the input semver 'semver'.
+//!     the input version 'version'.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
 enum disir_status
 dc_add_keyval_integer (struct disir_context *parent,
                        const char *name, int64_t def,
-                       const char *doc, struct semantic_version *semver,
+                       const char *doc, struct disir_version *version,
                        struct disir_context **output);
 
 //! \brief Shortcut to add a KEYVAL float entry to a parent context.
@@ -146,14 +146,14 @@ dc_add_keyval_integer (struct disir_context *parent,
 //!             Caller must take care to use dc_putcontext () when he is done.
 //!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
-//!     the input semver 'semver'.
+//!     the input version 'version'.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
 enum disir_status
 dc_add_keyval_float (struct disir_context *parent,
                      const char *name, double def,
-                     const char *doc, struct semantic_version *semver,
+                     const char *doc, struct disir_version *version,
                      struct disir_context **output);
 
 //! \brief Shortcut to add a KEYVAL boolean entry to a parent context.
@@ -168,14 +168,14 @@ dc_add_keyval_float (struct disir_context *parent,
 //!             Caller must take care to use dc_putcontext () when he is done.
 //!
 //! \return DISIR_STATUS_OK if the parent accepted the input keyval with 'name', at
-//!     the input semver 'semver'.
+//!     the input version 'version'.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
 enum disir_status
 dc_add_keyval_boolean (struct disir_context *parent,
                        const char *name, uint8_t def,
-                       const char *doc, struct semantic_version *semver,
+                       const char *doc, struct disir_version *version,
                        struct disir_context **output);
 
 //! \brief  Add a default value to an entry, type inferred from the parent context
@@ -190,87 +190,86 @@ dc_add_keyval_boolean (struct disir_context *parent,
 //! \param value String to parse the relevant value information from
 //! \param value_size: Only applicable to string manipulating value types.
 //!     Size in bytes of the input string to copy.A
-//! \param semver Semantic version number to tag this default with. NULL indicates
-//!     a semantic version number of 1.0.0
+//! \param version Number this default entry is valid from. NULL indicates
+//!     the default version number.
 //!
 //! \return DISIR_STATUS_OK if a new default object was associated with the parent context
 //!
 enum disir_status
 dc_add_default (struct disir_context *context, const char *value,
-                int32_t value_size, struct semantic_version *semver);
+                int32_t value_size, struct disir_version *version);
 
 //! \brief Add a default string value to the parent context.
 //!
 //! Type of parent must be DISIR_VALUE_TYPE_STRING. There must not be a default context
-//! in parent with an equal semantic version number.
+//! in parent with an equal version number.
 //!
 //! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_MOLD.
 //! \param value Default string value to add.
 //! \param value_size Size in bytes of the string to copy.
-//! \param semver Semantic version number this default entry is valid from. NULL indicates
-//!     the semantic verssion number 1.0.0
+//! \param version Number this default entry is valid from. NULL indicates
+//!     the default version number.
 //!
 //! \return DISIR_STATUS_OK if the default string 'value' entry succesfully added
 //!     to the parent context.
-//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'version'.
 //!
 enum disir_status
 dc_add_default_string (struct disir_context *parent, const char *value,
-                       int32_t value_size, struct semantic_version *semver);
+                       int32_t value_size, struct disir_version *version);
 
 //! \brief Add a default integer value to the parent context.
 //!
 //! Type of parent must be DISIR_VALUE_TYPE_INTEGER. There must not be a default context
-//! in parent with an equal semantic version number.
+//! in parent with an equal version number.
 //!
 //! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_MOLD.
 //! \param value Default integer value to add.
-//! \param semver Semantic version number this default entry is valid from. NULL indicates
-//!     the semantic verssion number 1.0.0
+//! \param version Number this default entry is valid from. NULL indicates
+//!     the default version number.
 //!
 //! \return DISIR_STATUS_OK if the default integer 'value' entry succesfully added
 //!     to the parent context.
-//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'version'.
 //!
 enum disir_status
 dc_add_default_integer (struct disir_context *parent, int64_t value,
-                        struct semantic_version *semver);
+                        struct disir_version *version);
 
 //! \brief Add a default float value to the parent context.
 //!
 //! Type of parent must be DISIR_VALUE_TYPE_FLOAT. There must not be a default context
-//! in parent with an equal semantic version number.
+//! in parent with an equal version number.
 //!
 //! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_MOLD.
 //! \param value Default float value to add.
-//! \param semver Semantic version number this default entry is valid from. NULL indicates
-//!     the semantic verssion number 1.0.0
-//!
+//! \param version Number this default entry is valid from. NULL indicates
+//!     the default version number.
 //! \return DISIR_STATUS_OK if the default float 'value' entry succesfully added
 //!     to the parent context.
-//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'version'.
 //!
 enum disir_status
 dc_add_default_float (struct disir_context *parent, double value,
-                      struct semantic_version *semver);
+                      struct disir_version *version);
 
 //! \brief Add a default boolean value to the parent context.
 //!
 //! Type of parent must be DISIR_VALUE_TYPE_BOOLEAN. There must not be a default context
-//! in parent with an equal semantic version number.
+//! in parent with an equal version number.
 //!
 //! \param parent A DISIR_CONTEXT_KEYVAL context, whose toplevel context is a DISIR_CONTEXT_MOLD.
 //! \param booelan Default bool value to add.
-//! \param semver Semantic version number this default entry is valid from. NULL indicates
-//!     the semantic verssion number 1.0.0
+//! \param version Number this default entry is valid from. NULL indicates
+//!     the default version number.
 //!
 //! \return DISIR_STATUS_OK if the default 'boolean' entry succesfully added
 //!     to the parent context.
-//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'semver'.
+//! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'version'.
 //!
 enum disir_status
 dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
-                        struct semantic_version *semver);
+                        struct disir_version *version);
 
 
 #ifdef __cplusplus

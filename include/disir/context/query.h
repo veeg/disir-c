@@ -12,7 +12,7 @@ extern "C"{
 //! The supported contexts are:
 //!     * DISIR_CONTEXT_DEFAULT: Plainly retrieve the appointed to default value
 //!     * DISIR_CONTEXT_KEYVAL: Search for the matching default entry in keyval.
-//! The matching default version when searching KEYVAL is picked. If semver is NULL,
+//! The matching default version when searching KEYVAL is picked. If version is NULL,
 //! the highest version is chosen.
 //!
 //! The output buffer is populated with the string representation of the default value held
@@ -30,7 +30,7 @@ extern "C"{
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-dc_get_default (struct disir_context *context, struct semantic_version *semver,
+dc_get_default (struct disir_context *context, struct disir_version *version,
                 int32_t output_buffer_size,
                 char *output, int32_t *output_string_size);
 

@@ -78,7 +78,7 @@ TEST_F (ContextConfigTest, config_begin_invalid_arguments)
 
 TEST_F (ContextConfigTest, get_introduced_shall_fail)
 {
-    struct semantic_version semver;
+    struct disir_version semver;
 
     status = dc_get_introduced (context_config, &semver);
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);
@@ -86,7 +86,7 @@ TEST_F (ContextConfigTest, get_introduced_shall_fail)
 
 TEST_F (ContextConfigTest, add_introduced_shall_fail)
 {
-    struct semantic_version semver;
+    struct disir_version semver;
 
     status = dc_add_introduced (context_config, &semver);
     ASSERT_STATUS (DISIR_STATUS_WRONG_CONTEXT, status);

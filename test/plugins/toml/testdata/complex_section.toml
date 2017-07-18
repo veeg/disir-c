@@ -1,4 +1,4 @@
-'@DISIR_CONFIG_VERSION' = "1.0.0"
+'@DISIR_CONFIG_VERSION' = "1.0"
 
 [single_section]
 key_boolean = false

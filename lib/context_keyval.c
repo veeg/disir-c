@@ -144,7 +144,7 @@ dx_keyval_finalize (struct disir_context *keyval)
 
 static enum disir_status
 add_keyval_generic (struct disir_context *parent, const char *name, const char *doc,
-                    struct semantic_version *semver, enum disir_value_type type,
+                    struct disir_version *version, enum disir_value_type type,
                     const char *string_input,
                     double float_input,
                     int64_t integer_input,
@@ -188,7 +188,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         // FALL-THROUGH
     case DISIR_VALUE_TYPE_STRING:
     {
-        status = dc_add_default_string (keyval, string_input, strlen (string_input), semver);
+        status = dc_add_default_string (keyval, string_input, strlen (string_input), version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -198,7 +198,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
     }
     case DISIR_VALUE_TYPE_INTEGER:
     {
-        status = dc_add_default_integer (keyval, integer_input, semver);
+        status = dc_add_default_integer (keyval, integer_input, version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -208,7 +208,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
     }
     case DISIR_VALUE_TYPE_FLOAT:
     {
-        status = dc_add_default_float (keyval, float_input, semver);
+        status = dc_add_default_float (keyval, float_input, version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -218,7 +218,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
     }
     case DISIR_VALUE_TYPE_BOOLEAN:
     {
-        status = dc_add_default_boolean (keyval, boolean_input, semver);
+        status = dc_add_default_boolean (keyval, boolean_input, version);
         if (status != DISIR_STATUS_OK)
         {
             // Already logged
@@ -270,12 +270,12 @@ error:
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_enum (struct disir_context *parent, const char *name, const char *def,
-                    const char *doc, struct semantic_version *semver,
+                    const char *doc, struct disir_version *version,
                     struct disir_context **output)
 {
     // TODO: How do we refine this function signature to take varadic number of arguments,
     // which we only want to add as restrictions to the enum? Hmm
-    return add_keyval_generic (parent, name, doc, semver,
+    return add_keyval_generic (parent, name, doc, version,
                                DISIR_VALUE_TYPE_ENUM,
                                def,
                                0,
@@ -288,10 +288,10 @@ dc_add_keyval_enum (struct disir_context *parent, const char *name, const char *
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_string (struct disir_context *parent, const char *name, const char *def,
-                      const char *doc, struct semantic_version *semver,
+                      const char *doc, struct disir_version *version,
                       struct disir_context **output)
 {
-    return add_keyval_generic (parent, name, doc, semver,
+    return add_keyval_generic (parent, name, doc, version,
                                DISIR_VALUE_TYPE_STRING,
                                def,
                                0,
@@ -304,10 +304,10 @@ dc_add_keyval_string (struct disir_context *parent, const char *name, const char
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_boolean (struct disir_context *parent, const char *name, uint8_t def,
-                       const char* doc, struct semantic_version *semver,
+                       const char* doc, struct disir_version *version,
                        struct disir_context **output)
 {
-    return add_keyval_generic (parent, name, doc, semver,
+    return add_keyval_generic (parent, name, doc, version,
                                DISIR_VALUE_TYPE_BOOLEAN,
                                NULL,
                                0,
@@ -320,10 +320,10 @@ dc_add_keyval_boolean (struct disir_context *parent, const char *name, uint8_t d
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_float (struct disir_context *parent, const char *name, double def,
-                     const char *doc, struct semantic_version *semver,
+                     const char *doc, struct disir_version *version,
                      struct disir_context **output)
 {
-    return add_keyval_generic (parent, name, doc, semver,
+    return add_keyval_generic (parent, name, doc, version,
                                DISIR_VALUE_TYPE_FLOAT,
                                NULL,
                                def,
@@ -336,10 +336,10 @@ dc_add_keyval_float (struct disir_context *parent, const char *name, double def,
 //! PUBLIC API
 enum disir_status
 dc_add_keyval_integer (struct disir_context *parent, const char *name, int64_t def,
-                       const char *doc, struct semantic_version *semver,
+                       const char *doc, struct disir_version *version,
                        struct disir_context **output)
 {
-    return add_keyval_generic (parent, name, doc, semver,
+    return add_keyval_generic (parent, name, doc, version,
                                DISIR_VALUE_TYPE_INTEGER,
                                NULL,
                                0,

@@ -1,5 +1,5 @@
-{  
-    "version" : "1.0.0",
+{
+    "version" : "1.0",
     "test1" : "1",
     "integer" : 123,
     "float"   : 12.123,

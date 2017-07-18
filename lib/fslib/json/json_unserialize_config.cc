@@ -29,7 +29,7 @@ ConfigReader::ConfigReader (struct disir_instance *disir)
 }
 
 enum disir_status
-ConfigReader::read_config_version (struct semantic_version *semver, const char *path)
+ConfigReader::read_config_version (struct disir_version *version, const char *path)
 {
     enum disir_status status;
 
@@ -39,9 +39,9 @@ ConfigReader::read_config_version (struct semantic_version *semver, const char *
         return status;
     }
 
-    auto version = m_configRoot[VERSION];
+    auto version_string = m_configRoot[VERSION];
 
-    if (version.isNull ())
+    if (version_string.isNull ())
     {
         disir_error_set (m_disir,
                 "Could not read config version. ");
@@ -49,7 +49,7 @@ ConfigReader::read_config_version (struct semantic_version *semver, const char *
         return DISIR_STATUS_FS_ERROR;
     }
 
-    return dc_semantic_version_convert (version.asCString(), semver);
+    return dc_version_convert (version_string.asCString(), version);
 }
 
 //! PUBLIC
@@ -141,31 +141,29 @@ error:
 void
 ConfigReader::set_config_version (struct disir_context *context_config, Json::Value& ver)
 {
-    struct semantic_version semver;
+    struct disir_version version;
     enum disir_status status;
-    const char *version;
+    const char *version_string;
 
     // Absent version keyval
     if (ver.isNull () || !ver.isString ())
     {
-        semver.sv_major = 1;
-        semver.sv_minor = 0;
-        semver.sv_patch = 0;
+        version.sv_major = 1;
+        version.sv_minor = 0;
     }
     else
     {
-        version = ver.asCString ();
+        version_string = ver.asCString ();
 
-        status = dc_semantic_version_convert (version, &semver);
+        status = dc_version_convert (version_string, &version);
         if (status != DISIR_STATUS_OK)
         {
-            semver.sv_major = 1;
-            semver.sv_minor = 0;
-            semver.sv_patch = 0;
+            version.sv_major = 1;
+            version.sv_minor = 0;
         }
     }
 
-    dc_set_version (context_config, &semver);
+    dc_set_version (context_config, &version);
 }
 
 //! PRIVATE

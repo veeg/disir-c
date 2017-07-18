@@ -52,10 +52,9 @@ restriction_keyval_numeric_types (struct disir_mold **mold)
 
 
     // float_complex
-    struct semantic_version semver;
-    semver.sv_major = 1;
-    semver.sv_minor = 1;
-    semver.sv_patch = 0;
+    struct disir_version version;
+    version.sv_major = 1;
+    version.sv_minor = 1;
     status = dc_add_keyval_float (context_mold, "float_complex", 5.66, "float_complex doc", NULL,
                                   &context_complex);
     if (status != DISIR_STATUS_OK)
@@ -67,17 +66,17 @@ restriction_keyval_numeric_types (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
     // TODO: Uncomment when dc_add_deprecated is implemented
-    //status = dc_add_deprecated (context_restriction, &semver);
+    //status = dc_add_deprecated (context_restriction, &version);
     //if (status != DISIR_STATUS_OK)
     //    goto error;
 
     status = dc_add_restriction_value_numeric (context_complex, 66.69, "uncertain", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
-    status = dc_add_restriction_value_numeric (context_complex, 13.37, "l33t", &semver, NULL);
+    status = dc_add_restriction_value_numeric (context_complex, 13.37, "l33t", &version, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
-    status = dc_add_restriction_value_range (context_complex, 60.0, 100.0, NULL, &semver, NULL);
+    status = dc_add_restriction_value_range (context_complex, 60.0, 100.0, NULL, &version, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
     status = dc_putcontext (&context_complex);

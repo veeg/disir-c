@@ -6,11 +6,10 @@ basic_version_difference (struct disir_mold **mold)
     struct disir_context *context;
     struct disir_context *context_section;
     struct disir_context *context_mold;
-    struct semantic_version semver;
+    struct disir_version version;
 
-    semver.sv_major = 2;
-    semver.sv_minor = 0;
-    semver.sv_patch = 0;
+    version.sv_major = 2;
+    version.sv_minor = 0;
 
     status = dc_mold_begin (&context_mold);
     if (status != DISIR_STATUS_OK)
@@ -24,19 +23,19 @@ basic_version_difference (struct disir_mold **mold)
                                    NULL, &context);
     if (status != DISIR_STATUS_OK)
         goto error;
-    status = dc_add_deprecated (context, &semver);
+    status = dc_add_deprecated (context, &version);
     if (status != DISIR_STATUS_OK)
         goto error;
     dc_putcontext (&context);
 
     // key_introduced_2_0_0
     status = dc_add_keyval_integer (context_mold, "key_introduced_2_0_0", 42, "k2value doc",
-                                    &semver, NULL);
+                                    &version, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
 
-    // Start a section that is deprecated in 3.0.0
+    // Start a section that is deprecated in 3.0
     status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section);
     if (status != DISIR_STATUS_OK)
         goto error;
@@ -44,27 +43,27 @@ basic_version_difference (struct disir_mold **mold)
                          strlen ("section_introduced_2_0_0"));
     if (status != DISIR_STATUS_OK)
         goto error;
-    status = dc_add_introduced (context_section, &semver);
+    status = dc_add_introduced (context_section, &version);
     if (status != DISIR_STATUS_OK)
         goto error;
-    semver.sv_major = 3;
-    status = dc_add_deprecated (context_section, &semver);
+    version.sv_major = 3;
+    status = dc_add_deprecated (context_section, &version);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    // add key introduced 2.0.0
+    // add key introduced 2.0
     status = dc_add_keyval_float (context_section, "key_introduced_2_0_0", 3.77, "k doc", NULL, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    // add key deprecated 2.5.0
+    // add key deprecated 2.5
     status = dc_add_keyval_integer (context_section, "key_deprecated_2_5_0", 3, "k3value doc",
                                     NULL, &context);
     if (status != DISIR_STATUS_OK)
         goto error;
-    semver.sv_major = 2;
-    semver.sv_minor = 5;
-    status = dc_add_deprecated (context, &semver);
+    version.sv_major = 2;
+    version.sv_minor = 5;
+    status = dc_add_deprecated (context, &version);
     if (status != DISIR_STATUS_OK)
         goto error;
     status = dc_putcontext (&context);
@@ -75,9 +74,9 @@ basic_version_difference (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    // add key boolean introduced 2.6.0
-    semver.sv_minor = 6;
-    status = dc_add_keyval_boolean (context_mold, "key_introduced_2_6_0", 1, "bool doc", &semver, NULL);
+    // add key boolean introduced 2.6
+    version.sv_minor = 6;
+    status = dc_add_keyval_boolean (context_mold, "key_introduced_2_6_0", 1, "bool doc", &version, NULL);
     if (status != DISIR_STATUS_OK)
         goto error;
 

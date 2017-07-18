@@ -135,10 +135,9 @@ dx_mold_create (struct disir_context *context)
         goto error;
     }
 
-    // Initialize version to 1.0.0
+    // Initialize version to 1.0
     mold->mo_version.sv_major = 1;
     mold->mo_version.sv_minor = 0;
-    mold->mo_version.sv_patch = 0;
 
     return mold;
 error:
@@ -204,61 +203,51 @@ dx_mold_destroy (struct disir_mold **mold)
 
 //! INTERNAL API
 enum disir_status
-dx_mold_update_version (struct disir_mold *mold, struct semantic_version *semver)
+dx_mold_update_version (struct disir_mold *mold, struct disir_version *version)
 {
-    struct semantic_version fact;
+    struct disir_version fact;
     char buffer[32];
 
-    if (mold == NULL || semver == NULL)
+    if (mold == NULL || version == NULL)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
     fact.sv_major = mold->mo_version.sv_major;
     fact.sv_minor = mold->mo_version.sv_minor;
-    fact.sv_patch = mold->mo_version.sv_patch;
 
-    if (mold->mo_version.sv_major < semver->sv_major)
+    if (mold->mo_version.sv_major < version->sv_major)
     {
-        fact.sv_major = semver->sv_major;
-        fact.sv_minor = semver->sv_minor;
-        fact.sv_patch = semver->sv_patch;
+        fact.sv_major = version->sv_major;
+        fact.sv_minor = version->sv_minor;
     }
-    else if (mold->mo_version.sv_major == semver->sv_major &&
-             mold->mo_version.sv_minor < semver->sv_minor)
+    else if (mold->mo_version.sv_major == version->sv_major &&
+             mold->mo_version.sv_minor < version->sv_minor)
     {
-        fact.sv_minor = semver->sv_minor;
-        fact.sv_patch = semver->sv_patch;
-    }
-    else if (mold->mo_version.sv_minor == semver->sv_minor &&
-             mold->mo_version.sv_patch < semver->sv_patch)
-    {
-        fact.sv_patch = semver->sv_patch;
+        fact.sv_minor = version->sv_minor;
     }
 
     mold->mo_version.sv_major = fact.sv_major;
     mold->mo_version.sv_minor = fact.sv_minor;
-    mold->mo_version.sv_patch = fact.sv_patch;
 
     log_debug (6, "mold (%p) version sat to: %s",
-               mold, dc_semantic_version_string (buffer, 32, &fact));
+               mold, dc_version_string (buffer, 32, &fact));
 
     return DISIR_STATUS_OK;
 }
 
 //! PUBLIC API
 enum disir_status
-dc_mold_get_version (struct disir_mold *mold, struct semantic_version *semver)
+dc_mold_get_version (struct disir_mold *mold, struct disir_version *version)
 {
-    if (mold == NULL || semver == NULL)
+    if (mold == NULL || version == NULL)
     {
         log_debug (0, "invoked with NULL pointer(s)");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    semver->sv_major = mold->mo_version.sv_major;
-    semver->sv_minor = mold->mo_version.sv_minor;
-    semver->sv_patch = mold->mo_version.sv_patch;
+    version->sv_major = mold->mo_version.sv_major;
+    version->sv_minor = mold->mo_version.sv_minor;
 
     return DISIR_STATUS_OK;
 }

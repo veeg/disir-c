@@ -84,18 +84,18 @@ dx_documentation_add (struct disir_context *parent, struct disir_documentation *
     }
 
     exists = MQ_SIZE_COND (*doc_queue,
-                (dc_semantic_version_compare (&entry->dd_introduced, &doc->dd_introduced) == 0));
+                (dc_version_compare (&entry->dd_introduced, &doc->dd_introduced) == 0));
     if (exists)
     {
         dx_log_context (parent,
             "already contains a documentation entry with semantic version: %s",
-            dc_semantic_version_string (buffer, 40, &doc->dd_introduced));
+            dc_version_string (buffer, 40, &doc->dd_introduced));
         status = DISIR_STATUS_CONFLICTING_SEMVER;
     }
     else
     {
         MQ_ENQUEUE_CONDITIONAL (*doc_queue, doc,
-            (dc_semantic_version_compare (&entry->dd_introduced, &doc->dd_introduced) > 0));
+            (dc_version_compare (&entry->dd_introduced, &doc->dd_introduced) > 0));
         status = DISIR_STATUS_OK;
     }
 
@@ -193,7 +193,7 @@ dc_add_documentation (struct disir_context *parent, const char *doc, int32_t doc
 
 //! PUBLIC API
 enum disir_status
-dc_get_documentation (struct disir_context *context, struct semantic_version *semver,
+dc_get_documentation (struct disir_context *context, struct disir_version *version,
                       const char **doc, int32_t *doc_size)
 {
     enum disir_status status;
@@ -242,9 +242,9 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
     }
     }
 
-    if (semver == NULL)
+    if (version == NULL)
     {
-        // Get highest semver
+        // Get highest version
         doc_context = MQ_TAIL (*doc_parent);
     }
     else
@@ -252,7 +252,7 @@ dc_get_documentation (struct disir_context *context, struct semantic_version *se
         // Get the prev entry from the found entry
         //  NULL is returned if the tail is lower than our version compare input
         doc_context = MQ_FIND (*doc_parent,
-                (dc_semantic_version_compare (&entry->dd_introduced, semver) > 0));
+                (dc_version_compare (&entry->dd_introduced, version) > 0));
         if (doc_context != NULL && doc_context->prev != MQ_TAIL (*doc_parent))
         {
             doc_context = doc_context->prev;

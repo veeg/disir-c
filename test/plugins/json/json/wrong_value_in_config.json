@@ -1,5 +1,4 @@
-{  
-    "version" : "1.0.0",
+{
     "config" : {
         "test1" : "1",
         "integer" : 123,

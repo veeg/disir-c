@@ -271,7 +271,7 @@ dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
     const toml::Value* version = root.findChild (ATTRIBUTE_KEY_DISIR_CONFIG_VERSION);
     if (version != nullptr)
     {
-        struct semantic_version semver;
+        struct disir_version config_version;
 
         disir_log_user (instance, "TOML: we have the config!");
         if (version->is<std::string>() == false)
@@ -284,7 +284,7 @@ dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
         }
         else
         {
-            status = dc_semantic_version_convert (version->as<std::string>().c_str (), &semver);
+            status = dc_version_convert (version->as<std::string>().c_str (), &config_version);
             if (status != DISIR_STATUS_OK)
             {
                 // XXX: set error on CONFIG_CONTEXT
@@ -292,7 +292,7 @@ dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
                                            ATTRIBUTE_KEY_DISIR_CONFIG_VERSION,
                                            version->as<std::string>().c_str ());
             }
-            status = dc_set_version (context_config, &semver);
+            status = dc_set_version (context_config, &config_version);
             if (status != DISIR_STATUS_OK)
             {
                 // TODO. Determine how to handle this situvation.

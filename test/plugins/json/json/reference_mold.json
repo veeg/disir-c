@@ -1,141 +1,128 @@
 {
-    "version" : "1.0.0",
     "mold" : {
         "test1" : {
             "type" : "STRING",
             "doc" : "test keyval",
-            "introduced" : "1.0.0",
             "defaults" : [
             {
                 "value" : "1",
-                "introduced" : "1.0.0"
+                "introduced" : "1.0"
             }
             ]
         },
         "test2" : {
             "type" : "STRING",
             "doc" : "test keyval",
-            "introduced" : "1.0.0",
             "defaults" : [
             {
                 "value" : "1",
-                "introduced" : "1.0.0"
+                "introduced" : "1.0"
             }
             ]
         },
         "integer" : {
             "type" : "INTEGER",
             "doc" : "integer doc",
-            "introduced" : "1.0.0",
             "defaults" : [
             {
                 "value" : 123,
-                "introduced" : "1.0.0"
+                "introduced" : "1.0"
             }
             ]
         },
         "float" : {
             "type" : "FLOAT",
             "doc" : "floatdoc",
-            "introduced" : "1.0.0",
             "defaults" : [
             {
                 "value" : 12.123,
-                "introduced" : "1.0.0"
+                "introduced" : "1.0"
             }
             ]
         },
         "boolean" : {
             "type" : "BOOLEAN",
             "doc" : "doc",
-            "introduced" : "1.0.0",
             "defaults" : [
             {
                 "value" : true,
-                "introduced" : "1.0.0"
+                "introduced" : "1.0"
             }
             ]
         },
         "section_name" : {
-            "introduced" : "0.0.0",
+            "introduced" : "1.0",
             "elements" : {
                 "k1" : {
                     "type" : "STRING",
                     "doc" : "k1value doc",
-                    "introduced" : "1.0.0",
                     "defaults" : [
                     {
                         "value" :"k1value",
-                        "introduced" : "1.0.0"
+                        "introduced" : "1.0"
                     }
                     ]
                 },
                 "bool" : {
                     "type" : "BOOLEAN",
                     "doc" : "boolvalue doc",
-                    "introduced" : "1.0.0",
                     "defaults" : [
                     {
                         "value" : true,
-                        "introduced" : "1.0.0"
+                        "introduced" : "1.0"
                     }
                     ]
                 },
                 "float" : {
                     "type" : "FLOAT",
                     "doc" : "floatvalue doc",
-                    "introduced" : "1.0.0",
                     "defaults" : [
                     {
                         "value" : 1.12,
-                        "introduced" : "1.0.0"
+                        "introduced" : "1.0"
                     }
                     ]
                 },
                 "integer" : {
                     "type" : "INTEGER",
                     "doc" : "intvalue doc",
-                    "introduced" : "1.0.0",
                     "defaults" : [
                     {
                         "value" : 123123,
-                        "introduced" : "1.0.0"
+                        "introduced" : "1.0"
                     }
                     ]
                 },
                 "k2" : {
                     "type" : "STRING",
                     "doc" : "k2value doc",
-                    "introduced" : "1.0.0",
                     "defaults" : [
                     {
                         "value" : "k2value",
-                        "introduced" : "1.0.0"
+                        "introduced" : "1.0"
                     }
                     ]
                 },
                 "k3" : {
                     "type" : "STRING",
                     "doc" : "k3value doc",
-                    "introduced" : "1.0.0",
                     "defaults" : [
                     {
                         "value" : "k3value",
-                        "introduced" : "1.0.0"
+                        "introduced" : "1.0"
                     }
                     ]
                 },
                 "section2" : {
-                    "introduced" : "0.0.0",
+                    "introduced" : "1.0",
                     "elements" : {
                         "k3" : {
                             "type" : "STRING",
-                            "introduced" : "1.0.0",
                             "doc" : "k1value doc",
                             "defaults" : [
                             {
                                 "value" : "k3value",
-                                "introduced" : "1.0.0"
+                                "introduced" : "1.0"
                             }
                             ]
                             }

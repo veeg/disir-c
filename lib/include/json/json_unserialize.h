@@ -48,14 +48,14 @@ namespace dio
 
         //! \brief  Parses the config on path and returns its semantic version
         //!
-        //! param[in] semver semantic version object populated
+        //! param[in] version semantic version object populated
         //! param[in] path path to config file
         //! \return DPLUGIN_STATUS_OK on success
         //! \return DPLUGIN_IO_ERROR if filepath is invalid.
         //! \return DPLUGIN_PARSE_ERROR if json file has syntax errors.
         //!
         enum disir_status
-        read_config_version (struct semantic_version *semver, const char *path);
+        read_config_version (struct disir_version *version, const char *path);
 
     private:
         /* Methods */

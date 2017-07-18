@@ -158,7 +158,7 @@ class MoldOverrideTest : public testing::JsonDioTestWrapper
 TEST_F (MoldOverrideTest, invalid_override_on_uncovered_version_sync)
 {
     ASSERT_NO_THROW (
-        root["sync"][0]["override"] = "3.0.0";
+        root["sync"][0]["override"] = "3.0";
     );
 
     std::stringstream json_stream (jsonWriter.writeOrdered (root));
@@ -256,7 +256,7 @@ TEST_F (MoldOverrideTest, invalid_override_on_absent_keyval_override_version)
 TEST_F (MoldOverrideTest, invalid_override_on_higher_override_version_than_mold_version)
 {
     ASSERT_NO_THROW (
-        root["sync"][0]["namespace"] = "3.0.0"
+        root["sync"][0]["namespace"] = "3.0"
     );
     std::stringstream json_stream (jsonWriter.writeOrdered (root));
 
@@ -268,8 +268,8 @@ TEST_F (MoldOverrideTest, invalid_override_on_higher_override_version_than_mold_
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 1);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD",
-                                  "keyval 'section_name.k1' override version (3.0.0) "
-                                  "is higher than namespace mold version (2.0.0)");
+                                  "keyval 'section_name.k1' override version (3.0) "
+                                  "is higher than namespace mold version (2.0)");
 }
 
 TEST_F (MoldOverrideTest, invalid_override_on_override_type_mismatch_existing_default)
@@ -314,7 +314,7 @@ TEST_F (MoldOverrideTest, invalid_override_on_non_existing_keyval_in_namespace_m
 {
     ASSERT_NO_THROW (
         root["override"]["absent_keyval"]["value"] = 1;
-        root["override"]["absent_keyval"]["version"] = "1.0.0";
+        root["override"]["absent_keyval"]["version"] = "1.0";
     );
     std::stringstream json_stream (jsonWriter.writeOrdered (root));
 

@@ -19,16 +19,16 @@ namespace dio
         //! keyval name absolute
         std::string mo_name;
         //! Namespace override version
-        struct semantic_version mo_version;
+        struct disir_version mo_version;
         //! Override value
         Json::Value mo_value;
     };
-    //! semver comparator
-    struct cmp_semver
+    //! version comparator
+    struct cmp_version
     {
-        bool operator()(struct semantic_version a, struct semantic_version b)
+        bool operator()(struct disir_version a, struct disir_version b)
         {
-            return dc_semantic_version_compare (&a, &b) < 0;
+            return dc_version_compare (&a, &b) < 0;
         }
     };
     // mo_version comparator
@@ -37,11 +37,11 @@ namespace dio
         bool operator()(const std::unique_ptr<struct mold_entry_override>& a,
                         const std::unique_ptr<struct mold_entry_override>& b)
         {
-            return dc_semantic_version_compare (&a.get()->mo_version, &b.get()->mo_version) < 0;
+            return dc_version_compare (&a.get()->mo_version, &b.get()->mo_version) < 0;
         }
     };
     //! rename map to hold synchronization override mapping
-    using syncmap = std::map<struct semantic_version, struct semantic_version, cmp_semver>;
+    using syncmap = std::map<struct disir_version, struct disir_version, cmp_version>;
 
     class MoldOverride
     {
@@ -59,8 +59,8 @@ namespace dio
 
     private:
         enum disir_status
-        string_to_semantic_version (Json::Value& current, const char *attribute_key,
-                                    struct semantic_version *semver);
+        string_to_disir_version (Json::Value& current, const char *attribute_key,
+                                 struct disir_version *version);
         enum disir_status
         validate_override_entry (struct disir_instance *intance, Json::Value& root);
 
@@ -78,18 +78,18 @@ namespace dio
 
         enum disir_status
         retrieve_highest_default_version (struct disir_context *context,
-                                         struct semantic_version *highest_semver);
+                                          struct disir_version *highest_version);
 
         enum disir_status
         parse_override_sync_mapping (Json::Value& sync_entries, syncmap& mapping);
 
         enum disir_status
         set_value_existing_default (struct disir_context *context_keyval,
-                                    struct semantic_version *semver, Json::Value& value);
+                                    struct disir_version *version, Json::Value& value);
 
         enum disir_status
         apply_override (struct disir_context *context_mold, struct mold_entry_override *entry,
-                        struct semantic_version *mold_version);
+                        struct disir_version *mold_version);
 
     private:
         std::map<std::string,

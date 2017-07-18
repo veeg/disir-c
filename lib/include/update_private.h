@@ -4,7 +4,7 @@
 struct disir_update
 {
     //! Target version to upgrade config to
-    struct semantic_version     up_target;
+    struct disir_version        up_target;
     //! Config to upgrade
     struct disir_config         *up_config;
 

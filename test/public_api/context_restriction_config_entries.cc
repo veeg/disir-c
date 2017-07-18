@@ -100,7 +100,7 @@ class ContextRestrictionConfigFinalizedEntriesTestPluginTest : public testing::D
     }
 
 public:
-    void setup_testconfig (const char *entry, struct semantic_version *semver)
+    void setup_testconfig (const char *entry, struct disir_version *semver)
     {
         status = disir_mold_read (instance, "test", entry, &mold);
         ASSERT_STATUS (DISIR_STATUS_OK, status);
@@ -152,7 +152,7 @@ TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
 TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
         finalizing_config_with_max_entries_violated_yields_invalid_config)
 {
-    struct semantic_version semver;
+    struct disir_version semver;
 
     ASSERT_NO_SETUP_FAILURE();
 
@@ -163,7 +163,6 @@ TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
     // Set config version to 1.0.0 - this sets max at 2
     semver.sv_major = 1;
     semver.sv_minor = 0;
-    semver.sv_patch = 0;
     status = dc_set_version (context_config, &semver);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
@@ -210,7 +209,7 @@ TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
 {
     ASSERT_NO_SETUP_FAILURE();
 
-    struct semantic_version semver;
+    struct disir_version semver;
     ASSERT_NO_FATAL_FAILURE (
         setup_testmold ("restriction_section_parent_keyval_max_entry");
     );
@@ -218,7 +217,6 @@ TEST_F (ContextRestrictionConfigConstructingEntriesTestPluginTest,
     // Set config version to 1.0.0
     semver.sv_major = 1;
     semver.sv_minor = 0;
-    semver.sv_patch = 0;
     status = dc_set_version (context_config, &semver);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 

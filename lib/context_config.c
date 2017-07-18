@@ -203,17 +203,16 @@ dx_config_destroy (struct disir_config **config)
 
 //! PUBLIC API
 enum disir_status
-dc_config_get_version (struct disir_config *config, struct semantic_version *semver)
+dc_config_get_version (struct disir_config *config, struct disir_version *version)
 {
-    if (config == NULL || semver == NULL)
+    if (config == NULL || version == NULL)
     {
         log_debug (0, "invoked with NULL pointer(s)");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    semver->sv_major = config->cf_version.sv_major;
-    semver->sv_minor = config->cf_version.sv_minor;
-    semver->sv_patch = config->cf_version.sv_patch;
+    version->sv_major = config->cf_version.sv_major;
+    version->sv_minor = config->cf_version.sv_minor;
 
     return DISIR_STATUS_OK;
 }

@@ -12,10 +12,10 @@ struct disir_section
     struct disir_context                *se_mold_equiv;
 
     //! Version this section entry was introduced.
-    struct semantic_version             se_introduced;
+    struct disir_version                se_introduced;
 
     //! Version this section entry was introduced.
-    struct semantic_version             se_deprecated;
+    struct disir_version                se_deprecated;
 
     //! Name of this section.
     struct disir_value                  se_name;

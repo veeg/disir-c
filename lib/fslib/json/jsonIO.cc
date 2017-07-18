@@ -134,7 +134,7 @@ set_value (Json::Value& val, struct disir_context *context)
 
 enum disir_status
 add_value_default (struct disir_context *context, Json::Value& value,
-                   struct semantic_version *semver)
+                   struct disir_version *version)
 {
     if (disir_value_to_json_value (dc_value_type (context)) != value.type())
     {
@@ -144,14 +144,14 @@ add_value_default (struct disir_context *context, Json::Value& value,
     switch (value.type())
     {
         case Json::intValue:
-            return dc_add_default_integer (context, value.asInt64(), semver);
+            return dc_add_default_integer (context, value.asInt64(), version);
         case Json::booleanValue:
-            return dc_add_default_boolean (context, (uint8_t)value.asInt64(), semver);
+            return dc_add_default_boolean (context, (uint8_t)value.asInt64(), version);
         case Json::realValue:
-            return dc_add_default_float (context, (double)value.asDouble(), semver);
+            return dc_add_default_float (context, (double)value.asDouble(), version);
         case Json::stringValue:
             return dc_add_default_string (context, value.asString().c_str(),
-                                                   value.asString().size(), semver);
+                                                   value.asString().size(), version);
         case Json::arrayValue:
         case Json::uintValue:
         case Json::objectValue:

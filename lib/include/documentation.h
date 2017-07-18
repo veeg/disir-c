@@ -9,7 +9,7 @@ struct disir_documentation
     struct disir_context                        *dd_context;
 
     //! Version this documentation entry was introduced.
-    struct semantic_version     dd_introduced;
+    struct disir_version        dd_introduced;
 
     //! Container for the documentation value
     struct disir_value          dd_value;

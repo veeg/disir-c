@@ -282,17 +282,16 @@ dio_toml_serialize_config (struct disir_instance *instance,
     toml::Value* current = &root;
 
     // Add DISIR_CONFIG_VERSION key
-    struct semantic_version semver;
+    struct disir_version version;
     char buffer[512];
-    status = dc_config_get_version (config, &semver);
+    status = dc_config_get_version (config, &version);
     if (status != DISIR_STATUS_OK)
     {
         // TODO: Log error
-        semver.sv_major = 0;
-        semver.sv_minor = 0;
-        semver.sv_patch = 0;
+        version.sv_major = 0;
+        version.sv_minor = 0;
     }
-    if (dc_semantic_version_string (buffer, 512, &semver) == NULL)
+    if (dc_version_string (buffer, 512, &version) == NULL)
     {
         // TODO: Log error
         snprintf (buffer, 512, "0.0.0");

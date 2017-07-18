@@ -14,7 +14,7 @@
 //! PUBLIC API
 enum disir_status
 disir_update_config (struct disir_config *config,
-                     struct semantic_version *target, struct disir_update **update)
+                     struct disir_version *target, struct disir_update **update)
 {
     enum disir_status status;
     int res;
@@ -35,22 +35,22 @@ disir_update_config (struct disir_config *config,
         // TODO: Check mold context is still valid.
         target = &config->cf_mold->mo_version;
         log_debug (4, "using highest version from mold: %s\n",
-                   dc_semantic_version_string (buffer, 512, target));
+                   dc_version_string (buffer, 512, target));
     }
 
-    res = dc_semantic_version_compare (&config->cf_version, target);
+    res = dc_version_compare (&config->cf_version, target);
     if (res > 0)
     {
         log_warn ("Config has higher version (%s) than target (%s)",
-                  dc_semantic_version_string (buffer, 256, &config->cf_version),
-                  dc_semantic_version_string (buffer + 256, 256, target));
+                  dc_version_string (buffer, 256, &config->cf_version),
+                  dc_version_string (buffer + 256, 256, target));
         return DISIR_STATUS_CONFLICTING_SEMVER;
     }
     if (res == 0)
     {
         // Nothing to be done - the config is already up-to-date
         log_debug (4, "Config and Schema are of equal version (%s)- nothing to be done",
-                   dc_semantic_version_string (buffer, 512, &config->cf_version));
+                   dc_version_string (buffer, 512, &config->cf_version));
         return DISIR_STATUS_NO_CAN_DO;
     }
 
@@ -70,7 +70,7 @@ disir_update_config (struct disir_config *config,
     }
 
     up->up_config = config;
-    dc_semantic_version_set (&up->up_target, target);
+    dc_version_set (&up->up_target, target);
 
     *update = up;
     return disir_update_continue (up);
@@ -110,10 +110,10 @@ disir_update_continue (struct disir_update *update)
 
         keyval = config_keyval->cx_keyval;
 
-        // Get keyval default of target semver - if semver is less or equal to current
+        // Get keyval default of target version - if version is less or equal to current
         // Do nothing
         dx_default_get_active (keyval->kv_mold_equiv, &update->up_target, &target_def);
-        res = dc_semantic_version_compare (&target_def->de_introduced,
+        res = dc_version_compare (&target_def->de_introduced,
                                            &update->up_config->cf_version);
         if (res <= 0)
         {
@@ -147,7 +147,7 @@ disir_update_continue (struct disir_update *update)
         else
         {
             // Oh-oh - We have a conflict
-            // Target default is higher semver than config value. Config value differ
+            // Target default is higher version than config value. Config value differ
             // from config default. Manual resolution is in order.
             update->up_keyval = keyval;
 
@@ -170,7 +170,7 @@ disir_update_continue (struct disir_update *update)
     }
 
     // Update version number of config
-    dc_semantic_version_set (&update->up_config->cf_version, &update->up_target);
+    dc_version_set (&update->up_config->cf_version, &update->up_target);
 
     TRACE_EXIT ("");
     return DISIR_STATUS_OK;

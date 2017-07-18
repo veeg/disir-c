@@ -100,7 +100,7 @@ disir_config_query (struct disir_instance *instance, const char *group_id,
 //! \brief Generate a config at a given version from the finished mold.
 //!
 //! \param[in] mold The completed mold of which to generate a config object of.
-//! \param[in] semver Version number of mold to generate config of. If NULL, highest
+//! \param[in] version Version number of mold to generate config of. If NULL, highest
 //!     mold version is used for generation.
 //! \param[out] config Output config object allocated with generated config object.
 //!
@@ -108,7 +108,7 @@ disir_config_query (struct disir_instance *instance, const char *group_id,
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_generate_config_from_mold (struct disir_mold *mold, struct semantic_version *semver,
+disir_generate_config_from_mold (struct disir_mold *mold, struct disir_version *version,
                                  struct disir_config **config);
 
 //! \brief Validate the config, checking for any contexts that are invalid.

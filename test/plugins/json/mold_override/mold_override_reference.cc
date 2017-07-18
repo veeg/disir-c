@@ -1,13 +1,13 @@
 
 static enum disir_status
 retrieve_default_context (struct disir_context *context_keyval,
-                          struct semantic_version *semver_target,
+                          struct disir_version *semver_target,
                           struct disir_context **context_default)
 {
     enum disir_status status;
     struct disir_collection *collection = NULL;
     struct disir_context *context = NULL;
-    struct semantic_version semver;
+    struct disir_version semver;
 
     status = dc_get_default_contexts (context_keyval, &collection);
     if (status != DISIR_STATUS_OK)
@@ -21,7 +21,7 @@ retrieve_default_context (struct disir_context *context_keyval,
         if (status != DISIR_STATUS_OK)
             goto out;
 
-        if (dc_semantic_version_compare (&semver, semver_target) == 0)
+        if (dc_version_compare (&semver, semver_target) == 0)
         {
             *context_default = context;
             context = NULL;
@@ -47,7 +47,7 @@ override_basic_keyval (struct disir_mold **mold)
     struct disir_context *context_mold = NULL;
     struct disir_context *context_keyval = NULL;
     struct disir_context *context_default = NULL;
-    struct semantic_version semver;
+    struct disir_version semver;
 
     context_mold = dc_mold_getcontext (*mold);
 
@@ -55,7 +55,7 @@ override_basic_keyval (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {1,0,0};
+    semver = {1,0};
 
     status = retrieve_default_context (context_keyval, &semver, &context_default);
     if (status != DISIR_STATUS_OK)
@@ -129,7 +129,7 @@ override_json_test_mold (struct disir_mold **mold)
     struct disir_context *context_mold = NULL;
     struct disir_context *context_keyval = NULL;
     struct disir_context *context_default = NULL;
-    struct semantic_version semver;
+    struct disir_version semver;
 
     context_mold = dc_mold_getcontext (*mold);
 
@@ -137,14 +137,14 @@ override_json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {1, 7, 0};
+    semver = {1, 7};
 
     status = dc_add_default_string (context_keyval, "override_string",
                                     strlen ("override_string"), &semver);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {1, 0, 0};
+    semver = {1, 0};
 
     status = retrieve_default_context (context_keyval, &semver, &context_default);
     if (status != DISIR_STATUS_OK)
@@ -162,7 +162,7 @@ override_json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {1, 5, 0};
+    semver = {1, 5};
 
     status = dc_add_default_integer (context_keyval, 1, &semver);
     if (status != DISIR_STATUS_OK)
@@ -174,7 +174,7 @@ override_json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {2, 0, 0};
+    semver = {2, 0};
     status = dc_add_default_float (context_keyval, 6.14, &semver);
     if (status != DISIR_STATUS_OK)
         goto error;
@@ -185,7 +185,7 @@ override_json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {2, 0, 0};
+    semver = {2, 0};
     status = dc_add_default_string (context_keyval, "override_string",
                                     strlen ("override_string"), &semver);
     if (status != DISIR_STATUS_OK)
@@ -209,7 +209,7 @@ override_complex_section_equal_version (struct disir_mold **mold)
     struct disir_context *context_mold = NULL;
     struct disir_context *context_default = NULL;
     struct disir_context *context_keyval = NULL;
-    struct semantic_version semver;
+    struct disir_version semver;
 
     context_mold = dc_mold_getcontext (*mold);
 
@@ -217,7 +217,7 @@ override_complex_section_equal_version (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {1,0,0};
+    semver = {1,0};
 
     status = retrieve_default_context (context_keyval, &semver, &context_default);
     if (status != DISIR_STATUS_OK)
@@ -262,7 +262,7 @@ override_restriction_config_parent_keyval_min_entry (struct disir_mold **mold)
     enum disir_status status;
     struct disir_context *context_mold = NULL;
     struct disir_context *context_keyval = NULL;
-    struct semantic_version semver;
+    struct disir_version semver;
 
     context_mold = dc_mold_getcontext (*mold);
 
@@ -270,13 +270,13 @@ override_restriction_config_parent_keyval_min_entry (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {1,7,0};
+    semver = {1,7};
 
     status = dc_add_default_integer (context_keyval, 170, &semver);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    semver = {2,0,0};
+    semver = {2,0};
 
     status = dc_add_default_integer (context_keyval, 200, &semver);
     if (status != DISIR_STATUS_OK)

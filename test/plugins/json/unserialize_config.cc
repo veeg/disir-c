@@ -84,15 +84,15 @@ TEST_F(UnMarshallConfigTest, unmarshal_succeed)
 
 TEST_F(UnMarshallConfigTest, version_should_be_correct)
 {
-    struct semantic_version expected;
-    struct semantic_version actual;
+    struct disir_version expected;
+    struct disir_version actual;
 
     EXPECT_NO_THROW ({
-        status = reader->unserialize (&config, std::string ("{\"version\" : \"1.0.0\"}"));
+        status = reader->unserialize (&config, std::string ("{\"version\" : \"1.0\"}"));
     });
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-    status = dc_semantic_version_convert ("1.0.0", &expected);
+    status = dc_version_convert ("1.0", &expected);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     context_config = dc_config_getcontext (config);
@@ -102,21 +102,21 @@ TEST_F(UnMarshallConfigTest, version_should_be_correct)
 
     dc_putcontext (&context_config);
 
-    ASSERT_EQ (0, dc_semantic_version_compare (&expected, &actual));
+    ASSERT_EQ (0, dc_version_compare (&expected, &actual));
 }
 
 TEST_F(UnMarshallConfigTest, no_version_should_result_standard)
 {
-    struct semantic_version expected;
-    struct semantic_version actual;
+    struct disir_version expected;
+    struct disir_version actual;
 
     EXPECT_NO_THROW ({
-        status = reader->unserialize (&config, std::string ("{\"noversion\" : \"1.0.0\"}"));
+        status = reader->unserialize (&config, std::string ("{\"noversion\" : \"1.0\"}"));
     });
 
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
-    status = dc_semantic_version_convert ("1.0.0", &expected);
+    status = dc_version_convert ("1.0", &expected);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     context_config = dc_config_getcontext (config);
@@ -126,7 +126,7 @@ TEST_F(UnMarshallConfigTest, no_version_should_result_standard)
 
     dc_putcontext (&context_config);
 
-    ASSERT_EQ (0, dc_semantic_version_compare (&expected, &actual));
+    ASSERT_EQ (0, dc_version_compare (&expected, &actual));
 }
 
 TEST_F(UnMarshallConfigTest, unmarshal_returns_parse_error)

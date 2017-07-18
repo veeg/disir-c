@@ -19,9 +19,9 @@ MoldWriter::serialize_deprecated (struct disir_context *context, Json::Value& cu
 {
     char buf[500];
     enum disir_status status;
-    struct semantic_version semver;
+    struct disir_version version;
 
-    status = dc_get_deprecated (context, &semver);
+    status = dc_get_deprecated (context, &version);
     if (status != DISIR_STATUS_OK &&
         status != DISIR_STATUS_WRONG_CONTEXT)
     {
@@ -32,9 +32,9 @@ MoldWriter::serialize_deprecated (struct disir_context *context, Json::Value& cu
         return DISIR_STATUS_OK;
     }
 
-    auto semver_string = dc_semantic_version_string (buf, 500, &semver);
+    auto version_string = dc_version_string (buf, 500, &version);
 
-    current[ATTRIBUTE_KEY_DEPRECATED] = semver_string;
+    current[ATTRIBUTE_KEY_DEPRECATED] = version_string;
 
     return status;
 }
@@ -44,9 +44,9 @@ MoldWriter::serialize_introduced (struct disir_context *context, Json::Value& cu
 {
     char buf[500];
     enum disir_status status;
-    struct semantic_version semver;
+    struct disir_version version;
 
-    status = dc_get_introduced (context, &semver);
+    status = dc_get_introduced (context, &version);
     if (status != DISIR_STATUS_OK &&
         status != DISIR_STATUS_WRONG_CONTEXT)
     {
@@ -57,9 +57,9 @@ MoldWriter::serialize_introduced (struct disir_context *context, Json::Value& cu
         return DISIR_STATUS_OK;
     }
 
-    auto semver_string = dc_semantic_version_string (buf, 500, &semver);
+    auto version_string = dc_version_string (buf, 500, &version);
 
-    current[ATTRIBUTE_KEY_INTRODUCED] = semver_string;
+    current[ATTRIBUTE_KEY_INTRODUCED] = version_string;
 
     return status;
 }

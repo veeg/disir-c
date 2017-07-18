@@ -100,12 +100,12 @@ end:
 enum disir_status
 ConfigWriter::set_config_version (struct disir_context *context_config, Json::Value& root)
 {
-    struct semantic_version semver;
+    struct disir_version version;
     enum disir_status status;
     char buf[500];
     char *temp;
 
-    status = dc_get_version (context_config, &semver);
+    status = dc_get_version (context_config, &version);
     if (status != DISIR_STATUS_OK)
     {
         disir_error_set (m_disir, "Could not read config version: (%s)",
@@ -113,7 +113,7 @@ ConfigWriter::set_config_version (struct disir_context *context_config, Json::Va
         return status;
     }
 
-    temp = dc_semantic_version_string ((char *)buf, (int32_t)500, &semver);
+    temp = dc_version_string ((char *)buf, (int32_t)500, &version);
     if (temp == NULL)
     {
         disir_error_set (m_disir, "Error retrieving semantic version string");

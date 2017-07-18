@@ -474,7 +474,7 @@ validate_restriction (struct disir_context *context)
             if (entry->re_type == res->re_type && entry->re_context != (void *)context)
             {
                 // Check introduced does not conflict with any other entries
-                if (dc_semantic_version_compare (&entry->re_introduced, &res->re_introduced) == 0)
+                if (dc_version_compare (&entry->re_introduced, &res->re_introduced) == 0)
                 {
                     log_debug (6, "introduced conflict (entry %p vs context %p)",
                                   entry->re_context, context);
