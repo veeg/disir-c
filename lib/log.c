@@ -13,7 +13,7 @@
 
 //! Variable to control the loglevel
 //! Hardcode default for now.
-enum disir_log_level runtime_loglevel = DISIR_LOG_LEVEL_DEBUG_09;
+enum disir_log_level runtime_loglevel = DISIR_LOG_LEVEL_DEBUG_01;
 
 //! Variable to control whether or not to forcefully output TRACE log messages
 //! regardless of loglevel setting
