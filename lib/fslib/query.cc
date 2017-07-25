@@ -143,7 +143,7 @@ fslib_mold_query_entries (struct disir_instance *instance, struct disir_register
                 entry = (struct disir_entry *) calloc (1, sizeof (struct disir_entry));
 
                 std::string direntry (dp->d_name);
-                if (direntry.compare (0, direntry.size() - suffix.size(), "__directory") == 0)
+                if (direntry.compare (0, direntry.size() - suffix.size(), "__namespace") == 0)
                 {
                     entry->flag.DE_NAMESPACE_ENTRY = 1;
                     std::size_t found = entry_name.find_last_of('/');
@@ -295,7 +295,7 @@ fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_regis
 
         // Create the namespace entry filepath
         *sep = '\0';
-        strcat (filepath, "/__directory.");
+        strcat (filepath, "/__namespace.");
         strcat (filepath, plugin->dp_mold_entry_type);
 
         // Attempt to find the namespace entry file.

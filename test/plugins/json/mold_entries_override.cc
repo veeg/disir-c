@@ -56,7 +56,7 @@ class MoldOverrideParameterized :
             struct disir_mold *mold_reference = NULL;
             struct disir_context *context_override = NULL;
             struct disir_context *context_reference = NULL;
-            std::string entry_mold_namespace (entry_mold + "/" + "__directory");
+            std::string entry_mold_namespace (entry_mold + "/" + "__namespace");
             std::string entry_mold_override_id (entry_override_namespace + "/" +
                                                 entry_mold_override);
 

@@ -162,7 +162,7 @@ dio_json_unserialize_mold_filepath (struct disir_instance *instance,
 
         *sep = '\0';
 
-        strcat (namespace_entry, "/__directory");
+        strcat (namespace_entry, "/__namespace");
         strcat (namespace_entry, suffix);
 
         status = fslib_stat_filepath (instance, namespace_entry, &statbuf);
