@@ -494,17 +494,23 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
     }
     case DISIR_RESTRICTION_EXC_VALUE_RANGE:
     {
-
-        if (current[ATTRIBUTE_KEY_VALUE_MIN].isNull ())
+        if (current[ATTRIBUTE_KEY_VALUE].isNull ())
         {
-            dc_fatal_error (context, "No restriction value_min present");
+            dc_fatal_error (context, "No restriction value present");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
-        if (current[ATTRIBUTE_KEY_VALUE_MAX].isNull ())
+        if (current[ATTRIBUTE_KEY_VALUE].isArray () == false)
         {
-            dc_fatal_error (context, "No restriction value_max present");
+            dc_fatal_error (context, "restriction range value field should be array");
             return DISIR_STATUS_INVALID_CONTEXT;
         }
+        if (current[ATTRIBUTE_KEY_VALUE].size () != 2)
+        {
+            dc_fatal_error (context, "restriction range value field should have 2 values, got %d",
+                                      current[ATTRIBUTE_KEY_VALUE].size());
+            return DISIR_STATUS_INVALID_CONTEXT;
+        }
+        value = current[ATTRIBUTE_KEY_VALUE];
         break;
     }
     case DISIR_RESTRICTION_UNKNOWN:
@@ -566,27 +572,37 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
     }
     case DISIR_RESTRICTION_EXC_VALUE_RANGE:
     {
-        if (assert_json_value_type (current[ATTRIBUTE_KEY_VALUE_MIN], Json::intValue)
-            != DISIR_STATUS_OK
-            || assert_json_value_type (current[ATTRIBUTE_KEY_VALUE_MAX], Json::intValue)
-               != DISIR_STATUS_OK
-            || assert_json_value_type (current[ATTRIBUTE_KEY_VALUE_MIN], Json::realValue)
-               != DISIR_STATUS_OK
-            || assert_json_value_type (current[ATTRIBUTE_KEY_VALUE_MAX], Json::realValue)
-               != DISIR_STATUS_OK)
-        if (status != DISIR_STATUS_OK)
+        if (assert_json_value_type (value[0], Json::intValue) == DISIR_STATUS_OK ||
+            assert_json_value_type (value[1], Json::intValue) == DISIR_STATUS_OK ||
+            assert_json_value_type (value[0], Json::realValue) == DISIR_STATUS_OK ||
+            assert_json_value_type (value[1], Json::realValue) == DISIR_STATUS_OK)
         {
-            dc_fatal_error (context, "Wrong value type for exclusive value range");
-            return DISIR_STATUS_INVALID_CONTEXT;
+
+            auto min = value[0].asDouble();
+            auto max = value[1].asDouble();
+
+            // max must be larger than min
+            if (min > max)
+            {
+                dc_fatal_error (context, "restriction value range should have min < max (%g, %g)",
+                                          min, max);
+                return DISIR_STATUS_INVALID_CONTEXT;
+            }
+
+            status = dc_restriction_set_range (context, min, max);
+            if (status != DISIR_STATUS_OK)
+            {
+                return status;
+            }
         }
-
-        auto min = current[ATTRIBUTE_KEY_VALUE_MIN].asDouble ();
-        auto max = current[ATTRIBUTE_KEY_VALUE_MAX].asDouble ();
-
-        status = dc_restriction_set_range (context, min, max);
-        if (status != DISIR_STATUS_OK)
+        else
         {
-            return status;
+            // only using value[0] since the json library
+            // restricts types in an array to be equal
+            dc_fatal_error (context,
+                            "wrong type for value range - got %s, expected integer or float",
+                            json_valuetype_stringify (value[0].type()));
+            return DISIR_STATUS_INVALID_CONTEXT;
         }
         break;
     }
