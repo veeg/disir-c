@@ -217,7 +217,7 @@ Any keys-value pairs found that does not match those listed here shall be
 ignored for future-compatibility.
 
 .Example: metadata.toml
-[[source, toml]]
+[source, toml]
 ----
 disir_org_version = "0/1-draft"
 implementation = "disir_c/0.1.0"
@@ -243,7 +243,7 @@ ignored for future-compatibility.
 
 
 .Example: JSON/entries.toml
-[[source, toml]]
+[source, toml]
 ----
 [meos]
   "system/preferences" = "1.0"

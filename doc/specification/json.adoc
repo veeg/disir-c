@@ -62,7 +62,7 @@ of this config_base_id and the entry_id, with the file extension `.json`.
 
 The most bare-boned config entry looks like this:
 
-[[source, JSON]]
+[source, JSON]
 ----
 {}
 ----
@@ -76,7 +76,7 @@ To specify which version of the mold entry this config entry was last synced wit
 the `version` string key present at global scope, with a string value made up of exactly
 non-negative integers, separated by a dot (`.`).
 
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "version" : "1.5"
@@ -89,7 +89,7 @@ To indicate that this is a valid config entry representation, the expression of
 key-value pairs is not done in global scope, but rather within the JSON Object which
 is a value of the key `config` string key in global scope.
 
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "config" : {
@@ -115,7 +115,7 @@ of the array represent the index of multiple entries for this key, where the val
 is the equivalent JSON value as described above.
 
 .Example: Each key-value type with maximum 1 entry.
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "config" : {
@@ -129,7 +129,7 @@ is the equivalent JSON value as described above.
 ----
 
 .Example: Integer key-value type with 3 instances of the same key.
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "config" : {
@@ -150,7 +150,7 @@ of the array represents the index of multiple entries for this section. The valu
 for each element in the array is the JSON Object.
 
 .Example: Section with maximum 1 entry.
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "config" : {
@@ -166,7 +166,7 @@ for each element in the array is the JSON Object.
 ----
 
 .Example: Section with 2 instances of the same section.
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "config" : {
@@ -196,7 +196,7 @@ of this mold_base_id and the entry_id, with the file extension `.json`.
 
 The most bare-boned mold entry looks like this:
 
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "mold" : {
@@ -211,7 +211,7 @@ This is however, not so useful. To define a element on the root of the mold,
 simply add a key to the mold with the name of the element, where the value
 is another object.
 
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "mold" : {
@@ -258,7 +258,7 @@ This entry is optional, If it is not present, the default version is assumed.
 If present the value MUST contain ONE dot (.), separating two non-negative integers.
 
 .Example: Mold entry with a single keyval.
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "mold" : {
@@ -296,7 +296,7 @@ All values of these keys must be another object, where either the object represe
 keyval or section.
 
 .Example: Mold entry with a single section.
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "mold" : {
@@ -345,7 +345,7 @@ For RESTRICTION_EXCLUSIVE_VALUE_RANGE, the value is an array with two values,
 each of the JSON type determined by the keyval type.
 
 .Example: RESTRICTION_INCLUSIVE_ENTRY_MIN
-[[source, JSON]]
+[source, JSON]
 ----
 {
     ...
@@ -363,7 +363,7 @@ each of the JSON type determined by the keyval type.
 ----
 
 .Example: RESTRICTION_INCLUSIVE_ENTRY_MAX
-[[source, JSON]]
+[source, JSON]
 ----
 {
     ...
@@ -380,7 +380,7 @@ each of the JSON type determined by the keyval type.
 ----
 
 .Example: RESTRICTION_EXCLUSIVE_VALUE_ENUM
-[[source, JSON]]
+[source, JSON]
 ----
 {
     ...
@@ -403,7 +403,7 @@ each of the JSON type determined by the keyval type.
 ----
 
 .Example: RESTRICTION_EXCLUSIVE_VALUE_NUMERIC
-[[source, JSON]]
+[source, JSON]
 ----
 {
     ...
@@ -435,7 +435,7 @@ each of the JSON type determined by the keyval type.
 
 
 .Example: RESTRICTION_EXCLUSIVE_VALUE_RANGE
-[[source, JSON]]
+[source, JSON]
 ----
 {
     ...
@@ -537,6 +537,7 @@ This is the new default value for this synced version.
 this override. The value of this version number must be present in the sync array above
 as the value of the "override" key.
 
+[source, JSON]
 ----
 {
     "sync" : [
@@ -556,7 +557,7 @@ If the override key contains an array of objects, each object must have an
 unique version among all objects within the array.
 
 .Example: array of objects to override single key.
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "sync" : [
@@ -578,7 +579,7 @@ unique version among all objects within the array.
 
 
 .Example: Full example containing multiple sync points and nested key override
-[[source, JSON]]
+[source, JSON]
 ----
 {
     "sync" : [
