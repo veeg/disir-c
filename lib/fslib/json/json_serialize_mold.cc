@@ -308,13 +308,13 @@ MoldWriter::serialize_restrictions (struct disir_context *context, Json::Value& 
 
             if (value_type == DISIR_VALUE_TYPE_FLOAT)
             {
-                current_restriction[ATTRIBUTE_KEY_VALUE_MIN] = min;
-                current_restriction[ATTRIBUTE_KEY_VALUE_MAX] = max;
+                current_restriction[ATTRIBUTE_KEY_VALUE].append (min);
+                current_restriction[ATTRIBUTE_KEY_VALUE].append (max);
             }
             else
             {
-                current_restriction[ATTRIBUTE_KEY_VALUE_MIN] = (Json::Int64)min;
-                current_restriction[ATTRIBUTE_KEY_VALUE_MAX] = (Json::Int64)max;
+                current_restriction[ATTRIBUTE_KEY_VALUE].append ((Json::Int64)min);
+                current_restriction[ATTRIBUTE_KEY_VALUE].append ((Json::Int64)max);
             }
 
             break;

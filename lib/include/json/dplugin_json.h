@@ -14,8 +14,6 @@
 #define ATTRIBUTE_KEY_DEFAULTS "defaults"
 #define ATTRIBUTE_KEY_MOLD "mold"
 #define ATTRIBUTE_KEY_VALUE "value"
-#define ATTRIBUTE_KEY_VALUE_MIN "value_min"
-#define ATTRIBUTE_KEY_VALUE_MAX "value_max"
 #define ATTRIBUTE_KEY_TYPE "type"
 #define ATTRIBUTE_KEY_CONFIG "config"
 #define ATTRIBUTE_KEY_RESTRICTIONS "restrictions"
