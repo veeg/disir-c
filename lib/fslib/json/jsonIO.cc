@@ -38,6 +38,16 @@ std::map<const char *, enum disir_restriction_type, cmp_str> attribute_disir_res
     {"RANGE"          , DISIR_RESTRICTION_EXC_VALUE_RANGE},
     {"NUMERIC"        , DISIR_RESTRICTION_EXC_VALUE_NUMERIC}};
 
+//! Map holding string representation of json valuetypes
+std::map<Json::ValueType, const char *> json_type_stringified  = {
+    {Json::intValue    , "integer"},
+    {Json::realValue   , "float"},
+    {Json::booleanValue , "boolean"},
+    {Json::stringValue , "string"},
+    {Json::arrayValue  , "array"},
+    {Json::nullValue   , "null"},
+    {Json::objectValue , "object"}};
+
 JsonIO::JsonIO (struct disir_instance *disir)
 {
     m_disir = disir;
@@ -187,3 +197,15 @@ attribute_key_to_disir_restriction (const char *type)
     }
 }
 
+const char *
+json_valuetype_stringify (Json::ValueType type)
+{
+    try
+    {
+        return json_type_stringified.at (type);
+    }
+    catch (std::out_of_range e)
+    {
+        return "unknown";
+    }
+}
