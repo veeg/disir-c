@@ -287,11 +287,11 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value)
                                         "No restriction value present");
 }
 
-TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_min)
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_restriction_value_range_type)
 {
     ASSERT_NO_THROW (
         Json::Value& restrictions = json_mold["mold"]["float"]["restrictions"];
-        restrictions[0]["value_min"] = Json::nullValue;
+        restrictions[0]["value"] = 1;
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
@@ -301,14 +301,14 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_min)
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
     ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
-                                        "No restriction value_min present");
+                                        "restriction range value field should be array");
 }
 
-TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_max)
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_range_value_count)
 {
     ASSERT_NO_THROW (
         Json::Value& restrictions = json_mold["mold"]["float"]["restrictions"];
-        restrictions[0]["value_max"] = Json::nullValue;
+        restrictions[0]["value"].append (1);
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
@@ -318,7 +318,48 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_max)
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
     ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
-                                        "No restriction value_max present");
+                                        "restriction range value field should have 2 values"\
+                                        ", got 3");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_range_value_type)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["float"]["restrictions"];
+        restrictions[0]["value"] = Json::arrayValue;
+        restrictions[0]["value"].append ("1");
+        restrictions[0]["value"].append ("2");
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
+                                        "wrong type for value range - got string, expected"\
+                                        " integer or float");
+}
+
+TEST_F (UnMarshallMoldTest, invalid_context_on_value_range_min_larger_than_max)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["float"]["restrictions"];
+        restrictions[0]["value"] = Json::arrayValue;
+        restrictions[0]["value"].append (10.1);
+        restrictions[0]["value"].append (1.2);
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
+                                        "restriction value range should have min < max ("\
+                                        "10.1, 1.2)");
 }
 
 TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_min_type)
