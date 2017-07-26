@@ -39,6 +39,10 @@ enum disir_restriction_type attribute_key_to_disir_restriction (const char *type
 
 enum disir_status assert_json_value_type (Json::Value& value, Json::ValueType type);
 
+//! Get the string representation of a json ValueType
+//! return "unknown" if called with invalid type
+const char * json_valuetype_stringify (Json::ValueType type);
+
 
 namespace dio
 {
