@@ -20,6 +20,7 @@ const char *molds[] = {
     "basic_version_difference",
     "complex_section",
     "config_query_permutations",
+    "multiple_defaults",
 };
 
 class SerializeUnserializeTest : public ::testing::DisirTestTestPlugin,
