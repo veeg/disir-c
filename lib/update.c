@@ -1,15 +1,75 @@
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include <disir/disir.h>
 #include <disir/context.h>
 
 #include "config.h"
 #include "default.h"
+#include "section.h"
 #include "keyval.h"
 #include "log.h"
 #include "mold.h"
 #include "update_private.h"
+
+//! STATIC FUNCTION
+static enum disir_status
+retrieve_all_keyvals_recursively (struct disir_context *current, struct disir_collection *keyvals)
+{
+    enum disir_status status;
+    struct disir_collection *coll = NULL;
+    struct disir_context *context = NULL;
+    struct disir_element_storage *elements = NULL;
+
+    switch (current->cx_type)
+    {
+    case DISIR_CONTEXT_CONFIG:
+    {
+        elements = current->cx_config->cf_elements;
+        break;
+    }
+    case DISIR_CONTEXT_SECTION:
+    {
+        elements = current->cx_section->se_elements;
+        break;
+    }
+    case DISIR_CONTEXT_KEYVAL:
+    {
+        return dc_collection_push_context (keyvals, current);
+    }
+    default:
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = dx_element_storage_get_all (elements, &coll);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    do
+    {
+        status = dc_collection_next (coll, &context);
+        if (status != DISIR_STATUS_OK)
+            break;
+
+        status = retrieve_all_keyvals_recursively (context, keyvals);
+        if (status != DISIR_STATUS_OK)
+            break;
+
+        dc_putcontext (&context);
+    }
+    while (1);
+
+    if (coll)
+        dc_collection_finished (&coll);
+    if (context)
+        dc_putcontext (&context);
+
+    return status;
+}
 
 //! PUBLIC API
 enum disir_status
@@ -17,6 +77,7 @@ disir_update_config (struct disir_config *config,
                      struct disir_version *target, struct disir_update **update)
 {
     enum disir_status status;
+    struct disir_config *config_at_target;
     int res;
     char buffer[512];
     struct disir_update *up;
@@ -61,27 +122,36 @@ disir_update_config (struct disir_config *config,
         return DISIR_STATUS_NO_MEMORY;
     }
 
-    status = dx_element_storage_get_all (config->cf_elements, &up->up_collection);
+    status = disir_generate_config_from_mold (config->cf_mold, target, &config_at_target);
     if (status != DISIR_STATUS_OK)
     {
-        log_error ("Could not retrieve elements on config: %s\n", disir_status_string (status));
-        free (up);
-        return status;
+        log_error ("failed to generate config from mold\n");
+        goto error;;
     }
 
-    up->up_config = config;
+    up->up_config_target = config_at_target;
+
+    up->up_collection = dc_collection_create();
+
+    status = retrieve_all_keyvals_recursively (config->cf_context, up->up_collection);
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_EXHAUSTED)
+        goto error;
+
+    up->up_config_old = config;
     dc_version_set (&up->up_target, target);
 
     *update = up;
     return disir_update_continue (up);
-
+error:
+    disir_update_finished (&up, NULL);
+    return status;
 }
 
 enum disir_status
 disir_update_continue (struct disir_update *update)
 {
     enum disir_status status;
-    struct disir_context *config_keyval;
+    struct disir_context *config_keyval = NULL;
     struct disir_keyval *keyval;
     struct disir_default *config_def;
     struct disir_default *target_def;
@@ -104,17 +174,25 @@ disir_update_continue (struct disir_update *update)
 
     while (1)
     {
+        update->up_context_keyval = NULL;
+
+        if (config_keyval)
+        {
+            dc_putcontext (&config_keyval);
+        }
+
         status = dc_collection_next (update->up_collection, &config_keyval);
         if (status != DISIR_STATUS_OK)
             break;
 
+        update->up_context_keyval = config_keyval;
         keyval = config_keyval->cx_keyval;
 
         // Get keyval default of target version - if version is less or equal to current
         // Do nothing
         dx_default_get_active (keyval->kv_mold_equiv, &update->up_target, &target_def);
         res = dc_version_compare (&target_def->de_introduced,
-                                           &update->up_config->cf_version);
+                                  &update->up_config_old->cf_version);
         if (res <= 0)
         {
             // Do nothing - mold default value for target is older or equal to config version
@@ -132,8 +210,7 @@ disir_update_continue (struct disir_update *update)
         // Two cases:
         //  * Update config if value of default at config version equals entry in config
         //  * Conflict if default at config version differ from entry in config
-
-        dx_default_get_active (keyval->kv_mold_equiv, &update->up_config->cf_version,
+        dx_default_get_active (keyval->kv_mold_equiv, &update->up_config_old->cf_version,
                                &config_def);
         res = dx_value_compare (&keyval->kv_value, &config_def->de_value);
         if (res == 0)
@@ -170,7 +247,7 @@ disir_update_continue (struct disir_update *update)
     }
 
     // Update version number of config
-    dc_version_set (&update->up_config->cf_version, &update->up_target);
+    dc_version_set (&update->up_config_old->cf_version, &update->up_target);
 
     TRACE_EXIT ("");
     return DISIR_STATUS_OK;
@@ -206,6 +283,7 @@ enum disir_status
 disir_update_resolve (struct disir_update *update, const char *resolve)
 {
     enum disir_status status;
+    struct disir_context *context_keyval = NULL;
 
     TRACE_ENTER ("");
     if (update == NULL)
@@ -219,35 +297,54 @@ disir_update_resolve (struct disir_update *update, const char *resolve)
         return DISIR_STATUS_NO_CAN_DO;
     }
 
-    // set keyval value
-    // TODO: Switch with dc_set_value call when implemented / supporting more types
-    status = dc_set_value_string (update->up_keyval->kv_context, resolve, strlen (resolve));
+    status = dc_query_resolve_context (update->up_config_target->cf_context,
+                                       update->up_keyval->kv_name.dv_string, &context_keyval);
     if (status != DISIR_STATUS_OK)
-    {
-        // No value set - did not validate?
-        return status;
-    }
+        goto out;
+
+    status = dc_set_value (context_keyval, resolve, strlen (resolve));
+    if (status != DISIR_STATUS_OK)
+        goto out;
+
+    dc_putcontext (&update->up_context_keyval);
 
     // TODO: Add update report entry
     update->up_updated++;
 
     // Remove conflict state
     update->up_keyval = NULL;
+    update->up_context_keyval = NULL;
     free (update->up_config_value);
     update->up_config_value = NULL;
     free (update->up_mold_value);
     update->up_mold_value = NULL;
 
     TRACE_EXIT ("");
-    return DISIR_STATUS_OK;
+    // FALL-THROUGH
+out:
+    if (context_keyval)
+        dc_putcontext (&context_keyval);
+
+    return status;
 }
 
 enum disir_status
-disir_update_finished (struct disir_update **update)
+disir_update_finished (struct disir_update **update, struct disir_config **config)
 {
     struct disir_update *up;
 
+    TRACE_ENTER ("");
+
     up = *update;
+
+    if (config)
+    {
+        *config = up->up_config_target;
+    }
+    else
+    {
+        disir_config_finished (&up->up_config_target);
+    }
 
     dc_collection_finished (&up->up_collection);
     if (up->up_config_value)
@@ -258,10 +355,68 @@ disir_update_finished (struct disir_update **update)
     {
         free (up->up_mold_value);
     }
+    if (up->up_context_keyval)
+    {
+        dc_putcontext (&up->up_context_keyval);
+    }
 
     free (up);
     *update = NULL;
 
+    TRACE_EXIT ("");
+
     return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_update_config_with_changes (struct disir_config **config, int discard_violations)
+{
+    enum disir_status status;
+    struct disir_update *update = NULL;
+    struct disir_config *c;
+    const char *name;
+    const char *keyval;
+    const char *mold;
+
+    status = disir_update_config (*config, &(*config)->cf_mold->mo_version, &update);
+    if (status != DISIR_STATUS_CONFLICT)
+        goto error;
+
+    do
+    {
+        if (status != DISIR_STATUS_CONFLICT)
+            break;
+
+        status = disir_update_conflict (update, &name, &keyval, &mold);
+        if (status != DISIR_STATUS_OK)
+            goto error;
+
+        status = disir_update_resolve (update, keyval);
+        if (status != DISIR_STATUS_OK &&
+            status == DISIR_STATUS_RESTRICTION_VIOLATED && discard_violations)
+        {
+            status = disir_update_resolve (update, mold);
+        }
+        else if (status != DISIR_STATUS_OK)
+        {
+            goto error;
+        }
+
+        status = disir_update_continue (update);
+
+    }
+    while (1);
+   
+    c = *config;
+
+    disir_update_finished (&update, config);
+
+    return disir_config_finished (&c);
+error:
+    if (update)
+        disir_update_finished (&update, NULL);
+
+    return status;
 }
 
