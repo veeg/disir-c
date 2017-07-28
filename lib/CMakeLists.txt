@@ -74,6 +74,9 @@ set (_LIBDISIR_SOURCES
     "element_storage.c"
     "error.c"
     "disir.c"
+    "disir_archive.cc"
+    "disir_archive_util.cc"
+    "disir_export.cc"
     "disir_config.c"
     "disir_config_query.c"
     "disir_entry.c"
@@ -113,6 +116,7 @@ set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES SOVERSION 0)
 
 # We require DL_LIBS for your loading plugin functionality.
 target_link_libraries (${PROJECT_SO_LIBRARY} ${CMAKE_DL_LIBS})
+target_link_libraries (${PROJECT_SO_LIBRARY} archive)
 
 install (TARGETS ${PROJECT_SO_LIBRARY}
     EXPORT ${EXPORT_TARGET}
