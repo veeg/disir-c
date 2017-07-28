@@ -7,6 +7,7 @@ extern "C"{
 
 #include <disir/disir.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 // Forward declare structure for typedef's below
 struct disir_register_plugin;
@@ -53,6 +54,23 @@ typedef enum disir_status (*config_write) (struct disir_instance *instance,
                                            struct disir_register_plugin *plugin,
                                            const char *entry_id,
                                            struct disir_config *config);
+
+//! \brief Function signature for plugin to implement writing config object to FILE
+//!
+//! \param[in] instance Library instance associated with this I/O operation.
+//! \param[in] config The config object to persist to 'id' locatiton.
+//! \param[out] out File to which serialized config is written
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+typedef enum disir_status (*config_fd_write) (struct disir_instance *instance,
+                                              struct disir_config *config,
+                                              FILE *out);
+
+typedef enum disir_status (*config_fd_read) (struct disir_instance *instance,
+                                             FILE *in,
+                                             struct disir_mold *mold,
+                                             struct disir_config **config);
 
 //! \brief Function signature for plugin to implement retrieval of all available config entries.
 //!
@@ -181,6 +199,8 @@ struct disir_register_plugin
 
     config_read     dp_config_read;
     config_write    dp_config_write;
+    config_fd_write dp_config_fd_write;
+    config_fd_read  dp_config_fd_read;
     config_entries  dp_config_entries;
     config_query    dp_config_query;
     mold_read       dp_mold_read;
