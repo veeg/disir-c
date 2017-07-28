@@ -26,6 +26,22 @@ dio_json_config_write (struct disir_instance *instance,
 
 //! PLUGIN API
 enum disir_status
+dio_json_config_fd_write (struct disir_instance *instance,
+                          struct disir_config *config, FILE *out)
+{
+    return dio_json_serialize_config (instance, config, out);
+}
+
+//! PLUGIN API
+enum disir_status
+dio_json_config_fd_read (struct disir_instance *instance, FILE *in,
+                         struct disir_mold *mold, struct disir_config **config)
+{
+    return dio_json_unserialize_config (instance, in, mold, config);
+}
+
+//! PLUGIN API
+enum disir_status
 dio_json_config_entries (struct disir_instance *instance,
                          struct disir_register_plugin *plugin,
                          struct disir_entry **entries)

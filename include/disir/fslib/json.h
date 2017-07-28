@@ -31,6 +31,18 @@ dio_json_config_write (struct disir_instance *instance,
                        struct disir_register_plugin *plugin, const char *entry_id,
                        struct disir_config *config);
 
+//! \brief JSON implementation of config_write to filedescriptor
+//!
+enum disir_status
+dio_json_config_fd_write (struct disir_instance *instance,
+                          struct disir_config *config, FILE *out);
+
+//! \brief JSON implementation of config_read to filedescriptor
+//!
+enum disir_status
+dio_json_config_fd_read (struct disir_instance *instance, FILE *in,
+                         struct disir_mold *mold, struct disir_config **config);
+
 //! \brief JSON imlementation of config_entries
 //!
 enum disir_status
