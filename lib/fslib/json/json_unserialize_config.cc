@@ -107,6 +107,8 @@ ConfigReader::construct_config (struct disir_config **config)
     enum disir_status status;
     struct disir_context *context_config = NULL;
 
+    *config = NULL;
+
     status = dc_config_begin (m_refMold, &context_config);
     if (status != DISIR_STATUS_OK)
     {
@@ -114,7 +116,9 @@ ConfigReader::construct_config (struct disir_config **config)
         goto error;
     }
 
-     set_config_version (context_config, m_configRoot[VERSION]);
+    status = set_config_version (context_config, m_configRoot[VERSION]);
+    if (status != DISIR_STATUS_OK)
+        goto error;
 
      status = build_config_from_json (context_config);
      if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
@@ -138,10 +142,11 @@ error:
      return status;
 }
 
-void
+enum disir_status
 ConfigReader::set_config_version (struct disir_context *context_config, Json::Value& ver)
 {
     struct disir_version version;
+    struct disir_version mold_version;
     enum disir_status status;
     const char *version_string;
 
@@ -158,12 +163,22 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
         status = dc_version_convert (version_string, &version);
         if (status != DISIR_STATUS_OK)
         {
-            version.sv_major = 1;
-            version.sv_minor = 0;
+            return status;
         }
     }
+    status = dc_mold_get_version (m_refMold, &mold_version);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
 
-    dc_set_version (context_config, &version);
+    // Mold version is lower than config version
+    if (dc_version_compare (&version, &mold_version) > 0)
+    {
+        return DISIR_STATUS_CONFLICTING_SEMVER;
+    }
+
+    return dc_set_version (context_config, &version);
 }
 
 //! PRIVATE
