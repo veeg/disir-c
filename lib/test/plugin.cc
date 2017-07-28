@@ -32,6 +32,7 @@
 #include "basic_version_difference.cc"
 #include "complex_section.cc"
 #include "config_query_permutations.cc"
+#include "multiple_defaults.cc"
 
 typedef enum disir_status (*output_mold)(struct disir_mold **);
 
@@ -58,6 +59,7 @@ static std::map<std::string, output_mold> molds = {
     std::make_pair ("super/", basic_keyval),
     std::make_pair ("super/nested/", basic_keyval),
     std::make_pair ("super/nested/basic_keyval", basic_keyval),
+    std::make_pair ("multiple_defaults", multiple_defaults),
 };
 
 
