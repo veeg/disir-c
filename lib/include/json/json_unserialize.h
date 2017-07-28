@@ -73,7 +73,8 @@ namespace dio
         //! \param[in] context_config the config to which the version is set.
         //! \param[in] ver json object containing the version string
         //!
-        void set_config_version (struct disir_context *context_config, Json::Value& ver);
+        enum disir_status
+        set_config_version (struct disir_context *context_config, Json::Value& ver);
 
         //! \brief populates parent context with value type of keyval
         //!
