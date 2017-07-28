@@ -327,7 +327,7 @@ disir_update_continue (struct disir_update *update);
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
-disir_update_finished (struct disir_update **update);
+disir_update_finished (struct disir_update **update, struct disir_config **config);
 
 
 #ifdef __cplusplus
