@@ -18,6 +18,7 @@
 #include <disir/cli/command_verify.h>
 #include <disir/cli/command_dump.h>
 #include <disir/cli/command_export.h>
+#include <disir/cli/command_import.h>
 
 using namespace disir;
 
@@ -280,6 +281,9 @@ Cli::add_default_commands (void)
     add_command (command_ptr);
 
     command_ptr = std::make_shared<CommandExport> ();
+    add_command (command_ptr);
+
+    command_ptr = std::make_shared<CommandImport> ();
     add_command (command_ptr);
 }
 

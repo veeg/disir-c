@@ -8,6 +8,7 @@ set (CLIDISIR_SOURCES
     "command_verify.cc"
     "command_dump.cc"
     "command_export.cc"
+    "command_import.cc"
 )
 
 set (CLI_TARGET cli)
