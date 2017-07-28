@@ -25,6 +25,9 @@ std::map<std::string, std::tuple<std::string, config_apply_override>> override_r
     std::make_pair ("multiple_defaults_1_0_restriction",
                     std::make_tuple("multiple_defaults",
                                     multiple_defaults_1_0_restriction)),
+    std::make_pair ("multiple_defaults_1_2_differ_1_0",
+                    std::make_tuple("multiple_defaults",
+                                    multiple_defaults_1_2_differ_1_0)),
     std::make_pair ("json_test_mold_2_0",
                     std::make_tuple("json_test_mold", json_test_mold_override)),
 };
