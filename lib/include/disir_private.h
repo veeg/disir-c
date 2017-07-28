@@ -43,6 +43,10 @@ struct disir_instance
     int32_t                         disir_error_message_size;
 };
 
+//! \brief get disir_register_plugin by group id
+enum disir_status
+dx_retrieve_plugin_by_group (struct disir_instance *instance, const char *group_id,
+                             struct disir_register_plugin **plugin);
 
 #endif // _LIBDISIR_PRIVATE_DISIR_H
 

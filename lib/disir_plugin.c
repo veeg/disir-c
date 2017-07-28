@@ -145,3 +145,33 @@ disir_plugin_finished (struct disir_plugin **plugin)
 
     return DISIR_STATUS_OK;
 }
+
+//! INTERNAL API
+enum disir_status
+dx_retrieve_plugin_by_group (struct disir_instance *instance, const char *group_id,
+                             struct disir_register_plugin **plugin)
+{
+    if (instance == NULL || group_id == NULL || plugin == NULL)
+    {
+        log_debug (0, "invoked with NULL pointer(s). (%p %p %p)",
+                   instance, group_id, plugin);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    *plugin = NULL;
+
+    MQ_FOREACH (instance->dio_plugin_queue,
+    ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            entry = entry->next;
+            continue;
+        }
+
+        *plugin = &entry->pi_plugin;
+        break;
+    }));
+
+    return DISIR_STATUS_OK;
+}
+
