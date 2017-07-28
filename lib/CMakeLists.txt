@@ -78,6 +78,7 @@ set (_LIBDISIR_SOURCES
     "disir_archive_util.cc"
     "disir_export.cc"
     "disir_config.c"
+    "disir_import.c"
     "disir_config_query.c"
     "disir_entry.c"
     "disir_mold.c"

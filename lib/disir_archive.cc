@@ -7,6 +7,7 @@
 // disir private
 #include "archive_private.h"
 extern "C" {
+#include "import.h"
 #include "disir_private.h"
 #include "mqueue.h"
 #include "update_private.h"
@@ -42,6 +43,135 @@ disir_archive_export_begin (struct disir_instance *instance,
     {
         status = dx_archive_begin_existing (instance, archive_path, archive);
     }
+
+    return status;
+}
+
+//! STATIC FUNCTION
+static enum disir_status
+archive_import_config_entries (struct disir_instance *instance,
+                               struct disir_archive *archive,
+                               struct disir_import **import)
+{
+    enum disir_status status;
+    struct disir_import_entry **current;
+    struct disir_import_entry *entry;
+    struct disir_import *im;
+
+    im = (struct disir_import*)calloc (1, sizeof (disir_import));
+    if (im == NULL)
+    {
+        return DISIR_STATUS_NO_MEMORY;
+    }
+
+    im->di_num_entries = archive->da_config_entries->size();
+
+    im->di_entries = (struct disir_import_entry**)calloc (1, sizeof (struct disir_import_entry*)
+                                                                     *im->di_num_entries);
+    if (im->di_entries == NULL)
+    {
+        status = DISIR_STATUS_NO_MEMORY;
+        goto error;
+    }
+
+    current = im->di_entries;
+    for (const auto& e : *archive->da_config_entries)
+    {
+        entry = (struct disir_import_entry*)calloc (1, sizeof (struct disir_import_entry));
+        if (entry == NULL)
+        {
+            status = DISIR_STATUS_NO_MEMORY;
+            goto error;
+        }
+
+        entry->ie_entry_id = strdup (e.de_entry_id.c_str());
+        entry->ie_group_id = strdup (e.de_group_id.c_str());
+        entry->ie_backend_id = strdup (e.de_backend_id.c_str());
+        entry->ie_version = strdup (e.de_version.c_str());
+
+        status = dx_resolve_config_import_status (instance, e.de_filepath.c_str(), entry);
+        if (status != DISIR_STATUS_OK &&
+            status != DISIR_STATUS_CONFLICT &&
+            status != DISIR_STATUS_NO_CAN_DO &&
+            status != DISIR_STATUS_CONFIG_INVALID &&
+            status != DISIR_STATUS_CONFLICTING_SEMVER)
+        {
+            goto error;
+        }
+
+        entry->ie_status = status;
+
+        (*current++) = entry;
+    }
+
+    *import = im;
+    return DISIR_STATUS_OK;
+error:
+    if (im)
+        dx_import_destroy (im);
+
+    return status;
+}
+
+//! PUBLIC API
+enum disir_status
+disir_archive_import (struct disir_instance *instance, const char *archive_path,
+                      struct disir_import **import, int *entries)
+{
+    enum disir_status status;
+    struct disir_archive *archive = NULL;
+    struct stat st;
+    std::map<std::string, std::string> archive_content;
+    char *tmp_dir_name = NULL;
+
+    if (instance == NULL || archive_path == NULL || import == NULL || entries == NULL)
+    {
+        log_debug (0, "invoked with NULL argument(s). instance(%p), archive_path (%p)," \
+                      "import (%p), entries (%p)", instance, archive_path, import, entries);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    status = fslib_stat_filepath (instance, archive_path, &st);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    status = dx_archive_create (&archive);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    // Create temp path for extraction
+    tmp_dir_name = dx_archive_create_temp_folder();
+    if (tmp_dir_name == NULL)
+    {
+        return DISIR_STATUS_FS_ERROR;
+    }
+
+    archive->da_extract_folder_path = tmp_dir_name;
+
+    status = dx_archive_extract (archive_path, archive_content, tmp_dir_name);
+    if (status != DISIR_STATUS_OK)
+        goto out;
+
+    status = dx_archive_validate (archive, archive_content);
+    if (status != DISIR_STATUS_OK)
+    {
+        disir_error_set (instance, "archive on path '%s' is invalid", archive_path);
+        goto out;
+    }
+
+    status = archive_import_config_entries (instance, archive, import);
+    if (status != DISIR_STATUS_OK)
+        goto out;
+
+    *entries = (*import)->di_num_entries;
+    // FALL-THROUGH
+out:
+    if (archive)
+        disir_archive_finalize (instance, NULL, &archive);
 
     return status;
 }
