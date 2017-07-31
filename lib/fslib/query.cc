@@ -197,6 +197,7 @@ fslib_plugin_config_query (struct disir_instance *instance, struct disir_registe
     if (status == DISIR_STATUS_NOT_EXIST)
     {
         disir_error_set (instance, "there exists no mold for entry %s", entry_id);
+        disir_entry_finished (&ret);
         return DISIR_STATUS_MOLD_MISSING;
     }
     if (status != DISIR_STATUS_EXISTS)
