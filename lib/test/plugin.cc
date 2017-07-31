@@ -198,7 +198,7 @@ dio_test_mold_query (struct disir_instance *instance, struct disir_register_plug
     if (molds.count (name) == 0)
     {
         if (fslib_namespace_entry (entry_id, namespace_entry) == NULL)
-            return DISIR_STATUS_INVALID_ARGUMENT;
+            return DISIR_STATUS_NOT_EXIST;
 
         name = std::string (namespace_entry);
         // The namespace entry does not exist
