@@ -34,10 +34,10 @@ add_definitions (-Wdate-time)
 # TMP: MEOS
 set (CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} /usr/share/meos-pkgtools/cmake)
 
-#add_subdirectory (lib)
-#add_subdirectory (plugins)
-#add_subdirectory (cli)
+add_subdirectory (lib)
+add_subdirectory (plugins)
+add_subdirectory (cli)
 add_subdirectory (doc)
 
 enable_testing ()
-#add_subdirectory (test)
+add_subdirectory (test)
