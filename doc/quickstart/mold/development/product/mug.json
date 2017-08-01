@@ -1,0 +1,11 @@
+{
+    "sync" : [
+        {"namespace" : "1.0", "version" : "1.0"}
+    ],
+    "override" : {
+        "name" : {
+            "version" : "1.0",
+            "value" : "Mug"
+        }
+    }
+}

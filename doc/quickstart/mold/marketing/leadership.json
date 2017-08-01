@@ -1,0 +1,12 @@
+{
+    "mold" : {
+        "leader" : {
+            "documentation" : "Who is the leader of the Marketing department?",
+            "type" : "STRING",
+            "defaults" : [{
+                "value" : "hho037"
+            }
+            ]
+        }
+    }
+}

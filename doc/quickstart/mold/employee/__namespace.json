@@ -1,0 +1,20 @@
+{
+    "mold" : {
+
+        "name" : {
+            "documentation" : "Full employee name.",
+            "type" : "STRING",
+            "defaults" : [{
+                "value" : "John Doe"
+            }]
+        },
+
+        "birth_year" : {
+            "documentation" : "Year of birth of the employee",
+            "type" : "INTEGER",
+            "defaults" : [{
+                "value" : 2000
+            }]
+        }
+    }
+}

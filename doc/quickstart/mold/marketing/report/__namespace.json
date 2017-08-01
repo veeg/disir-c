@@ -1,0 +1,8 @@
+{
+    "mold" : {
+        "report_type" : {
+            "documentation" : "What kind of company report is this?",
+            "restrictions" :
+        }
+    }
+}

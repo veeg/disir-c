@@ -1,0 +1,77 @@
+= Disir Quickstart Guide: Full ecosystem introduction
+Vegard Sandengen
+
+Disir is a configuration management system - the current implementation (`disir-c`)
+drove the generalization of the system into three specification: Disir Core, Disir Org
+and Disir JSON back-end. Here we will present a example-driven introduction to
+the ecosystem and what it provides.
+
+First of the bat, Disir Core introduces two main concepts: config and mold.
+A mold is the full description of keyvals and sections, their documentation,
+default values, restrictions and most importantly, the history of changes made
+to these values. From this mold, we may derive a config.
+A config is never valid without a mold.
+
+The mold is the property of the system; they are never changed once installed.
+The config is the property of the user; a program shall not rely on their
+presence to retrieve relevant key-value pairs, since they can be derived from
+the mold. The program shall of course take the config into account, if it is present.
+
+To identify a single mold/config pair, we refer to them by an `entry_id`.
+All entry_ids must be lowercase ASCII characters (a-z), underscore (_) and
+forward-slash (/). Example: `department/development/product/yard_stick`.
+Furthermore, we may organize a set of entry_ids into a named group by a `group_id`.
+The tuple (group_id, entry_id) uniqely identifies a mold/config.
+We introduce the group concept so we can cleanly separate what is exposed to
+a user. A company may organize their configs in an external and internal group,
+where the external group is ment to be accessed and modified by the customer.
+The group used in the examples in this document uses the group_id 'internal'.
+
+As previously stated, a config must be represented by a mold; however, a single
+mold can represent multiple configs. We refer to this as a namespace entry.
+A namespace mold namespace entry_id always ends with a forward-slash.
+All config entries that is prefixed with a mold namespace entry_id and contain
+no additional trailing forward-slashes. Example: `employee/`.
+
+We represent both config and mold as a separate JSON formatted file, specified
+in Disir JSON back-end specification.
+The entry_id is joined with a base directory path, with the `json` file extension.
+This forms a full file system path.
+The mold namespace entries are appended with `__namespace.json`.
+
+.Example: Tree structure for a system install with various mold definitions.
+----
+/etc/disir/mold/company.json
+/etc/disir/mold/department/development/leadership.json
+/etc/disir/mold/department/development/product/__namespace.json
+/etc/disir/mold/department/development/product/yard_stick.json
+/etc/disir/mold/department/development/product/mug.json
+/etc/disir/mold/department/marketing/leadership.json
+/etc/disir/mold/department/marketing/report/__namespace.json
+/etc/disir/mold/employee/__namespace.json
+/etc/disir/mold/employee/vsa002.json
+/etc/disir/mold/employee/hho037.json
+/etc/disir/mold/employee/kre412.json
+----
+
+.Example: JSON mold file content for entry_id 'company'.
+[source, JSON]
+----
+include::mold/company.json[]
+----
+
+.Example: Generate & dump latest version of config for entry_id 'company'
+[source, shell]
+----
+$ disir generate company
+In group internal
+  Generated company
+
+$ disir dump company
+In group internal
+
+  company_name: Accessories Inc
+  founded: 1987
+  continent: Europe
+----
+

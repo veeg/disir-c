@@ -1,0 +1,15 @@
+{
+    "mold" : {
+        "leader" : {
+            "documentation" : "Who is the leader of the development department?",
+            "type" : "STRING",
+            "defaults" : [{
+                "value" : "ffr006"
+            },
+            {
+                "introduced" : "1.1",
+                "value" : "kre412"
+            }]
+        }
+    }
+}

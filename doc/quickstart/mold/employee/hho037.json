@@ -1,0 +1,15 @@
+{
+    "sync" : [
+        {"namespace" : "1.0", "version" : "1.0"}
+    ],
+    "override" : {
+        "name" : {
+            "version" : "1.0",
+            "value" : "Hanne Holm"
+        },
+        "birth_year" : {
+            "version" : "1.0",
+            "value" : 1978
+        }
+    }
+}

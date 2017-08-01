@@ -1,0 +1,28 @@
+{
+    "mold" : {
+        "name" : {
+            "documenatation" : "The full commercial product name.",
+            "type" : "STRING",
+            "defaults" : [{
+                "value" : "The Product"
+            }]
+        },
+        "release" : {
+            "documentation" : "Information about a single release",
+            "elements" : {
+                "date" : {
+                    "type" : "STRING",
+                    "defaults" : [{
+                        "value" : "2000-01-01"
+                    }]
+                },
+                "version" : {
+                    "type" : "INTEGER",
+                    "defaults" : [{
+                        "value" : 1
+                    }]
+                }
+            }
+        }
+    }
+}

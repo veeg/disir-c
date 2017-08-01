@@ -1,0 +1,52 @@
+{
+    "mold" : {
+
+        "company_name" : {
+            "type" : "STRING",
+            "documentation" : "What is the name of the company?",
+            "defaults" : [{
+                "value" : "Accessories Inc"
+            }]
+        },
+        "founded" : {
+            "type" : "INTEGER",
+            "documentation" : "What year was the company founded?",
+            "restrictions" : [{
+                "type" : "RANGE",
+                "value" : [1500, 10000]
+            }],
+            "defaults" : [{
+                "value" : 1987
+            }]
+        },
+        "continent" : {
+            "type" : "ENUM",
+            "documentation" : "What continent was the company founded on?",
+            "restrictions" : [{
+                "type" : "ENUM",
+                "value" : "Europe"
+            },
+            {
+                "type" : "ENUM",
+                "value" : "Asia"
+            },
+            {
+                "type" : "ENUM",
+                "value" : "Africa"
+            },
+            {
+                "type" : "ENUM",
+                "value" : "Oceania"
+            },
+            {
+                "type" : "ENUM",
+                "value" : "Antartica",
+                "version" : "1.2"
+            }],
+            "defaults" : [{
+                "introduced" : "1.1",
+                "value" : "Europe"
+            }]
+        }
+    }
+}
