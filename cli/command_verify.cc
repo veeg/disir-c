@@ -34,6 +34,10 @@ CommandVerify::handle_command (std::vector<std::string> &args)
     args::ValueFlag<std::string> opt_group_id (parser, "NAME", group_description.str(),
                                                args::Matcher{"group"});
 
+    args::Flag opt_mold (parser, "mold",
+                         "Verify all molds instead of configs.",
+                         args::Matcher{"mold"});
+
     args::ValueFlag<std::string> opt_text_mold (parser, "TEXT MOLD",
                                                 "Verify mold from disk.",
                                                 args::Matcher{"text-mold"});
@@ -116,19 +120,26 @@ CommandVerify::handle_command (std::vector<std::string> &args)
         m_cli->verbose() << "Verifying all available entries." << std::endl;
 
         enum disir_status status;
-        struct disir_entry *config_entries;
+        struct disir_entry *entries;
         struct disir_entry *next;
         struct disir_entry *current;
 
-        status = disir_config_entries (m_cli->disir(), m_cli->group_id().c_str(), &config_entries);
+        if (opt_mold)
+        {
+            status = disir_mold_entries (m_cli->disir(), m_cli->group_id().c_str(), &entries);
+        }
+        else
+        {
+            status = disir_config_entries (m_cli->disir(), m_cli->group_id().c_str(), &entries);
+        }
         if (status != DISIR_STATUS_OK)
         {
-            std::cerr << "Failed to retrieve available configs: "
+            std::cerr << "Failed to retrieve available entries: "
                       << disir_error (m_cli->disir()) << std::endl;
             return (-1);
         }
 
-        current = config_entries;
+        current = entries;
         while (current != NULL)
         {
             next = current->next;
@@ -144,7 +155,7 @@ CommandVerify::handle_command (std::vector<std::string> &args)
     std::cout << "In group " << m_cli->group_id() << std::endl;
     if (entries_to_verify.empty())
     {
-        std::cout << "  There are no available configs." << std::endl;
+        std::cout << "  There are no available entries." << std::endl;
         return (0);
     }
 
@@ -156,13 +167,24 @@ CommandVerify::handle_command (std::vector<std::string> &args)
         // We simply read the config entry - the return status shall indicate whether it is invalid or not
         enum disir_status status;
         struct disir_config *config = NULL;
+        struct disir_mold *mold = NULL;
 
-        status = disir_config_read (m_cli->disir(), m_cli->group_id().c_str(),
-                                    entry.c_str(), NULL, &config);
+        if (opt_mold)
+        {
+            status = disir_mold_read (m_cli->disir(), m_cli->group_id().c_str(),
+                                      entry.c_str(), &mold);
+        }
+        else
+        {
+            status = disir_config_read (m_cli->disir(), m_cli->group_id().c_str(),
+                                        entry.c_str(), NULL, &config);
+        }
 
-        print_verify (status, entry.c_str(), config, NULL);
+        print_verify (status, entry.c_str(), config, mold);
         if (config)
             disir_config_finished (&config);
+        if (mold)
+            disir_mold_finished (&mold);
     }
     std::cout << std::endl;
 
