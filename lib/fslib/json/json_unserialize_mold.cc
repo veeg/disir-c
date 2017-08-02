@@ -741,11 +741,19 @@ MoldReader::unserialize_defaults (struct disir_context *context_keyval, Json::Va
         {
             status = set_value (context_default, def[ATTRIBUTE_KEY_VALUE]);
             if (status != DISIR_STATUS_OK &&
-                status != DISIR_STATUS_INVALID_CONTEXT)
+                status != DISIR_STATUS_INVALID_CONTEXT &&
+                status != DISIR_STATUS_WRONG_VALUE_TYPE)
             {
                 disir_log_user (m_disir, "Unable to set value on context: %s",
                                        disir_status_string (status));
                 return status;
+            }
+            else if (status == DISIR_STATUS_WRONG_VALUE_TYPE)
+            {
+                dc_fatal_error (context_default,
+                                "value default should be %s, got %s",
+                                dc_value_type_string (context_default),
+                                json_valuetype_stringify (def[ATTRIBUTE_KEY_VALUE].type()));
             }
 
             status = unserialize_introduced (context_default, def);
