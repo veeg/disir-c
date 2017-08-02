@@ -435,3 +435,19 @@ TEST_F (UnMarshallMoldTest, unserialize_value_int_as_float_shall_succeed)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
+TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_default_value_type)
+{
+    ASSERT_NO_THROW (
+        Json::Value& defaults = json_mold["mold"]["float"]["defaults"];
+        defaults[0]["value"] = "wrong_type";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
+                                        "value default should be FLOAT, got string");
+}
+
