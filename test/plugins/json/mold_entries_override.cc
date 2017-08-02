@@ -330,6 +330,20 @@ TEST_F (MoldOverrideTest, invalid_override_on_non_existing_keyval_in_namespace_m
                                   "does not exist in namespace mold");
 }
 
+TEST_F (MoldOverrideTest, override_value_int_as_float_shall_succeed)
+{
+    ASSERT_NO_THROW (
+        root["override"]["section_name.float"]["value"] = 16;
+    );
+    std::stringstream json_stream (jsonWriter.writeOrdered (root));
+
+    status = reader->set_mold_override (json_stream);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = reader->unserialize (mold_json, &mold);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}
+
 TEST_P (MoldOverrideParameterized, mold_override_unserialize)
 {
     auto entry = GetParam ();
