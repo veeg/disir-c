@@ -739,7 +739,7 @@ MoldReader::unserialize_defaults (struct disir_context *context_keyval, Json::Va
         // to notify about the error
         if (error == DISIR_STATUS_OK)
         {
-            status = set_value (def[ATTRIBUTE_KEY_VALUE], context_default);
+            status = set_value (context_default, def[ATTRIBUTE_KEY_VALUE]);
             if (status != DISIR_STATUS_OK &&
                 status != DISIR_STATUS_INVALID_CONTEXT)
             {

@@ -107,38 +107,44 @@ disir_value_to_json_value (enum disir_value_type type)
 }
 
 enum disir_status
-set_value (Json::Value& val, struct disir_context *context)
+set_value (struct disir_context *context, Json::Value& val)
 {
-    if (disir_value_to_json_value (dc_value_type (context)) != val.type())
-    {
-        return DISIR_STATUS_WRONG_VALUE_TYPE;
-    }
-
     switch (val.type())
     {
-        case Json::intValue:
-            return dc_set_value_integer (context, val.asInt64());
-        case Json::booleanValue:
-            return dc_set_value_boolean (context, val.asBool());
-        case Json::realValue:
+    case Json::intValue:
+    {
+        if (dc_value_type (context) == DISIR_VALUE_TYPE_FLOAT)
+        {
             return dc_set_value_float (context, (double)val.asDouble());
-        case Json::stringValue:
-            if (dc_value_type (context) == DISIR_VALUE_TYPE_ENUM)
-            {
-                return dc_set_value_enum (context,
-                        val.asString().c_str(), val.asString().size());
-            }
-            else
-            {
-                return dc_set_value_string (context,
-                        val.asString().c_str(), val.asString().size());
-            }
-        case Json::arrayValue:
-        case Json::uintValue:
-        case Json::objectValue:
-        case Json::nullValue:
-        default:
-            return DISIR_STATUS_WRONG_VALUE_TYPE;
+        }
+        else
+        {
+            return dc_set_value_integer (context, val.asInt64());
+        }
+    }
+    case Json::booleanValue:
+        return dc_set_value_boolean (context, val.asBool());
+    case Json::realValue:
+        return dc_set_value_float (context, (double)val.asDouble());
+    case Json::stringValue:
+    {
+        if (dc_value_type (context) == DISIR_VALUE_TYPE_ENUM)
+        {
+            return dc_set_value_enum (context,
+                    val.asString().c_str(), val.asString().size());
+        }
+        else
+        {
+            return dc_set_value_string (context,
+                    val.asString().c_str(), val.asString().size());
+        }
+    }
+    case Json::arrayValue:
+    case Json::uintValue:
+    case Json::objectValue:
+    case Json::nullValue:
+    default:
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 }
 
@@ -146,28 +152,32 @@ enum disir_status
 add_value_default (struct disir_context *context, Json::Value& value,
                    struct disir_version *version)
 {
-    if (disir_value_to_json_value (dc_value_type (context)) != value.type())
-    {
-        return DISIR_STATUS_WRONG_VALUE_TYPE;
-    }
-
     switch (value.type())
     {
-        case Json::intValue:
-            return dc_add_default_integer (context, value.asInt64(), version);
-        case Json::booleanValue:
-            return dc_add_default_boolean (context, (uint8_t)value.asInt64(), version);
-        case Json::realValue:
+    case Json::intValue:
+    {
+        if (dc_value_type (context) == DISIR_VALUE_TYPE_FLOAT)
+        {
             return dc_add_default_float (context, (double)value.asDouble(), version);
-        case Json::stringValue:
-            return dc_add_default_string (context, value.asString().c_str(),
-                                                   value.asString().size(), version);
-        case Json::arrayValue:
-        case Json::uintValue:
-        case Json::objectValue:
-        case Json::nullValue:
-        default:
-            return DISIR_STATUS_WRONG_VALUE_TYPE;
+        }
+        else
+        {
+            return dc_add_default_integer (context, value.asInt64(), version);
+        }
+    }
+    case Json::booleanValue:
+        return dc_add_default_boolean (context, (uint8_t)value.asInt64(), version);
+    case Json::realValue:
+        return dc_add_default_float (context, (double)value.asDouble(), version);
+    case Json::stringValue:
+        return dc_add_default_string (context, value.asString().c_str(),
+                                               value.asString().size(), version);
+    case Json::arrayValue:
+    case Json::uintValue:
+    case Json::objectValue:
+    case Json::nullValue:
+    default:
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
     }
 }
 

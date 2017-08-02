@@ -393,7 +393,7 @@ MoldOverride::set_value_existing_default (struct disir_context *context_keyval,
 
         if (dc_version_compare (&version, version_target) == 0)
         {
-            status = set_value (value, context_default);
+            status = set_value (context_default, value);
             if (status != DISIR_STATUS_OK)
                 goto out;
         }

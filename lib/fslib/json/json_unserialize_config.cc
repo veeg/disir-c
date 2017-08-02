@@ -201,7 +201,7 @@ ConfigReader::set_keyval (struct disir_context *parent_context,
 
     // If wrong value type is set, we can continue
     // , but set_value returns invalid context
-    status = set_value (keyval, context_keyval);
+    status = set_value (context_keyval, keyval);
     if (status != DISIR_STATUS_OK &&
         status != DISIR_STATUS_INVALID_CONTEXT)
     {

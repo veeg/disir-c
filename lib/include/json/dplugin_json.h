@@ -24,7 +24,7 @@
 #define ATTRIBUTE_KEY_NAMESPACE "namespace"
 
 //! \brief helper function that resolves typeof val and sets context's value accordingly
-enum disir_status set_value (Json::Value& val, struct disir_context *context);
+enum disir_status set_value (struct disir_context *context, Json::Value& val);
 
 enum disir_status add_value_default (struct disir_context *contexts, Json::Value& value,
                                      struct disir_version *version);
