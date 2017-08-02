@@ -68,7 +68,6 @@ CommandVerify::handle_command (std::vector<std::string> &args)
         enum disir_status status;
         struct disir_mold *mold = NULL;
         struct stat statbuf;
-        FILE *file = NULL;
         std::string filepath_mold;
 
         filepath_mold = args::get (opt_text_mold);
@@ -81,18 +80,9 @@ CommandVerify::handle_command (std::vector<std::string> &args)
             return (1);
         }
 
-        file = fopen (filepath_mold.c_str(), "r");
-        if (file == NULL)
-        {
-            std::cerr << "opening for reading " << filepath_mold.c_str()
-                                                << ": " <<strerror (errno)
-                                                << std::endl;
-            return (1);
-        }
-
         // TODO: Check file extension - switch on available molds
         // XXX Hardcode to json unserialize for now
-        status = dio_json_unserialize_mold (m_cli->disir(), file, &mold);
+        status = dio_json_unserialize_mold_filepath (m_cli->disir(), filepath_mold.c_str(), &mold);
         print_verify (status, filepath_mold.c_str(), NULL, mold);
 
         // TODO: Take entries arguments and verify them as config with this mold ( if the mold is OK)
@@ -102,7 +92,6 @@ CommandVerify::handle_command (std::vector<std::string> &args)
         {
             disir_mold_finished (&mold);
         }
-        fclose (file);
 
         return (0);
     }
