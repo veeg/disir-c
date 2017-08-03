@@ -524,6 +524,8 @@ disir_import_finalize (struct disir_instance *instance, enum disir_import_option
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
+    disir_error_clear (instance);
+
     if (*import == NULL || (*import)->di_entries == NULL)
     {
         return DISIR_STATUS_INVALID_ARGUMENT;
