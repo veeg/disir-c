@@ -120,7 +120,6 @@ disir_archive_import (struct disir_instance *instance, const char *archive_path,
 {
     enum disir_status status;
     struct disir_archive *archive = NULL;
-    struct stat st;
     std::map<std::string, std::string> archive_content;
     char *tmp_dir_name = NULL;
 
@@ -131,9 +130,10 @@ disir_archive_import (struct disir_instance *instance, const char *archive_path,
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    status = fslib_stat_filepath (instance, archive_path, &st);
+    status = dx_assert_read_permission (archive_path);
     if (status != DISIR_STATUS_OK)
     {
+        disir_error_set (instance, "unable to read archive: '%s'", archive_path);
         return status;
     }
 
@@ -291,7 +291,6 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
     enum disir_status status;
     enum disir_status archive_status;
     struct disir_archive *ar;
-    char temp_archive_path[4096];
     int ret;
     struct stat st;
 
@@ -303,12 +302,6 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
 
     status = DISIR_STATUS_OK;
     ar = *archive;
-
-    // Store for clean-up in the end
-    if (ar && ar->da_temp_archive_path)
-    {
-        strcpy (temp_archive_path, ar->da_temp_archive_path);
-    }
 
     // Check for empty archive
     if (ar && archive_path && ar->da_entries->empty())
@@ -352,16 +345,14 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
 out:
     archive_status = status;
 
-    status = dx_archive_destroy (ar);
-    *archive = NULL;
-
     // Remove temp archive.
-    if (fslib_stat_filepath (instance, temp_archive_path, &st) == DISIR_STATUS_OK)
+    if (ar && ar->da_temp_archive_path &&
+        fslib_stat_filepath (instance, ar->da_temp_archive_path, &st) == DISIR_STATUS_OK)
     {
-        ret = remove (temp_archive_path);
+        ret = remove (ar->da_temp_archive_path);
         if (ret != 0)
         {
-            log_error ("failed to remove temp archive '%s': %s", temp_archive_path,
+            log_error ("failed to remove temp archive '%s': %s", ar->da_temp_archive_path,
                        strerror (errno));
             status = DISIR_STATUS_FS_ERROR;
         }
@@ -370,6 +361,9 @@ out:
     {
         disir_error_clear (instance);
     }
+
+    status = dx_archive_destroy (ar);
+    *archive = NULL;
 
     return (archive_status != DISIR_STATUS_OK) ? archive_status : status;
 }

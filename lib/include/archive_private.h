@@ -101,6 +101,14 @@ dx_archive_config_entries_write (struct disir_instance *instance, struct disir_a
                                  struct disir_entry *config_entry,
                                  const char *group_id);
 
+//! Check for existence of given path, aswell as read permission.
+enum disir_status
+dx_assert_read_permission (const char *archive_path);
+
+//! Check for existence of given path, aswell as write permission.
+enum disir_status
+dx_assert_write_permission (const char *archive_path);
+
 //! Write archive metadata (metadata.toml and entries.toml)
 enum disir_status
 dx_archive_metadata_write (struct disir_archive *archive);
