@@ -505,7 +505,6 @@ dx_archive_begin_existing (struct disir_instance *instance, const char *archive_
     enum disir_status status;
     std::map<std::string, std::string> extract_content;
     struct disir_archive *write_archive = NULL;
-    struct stat st;
     char *tmp_dir_name = NULL;
     const char *ext = NULL;
 
@@ -524,10 +523,11 @@ dx_archive_begin_existing (struct disir_instance *instance, const char *archive_
         return DISIR_STATUS_NO_CAN_DO;
     }
 
-    // Make sure file exists
-    status = fslib_stat_filepath (instance, archive_path, &st);
+    // Assert archive exists and we can read it
+    status = dx_assert_read_permission (archive_path);
     if (status != DISIR_STATUS_OK)
     {
+        disir_error_set (instance, "unable to read archive: '%s'", archive_path);
         return status;
     }
 

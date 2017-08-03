@@ -85,8 +85,8 @@ error:
 
 //! INTERNAL API
 enum disir_status
-dx_archive_extract (const char *archive_path, std::map<std::string,
-                    std::string>& extract_content, const char *extract_path)
+dx_archive_extract (const char *archive_path, std::map<std::string, std::string>& extract_content,
+                    const char *extract_path)
 {
     enum disir_status status;
     struct archive *write_archive = NULL;
@@ -98,6 +98,13 @@ dx_archive_extract (const char *archive_path, std::map<std::string,
     size_t size;
     const void *buff;
     char path[PATH_MAX];
+
+    // Check for write permission
+    status = dx_assert_write_permission (extract_path);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
 
     flags = ARCHIVE_EXTRACT_TIME;
     flags |= ARCHIVE_EXTRACT_PERM;
@@ -267,6 +274,7 @@ dx_archive_open_write (struct disir_archive *archive)
     while (retry_count <= 100)
     {
         dx_random_string (10, retry_count, random_suffix);
+        temp_archive_path[0] = '\0';
         snprintf (temp_archive_path, PATH_MAX, "/tmp/arc.%s", random_suffix);
 
         archive->da_temp_archive_path = strdup (temp_archive_path);
@@ -666,31 +674,54 @@ dx_archive_destroy (struct disir_archive *ar)
     return DISIR_STATUS_OK;
 }
 
-//! STATIC FUNCTION
-static enum disir_status
-dx_assert_write_permission (struct disir_instance *instance, const char *archive_path)
+//! INTERNAL API
+enum disir_status
+dx_assert_write_permission (const char *archive_path)
 {
-    enum disir_status status;
     struct stat st;
-    char *temp_path = NULL;
-    char *parent_folder = NULL;
+    int ret;
 
-    temp_path = strdup (archive_path);
-    parent_folder = dirname (temp_path);
-
-    status = DISIR_STATUS_OK;
-    if (parent_folder == NULL)
+    // Assert that directory exists
+    ret = stat (archive_path, &st);
+    if (ret != 0)
     {
-        status = DISIR_STATUS_FS_ERROR;
-        goto out;
+        log_error ("unable to write: '%s' does not exist", archive_path);
+        return DISIR_STATUS_NOT_EXIST;
     }
 
-    status = fslib_stat_filepath (instance, parent_folder, &st);
+    // Assert write permission
+    if (access (archive_path, W_OK) != 0)
+    {
+        log_error ("no write permission for folder: '%s'", archive_path);
+        return DISIR_STATUS_PERMISSION_ERROR;
+    }
 
-    //FALL-THROUGH
-out:
-    free (temp_path);
-    return status;
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_assert_read_permission (const char *archive_path)
+{
+    struct stat st;
+    int ret;
+
+    // Assert that directory exists
+    ret = stat (archive_path, &st);
+    if (ret != 0)
+    {
+        log_error ("unable to read: '%s' does not exist", archive_path);
+        return DISIR_STATUS_NOT_EXIST;
+    }
+
+    // Assert read permission
+    if (access (archive_path, R_OK) != 0)
+    {
+        log_error ("no read permission for folder: '%s'", archive_path);
+        return DISIR_STATUS_PERMISSION_ERROR;
+    }
+
+    return DISIR_STATUS_OK;
 }
 
 //! STATIC FUNCTION
@@ -714,6 +745,35 @@ copy_file (const char *from, const char *to)
     return DISIR_STATUS_OK;
 }
 
+//! STATIC FUNCTION
+static enum disir_status
+get_dirname (const char *archive_path, char *dirpath)
+{
+    enum disir_status status;
+    char *temp_path = NULL;
+    char *temp_dirname;
+
+    status = DISIR_STATUS_OK;
+
+    temp_path = strdup (archive_path);
+    if (temp_path == NULL)
+    {
+        return DISIR_STATUS_NO_MEMORY;
+    }
+
+    temp_dirname = dirname (temp_path);
+
+    if (strcmp (temp_dirname, ".") == 0)
+    {
+        log_error ("cannot find parent directory of file at path '%s'", archive_path);
+        status = DISIR_STATUS_FS_ERROR;
+    }
+
+    strcpy (dirpath, temp_dirname);
+    free (temp_path);
+    return status;
+}
+
 //! INTERNAL API
 enum disir_status
 dx_archive_disk_append (struct disir_instance *instance, const char *new_archive_path,
@@ -724,13 +784,7 @@ dx_archive_disk_append (struct disir_instance *instance, const char *new_archive
     char backup_path[4096];
     char archive_path_with_extension[4096];
     const char *ext = NULL;
-
-    // Make sure the directory exists and that we have write permission.
-    status = dx_assert_write_permission (instance, new_archive_path);
-    if (status != DISIR_STATUS_OK)
-    {
-        return status;
-    }
+    char extract_folder_path[PATH_MAX];
 
     strcpy (archive_path_with_extension, new_archive_path);
 
@@ -744,6 +798,19 @@ dx_archive_disk_append (struct disir_instance *instance, const char *new_archive
     // CASE 1: Finalizing a new archive to given location
     if (existing_archive_path == NULL)
     {
+        status = get_dirname (new_archive_path, extract_folder_path);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+
+        status = dx_assert_write_permission (extract_folder_path);
+        if (status != DISIR_STATUS_OK)
+        {
+            disir_error_set (instance, "unable to write to path: '%s'", extract_folder_path);
+            return status;
+        }
+
         status = copy_file (temp_archive_path, archive_path_with_extension);
         if (status != DISIR_STATUS_OK)
         {
@@ -764,9 +831,16 @@ dx_archive_disk_append (struct disir_instance *instance, const char *new_archive
             return DISIR_STATUS_FS_ERROR;
         }
 
-        status = dx_assert_write_permission (instance, existing_archive_path);
+        status = get_dirname (existing_archive_path, extract_folder_path);
         if (status != DISIR_STATUS_OK)
         {
+            return status;
+        }
+
+        status = dx_assert_write_permission (extract_folder_path);
+        if (status != DISIR_STATUS_OK)
+        {
+            disir_error_set (instance, "unable to write to path: '%s'", extract_folder_path);
             return status;
         }
 
@@ -780,11 +854,19 @@ dx_archive_disk_append (struct disir_instance *instance, const char *new_archive
     }
 
     // CASE 3: Existing archive should be overwritten
-    if (existing_archive_path && (strcmp (existing_archive_path, archive_path_with_extension) == 0))
+    if (existing_archive_path &&
+        (strcmp (existing_archive_path, archive_path_with_extension) == 0))
     {
-        status = dx_assert_write_permission (instance, existing_archive_path);
+        status = get_dirname (existing_archive_path, extract_folder_path);
         if (status != DISIR_STATUS_OK)
         {
+            return status;
+        }
+
+        status = dx_assert_write_permission (extract_folder_path);
+        if (status != DISIR_STATUS_OK)
+        {
+            disir_error_set (instance, "unable to write to path: '%s'", extract_folder_path);
             return status;
         }
 
