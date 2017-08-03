@@ -256,8 +256,7 @@ TEST_F (ArchiveExistingTest, invalid_filepath)
     // Non-existing file given
     status = disir_archive_export_begin (instance_export, "/tmp/no_file.disir", &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_NOT_EXIST, status);
-    ASSERT_STREQ ("entry resolved to filepath '/tmp/no_file.disir' "\
-                  "does not exist: No such file or directory", disir_error (instance_export));
+    ASSERT_STREQ ("unable to read archive: '/tmp/no_file.disir'", disir_error (instance_export));
 
     // File without .disir extension given:
     invalid = fopen ("/tmp/no_ext", "w");
@@ -927,4 +926,16 @@ TEST_F (ArchiveExistingTest, empty_archive)
 
     status = disir_archive_finalize (instance_export, "/tmp/empty", &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_NO_CAN_DO, status);
+}
+
+TEST_F (ArchiveExistingTest, no_permission_to_write_archive)
+{
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = disir_archive_append_group (instance_export, disir_archive, "JSON");
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = disir_archive_finalize (instance_export, "/sys/archive", &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_PERMISSION_ERROR, status);
 }
