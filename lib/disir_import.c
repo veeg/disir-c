@@ -585,7 +585,7 @@ disir_import_finalize (struct disir_instance *instance, enum disir_import_option
                    snprintf (buf, 4096, "Failed:         %s", current->ie_entry_id);
                    rep->ir_entry[i] = strdup (buf);
                }
-               else
+               else if (status == DISIR_STATUS_OK && current->ie_import)
                {
                    snprintf (buf, 4096, "Imported:       %s (%s)",
                                          current->ie_entry_id,
