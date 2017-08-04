@@ -75,8 +75,20 @@ ConfigReader::construct_config (Json::Value& root, struct disir_config **config)
     }
 
     status = set_config_version (context_config, root[VERSION]);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+       goto finalize;
+    }
+    else if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
+    {
         goto error;
+    }
+
+    if (assert_json_value_type (root[ATTRIBUTE_KEY_CONFIG], Json::objectValue))
+    {
+        dc_fatal_error (context_config, "config does not contain config element");
+        goto finalize;
+    }
 
     status = _unserialize_node (context_config, root[ATTRIBUTE_KEY_CONFIG]);
     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
@@ -108,6 +120,13 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
     struct disir_version mold_version;
     enum disir_status status;
     const char *version_string;
+
+    if (assert_json_value_type (ver, Json::stringValue) != DISIR_STATUS_OK)
+    {
+        dc_fatal_error (context_config, "config version should be string, got %s",
+                                        json_valuetype_stringify (ver.type()));
+        return DISIR_STATUS_INVALID_CONTEXT;
+    }
 
     // Absent version keyval
     if (ver.isNull () || !ver.isString ())
@@ -170,7 +189,8 @@ ConfigReader::set_keyval (struct disir_context *parent_context,
     // , but set_value returns invalid context
     status = set_value (context_keyval, keyval);
     if (status != DISIR_STATUS_OK &&
-        status != DISIR_STATUS_INVALID_CONTEXT)
+        status != DISIR_STATUS_INVALID_CONTEXT &&
+        status != DISIR_STATUS_WRONG_VALUE_TYPE)
     {
         disir_log_user (m_disir, "something went horribly wrong: (%s) with keyname %s",
                           disir_status_string (status), name.c_str ());
