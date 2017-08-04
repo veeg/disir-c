@@ -103,11 +103,11 @@ dx_archive_config_entries_write (struct disir_instance *instance, struct disir_a
 
 //! Check for existence of given path, aswell as read permission.
 enum disir_status
-dx_assert_read_permission (const char *archive_path);
+dx_assert_read_permission (const char *path);
 
 //! Check for existence of given path, aswell as write permission.
 enum disir_status
-dx_assert_write_permission (const char *archive_path);
+dx_assert_write_permission (const char *path);
 
 //! Write archive metadata (metadata.toml and entries.toml)
 enum disir_status
@@ -119,8 +119,8 @@ dx_archive_create_temp_folder (void);
 
 //! Move archive to given location on disk. Overwrite existing archive with backup.
 enum disir_status
-dx_archive_disk_append (struct disir_instance *instance, const char *new_archive_path,
-                        const char *existing_archive_path, const char *temp_archive_path);
+dx_archive_disk_append (const char *new_archive_path, const char *existing_archive_path,
+                        const char *temp_archive_path);
 
 //! Clean up temporary files and free data structures
 enum disir_status
