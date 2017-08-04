@@ -55,9 +55,9 @@ enum disir_import_option
 //!
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_FS_ERROR if archive is invalid. May involve invalid metadata, failure to
-//!         extract data, failure when writing to new archive or writing config entries to disk.
+//!     extract data, failure when writing to new archive or writing config entries to disk.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either of the inputs are NULL or
-//!         invalid options.
+//!     invalid options.
 //! \return DISIR_STATUS_NO_MEMORY if unable to allocate enough memory for disir archive structure.
 //!
 enum disir_status
@@ -76,7 +76,7 @@ disir_archive_export_begin (struct disir_instance *instance,
 //!
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either of the inputs are NULL or
-//!         invalid options.
+//!     invalid options.
 //! \return DISIR_STATUS_EXISTS if appending group already exist in archive.
 //! \return DISIR_STATUS_NOT_EXIST if no config entries exists for given group id.
 //! \return DISIR_STATUS_FS_ERROR if unable to write to disk or clean up temporary files.
@@ -99,7 +99,7 @@ disir_archive_append_group (struct disir_instance *instance, struct disir_archiv
 //!
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either of the inputs are NULL or
-//!         invalid options.
+//!     invalid options.
 //! \return DISIR_STATUS_EXISTS if appending entry id already exist in archive.
 //! \return DISIR_STATUS_FS_ERROR if unable to write to disk or clean up temporary files.
 //! \return DISIR_STATUS_NO_CAN_DO if plugin does not support serializing configuartion entries.
@@ -211,8 +211,7 @@ disir_import_resolve_entry (struct disir_import *import,
 //! \param[out] report Import summary - not populated if NULL.
 //!
 //! \return DISIR_STATUS_OK on success.
-//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the inputs are NULL or
-//!         invalid options.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the inputs are NULL or invalid options.
 //!
 enum disir_status
 disir_import_finalize (struct disir_instance *instance, enum disir_import_option opt,
