@@ -56,19 +56,6 @@ namespace dio
         JsonIO (struct disir_instance *disir);
 
         virtual ~JsonIO () = default;
-
-        //! \brief reads a file from filepath and parses it into the json value object
-        //!
-        //! \param[in] filepath path to where the file resides
-        //! \param[in] root object to which filecontent is parsed
-        //!
-        //! \return DPLUGIN_STATUS_OK on success
-        //! \return DPLUGIN_PARSE_ERROR if the json file contains errors. The disir insance
-        //! will contain an explenation of any errors.
-        //! \return DPLUGIN_IO_ERROR if filepath is invalid.
-        //!
-        virtual enum disir_status read_json_from_file (const char *filepath, Json::Value& root);
-
    protected:
         // An instance of the libdisir instance
         // that invoked library call

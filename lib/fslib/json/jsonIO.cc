@@ -54,33 +54,6 @@ JsonIO::JsonIO (struct disir_instance *disir)
 }
 
 enum disir_status
-JsonIO::read_json_from_file (const char *filepath, Json::Value& root)
-{
-    std::ifstream file (filepath);
-    std::stringstream buffer;
-    Json::Reader reader;
-
-    if (file.is_open())
-    {
-        buffer << file.rdbuf();
-    }
-    else
-    {
-        disir_error_set (m_disir, "Could not open file on filepath: %s", strerror (errno));
-        return DISIR_STATUS_FS_ERROR;
-    }
-
-    bool success = reader.parse (buffer, root);
-    if (!success)
-    {
-        disir_error_set (m_disir, "Could not parse jsonfile: %s",
-                                   reader.getFormattedErrorMessages ().c_str ());
-        return DISIR_STATUS_FS_ERROR;
-    }
-    return DISIR_STATUS_OK;
-}
-
-enum disir_status
 assert_json_value_type (Json::Value& value, Json::ValueType type)
 {
  return (value.type () == type) ? DISIR_STATUS_OK : DISIR_STATUS_WRONG_VALUE_TYPE;
