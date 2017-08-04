@@ -73,7 +73,7 @@ class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 
 TEST_F (UnMarshallMoldTest, read_mold_shall_succeed)
 {
-    status = reader->unserialize (m_moldjsonPath.c_str(), &mold);
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 }
 
