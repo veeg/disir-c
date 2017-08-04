@@ -1,0 +1,177 @@
+{
+   "mold" : {
+      "test1" : {
+         "type" : "STRING",
+         "documentation" : "test keyval",
+         "restrictions" : [
+            {
+               "introduced" : "1.0",
+               "type" : "MAXIMUM_ENTRIES",
+               "value" : 4
+            },
+            {
+               "introduced" : "1.0",
+               "type" : "MINIMUM_ENTRIES",
+               "value" : 2
+            }
+         ],
+         "defaults" : [
+            {
+               "introduced" : "1.0",
+               "value" : "1"
+            }
+         ]
+      },
+      "test2" : {
+         "type" : "STRING",
+         "documentation" : "test keyval",
+         "defaults" : [
+            {
+               "introduced" : "1.0",
+               "value" : "1"
+            }
+         ]
+      },
+      "integer" : {
+         "type" : "INTEGER",
+         "documentation" : "integer doc",
+         "restrictions" : [
+            {
+               "introduced" : "1.0",
+               "type" : "NUMERIC",
+               "value" : 1
+            },
+            {
+               "introduced" : "1.0",
+               "type" : "NUMERIC",
+               "value" : 2
+            }
+         ],
+         "defaults" : [
+            {
+               "introduced" : "1.0",
+               "value" : 2
+            }
+         ]
+      },
+      "float" : {
+         "type" : "FLOAT",
+         "documentation" : "floatdoc",
+         "restrictions" : [
+            {
+               "introduced" : "1.0",
+               "type" : "RANGE",
+               "value" : [ 10, 15.15 ]
+            }
+         ],
+         "defaults" : [
+            {
+               "introduced" : "1.0",
+               "value" : 12.12
+            }
+         ]
+      },
+      "boolean" : {
+         "type" : "BOOLEAN",
+         "documentation" : "doc",
+         "defaults" : [
+            {
+               "introduced" : "1.0",
+               "value" : true
+            }
+         ]
+      },
+      "section_name" : {
+         "introduced" : "1.0",
+         "restrictions" : [
+            {
+               "introduced" : "1.0",
+               "type" : "MAXIMUM_ENTRIES",
+               "value" : 4
+            },
+            {
+               "introduced" : "2.0",
+               "type" : "MAXIMUM_ENTRIES",
+               "value" : 2
+            }
+         ],
+         "elements" : {
+            "k1" : {
+               "type" : "STRING",
+               "documentation" : "k1value doc",
+               "defaults" : [
+                  {
+                     "introduced" : "1.0",
+                     "value" : "k1value"
+                  }
+               ]
+            },
+            "bool" : {
+               "type" : "BOOLEAN",
+               "documentation" : "boolvalue doc",
+               "defaults" : [
+                  {
+                     "introduced" : "1.0",
+                     "value" : true
+                  }
+               ]
+            },
+            "float" : {
+               "type" : "FLOAT",
+               "documentation" : "floatvalue doc",
+               "defaults" : [
+                  {
+                     "introduced" : "1.0",
+                     "value" : 1.12
+                  }
+               ]
+            },
+            "integer" : {
+               "type" : "INTEGER",
+               "documentation" : "intvalue doc",
+               "defaults" : [
+                  {
+                     "introduced" : "1.0",
+                     "value" : 123123
+                  }
+               ]
+            },
+            "k2" : {
+               "type" : "STRING",
+               "documentation" : "k2value doc",
+               "defaults" : [
+                  {
+                     "introduced" : "1.0",
+                     "value" : "k2value"
+                  }
+               ]
+            },
+            "k3" : {
+               "type" : "STRING",
+               "documentation" : "k3value doc",
+               "defaults" : [
+                  {
+                     "introduced" : "1.0",
+                     "value" : "k3value"
+                  }
+               ]
+            },
+            "section2" : {
+               "introduced" : "1.0",
+               "elements" : {
+                  "k3" : {
+                     "type" : "STRING",
+                     "documentation" : "k1value doc",
+                     "defaults" : [
+                        {
+                           "introduced" : "1.0",
+                           "value" : "k3value"
+                        }
+                     ]
+                  }
+               }
+            }
+         }
+      }
+   }
+}
