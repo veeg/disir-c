@@ -285,3 +285,23 @@ TEST_F (ArchiveAppendNewTest, discard_archive)
     ASSERT_NE (stat (archive_path_out, &st), 0);
     ASSERT_TRUE (disir_archive == NULL);
 }
+
+TEST_F (ArchiveAppendNewTest, finalize_with_path_to_directory)
+{
+    struct stat st;
+
+    status = disir_archive_append_group (instance_export, disir_archive, "JSON");
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = disir_archive_finalize (instance_export, "/tmp/lol/", &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
+
+    ASSERT_STREQ ("invalid archive path: '/tmp/lol/' is a directory",
+                   disir_error (instance_export));
+
+    // Assert retry is ok
+    status = disir_archive_finalize (instance_export, archive_path_in, &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ASSERT_EQ (stat (archive_path_out, &st), 0);
+}

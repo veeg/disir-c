@@ -926,16 +926,106 @@ TEST_F (ArchiveExistingTest, empty_archive)
 
     status = disir_archive_finalize (instance_export, "/tmp/empty", &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_NO_CAN_DO, status);
+    ASSERT_STREQ ("cannot finalize empty archive", disir_error (instance_export));
 }
 
-TEST_F (ArchiveExistingTest, no_permission_to_write_archive)
+TEST_F (ArchiveExistingTest, not_permitted_to_write_archive)
 {
+    struct stat st;
+    int ret;
+    size_t old_mode = 0;
+
     status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     status = disir_archive_append_group (instance_export, disir_archive, "JSON");
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
-    status = disir_archive_finalize (instance_export, "/sys/archive", &disir_archive);
+    status = fslib_mkdir_p (instance_export, "/tmp/restricted_folder");
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ret = stat ("/tmp/restricted_folder", &st);
+    ASSERT_TRUE (ret == 0);
+
+    old_mode = st.st_mode;
+
+    // Remove write permission in extract folder
+    ret = chmod ("/tmp/restricted_folder", old_mode ^ S_IWUSR);
+    ASSERT_TRUE (ret == 0);
+
+    status = disir_archive_finalize (instance_export, "/tmp/restricted_folder/archive",
+                                     &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_PERMISSION_ERROR, status);
+    ASSERT_STREQ ("unable to write to path: '/tmp/restricted_folder'",
+                   disir_error (instance_export));
+
+    status = disir_archive_finalize (instance_export, NULL, &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ret = remove ("/tmp/restricted_folder");
+    ASSERT_EQ (ret, 0);
+}
+
+TEST_F (ArchiveExistingTest, no_write_permission_continue_from_error)
+{
+    struct stat st;
+    int ret;
+    size_t old_mode = 0;
+
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = disir_archive_append_group (instance_export, disir_archive, "JSON");
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = fslib_mkdir_p (instance_export, "/tmp/restricted_folder");
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ret = stat ("/tmp/restricted_folder", &st);
+    ASSERT_TRUE (ret == 0);
+
+    old_mode = st.st_mode;
+
+    // Remove write permission in extract folder
+    ret = chmod ("/tmp/restricted_folder", old_mode ^ S_IWUSR);
+    ASSERT_TRUE (ret == 0);
+
+    status = disir_archive_finalize (instance_export, "/tmp/restricted_folder/archive",
+                                     &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_PERMISSION_ERROR, status);
+    ASSERT_STREQ ("unable to write to path: '/tmp/restricted_folder'",
+                   disir_error (instance_export));
+
+    // Retry finalize to permitted path
+    status = disir_archive_finalize (instance_export, archive_path_in, &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    // Assert archive was written
+    ASSERT_EQ (stat (archive_path_out, &st), 0);
+
+    ret = remove ("/tmp/restricted_folder");
+    ASSERT_EQ (ret, 0);
+}
+
+TEST_F (ArchiveExistingTest, not_permitted_to_read_archive)
+{
+    struct stat st;
+    int ret;
+    size_t old_mode;
+
+    create_mockup_archive ();
+
+    ret = stat (archive_path_out, &st);
+    ASSERT_TRUE (ret == 0);
+
+    old_mode = st.st_mode;
+
+    // Remove read permission on archive
+    ret = chmod (archive_path_out, old_mode ^ S_IRUSR);
+    ASSERT_TRUE (ret == 0);
+
+    status = disir_archive_export_begin (instance_export, archive_path_out, &disir_archive);
+    ASSERT_STATUS (DISIR_STATUS_PERMISSION_ERROR, status);
+
+    ASSERT_STREQ ("unable to read archive: '/tmp/archive.disir'", disir_error (instance_export));
 }
