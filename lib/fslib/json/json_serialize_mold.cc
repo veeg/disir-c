@@ -80,6 +80,11 @@ MoldWriter::serialize (struct disir_mold *mold, std::string& mold_json)
     Json::StyledWriter writer;
     Json::Value root;
 
+    if (mold == NULL)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
     context_mold = dc_mold_getcontext (mold);
     if (context_mold == NULL)
     {
