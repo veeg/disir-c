@@ -123,11 +123,14 @@ disir_archive_append_entry (struct disir_instance *instance, struct disir_archiv
 //!
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_FS_ERROR if unable to properly clean up temp files, or remove
-//!         or rename existing archives.
-//! \return DISIR_STATUS_PERMISSION_ERROR if insufficient permissions to
-//!         files/folders on disk.
-//! \return DISIR_STATUS_NOT_EXIST if folders or files involving exported archive
-//!         does not exist.
+//!     or rename existing archives.
+//! \return DISIR_STATUS_INVALID_ARGUMENT if archive_path is invalid (e.g. path to a directory).
+//! \return DISIR_STATUS_PERMISSION_ERROR if insufficient permissions to write archive
+//!     to given path. Archive will not be destroyed and caller must re-call
+//!     finalize with a new (valid) path or discard it with archive_path = NULL.
+//! \return DISIR_STATUS_NOT_EXIST if given path does not exist. Archive will not be
+//!     destroyed and caller must re-call finalize with a new (valid) path or discard it with
+//!     archive_path = NULL.
 //!
 enum disir_status
 disir_archive_finalize (struct disir_instance *instance, const char *archive_path,
