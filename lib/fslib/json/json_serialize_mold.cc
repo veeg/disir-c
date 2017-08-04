@@ -20,6 +20,7 @@ MoldWriter::serialize_deprecated (struct disir_context *context, Json::Value& cu
     char buf[500];
     enum disir_status status;
     struct disir_version version;
+    struct disir_version version_zero;
 
     status = dc_get_deprecated (context, &version);
     if (status != DISIR_STATUS_OK &&
@@ -28,6 +29,13 @@ MoldWriter::serialize_deprecated (struct disir_context *context, Json::Value& cu
         return status;
     }
     if (status == DISIR_STATUS_WRONG_CONTEXT)
+    {
+        return DISIR_STATUS_OK;
+    }
+
+    version_zero.sv_major = 0;
+    version_zero.sv_minor = 0;
+    if (dc_version_compare (&version, &version_zero) == 0)
     {
         return DISIR_STATUS_OK;
     }
