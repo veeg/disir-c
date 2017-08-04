@@ -283,6 +283,36 @@ disir_archive_append_group (struct disir_instance *instance, struct disir_archiv
     return status;
 }
 
+//! STATIC FUNCTION
+static enum disir_status
+get_dirname (const char *archive_path, char *dirpath)
+{
+    enum disir_status status;
+    char *temp_path = NULL;
+    char *temp_dirname;
+
+    status = DISIR_STATUS_OK;
+
+    temp_path = strdup (archive_path);
+    if (temp_path == NULL)
+    {
+        return DISIR_STATUS_NO_MEMORY;
+    }
+
+    temp_dirname = dirname (temp_path);
+
+    if (strcmp (temp_dirname, ".") == 0)
+    {
+        log_error ("cannot format a directory path of given filepath '%s'", archive_path);
+        status = DISIR_STATUS_FS_ERROR;
+    }
+
+    strcpy (dirpath, temp_dirname);
+    free (temp_path);
+
+    return status;
+}
+
 //! PUBLIC API
 enum disir_status
 disir_archive_finalize (struct disir_instance *instance, const char *archive_path,
@@ -293,6 +323,7 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
     struct disir_archive *ar;
     int ret;
     struct stat st;
+    char extract_folder_path[4096];
 
     if (instance == NULL || archive == NULL)
     {
@@ -302,6 +333,31 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
 
     status = DISIR_STATUS_OK;
     ar = *archive;
+
+    // Make sure archive path is not a directory
+    if (archive_path && archive_path[strlen (archive_path)-1] == '/')
+    {
+        disir_error_set (instance, "invalid archive path: '%s' is a directory", archive_path);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    // Get directory path of location to store new archive
+    if (archive_path)
+    {
+        status = get_dirname (archive_path, extract_folder_path);
+        if (status != DISIR_STATUS_OK)
+        {
+            goto out;
+        }
+
+        // Assert that we have write permission in directory
+        status = dx_assert_write_permission (extract_folder_path);
+        if (status != DISIR_STATUS_OK)
+        {
+            disir_error_set (instance, "unable to write to path: '%s'", extract_folder_path);
+            return status;
+        }
+    }
 
     // Check for empty archive
     if (ar && archive_path && ar->da_entries->empty())
@@ -338,8 +394,12 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
 
     if (archive_path && status == DISIR_STATUS_OK)
     {
-        status = dx_archive_disk_append (instance, archive_path, ar->da_existing_path,
+        status = dx_archive_disk_append (archive_path, ar->da_existing_path,
                                          ar->da_temp_archive_path);
+        if (status != DISIR_STATUS_OK)
+        {
+            disir_error_set (instance, "failed to write archive to disk");
+        }
     }
     // FALL-THROUGH
 out:
