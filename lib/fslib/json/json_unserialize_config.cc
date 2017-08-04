@@ -19,37 +19,7 @@ ConfigReader::ConfigReader (struct disir_instance *disir, struct disir_mold *mol
     if (disir == NULL || mold == NULL)
         throw std::invalid_argument ("");
 
-    m_refMold = mold;
-}
-
-//! Used only when read_config_version is used
-ConfigReader::ConfigReader (struct disir_instance *disir)
-    : JsonIO (disir)
-{
-}
-
-enum disir_status
-ConfigReader::read_config_version (struct disir_version *version, const char *path)
-{
-    enum disir_status status;
-
-    status = read_json_from_file (path, m_configRoot);
-    if (status != DISIR_STATUS_OK)
-    {
-        return status;
-    }
-
-    auto version_string = m_configRoot[VERSION];
-
-    if (version_string.isNull ())
-    {
-        disir_error_set (m_disir,
-                "Could not read config version. ");
-        // We aren't going to crash this hard, are we?
-        return DISIR_STATUS_FS_ERROR;
-    }
-
-    return dc_version_convert (version_string.asCString(), version);
+    m_mold = mold;
 }
 
 //! PUBLIC
@@ -57,7 +27,9 @@ enum disir_status
 ConfigReader::unserialize (struct disir_config **config, std::istream& stream)
 {
     Json::Reader reader;
-    bool success = reader.parse (stream, m_configRoot);
+    Json::Value root;
+
+    bool success = reader.parse (stream, root);
 
     if (!success)
     {
@@ -66,16 +38,17 @@ ConfigReader::unserialize (struct disir_config **config, std::istream& stream)
         return DISIR_STATUS_FS_ERROR;
     }
 
-    return construct_config (config);
+    return construct_config (root, config);
 }
 
 //! PUBLIC
 enum disir_status
-ConfigReader::unserialize (struct disir_config **config, const std::string Json)
+ConfigReader::unserialize (struct disir_config **config, const std::string string)
 {
     Json::Reader reader;
+    Json::Value root;
 
-    bool success = reader.parse (Json, m_configRoot);
+    bool success = reader.parse (string, root);
     if (!success)
     {
         disir_error_set (m_disir, "Parse error: %s",
@@ -83,63 +56,49 @@ ConfigReader::unserialize (struct disir_config **config, const std::string Json)
         return DISIR_STATUS_FS_ERROR;
     }
 
-    return construct_config (config);
-}
-
-//! PUBLIC
-enum disir_status
-ConfigReader::unserialize (struct disir_config **config, const char *filepath)
-{
-    enum disir_status status;
-
-    status = read_json_from_file (filepath, m_configRoot);
-    if (status != DISIR_STATUS_OK)
-    {
-        return status;
-    }
-
-    return construct_config (config);
+    return construct_config (root, config);
 }
 
 enum disir_status
-ConfigReader::construct_config (struct disir_config **config)
+ConfigReader::construct_config (Json::Value& root, struct disir_config **config)
 {
     enum disir_status status;
     struct disir_context *context_config = NULL;
 
     *config = NULL;
 
-    status = dc_config_begin (m_refMold, &context_config);
+    status = dc_config_begin (m_mold, &context_config);
     if (status != DISIR_STATUS_OK)
     {
         disir_log_user (m_disir, "Could not create config context from mold");
         goto error;
     }
 
-    status = set_config_version (context_config, m_configRoot[VERSION]);
+    status = set_config_version (context_config, root[VERSION]);
     if (status != DISIR_STATUS_OK)
         goto error;
 
-     status = build_config_from_json (context_config);
-     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
-         goto error;
+    status = _unserialize_node (context_config, root[ATTRIBUTE_KEY_CONFIG]);
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
+        goto error;
 
-     status = dc_config_finalize (&context_config, config);
-     if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
-     {
-         disir_log_user (m_disir, "could not finalize config context: %s",
-                         disir_status_string (status));
-         goto error;
-     }
+finalize:
+    status = dc_config_finalize (&context_config, config);
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
+    {
+        disir_log_user (m_disir, "could not finalize config context: %s",
+                        disir_status_string (status));
+        goto error;
+    }
 
-     return status;
+    return status;
 error:
-     if (context_config)
-     {
-        dc_destroy (&context_config);
-     }
+    if (context_config)
+    {
+       dc_destroy (&context_config);
+    }
 
-     return status;
+    return status;
 }
 
 enum disir_status
@@ -166,7 +125,7 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
             return status;
         }
     }
-    status = dc_mold_get_version (m_refMold, &mold_version);
+    status = dc_mold_get_version (m_mold, &mold_version);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -179,13 +138,6 @@ ConfigReader::set_config_version (struct disir_context *context_config, Json::Va
     }
 
     return dc_set_version (context_config, &version);
-}
-
-//! PRIVATE
-enum disir_status
-ConfigReader::build_config_from_json (struct disir_context *context_config)
-{
-    return _unserialize_node (context_config, m_configRoot[ATTRIBUTE_KEY_CONFIG]);
 }
 
 //! PRIVATE
@@ -366,11 +318,9 @@ ConfigReader::_unserialize_node (struct disir_context *parent_context, Json::Val
 
         status = unserialize_type (parent_context, child_node, name);
         if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
-            goto error;
+            break;
     }
 
-    return status;
-error:
     return status;
 }
 
