@@ -47,18 +47,11 @@ namespace testing
     class JsonDioTestWrapper : public testing::DisirTestWrapper
     {
         protected:
-            const std::string m_configjsonPath
-                = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/json/reference_config.json";
-
-            const std::string m_moldjsonPath
-                = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/json/reference_mold.json";
-
-            const std::string m_jsonPath = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/json/";
+            const std::string m_json_references_path
+                = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/json/";
 
             const std::string m_override_entries_path
                 = CMAKE_PROJECT_SOURCE_DIR "/test/plugins/json/override_test_data/";
-
-            bool _compare_json_objects (Json::Value& objOne, Json::Value& objTwo);
 
             // Variables
             enum disir_status status;
@@ -73,11 +66,7 @@ namespace testing
             static struct disir_mold    *libdisir_mold;
             static struct disir_config  *libdisir_config;
 
-            //! \breif compares two json strings
-            bool compare_json_objects (std::string a, std::string b);
-
             bool GetJsonObject (Json::Value& root, std::string path);
-            bool GetJsonConfig (Json::Value& obj);
 
             bool
             assert_invalid_context (struct disir_mold *mold, const char *name,
@@ -95,21 +84,11 @@ namespace testing
             void emplace_mold_from_string (const char *namespace_entry, const char *name,
                                            std::string& mold);
 
-            std::string getMoldJson ();
-
             //! \brief checks whether a context with context_name is valid or not
             bool check_context_validity (struct disir_config *config, const char *context_name);
 
             //! \brief checks whether a context with context_name is valid or not
             bool check_context_validity (struct disir_context *context, const char *context_name);
-
-            bool GetJsonMold (Json::Value& obj);
-
-            bool formatJson (std::string& json,  std::string unformatted);
-
-            std::string getJsonString (Json::Value& obj);
-
-            int GenerateConfigFromJson (Json::Value& obj);
     };
 }
 #endif

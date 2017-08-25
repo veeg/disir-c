@@ -33,35 +33,40 @@ class MarshallMoldTest : public testing::JsonDioTestWrapper
         DisirLogCurrentTestExit();
     }
 
-    public:
-        struct disir_mold *mold = NULL;
-        dio::MoldWriter *writer = NULL;
+public:
+    void
+    compare_reference_and_serialized (const char* reference_name, const char *serialized)
+    {
+        std::stringstream ss;
+        std::ifstream reference (m_json_references_path + reference_name);
+        ASSERT_TRUE (reference.is_open());
+
+        ss << reference.rdbuf();
+
+        ASSERT_STREQ (ss.str().c_str(), serialized);
+    }
+
+public:
+    enum disir_status status;
+    struct disir_mold *mold = NULL;
+    dio::MoldWriter *writer = NULL;
+    Json::StyledWriter json_writer;
+    std::string string;
 };
 
 TEST_F (MarshallMoldTest, marshal_mold_shall_match)
 {
-  std::string json, expected_json;
-  Json::Value expected;
+    status = writer->serialize (mold, string);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
 
-  ASSERT_TRUE (GetJsonMold (expected));
-  expected_json = getJsonString (expected);
-  status = writer->serialize (mold, json);
-  ASSERT_TRUE (compare_json_objects (expected_json, json));
-  //ASSERT_JSON_STREQ (expected_json.c_str (), json.c_str ());
-  EXPECT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_NO_FATAL_FAILURE (
+        compare_reference_and_serialized ("json_test_mold.json", string.c_str());
+    );
 }
 
-TEST_F (MarshallMoldTest, invalid_mold_shall_fail)
+TEST_F (MarshallMoldTest, marshal_invalid_argument)
 {
-    struct disir_mold *invalid_mold;
-    std::string json;
-
-    invalid_mold = NULL;
-
-    EXPECT_STATUS (DISIR_STATUS_INTERNAL_ERROR, writer->serialize (invalid_mold, json));
+    status = writer->serialize (NULL, string);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
 }
 
-TEST_F (MarshallMoldTest, DISABLED_tets)
-{
-
-}

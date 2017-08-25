@@ -46,21 +46,6 @@ MoldReader::is_override_mold_entry (std::istream& entry)
 
 //! PUBLIC
 enum disir_status
-MoldReader::unserialize (const char *filepath, struct disir_mold **mold)
-{
-    enum disir_status status;
-
-    status = read_json_from_file (filepath, m_moldRoot);
-    if (status != DISIR_STATUS_OK)
-    {
-        return status;
-    }
-
-    return construct_mold (mold);
-}
-
-//! PUBLIC
-enum disir_status
 MoldReader::unserialize (std::string mold_json, struct disir_mold **mold)
 {
     Json::Reader reader;
