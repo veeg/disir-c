@@ -1186,6 +1186,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
                               string_value, entry->re_value_string);
                 exclusive_fulfilled = 1;
             }
+            break;
         }
         default:
         {

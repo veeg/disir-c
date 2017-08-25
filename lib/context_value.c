@@ -309,6 +309,7 @@ dc_set_value (struct disir_context *context, const char *value, int32_t value_si
     {
         // TODO: Implement dc_set_value enum
         dx_crash_and_burn ("dc_set_value ENUM NOT HANDLED!");
+        break;
     }
     case DISIR_VALUE_TYPE_UNKNOWN:
     {
