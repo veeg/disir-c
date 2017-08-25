@@ -1,6 +1,9 @@
 #ifndef _LIBDISIR_ARCHIVE_TEST_HELPER_H
 #define _LIBDISIR_ARCHIVE_TEST_HELPER_H
 
+#include <map>
+#include <algorithm>
+
 #include <gtest/gtest.h>
 #include "test_helper.h"
 
