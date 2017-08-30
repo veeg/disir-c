@@ -10,9 +10,8 @@ This project was developed as a means to solve a specific problem that
 should have a generic solution. Therefore, this implementation evolved with
 a few mixed abstraction layers and some design choices that would not have been
 made today. In an effort to document and thoroughly separate the abstractions that emerged,
-a few `Disir Specifications` emerged, which is located in this repository
-under `doc/specification/`.
-
+a few `Disir Specifications` is an attempt to formalize the functionality and formats used.
+These can be found in a link:http://www.github.com/veeg/disir-specification[dedicated repository].
 
 == Motivation
 
