@@ -289,6 +289,7 @@ MoldWriter::serialize_restrictions (struct disir_context *context, Json::Value& 
         case DISIR_RESTRICTION_INC_ENTRY_MIN:
         case DISIR_RESTRICTION_INC_ENTRY_MAX:
             value_type = DISIR_VALUE_TYPE_INTEGER;
+            __attribute__((fallthrough));
         case DISIR_RESTRICTION_EXC_VALUE_NUMERIC:
         {
             double value;
