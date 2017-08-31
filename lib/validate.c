@@ -573,7 +573,6 @@ validate_context_validity (struct disir_context *context)
             // Something is horribly wrong - break out.
             break;
         }
-        __attribute__ ((fallthrough));
     }
     case DISIR_CONTEXT_MOLD:
     {

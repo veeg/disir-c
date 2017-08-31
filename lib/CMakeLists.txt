@@ -115,9 +115,13 @@ target_include_directories (${PROJECT_SO_LIBRARY} PUBLIC
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES SOVERSION 0)
 
-# The imported JSON library yields a warning on a implicit fallthrough - Disable the lint
-set_source_files_properties (${PROJECT_3PARTY_LIBDIR}/jsoncpp/jsoncpp.cpp
-  PROPERTIES COMPILE_FLAGS -Wimplicit-fallthrough=0)
+# Only set the implict-fallthrough lint on GCC >= 7
+if (CMAKE_COMPILER_IS_GNUCC)
+  if (NOT (CMAKE_C_COMPILER_VERSION LESS "7"))
+    set_target_properties (${PROJECT_SO_LIBRARY}
+      PROPERTIES COMPILE_FLAGS -Wimplicit-fallthrough=0)
+  endif()
+endif()
 
 # We require DL_LIBS for your loading plugin functionality.
 target_link_libraries (${PROJECT_SO_LIBRARY} ${CMAKE_DL_LIBS})
