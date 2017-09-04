@@ -82,3 +82,91 @@ Command::setup_group (std::string id)
 
     return (code);
 }
+
+void
+Command::print_verify (enum disir_status status, const char *entry,
+                       struct disir_config *config,
+                       struct disir_mold *mold)
+{
+    struct disir_collection *collection = NULL;
+    struct disir_context *context = NULL;
+    char *resolved_name = NULL;
+
+    if (status == DISIR_STATUS_OK)
+    {
+        std::cout << "    OK:      " << entry << std::endl;
+    }
+    else if (status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+        std::cout << "    INVALID: " << entry << std::endl;
+
+        if (config)
+            status = disir_config_valid (config, &collection);
+        else if (mold)
+            status = disir_mold_valid (mold, &collection);
+        if (collection)
+        {
+            do
+            {
+                status = dc_collection_next (collection, &context);
+                if (status == DISIR_STATUS_EXHAUSTED)
+                    break;
+                if (status != DISIR_STATUS_OK)
+                {
+                    std::cerr << "failed to retrieve collection item: "
+                              << disir_status_string (status) << std::endl;
+                    break;
+                }
+
+                status = dc_resolve_root_name (context, &resolved_name);
+                const char *name;
+                if (status != DISIR_STATUS_OK)
+                {
+                    name = "UNRESOLVED";
+                }
+                else
+                {
+                    name = resolved_name;
+                }
+
+                if (dc_context_error (context))
+                {
+                    std::cout << "               " << name << ": "
+                              << dc_context_error (context) << std::endl;
+                }
+                else if (dc_context_type (context) == DISIR_CONTEXT_KEYVAL)
+                {
+                    std::cout << "               " << name << ": "
+                              << "(entry missing error)" << std::endl;
+                }
+                if (resolved_name != NULL)
+                {
+                    free (resolved_name);
+                }
+                dc_putcontext (&context);
+            } while (1);
+
+            if (context)
+            {
+                dc_putcontext (&context);
+            }
+            if (collection)
+            {
+                dc_collection_finished (&collection);
+            }
+        }
+    }
+    else
+    {
+        std::cout << "    ERROR:   " << entry << std::endl;
+        std::cout << "               " << disir_status_string (status) << std::endl;
+        if (disir_error (m_cli->disir()) != NULL)
+        {
+            std::cout << "             " << disir_error (m_cli->disir()) << std::endl;
+        }
+        else
+        {
+            std::cout << "             (no error registered)" << std::endl;
+        }
+    }
+}

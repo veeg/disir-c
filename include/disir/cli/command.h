@@ -6,6 +6,7 @@
 #include <vector>
 #include <set>
 
+#include <disir/disir.h>
 #include <disir/cli/args.hxx>
 
 namespace disir
@@ -34,6 +35,11 @@ namespace disir
         int setup_group (std::string);
 
         void setup_parser (args::ArgumentParser& parser);
+
+        // Print the unserialized config or mold (not both) and
+        // verify its content if the input status is not ok.
+        void print_verify (enum disir_status status, const char *entry,
+                           struct disir_config *config, struct disir_mold *mold);
 
     // Variables
     protected:

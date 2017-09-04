@@ -229,14 +229,16 @@ CommandGenerate::generate_entries (std::set<std::string>& entries)
         status = disir_generate_config_from_mold (mold, NULL, &config);
         if (status != DISIR_STATUS_OK)
         {
-            std::cerr << "generation error: " << entry << std::endl;
-            if (disir_error (m_cli->disir()) != NULL)
+
+            if (status == DISIR_STATUS_INVALID_CONTEXT)
             {
-                std::cerr << disir_error (m_cli->disir()) << std::endl;
+                print_verify (status, entry.c_str(), config, NULL);
+                disir_config_finished (&config);
             }
             else
             {
-                std::cerr << "(no error registered)" << std::endl;
+                std::cerr << "generation error " << disir_status_string(status)
+                          << ": " << entry << std::endl;
             }
 
             disir_mold_finished (&mold);
