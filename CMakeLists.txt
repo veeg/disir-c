@@ -7,10 +7,15 @@ project (disir VERSION 0.1.0 LANGUAGES C CXX)
 include (CMakePackageConfigHelpers)
 include (GNUInstallDirs)
 
+find_package(PkgConfig REQUIRED)
+pkg_search_module(ARCHIVE REQUIRED libarchive)
+
 set (CMAKE_C_STANDARD 11)
 set (CMAKE_CXSTANDARD_REQUIRED ON)
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# TODO: Require GCC >= 6
 
 # Set generic compiler flags applicable to both C and C++
 add_definitions (-pedantic)

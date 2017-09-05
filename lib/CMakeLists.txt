@@ -125,7 +125,7 @@ endif()
 
 # We require DL_LIBS for your loading plugin functionality.
 target_link_libraries (${PROJECT_SO_LIBRARY} ${CMAKE_DL_LIBS})
-target_link_libraries (${PROJECT_SO_LIBRARY} archive)
+target_link_libraries (${PROJECT_SO_LIBRARY} ${ARCHIVE_LIBRARIES})
 
 install (TARGETS ${PROJECT_SO_LIBRARY}
     EXPORT ${EXPORT_TARGET}
