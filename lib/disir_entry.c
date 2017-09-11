@@ -6,6 +6,12 @@
 enum disir_status
 disir_entry_finished (struct disir_entry **entry)
 {
+
+    if (entry == NULL || *entry == NULL)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
     // Remove it from queue.
     if ((*entry)->next)
     {
@@ -13,7 +19,7 @@ disir_entry_finished (struct disir_entry **entry)
     }
     if ((*entry)->prev)
     {
-        (*entry)->prev = (*entry)->next;
+        (*entry)->prev->next = (*entry)->next;
     }
 
     if ((*entry)->de_entry_name)
