@@ -88,6 +88,8 @@ fslib_config_query_entries (struct disir_instance *instance, struct disir_regist
         }
     }
 
+    closedir (directory);
+
     return DISIR_STATUS_OK;
 }
 
@@ -180,6 +182,8 @@ fslib_mold_query_entries (struct disir_instance *instance, struct disir_register
             }
         }
     }
+
+    closedir (directory);
 
     return DISIR_STATUS_OK;
 }
