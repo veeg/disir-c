@@ -28,7 +28,7 @@ class EntryFinished : public testing::DisirTestTestPlugin
 
 public:
     enum disir_status status = DISIR_STATUS_OK;
-    struct disir_entry *queue;
+    struct disir_entry *queue = NULL;
 };
 
 TEST_F (EntryFinished, invalid_arguments)
@@ -60,4 +60,63 @@ TEST_F (EntryFinished, remove_last_element)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     ASSERT_TRUE (queue->prev != last);
+}
+
+TEST_F (EntryFinished, remove_first_element)
+{
+    struct disir_entry *current;
+    struct disir_entry *next;
+    struct disir_entry *first;
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = disir_config_entries (instance, "test", &queue);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_TRUE (queue->prev != NULL);
+    ASSERT_TRUE (queue->next->prev == queue);
+
+    // Safe the queue pointer for deallocation
+    first = current = queue;
+    queue = queue->next;
+    next = first->next;
+
+    status = disir_entry_finished (&current);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    ASSERT_TRUE (next->prev != first);
+}
+
+TEST_F (EntryFinished, remove_all_elements)
+{
+    struct disir_entry *current;
+    struct disir_entry *next;
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = disir_config_entries (instance, "test", &queue);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_TRUE (queue != NULL);
+
+    next = queue->next;
+    current = queue;
+    while (1)
+    {
+        status = disir_entry_finished (&current);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+        current = next;
+        if (current == NULL)
+            break;
+        next = current->next;
+    }
+}
+
+TEST_F (EntryFinished, query_single_finish_single)
+{
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = disir_config_query (instance, "test", "basic_keyval", &queue);
+    ASSERT_STATUS (DISIR_STATUS_EXISTS, status);
+    ASSERT_TRUE (queue != NULL);
+
+    status = disir_entry_finished (&queue);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
 }

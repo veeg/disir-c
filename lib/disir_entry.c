@@ -15,14 +15,15 @@ disir_entry_finished (struct disir_entry **entry)
     // Remove it from queue.
     if ((*entry)->next)
     {
+        // We are not the tail
         (*entry)->next->prev = (*entry)->prev;
     }
-    else
+    else if ((*entry)->prev != NULL)
     {
         // We are the last element of the queue
         // We have to retrieve the head, and set the prev to our prev
         struct disir_entry *current = (*entry)->prev;
-        while (1)
+        while (current != NULL)
         {
             // Current is head
             if (current->prev == (*entry))
