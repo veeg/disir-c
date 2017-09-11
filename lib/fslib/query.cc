@@ -19,6 +19,7 @@ fslib_config_query_entries (struct disir_instance *instance, struct disir_regist
     struct dirent *dp;
     struct disir_entry *entry;
     struct disir_entry *mold_entry;
+    struct stat statbuf;
 
     // File extension is always without the leading dot - add 1 for it
     std::stringstream suffix_stream;
@@ -34,6 +35,19 @@ fslib_config_query_entries (struct disir_instance *instance, struct disir_regist
         sd << basedir;
     }
     std::string searchdir = sd.str();
+
+    // Stat if directory exists. If it does not, we try to create it
+    status = fslib_stat_filepath (instance, searchdir.c_str(), &statbuf);
+    if (status == DISIR_STATUS_NOT_EXIST)
+    {
+        // lets create it
+        status = fslib_mkdir_p (instance, searchdir.c_str());
+    }
+    if (status != DISIR_STATUS_OK)
+    {
+        // Error already set
+        return status;
+    }
 
     directory = opendir (searchdir.c_str());
     if (directory == NULL)
@@ -98,9 +112,11 @@ enum disir_status
 fslib_mold_query_entries (struct disir_instance *instance, struct disir_register_plugin *plugin,
                           const char *basedir, struct disir_entry **entries)
 {
+    enum disir_status status;
     DIR *directory;
     struct dirent *dp;
     struct disir_entry *entry;
+    struct stat statbuf;
 
     // File extension is always without the leading dot - add 1 for it
     std::stringstream suffix_stream;
@@ -116,6 +132,19 @@ fslib_mold_query_entries (struct disir_instance *instance, struct disir_register
         sd << basedir;
     }
     std::string searchdir = sd.str();
+
+    // Stat if directory exists. If it does not, we try to create it
+    status = fslib_stat_filepath (instance, searchdir.c_str(), &statbuf);
+    if (status == DISIR_STATUS_NOT_EXIST)
+    {
+        // lets create it
+        status = fslib_mkdir_p (instance, searchdir.c_str());
+    }
+    if (status != DISIR_STATUS_OK)
+    {
+        // Error already set
+        return status;
+    }
 
     directory = opendir (searchdir.c_str());
     if (directory == NULL)
