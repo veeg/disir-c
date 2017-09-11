@@ -109,12 +109,29 @@ dio_test_config_query (struct disir_instance *instance, struct disir_register_pl
 {
     (void) &instance;
     (void) &plugin;
-    (void) &entry;
 
     if (molds[entry_id] == NULL)
         return DISIR_STATUS_NOT_EXIST;
     else
+    {
+        if (entry != NULL)
+        {
+            std::string name (entry_id);
+            *entry  = (struct disir_entry *) calloc (1, sizeof (struct disir_entry));
+            if (*entry == NULL)
+                return DISIR_STATUS_NO_MEMORY;
+
+            (*entry)->de_entry_name = strdup (entry_id);
+            (*entry)->flag.DE_READABLE = 1;
+            (*entry)->flag.DE_WRITABLE = 1;
+            if (name.back() == '/')
+            {
+                (*entry)->flag.DE_NAMESPACE_ENTRY = 1;
+            }
+        }
+
         return DISIR_STATUS_EXISTS;
+    }
 }
 
 enum disir_status
