@@ -26,6 +26,36 @@ extern "C"{
 enum disir_status
 dc_restriction_collection (struct disir_context *context, struct disir_collection **collection);
 
+//! \brief Query the number of minimum required entries for this context.
+//!
+//! The context can only be of type
+//!     DISIR_CONTEXT_SECTION
+//!     DISIR_CONTEXT_KEYVAL
+//!
+//! \param[in] context The context to retrieve minimum required entries from.
+//! \param[out] output Populated variable with the requested value.
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context is provided.
+//! \return DISR_STATUS_OK on success.
+//!
+enum disir_status
+dc_restriction_entries_minimum (struct disir_context *context, int *output);
+
+//! \brief Query the number of maximum allowed entries for this context.
+//!
+//! The context can only be of type
+//!     DISIR_CONTEXT_SECTION
+//!     DISIR_CONTEXT_KEYVAL
+//!
+//! \param[in] context The context to retrieve maximum allowed entries from.
+//! \param[out] output Populated variable with the requested value.
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context is provided.
+//! \return DISR_STATUS_OK on success.
+//!
+enum disir_status
+dc_restriction_entries_maximum (struct disir_context *context, int *output);
+
 //! \brief Return a string representation of the restriction enumeration type.
 //!
 //! \return Stringified restriction type.

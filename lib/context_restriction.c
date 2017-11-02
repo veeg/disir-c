@@ -1374,6 +1374,22 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
 
 //! PUBLIC API
 enum disir_status
+dc_restriction_entries_minimum (struct disir_context *context, int *output)
+{
+    return dx_restriction_entries_value (context,
+                                         DISIR_RESTRICTION_INC_ENTRY_MIN, NULL, output);
+}
+
+//! PUBLIC API
+enum disir_status
+dc_restriction_entries_maximum (struct disir_context *context, int *output)
+{
+    return dx_restriction_entries_value (context,
+                                         DISIR_RESTRICTION_INC_ENTRY_MAX, NULL, output);
+}
+
+//! PUBLIC API
+enum disir_status
 dc_restriction_collection (struct disir_context *context, struct disir_collection **collection)
 {
     enum disir_status status;
