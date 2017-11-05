@@ -340,6 +340,12 @@ dc_get_value (struct disir_context *context, int32_t output_buffer_size,
         // Already logged;
         goto error;
     }
+    if (output == NULL)
+    {
+        dx_log_context (context, "cannot get value into NULL output buffer");
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
 
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_KEYVAL);
     if (status != DISIR_STATUS_OK)

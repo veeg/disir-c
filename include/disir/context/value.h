@@ -161,10 +161,12 @@ dc_set_value_boolean (struct disir_context *context, uint8_t value);
 //!
 //! The value, regardless of type, is stringified in the output buffer provided.
 //! if the output_buffer_size is insufficient to hold the full value of context,
-//! then only output_buffer_size - 1 bytes are copied to output and the output_size
-//! will be equal or greater than output_buffer_size.
+//! then only output_buffer_size - 1 bytes are copied to output.
+//! The output variable output_size, if provided, will be populated with
+//! the total number of bytes written to output_buffer. If the buffer has insufficient
+//! size, the total number of bytes that would be written is returned instead.
 //! A terminating NULL character is always added to the end of the output buffer,
-//! but is not part of the outout_size count returned
+//! but is not part of the outout_size count returned.
 //!
 //! Supported contexts are
 //!   * DISIR_CONTEXT_KEYVAL whose root is CONFIG

@@ -163,7 +163,6 @@ dc_version_convert (const char *input, struct disir_version *version)
     return DISIR_STATUS_OK;
 }
 
-// TODO: Refactor this function. Return int as normal string functions
 //! INTERNAL API
 enum disir_status
 dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
@@ -178,45 +177,47 @@ dx_value_stringify (struct disir_value *value, int32_t output_buffer_size,
     case DISIR_VALUE_TYPE_ENUM:
     case DISIR_VALUE_TYPE_STRING:
     {
+        int32_t copy_size;
         size = value->dv_size;
+        copy_size = size;
 
-        if (output_size)
-        {
-            *output_size = size;
-        }
-
-        if (size >= output_buffer_size)
+        if (copy_size >= output_buffer_size)
         {
             // Set size to be output_buffer_size - 1,
             // so we can signal that the supplied buffer is insufficient.
-            size = output_buffer_size - 1;
+            copy_size = output_buffer_size - 1;
             log_debug (3, "Insufficient buffer provided - decrementing output size by one");
         }
 
-        memcpy (output, value->dv_string, size);
+        memcpy (output, value->dv_string, copy_size);
         output[size] = '\0';
         break;
     }
     case DISIR_VALUE_TYPE_INTEGER:
     {
-        snprintf (output, output_buffer_size, "%ld", value->dv_integer);
+        size = snprintf (output, output_buffer_size, "%ld", value->dv_integer);
         break;
     }
     case DISIR_VALUE_TYPE_FLOAT:
     {
-        snprintf (output, output_buffer_size, "%lf", value->dv_float);
+        size = snprintf (output, output_buffer_size, "%lf", value->dv_float);
         break;
     }
     case DISIR_VALUE_TYPE_BOOLEAN:
     {
-        snprintf(output, output_buffer_size, "%s",
-                (value->dv_boolean ? "True" : "False"));
+        size = snprintf (output, output_buffer_size, "%s",
+                        (value->dv_boolean ? "True" : "False"));
         break;
     }
     default:
     {
         status = DISIR_STATUS_INVALID_ARGUMENT;
     }
+    }
+
+    if (output_size)
+    {
+        *output_size = size;
     }
 
     return status;
