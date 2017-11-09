@@ -75,9 +75,6 @@ fslib_stat_filepath (struct disir_instance *instance,
         {
             // TODO: Use threadsafe strerror
             status = DISIR_STATUS_NOT_EXIST;
-            disir_error_set (instance, "entry resolved to filepath '%s' does not exist: %s",
-                            filepath, strerror (errsave));
-
         }
 
         return status;
