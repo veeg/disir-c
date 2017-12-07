@@ -61,6 +61,23 @@ enum disir_status
 disir_config_write (struct disir_instance *instance, const char *group_id,
                     const char *entry_id, struct disir_config *config);
 
+//! \brief Remove a configuration entry from the group.
+//!
+//! \param[in] instance Library instance.
+//! \param[in] group_id String identifier for the which group to look for entry.
+//! \param[in] entry_id String identifier to remove.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if either of the input arguments are NULL.
+//! \return DISIR_STATUS_NO_CAN_DO if the matching plugin
+//!     for some reason does not implement config_write operation.
+//! \return DISIR_STATUS_NOT_EXIST if the plugin associated with `group`
+//!     is not registered with `instance`.
+//! \return status of the plugin config_remove operation.
+//!
+enum disir_status
+disir_config_remove (struct disir_instance *instance, const char *group_id,
+                     const char *entry_id);
+
 //! \brief List all the available config entries, from all plugins.
 //!
 //! \param[in] group_id String identifier for the which group to look for entry.

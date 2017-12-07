@@ -31,6 +31,12 @@ dio_json_config_write (struct disir_instance *instance,
                        struct disir_register_plugin *plugin, const char *entry_id,
                        struct disir_config *config);
 
+//! \brief JSON implementation of config_remove
+//!
+enum disir_status
+dio_json_config_remove (struct disir_instance *instance,
+                        struct disir_register_plugin *plugin, const char *entry_id);
+
 //! \brief JSON implementation of config_write to filedescriptor
 //!
 enum disir_status

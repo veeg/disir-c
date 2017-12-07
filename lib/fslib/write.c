@@ -182,3 +182,45 @@ fslib_plugin_mold_write (struct disir_instance *instance, struct disir_register_
     return status;
 }
 
+//! FSLIB API
+enum disir_status
+fslib_plugin_config_remove (struct disir_instance *instance,
+                            struct disir_register_plugin *plugin,
+                            const char *entry_id)
+{
+    enum disir_status status;
+    char filepath[PATH_MAX];
+    struct stat statbuf;
+
+    status = plugin->dp_mold_query (instance, plugin, entry_id, NULL);
+    if (status == DISIR_STATUS_NOT_EXIST)
+    {
+        disir_error_set (instance, "there exists no mold for entry %s", entry_id);
+        return DISIR_STATUS_MOLD_MISSING;
+    }
+    if (status != DISIR_STATUS_EXISTS)
+    {
+        // Unknown error ?
+        return status;
+    }
+
+    status = fslib_config_resolve_filepath (instance, plugin, entry_id, filepath);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+
+    status = fslib_stat_filepath (instance, filepath, &statbuf);
+    if (status == DISIR_STATUS_OK)
+    {
+        // Delete the file
+        remove (filepath);
+    }
+    else if (status == DISIR_STATUS_NOT_EXIST)
+    {
+        disir_error_set (instance, "these exists no config for entry %s", entry_id);
+    }
+
+    return status;
+}

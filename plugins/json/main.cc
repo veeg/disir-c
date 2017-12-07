@@ -20,6 +20,7 @@ dio_register_plugin (struct disir_instance *instance, struct disir_register_plug
     plugin->dp_config_entry_type = RM_CONST (char, "json");
     plugin->dp_config_read = dio_json_config_read;
     plugin->dp_config_write = dio_json_config_write;
+    plugin->dp_config_remove = dio_json_config_remove;
     plugin->dp_config_fd_write = dio_json_config_fd_write;
     plugin->dp_config_fd_read = dio_json_config_fd_read;
     plugin->dp_config_entries = dio_json_config_entries;

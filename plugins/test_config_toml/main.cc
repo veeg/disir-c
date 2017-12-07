@@ -21,6 +21,7 @@ dio_register_plugin (struct disir_instance *instance, struct disir_register_plug
     plugin->dp_config_entry_type = RM_CONST (char, "toml");
     plugin->dp_config_read = dio_toml_config_read;
     plugin->dp_config_write = dio_toml_config_write;
+    plugin->dp_config_remove = NULL;
     plugin->dp_config_entries = dio_toml_config_entries;
     plugin->dp_config_query = dio_toml_config_query;
 

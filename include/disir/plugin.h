@@ -55,6 +55,18 @@ typedef enum disir_status (*config_write) (struct disir_instance *instance,
                                            const char *entry_id,
                                            struct disir_config *config);
 
+//! \brief Function signature for plugin to implement removing config object.
+//!
+//! \param[in] instance Library instance associated with this I/O operation.
+//! \param[in] plugin The plugin instance this operation is associated with.
+//! \param[in] entry_id String identifier for the config entry to remove.
+//!
+//! \return DISIR_STATUS_OK on success.
+//!
+typedef enum disir_status (*config_remove) (struct disir_instance *instance,
+                                            struct disir_register_plugin *plugin,
+                                            const char *entry_id);
+
 //! \brief Function signature for plugin to implement writing config object to FILE
 //!
 //! \param[in] instance Library instance associated with this I/O operation.
@@ -199,6 +211,7 @@ struct disir_register_plugin
 
     config_read     dp_config_read;
     config_write    dp_config_write;
+    config_remove   dp_config_remove;
     config_fd_write dp_config_fd_write;
     config_fd_read  dp_config_fd_read;
     config_entries  dp_config_entries;

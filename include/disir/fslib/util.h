@@ -141,6 +141,11 @@ fslib_plugin_mold_write (struct disir_instance *instance, struct disir_register_
                          const char *entry_id, struct disir_mold *mold,
                          dio_serialize_mold func_serialize);
 
+//! \brief Generic filesystem based implementation of config_remove
+enum disir_status
+fslib_plugin_config_remove (struct disir_instance *instance, struct disir_register_plugin *plugin,
+                            const char *entry_id);
+
 //! \brief Generic filesystem based implementation of config_query
 enum disir_status
 fslib_plugin_config_query (struct disir_instance *instance, struct disir_register_plugin *plugin,

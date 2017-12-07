@@ -20,6 +20,7 @@ dio_register_plugin (struct disir_instance *instance, struct disir_register_plug
     plugin->dp_config_entry_type = RM_CONST (char, "test");
     plugin->dp_config_read = dio_test_config_read;
     plugin->dp_config_write = NULL;
+    plugin->dp_config_remove = NULL;
     plugin->dp_config_entries = dio_test_config_entries;
     plugin->dp_config_query = dio_test_config_query;
 

@@ -26,6 +26,14 @@ dio_json_config_write (struct disir_instance *instance,
 
 //! PLUGIN API
 enum disir_status
+dio_json_config_remove (struct disir_instance *instance,
+                        struct disir_register_plugin *plugin, const char *entry_id)
+{
+    return fslib_plugin_config_remove (instance, plugin, entry_id);
+}
+
+//! PLUGIN API
+enum disir_status
 dio_json_config_fd_write (struct disir_instance *instance,
                           struct disir_config *config, FILE *out)
 {

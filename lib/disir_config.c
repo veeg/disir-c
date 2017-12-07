@@ -171,6 +171,78 @@ disir_config_write (struct disir_instance *instance, const char *group_id, const
 
 //! PUBLIC API
 enum disir_status
+disir_config_remove (struct disir_instance *instance, const char *group_id,
+                     const char *entry_id)
+{
+    enum disir_status status;
+    struct disir_register_plugin_internal *plugin;
+    int entry_id_length;
+
+    plugin = NULL;
+
+    if (instance == NULL || group_id == NULL || entry_id == NULL)
+    {
+        log_debug (0, "invoked with NULL argument(s)." \
+                      " instance (%p), group_id (%p), entry_id (%p)",
+                      instance, group_id, entry_id);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    TRACE_ENTER ("instance (%p) group_id (%s) entry_id (%s)",
+                 instance, group_id, entry_id);
+
+    disir_error_clear (instance);
+
+    entry_id_length = strlen (entry_id);
+    if (entry_id[entry_id_length - 1] == '/')
+    {
+        disir_error_set (instance, "cannot remove namespace entry: %s", entry_id);
+        return DISIR_STATUS_FS_ERROR;
+    }
+
+    MQ_FOREACH (instance->dio_plugin_queue,
+    ({
+        if (strcmp (entry->pi_group_id, group_id) != 0)
+        {
+            entry = entry->next;
+            continue;
+        }
+
+        plugin = entry;
+        break;
+    }));
+
+    if (plugin)
+    {
+        if (plugin->pi_plugin.dp_config_write)
+        {
+            status = plugin->pi_plugin.dp_config_remove (instance, &plugin->pi_plugin,
+                                                         entry_id);
+        }
+        else
+        {
+            status = DISIR_STATUS_NO_CAN_DO;
+            log_debug (1, "Plugin '%s' does not implement config_write", plugin->pi_io_id);
+        }
+    }
+    else
+    {
+        disir_error_set (instance, "No plugin in group '%s' available.", group_id);
+        status = DISIR_STATUS_NOT_EXIST;
+    }
+
+    if (status == DISIR_STATUS_OK)
+    {
+        log_info("Removed from group '%s' configuration entry_id '%s'", group_id, entry_id);
+    }
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+
+}
+
+//! PUBLIC API
+enum disir_status
 disir_config_entries (struct disir_instance *instance, const char *group_id,
                       struct disir_entry **entries)
 {
