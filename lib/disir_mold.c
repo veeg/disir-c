@@ -263,6 +263,8 @@ disir_mold_query (struct disir_instance *instance, const char *group_id,
     enum disir_status status;
     struct disir_register_plugin_internal *plugin;
 
+    plugin = NULL;
+
     if (instance == NULL || group_id == NULL || entry_id == NULL)
     {
         log_debug (0, "invoked with NULL argument(s). instance(%p), group_id (%p), entry_id (%p)",
