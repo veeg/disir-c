@@ -211,6 +211,7 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
     struct disir_mold *libmold;
 
     status = DISIR_STATUS_OK;
+    libmold = NULL;
 
     TRACE_ENTER ("config_filepath: %s, config: %p, instance: %p",
                  config_filepath, config, instance);
@@ -244,7 +245,6 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
         // XXX: Incref config and mold? As of now, we STEAL the user provided references,
         // which probably is a bad design...
         libconf = config;
-        libmold = config->cf_mold;
     }
     else if (config_filepath)
     {
@@ -263,6 +263,11 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
         {
             dc_destroy (&plugin);
         }
+    }
+    // We do not need the libmold definition anymore
+    if (libmold)
+    {
+        disir_mold_finished (&libmold);
     }
 
     if (status != DISIR_STATUS_OK)
@@ -283,7 +288,6 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
         goto error;
     }
 
-    dis->libdisir_mold = libmold;
     dis->libdisir_config = libconf;
     *instance= dis;
 
@@ -350,7 +354,6 @@ disir_instance_destroy (struct disir_instance **instance)
     }
 
     disir_config_finished(&(*instance)->libdisir_config);
-    disir_mold_finished(&(*instance)->libdisir_mold);
 
     // Free any error message set on instance
     if ((*instance)->disir_error_message)

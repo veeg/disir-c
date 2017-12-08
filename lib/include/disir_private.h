@@ -32,8 +32,6 @@ struct disir_instance
 
     //! Active configuration based of libdisir_mold
     struct disir_config             *libdisir_config;
-    //! Mold of configuration entry for libdisir itself.
-    struct disir_mold               *libdisir_mold;
 
     //! Error message sat on the disir instance.
     //! Set with disir_error_set() and clear with disir_error_clear()
