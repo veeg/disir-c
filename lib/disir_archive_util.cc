@@ -803,8 +803,8 @@ dx_archive_disk_append (const char *new_archive_path, const char *existing_archi
     {
         // Rename existing archive with backup extension.
         *backup_path = '\0';
-        strcat (backup_path, existing_archive_path);
-        strcat (backup_path, ".backup");
+        strncat (backup_path, existing_archive_path, 4096);
+        strncat (backup_path, ".backup", 4096);
         ret = rename (existing_archive_path, backup_path);
         if (ret != 0)
         {
