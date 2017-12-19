@@ -340,7 +340,8 @@ out:
 
     if (filepath[0] != '\0')
     {
-        remove (filepath);
+        // Ignore failure condition
+        (void)remove (filepath);
     }
 
     if (current)
