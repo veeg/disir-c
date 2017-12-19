@@ -115,6 +115,8 @@ toml_serialize_inner (struct disir_context *parent, struct disir_context *contex
     struct disir_context *key_element;
     toml::Value *table;
 
+    key_element = NULL;
+
     // Get all elements from the parent
     status = dc_find_elements (parent, name, &key_collection);
     if (status != DISIR_STATUS_OK)
