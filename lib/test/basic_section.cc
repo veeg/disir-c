@@ -4,8 +4,8 @@ static enum disir_status
 basic_section(struct disir_mold **mold)
 {
     enum disir_status status;
-    struct disir_context *context_section;
-    struct disir_context *context_mold;
+    struct disir_context *context_section = NULL;
+    struct disir_context *context_mold = NULL;
 
 
     status = dc_mold_begin (&context_mold);
