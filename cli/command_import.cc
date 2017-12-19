@@ -484,6 +484,7 @@ CommandImport::import_all_option (struct disir_import *import, int entries,
             break;
         }
         default:
+            opt = DISIR_IMPORT_DISCARD;
             std::cerr << "Got unknown import status: "
                       << disir_status_string (entry.ai_status) << std::endl;
         }
