@@ -78,7 +78,7 @@ CommandImport::handle_command (std::vector<std::string> &args)
     }
     catch (args::ParseError e)
     {
-        std::cout << "ParseError: " << e.what() << std::endl;
+        std::cerr << "ParseError: " << e.what() << std::endl;
         std::cerr << "See '" << parser.Prog() << " --help'" << std::endl;
         return (1);
     }
