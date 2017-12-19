@@ -1321,6 +1321,8 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
         if (entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MIN ||
             entry->re_type == DISIR_RESTRICTION_INC_ENTRY_MAX)
         {
+            // XXX: This is severely flawed - the diff does not indicate
+            // how great of a version difference
             diff = dc_version_compare  (&entry->re_introduced, version);
             // entry is newer than target version
             if (diff > 0)
