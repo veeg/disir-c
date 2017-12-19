@@ -13,6 +13,7 @@
 #include "disir_private.h"
 #include "config.h"
 #include "mold.h"
+#include "section.h"
 #include "default.h"
 #include "keyval.h"
 #include "log.h"
@@ -24,7 +25,8 @@
 static enum disir_status
 generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
                                           struct disir_context *config_parent,
-                                          struct disir_version *version)
+                                          struct disir_version *version,
+                                          int generate_zero_min)
 {
     enum disir_status status;
     struct disir_collection *collection;
@@ -53,7 +55,7 @@ generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
             // XXX
             goto error;
         }
-        if (min_entries == 0)
+        if (generate_zero_min && min_entries == 0)
         {
             min_entries = 1;
         }
@@ -100,7 +102,8 @@ generate_config_from_mold_recursive_step (struct disir_context *mold_parent,
             else if (dc_context_type (equiv) == DISIR_CONTEXT_SECTION)
             {
                 // Send down parent and context -
-                generate_config_from_mold_recursive_step (equiv, context, version);
+                generate_config_from_mold_recursive_step (equiv, context, version,
+                                                          generate_zero_min);
             }
 
             status = dc_finalize (&context);
@@ -177,7 +180,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct disir_version *
         return status;
     }
 
-    generate_config_from_mold_recursive_step (mold->mo_context, config_context, &version);
+    generate_config_from_mold_recursive_step (mold->mo_context, config_context, &version, 1);
 
     status = dc_config_finalize (&config_context, config);
     if (status != DISIR_STATUS_OK)
@@ -208,4 +211,42 @@ error:
     return status;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_generate_from_config_root (struct disir_context *context)
+{
+    enum disir_status status;
+    struct disir_context *mold_equiv;
+    struct disir_version *version;
 
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (context);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_CONFIG, DISIR_CONTEXT_SECTION);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    {
+        dx_context_error_set (context, "root context must be of type CONFIG");
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    if (dc_context_type (context) == DISIR_CONTEXT_CONFIG)
+    {
+        mold_equiv = context->cx_config->cf_mold->mo_context;
+    }
+    else
+    {
+        mold_equiv = context->cx_section->se_mold_equiv;
+    }
+    version = &context->cx_root_context->cx_config->cf_version;
+
+    // We do not generate children whose minimum entry count is zero
+    return generate_config_from_mold_recursive_step (mold_equiv, context, version, 0);
+}

@@ -271,6 +271,22 @@ enum disir_status
 dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
                         struct disir_version *version);
 
+//! \brief Generate the contents of the input SECTION or CONFIG whose root is CONFIG.
+//!
+//! This function is used to make sure the input context has all its required children
+//! present. This is useful when constructing a new SECTION on a finalized parent,
+//! who cannot be finalized before all minimum occurrence children is also present.
+//! We do NOT generate child elements whose minimum occurrence count is zero.
+//!
+//! \param context A DISIR_CONTEXT_SECTION or DISIR_CONTEXT_CONFIG whose root is CONFIG.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if context is NULL or not a valid context.
+//! \return DISIR_CONTEXT_WRONG_CONTEXT if the context is of incorrect type or root.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_generate_from_config_root (struct disir_context *context);
+
 
 #ifdef __cplusplus
 }
