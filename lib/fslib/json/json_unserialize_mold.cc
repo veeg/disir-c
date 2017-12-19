@@ -198,7 +198,6 @@ MoldReader::unserialize_context (struct disir_context *parent_context,
         if (status != DISIR_STATUS_OK)
         {
             dc_fatal_error (context, "Section elements must be of type object");
-            status = DISIR_STATUS_INVALID_CONTEXT;
             goto finalize;
         }
 
