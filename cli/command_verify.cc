@@ -55,7 +55,7 @@ CommandVerify::handle_command (std::vector<std::string> &args)
     }
     catch (args::ParseError e)
     {
-        std::cout << "ParseError: " << e.what() << std::endl;
+        std::cerr << "ParseError: " << e.what() << std::endl;
         std::cerr << "See '" << m_cli->m_program_name << " --help'" << std::endl;
         return (1);
     }
