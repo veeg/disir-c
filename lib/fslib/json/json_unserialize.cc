@@ -152,7 +152,7 @@ dio_json_unserialize_mold_filepath (struct disir_instance *instance,
         }
 
         // hold onto suffix
-        strcpy (suffix, sep);
+        strncpy (suffix, sep, 128);
 
         sep = strrchr (namespace_entry, '/');
         if (sep == NULL)
