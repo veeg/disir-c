@@ -132,7 +132,7 @@ namespace dio
         serialize_default (struct disir_context *context, Json::Value& defaults);
 
         /* MEMBERS */
-        struct disir_mold *m_mold;
+        struct disir_mold *m_mold = nullptr;
     };
 }
 

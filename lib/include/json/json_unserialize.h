@@ -71,7 +71,7 @@ namespace dio
 
     public:
         //! holding the mold reference
-        struct disir_mold *m_mold;
+        struct disir_mold *m_mold = nullptr;
     };
 
     //! Class that unmarshals a json mold representation into a mold object
@@ -133,7 +133,7 @@ namespace dio
 
         private:
             /* Members */
-            struct disir_context *context_mold;
+            struct disir_context *context_mold = nullptr;
             Json::Value m_moldRoot;
             // True if override entry is provided
             bool override_mold_entries = false;
