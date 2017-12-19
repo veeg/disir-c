@@ -405,6 +405,7 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
     // FALL-THROUGH
 out:
     archive_status = status;
+    status = DISIR_STATUS_OK;
 
     // Remove temp archive.
     if (ar && ar->da_temp_archive_path &&
@@ -423,7 +424,7 @@ out:
         disir_error_clear (instance);
     }
 
-    status = dx_archive_destroy (ar);
+    dx_archive_destroy (ar);
     *archive = NULL;
 
     return (archive_status != DISIR_STATUS_OK) ? archive_status : status;
