@@ -29,12 +29,19 @@ restriction_entries (struct disir_mold **mold)
     status = dc_set_name (context_section, "section_default", strlen ("section_default"));
     if (status != DISIR_STATUS_OK)
         goto error;
+    status = dc_add_restriction_entries_max (context_section, 2, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
 
     // Add keyval to section so its non-empty
     status = dc_add_keyval_float (context_section, "nonempty", 3.14, "nonempty do docc", NULL,
-                                  NULL);
+                                  &context_keyval);
     if (status != DISIR_STATUS_OK)
         goto error;
+    status = dc_add_restriction_entries_min (context_keyval, 1, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+    dc_putcontext (&context_keyval);
 
     status = dc_finalize (&context_section);
     if (status != DISIR_STATUS_OK)
