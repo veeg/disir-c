@@ -171,8 +171,8 @@ disir_archive_import (struct disir_instance *instance, const char *archive_path,
     *entries = (*import)->di_num_entries;
     // FALL-THROUGH
 out:
-    if (archive)
-        disir_archive_finalize (instance, NULL, &archive);
+    // At this point, archive does exist.
+    disir_archive_finalize (instance, NULL, &archive);
 
     return status;
 }
