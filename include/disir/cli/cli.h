@@ -100,7 +100,7 @@ namespace disir
         std::string m_help_text = "";
 
         //! Internal disr instance pointer.
-        struct disir_instance *m_disir;
+        struct disir_instance *m_disir = nullptr;
     };
 }
 
