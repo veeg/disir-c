@@ -147,6 +147,7 @@ disir_archive_import (struct disir_instance *instance, const char *archive_path,
     tmp_dir_name = dx_archive_create_temp_folder();
     if (tmp_dir_name == NULL)
     {
+        dx_archive_destroy (archive);
         return DISIR_STATUS_FS_ERROR;
     }
 
