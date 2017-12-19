@@ -307,6 +307,7 @@ ConfigReader::unserialize_type (struct disir_context *context, Json::Value& valu
         }
         break;
     default:
+        status = DISIR_STATUS_INTERNAL_ERROR;
         break;
     }
     return status;
