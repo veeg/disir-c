@@ -101,9 +101,10 @@ Command::print_verify (enum disir_status status, const char *entry,
         std::cout << "    INVALID: " << entry << std::endl;
 
         if (config)
-            status = disir_config_valid (config, &collection);
+            disir_config_valid (config, &collection);
         else if (mold)
-            status = disir_mold_valid (mold, &collection);
+            disir_mold_valid (mold, &collection);
+
         if (collection)
         {
             do
