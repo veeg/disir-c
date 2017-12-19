@@ -393,7 +393,7 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
         }
     }
 
-    if (archive_path && status == DISIR_STATUS_OK)
+    if (ar && archive_path && status == DISIR_STATUS_OK)
     {
         status = dx_archive_disk_append (archive_path, ar->da_existing_path,
                                          ar->da_temp_archive_path);
