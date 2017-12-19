@@ -555,6 +555,7 @@ dc_set_name (struct disir_context *context, const char *name, int32_t name_size)
                           name, max, current_entries_count);
             if (max != 0 && max <= current_entries_count)
             {
+                dx_context_error_set (context, "maximum instances of %d exceeded", max);
                 return DISIR_STATUS_RESTRICTION_VIOLATED;
             }
         }
@@ -843,6 +844,8 @@ dx_set_mold_equiv (struct disir_context *context, const char *value, int32_t val
 
     if (context == NULL || value == NULL || value_size <= 0)
     {
+        log_debug(1, "setting mold equiv with NULL pointer arguments (%p, %p, %d)",
+                     context, value, value_size);
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 

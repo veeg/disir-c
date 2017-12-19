@@ -41,6 +41,7 @@ fslib_config_query_entries (struct disir_instance *instance, struct disir_regist
     if (status == DISIR_STATUS_NOT_EXIST)
     {
         // lets create it
+        disir_error_clear (instance);
         status = fslib_mkdir_p (instance, searchdir.c_str());
     }
     if (status != DISIR_STATUS_OK)
@@ -138,6 +139,7 @@ fslib_mold_query_entries (struct disir_instance *instance, struct disir_register
     if (status == DISIR_STATUS_NOT_EXIST)
     {
         // lets create it
+        disir_error_clear (instance);
         status = fslib_mkdir_p (instance, searchdir.c_str());
     }
     if (status != DISIR_STATUS_OK)
@@ -325,6 +327,8 @@ fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_regis
         sep = strrchr (filepath, '/');
         if (sep == NULL)
             return status;
+
+        disir_error_clear (instance);
 
         // Create the namespace entry filepath
         *sep = '\0';

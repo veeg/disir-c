@@ -125,6 +125,8 @@ fslib_plugin_mold_write (struct disir_instance *instance, struct disir_register_
         char *separator = NULL;
         int res;
 
+        disir_error_clear (instance);
+
         res = snprintf (dirpath, PATH_MAX, "%s/%s", plugin->dp_mold_base_id, entry_id);
         if (res >= 4096)
         {

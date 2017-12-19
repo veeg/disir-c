@@ -304,6 +304,11 @@ disir_mold_query (struct disir_instance *instance, const char *group_id,
             log_warn ("Plugin '%s' config_query failed with status: %s",
                       plugin->pi_io_id, disir_status_string (status));
         }
+        if (status == DISIR_STATUS_NOT_EXIST)
+        {
+            disir_error_set (instance, "entry_id '%s' in group '%s' does not exist",
+                                        entry_id, group_id);
+        }
     }
     else
     {
