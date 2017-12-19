@@ -126,6 +126,12 @@ enum disir_status dc_destroy (struct disir_context **context);
 //!
 enum disir_status dc_finalize (struct disir_context **context);
 
+//! \brief Submit the context to the parent, while keeping the reference on success.
+//!
+//! \see dc_finalize()
+//!
+enum disir_status dc_finalize_keep_reference (struct disir_context *context);
+
 //! \brief Put away a context obtained while querying a parent context.
 //!
 //! Contexts, who have yet to be finalized and are made available through any

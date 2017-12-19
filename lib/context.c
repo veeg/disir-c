@@ -423,6 +423,29 @@ dc_finalize (struct disir_context **context)
 
 //! PUBLIC API
 enum disir_status
+dc_finalize_keep_reference (struct disir_context *context)
+{
+    enum disir_status status;
+    struct disir_context *tmp = context;
+
+    if (context)
+    {
+        dx_context_incref (context);
+    }
+
+    status = dc_finalize (&tmp);
+    if (status == DISIR_STATUS_INVALID_CONTEXT && tmp)
+    {
+        // decref - we have an additional reference acquired above
+        dx_context_decref (&context);
+    }
+
+    return status;
+}
+
+
+//! PUBLIC API
+enum disir_status
 dc_putcontext (struct disir_context **context)
 {
     enum disir_status status;
