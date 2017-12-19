@@ -298,6 +298,8 @@ ConfigWriter::_serialize_context (struct disir_context *parent_context, Json::Va
     struct disir_context *child_context;
     enum disir_status status;
 
+    child_context = NULL;
+
     status = dc_get_elements (parent_context, &collection);
     if (status != DISIR_STATUS_OK)
     {
