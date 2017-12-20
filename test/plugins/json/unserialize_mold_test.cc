@@ -378,6 +378,22 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_absent_restriction_value_min_type
                                         "Unknown restriction type: invalid");
 }
 
+TEST_F (UnMarshallMoldTest, invalid_context_on_restriction_numeric_value_wrong_object)
+{
+    ASSERT_NO_THROW (
+        Json::Value& restrictions = json_mold["mold"]["integer"]["restrictions"];
+        restrictions[0]["value"] = "invalid";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "integer", "KEYVAL",
+        "restriction numeric value field should be integer or float, found string");
+}
+
 TEST_F (UnMarshallMoldTest, invalid_context_on_unresolvable_top_level_type)
 {
     ASSERT_NO_THROW (
