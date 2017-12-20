@@ -428,3 +428,50 @@ dx_keyval_destroy (struct disir_keyval **keyval)
     return DISIR_STATUS_OK;
 }
 
+//! PUBLIC API
+enum disir_status
+dc_keyval_set_default (struct disir_context *keyval, struct disir_version *version)
+{
+    enum disir_status status;
+    struct disir_default *def = NULL;
+
+    status = CONTEXT_NULL_INVALID_TYPE_CHECK (keyval);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    status = CONTEXT_TYPE_CHECK (keyval, DISIR_CONTEXT_KEYVAL);
+    if (status != DISIR_STATUS_OK)
+    {
+        // Already logged
+        return status;
+    }
+    if (dc_context_type (keyval->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    {
+        log_debug(2, "cannot set value of KEYVAL to its default if its root is not CONFIG");
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    if (keyval->cx_keyval->kv_mold_equiv == NULL)
+    {
+        log_warn("attempted to set value to default on a keyval who is missing a mold");
+        return DISIR_STATUS_MOLD_MISSING;
+    }
+
+    dx_default_get_active (keyval->cx_keyval->kv_mold_equiv, version, &def);
+
+    if (def == NULL)
+    {
+        log_warn("unable to get the default value from keyval");
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    status = dx_value_copy (&keyval->cx_keyval->kv_value, &def->de_value);
+    if (status != DISIR_STATUS_OK)
+    {
+        log_debug (2, "failed to copy value: %s", disir_status_string (status));
+    }
+
+    return status;
+}

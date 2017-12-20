@@ -287,6 +287,26 @@ dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
 enum disir_status
 dc_generate_from_config_root (struct disir_context *context);
 
+//! \brief Set the CONFIG KEYVAL value to its default value.
+//!
+//! This function inspects the mold equivalent for for this CONFIG KEYVAL
+//! and assigns the value to its default value, as requested by the optional
+//! input version specifier. If no version is specified, the default value
+//! available at the highest version is used.
+//!
+//! \param[in] keyval The CONFIG KEYVAL context to perform the operation on.
+//! \param[in] version Optional version specification. If NULL is passed,
+//!     the highest available version is used.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if keyval is NULL.
+//! \return DISIR_STATUS_WRONG_CONTEXT if keyval is not of type KEYVAL,
+//!     or if the root context is not of type CONFIG.
+//! \return DISIR_STATUS_MOLD_MISSING if no mold is associated with this CONFIG KEYVAL.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dc_keyval_set_default (struct disir_context *keyval, struct disir_version *version);
+
 
 #ifdef __cplusplus
 }
