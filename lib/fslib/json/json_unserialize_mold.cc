@@ -542,7 +542,9 @@ MoldReader::set_restriction_value (struct disir_context *context, Json::Value& c
         if (assert_json_value_type (value, Json::intValue) != DISIR_STATUS_OK
             && assert_json_value_type (value, Json::realValue) != DISIR_STATUS_OK)
         {
-            dc_fatal_error (context, "Wrong value type exclusive value numeric");
+            dc_fatal_error (context,
+                            "restriction numeric value field should be integer or float, found %s",
+                            json_valuetype_stringify (value.type()));
             return DISIR_STATUS_INVALID_CONTEXT;
         }
 
