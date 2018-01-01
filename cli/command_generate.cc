@@ -298,17 +298,14 @@ CommandGenerate::available_configs (void)
         next = current->next;
 
         // Ignore namespace entries
-        if (current->flag.DE_NAMESPACE_ENTRY)
+        if (!current->flag.DE_NAMESPACE_ENTRY)
         {
-            current = next;
-            continue;
-        }
-
-        status = disir_config_query (m_cli->disir(), m_cli->group_id().c_str(),
+            status = disir_config_query (m_cli->disir(), m_cli->group_id().c_str(),
                                      current->de_entry_name, NULL);
-        if (status == DISIR_STATUS_NOT_EXIST)
-        {
-            list.insert (std::string(current->de_entry_name));
+            if (status == DISIR_STATUS_NOT_EXIST)
+            {
+                list.insert (std::string(current->de_entry_name));
+            }
         }
 
         disir_entry_finished (&current);
