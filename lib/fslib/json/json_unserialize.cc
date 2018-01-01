@@ -107,15 +107,13 @@ dio_json_determine_mold_override (struct disir_instance *instance, FILE *input)
 
 enum disir_status
 dio_json_unserialize_mold_filepath (struct disir_instance *instance,
-                                    const char *filepath, struct disir_mold **mold)
+                                    const char *filepath, const char *override_filepath,
+                                    struct disir_mold **mold)
 {
     enum disir_status status;
     struct stat statbuf;
-    FILE *file = NULL;
-    char *sep = NULL;
-    FILE *file_namespace = NULL;
-    char namespace_entry[4096];
-    char suffix[128];
+    FILE *mold_file = NULL;
+    FILE *override_file = NULL;
 
     disir_log_user (instance, "TRACE ENTER dio_json_unserialize_mold");
 
@@ -123,81 +121,39 @@ dio_json_unserialize_mold_filepath (struct disir_instance *instance,
     status = fslib_stat_filepath (instance, filepath, &statbuf);
     if (status != DISIR_STATUS_OK)
     {
-
         return status;
     }
 
-    file = fopen (filepath, "r");
-    if (file == NULL)
+    mold_file = fopen (filepath, "r");
+    if (mold_file == NULL)
     {
         disir_error_set (instance, "opening for reading %s: %s", filepath, strerror (errno));
         return DISIR_STATUS_FS_ERROR;
     }
 
-    status = dio_json_determine_mold_override (instance, file);
-    fseek (file, 0, SEEK_SET);
-
-    if (status == DISIR_STATUS_EXISTS)
+    if (override_filepath)
     {
-        strcpy (namespace_entry, filepath);
-        // We have an override entry
-
-        sep = strrchr (namespace_entry, '.');
-        if (sep == NULL)
-        {
-            disir_error_set (instance, "requested mold read on filepath '%s' without extention",
-                                       filepath);
-            status = DISIR_STATUS_FS_ERROR;
-            goto out;
-        }
-
-        // hold onto suffix
-        strncpy (suffix, sep, 128);
-
-        sep = strrchr (namespace_entry, '/');
-        if (sep == NULL)
-        {
-            sep = namespace_entry;
-        }
-
-        *sep = '\0';
-
-        strcat (namespace_entry, "/__namespace");
-        strcat (namespace_entry, suffix);
-
-        status = fslib_stat_filepath (instance, namespace_entry, &statbuf);
-        if (status != DISIR_STATUS_OK)
-        {
-            // this overwrites disir error from stat_filepath
-            disir_error_set (instance,
-                            "requested mold on filepath '%s' is a mold namespace override entry "
-                            ", yet no mold namespace entry exists",
-                             filepath);
-            status = DISIR_STATUS_MOLD_MISSING;
-            goto out;
-        }
-        file_namespace = fopen (namespace_entry, "r");
-        if (file_namespace == NULL)
+        override_file = fopen (override_filepath, "r");
+        if (override_file == NULL)
         {
             disir_error_set (instance, "opening for reading %s: %s", filepath, strerror (errno));
             status = DISIR_STATUS_FS_ERROR;
             goto out;
         }
 
-        status = dio_json_unserialize_mold_override (instance, file_namespace, file, mold);
-
+        status = dio_json_unserialize_mold_override (instance, mold_file, override_file, mold);
     }
-    if (status == DISIR_STATUS_NOT_EXIST)
+    else
     {
         // Regular mold
-        status = dio_json_unserialize_mold (instance, file, mold);
+        status = dio_json_unserialize_mold (instance, mold_file, mold);
     }
     // FALL-THROUGH
 out:
-    if (file)
-        fclose (file);
-    if (file_namespace)
-        fclose (file_namespace);
+    if (mold_file)
+        fclose (mold_file);
+    if (override_file)
+        fclose (override_file);
 
     return status;
 }

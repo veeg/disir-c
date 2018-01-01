@@ -52,6 +52,7 @@ testing::DisirTestTestPlugin::SetUpTestCase ()
     enum disir_status s;
     struct disir_context *context_config;
     struct disir_context *context_section;
+    char path[2048];
 
     _log_disir_level (DISIR_LOG_LEVEL_TEST, "ENTER DisirTestTestPlugin SetupTestCase");
 
@@ -72,7 +73,7 @@ testing::DisirTestTestPlugin::SetUpTestCase ()
     s = dc_set_name (context_section, "plugin", strlen ("plugin"));
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
-    char path[2048];
+    path[0] = '\0';
     strcpy (path, CMAKE_BUILD_DIRECTORY);
     strcat (path, "/plugins/dplugin_test.so");
     s = dc_config_set_keyval_string (context_section, path, "plugin_filepath");
@@ -90,7 +91,34 @@ testing::DisirTestTestPlugin::SetUpTestCase ()
     s = dc_config_set_keyval_string (context_section, "test", "mold_base_id");
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
+    // Finalize plugin section
+    s = dc_finalize (&context_section);
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
 
+    // Open a plugin section
+    s = dc_begin (context_config, DISIR_CONTEXT_SECTION, &context_section);
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+    s = dc_set_name (context_section, "plugin", strlen ("plugin"));
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
+    path[0] = '\0';
+    strcpy (path, CMAKE_BUILD_DIRECTORY);
+    strcat (path, "/plugins/dplugin_json.so");
+    s = dc_config_set_keyval_string (context_section, path, "plugin_filepath");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
+    s = dc_config_set_keyval_string (context_section, "json", "io_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
+    s = dc_config_set_keyval_string (context_section, "json", "group_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
+    s = dc_config_set_keyval_string (context_section,
+                                     CMAKE_BUILD_DIRECTORY "/tree/json/config/", "config_base_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+    s = dc_config_set_keyval_string (context_section,
+                                     CMAKE_BUILD_DIRECTORY "/tree/json/mold/", "mold_base_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
 
     // Finalize plugin section
     s = dc_finalize (&context_section);
@@ -98,7 +126,6 @@ testing::DisirTestTestPlugin::SetUpTestCase ()
 
     s = dc_config_finalize (&context_config, &libdisir_config);
     ASSERT_STATUS (DISIR_STATUS_OK, s);
-
 
 
     s = disir_instance_create (NULL, libdisir_config, &instance);

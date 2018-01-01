@@ -79,17 +79,24 @@ fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_regis
 //! \brief Resolve the complete mold entry for entry_id.
 //!
 //! \param[out] filepath Populate the output buffer with the filepath to the mold
-//!     active for entry_id.
+//!     active for entry_id. null-terminated if it does not exist.
 //! \param[out] statbuf Stat results of filepath.
-//! \param[out] namespace_entry Boolean result indicating if filepath is a namespace entry
-//!     for entry_id.
+//! \param[out] override_filepath Populate the output buffer with the override entry filepath,
+//!     null-terminated if it does not exist.
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
 enum disir_status
 fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_register_plugin *plugin,
                              const char *entry_id, char *filepath,
-                             struct stat *statbuf, int *namespace_entry);
+                             char *override_filepath, struct stat *statbuf,
+                             int *namespace_entry);
+
+//! \brief Resolve mold entry from filepath
+enum disir_status
+fslib_mold_resolve_entry_filepath (struct disir_instance *instance, const char *entry_path,
+                             char *filepath, char *override_filepath, struct stat *statbuf,
+                             int *namespace_entry);
 
 //! \brief Stat the filepath and return appropriate error (with message set)
 //!

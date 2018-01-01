@@ -116,7 +116,8 @@ dio_json_unserialize_mold (struct disir_instance *instance,
 
 enum disir_status
 dio_json_unserialize_mold_filepath (struct disir_instance *instance,
-                                    const char *filepath, struct disir_mold **mold);
+                                    const char *filepath, const char *override_filepath,
+                                    struct disir_mold **mold);
 
 #ifdef __cplusplus
 }

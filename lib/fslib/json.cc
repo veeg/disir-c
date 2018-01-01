@@ -74,26 +74,26 @@ dio_json_mold_read (struct disir_instance *instance,
                     struct disir_mold **mold)
 {
     enum disir_status status;
-    char filepath_mold[4096];
+    char mold_filepath[4096];
+    char override_filepath[4096];
+    char *override_ref = override_filepath;
     struct stat statbuf;
     int namespace_entry;
 
     status = fslib_mold_resolve_entry_id (instance, plugin, entry_id,
-                                          filepath_mold, &statbuf, &namespace_entry);
+                                          mold_filepath, override_filepath,
+                                          &statbuf, &namespace_entry);
     if (status != DISIR_STATUS_OK)
     {
         return status;
     }
 
-    status = dio_json_unserialize_mold_filepath (instance, filepath_mold, mold);
-    if (status == DISIR_STATUS_MOLD_MISSING)
+    if (*override_filepath == '\0')
     {
-        // Overwrites error set in callee function
-        disir_error_set (instance,
-                        "requested mold '%s' is a mold namespace override entry"
-                        ", yet no mold namespace entry exists",
-                         entry_id);
+        override_ref = NULL;
     }
+
+    status = dio_json_unserialize_mold_filepath (instance, mold_filepath, override_ref, mold);
 
     return status;
 }

@@ -61,6 +61,10 @@ TEST_F (PluginInfoTest, registered)
     ASSERT_TRUE (current != NULL);
     ASSERT_STREQ ("test", current->pl_group_id);
 
+    // We have two plugins
+    current = current->next;
+    ASSERT_TRUE (current);
+
     current = current->next;
     ASSERT_TRUE (current == NULL);
 

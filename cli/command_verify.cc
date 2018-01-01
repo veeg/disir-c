@@ -73,20 +73,29 @@ CommandVerify::handle_command (std::vector<std::string> &args)
         struct disir_mold *mold = NULL;
         struct stat statbuf;
         std::string filepath_mold;
+        char filepath[4096];
+        char override_filepath[4096];
+        char *override_ref = override_filepath;
 
         filepath_mold = args::get (opt_text_mold);
 
         std::cout << "mold text: " << filepath_mold << std::endl;
-        status = fslib_stat_filepath (m_cli->disir(), filepath_mold.c_str(), &statbuf);
+        status = fslib_mold_resolve_entry_filepath (m_cli->disir(), filepath_mold.c_str(), filepath,
+                                                    override_filepath, &statbuf, NULL);
         if (status != DISIR_STATUS_OK)
         {
             std::cout << "  " << disir_error (m_cli->disir()) << std::endl;
             return (1);
         }
 
+        if (override_filepath[0] == '\0')
+        {
+            override_ref = NULL;
+        }
+
         // TODO: Check file extension - switch on available molds
         // XXX Hardcode to json unserialize for now
-        status = dio_json_unserialize_mold_filepath (m_cli->disir(), filepath_mold.c_str(), &mold);
+        status = dio_json_unserialize_mold_filepath (m_cli->disir(), filepath, override_ref, &mold);
         print_verify (status, filepath_mold.c_str(), NULL, mold);
 
         // TODO: Take entries arguments and verify them as config with this mold ( if the mold is OK)
