@@ -154,6 +154,12 @@ dio_json_unserialize_mold_filepath (struct disir_instance *instance,
         // hold onto suffix
         strncpy (suffix, sep, 128);
 
+        // TODO: Since we have a override entry, we should check
+        // the path stripped of override entry suffix.
+        // If original filepath and this constructed path is
+        // equal, we have inconsistencies in our molds
+        // (that is, override entry does not have the .oe suffix)
+
         sep = strrchr (namespace_entry, '/');
         if (sep == NULL)
         {
