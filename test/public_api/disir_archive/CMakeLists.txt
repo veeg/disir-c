@@ -19,5 +19,5 @@ target_link_libraries (${TESTS_PUBLIC_ARCHIVE} ${GTEST_BOTH_LIBRARIES})
 target_link_libraries (${TESTS_PUBLIC_ARCHIVE} pthread)
 target_link_libraries (${TESTS_PUBLIC_ARCHIVE} stdc++fs)
 
-add_test (LibDisirPublicAPITests ${TESTS_PUBLIC_ARCHIVE})
+add_test (LibDisirArchiveTest ${TESTS_PUBLIC_ARCHIVE})
 

@@ -194,15 +194,31 @@ TEST_F (QueryTest, get_section_and_keyval_contexts)
 
     status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context_keyval);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-
     status = dc_set_name (context_keyval, "k1", strlen ("k1"));
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-
     status = dc_set_value_string (context_keyval, "k1value", strlen ("k1value"));
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-
     status = dc_finalize (&context_keyval);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "k2", strlen ("k2"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_value_string (context_keyval, "k2value", strlen ("k2value"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+    status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "k3", strlen ("k3"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_value_string (context_keyval, "k3value", strlen ("k3value"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
 
     status = dc_find_elements (context_section, "k1", &collection);
     EXPECT_STATUS (DISIR_STATUS_OK, status);

@@ -83,10 +83,10 @@ class MoldOverrideParameterized :
                 ASSERT_STATUS (DISIR_STATUS_OK, status);
 
                 context_override = dc_mold_getcontext (mold_override);
-                EXPECT_NE (nullptr, context_override);
+                ASSERT_NE (nullptr, context_override);
 
                 status = dc_compare (context_override, context_reference, NULL);
-                EXPECT_STATUS (DISIR_STATUS_OK, status);
+                ASSERT_STATUS (DISIR_STATUS_OK, status);
             }
             else
             {
@@ -123,10 +123,10 @@ class MoldOverrideTest : public testing::JsonDioTestWrapper
         GetJsonObject (root, m_override_entries_path + "json_test_mold_override.json");
 
         status = disir_mold_read (instance, "test", "json_test_mold", &mold);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         status = writer->serialize (mold, mold_json);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         disir_mold_finished (&mold);
 

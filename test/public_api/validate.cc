@@ -120,6 +120,37 @@ TEST_F (ValidateTest, config_keyval_set_invalid_name)
 {
     const char name[] = "invalid_name";
 
+    // create the 4 required keys so the config is valid
+    // string
+    status = dc_begin (context_config, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "key_string", strlen ("key_string"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    // int
+    status = dc_begin (context_config, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "key_integer", strlen ("key_integer"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_begin (context_config, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    // float
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "key_float", strlen ("key_float"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    // bool
+    status = dc_begin (context_config, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "key_boolean", strlen ("key_boolean"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+
     // Setup keyval that is invalid
     status = dc_begin (context_config, DISIR_CONTEXT_KEYVAL, &context_keyval);
     ASSERT_STATUS (DISIR_STATUS_OK, status);

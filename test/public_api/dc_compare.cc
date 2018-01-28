@@ -39,11 +39,11 @@ public:
         struct disir_context *context_config2;
 
         status = disir_config_read (instance, "test", entry1, NULL, &config1);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
         context_config1 = dc_config_getcontext (config1);
 
         status = disir_config_read (instance, "test", entry2, NULL, &config2);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
         context_config2 = dc_config_getcontext (config2);
 
         status = dc_compare (context_config1, context_config2, NULL);
@@ -73,11 +73,11 @@ public:
         struct disir_context *context_mold2;
 
         status = disir_mold_read (instance, "test", entry1, &mold1);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
         context_mold1 = dc_mold_getcontext (mold1);
 
         status = disir_mold_read (instance, "test", entry2, &mold2);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
         context_mold2 = dc_mold_getcontext (mold2);
 
         status = dc_compare (context_mold1, context_mold2, NULL);

@@ -1356,10 +1356,10 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
         max = 1;
     }
 
-    // Mimimum entries is 0.
+    // Mimimum entries is 1.
     if (min == -1)
     {
-        min = 0;
+        min = 1;
     }
 
     if (type == DISIR_RESTRICTION_INC_ENTRY_MAX)

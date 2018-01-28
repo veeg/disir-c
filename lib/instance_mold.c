@@ -39,17 +39,6 @@ disir_libdisir_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
-    status = dc_add_keyval_string (context, "log_filepath", "/var/log/disir.log",
-                                   "Log filepath for the internal disir log", NULL, NULL);
-    if (status != DISIR_STATUS_OK)
-        goto error;
-
-    status = dc_add_keyval_string (context, "mold_dirpath", "/etc/disir/molds",
-                                   "Root directory to resolve mold lookups from.", NULL, NULL);
-    if (status != DISIR_STATUS_OK)
-        goto error;
-
-
     // Section defining plugins
     status = dc_begin (context, DISIR_CONTEXT_SECTION, &context_section);
     if (status != DISIR_STATUS_OK)

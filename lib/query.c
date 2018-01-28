@@ -130,7 +130,7 @@ query_resolve_name_to_context (struct disir_context *parent, char *name,
     if (status == DISIR_STATUS_NOT_EXIST)
     {
         // TODO: Print out entire resolved name until this point where it failed.
-        dx_log_context (parent, "Unable to locate entry");
+        log_info ("element not found: %s", resolved);
         return status;
     }
     else if (status == DISIR_STATUS_OK)
@@ -138,7 +138,6 @@ query_resolve_name_to_context (struct disir_context *parent, char *name,
         // Must we recursve?
         if (next_name)
         {
-            log_debug (0, "we must recurse: %p", context_found);
             status = query_resolve_name_to_context (context_found, next_name, resolved, out);
             dx_context_transfer_logwarn (parent, context_found);
             dc_putcontext (&context_found);

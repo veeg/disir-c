@@ -14,13 +14,13 @@ class UnMarshallMoldTest : public testing::JsonDioTestWrapper
         writer = new dio::MoldWriter (instance);
 
         status = disir_mold_read (instance, "test", "json_test_mold", &mold);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         std::string json_mold_string;
         Json::Reader json_reader;
 
         status = writer->serialize (mold, json_mold_string);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         bool success = json_reader.parse (json_mold_string, json_mold);
         ASSERT_TRUE (success);
@@ -74,7 +74,7 @@ class UnMarshallMoldTest : public testing::JsonDioTestWrapper
 TEST_F (UnMarshallMoldTest, read_mold_shall_succeed)
 {
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
 TEST_F (UnMarshallMoldTest, invalid_context_on_missing_defaults)
@@ -85,7 +85,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_missing_defaults)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -100,7 +100,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_defaults_type)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -115,7 +115,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_missing_default_value)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -130,7 +130,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_documentation_type)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -144,7 +144,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_absent_keyval_type)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -158,7 +158,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_keyval_type)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -173,7 +173,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_deprecated_type)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -188,7 +188,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_deprecated_format)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -203,7 +203,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_elements_type)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -218,7 +218,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_ements_type)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
@@ -233,7 +233,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_keyval_nor_section)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 1);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD",
@@ -247,7 +247,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_restriction_object)
     );
 
     status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
-    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);

@@ -65,6 +65,9 @@ testing::JsonDioTestWrapper::SetUpTestCase ()
     s = dc_config_set_keyval_string (context_section, "test", "config_base_id");
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
+    s = dc_config_set_keyval_string (context_section, "test", "mold_base_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
     s = dc_finalize (&context_section);
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
@@ -132,12 +135,12 @@ JsonDioTestWrapper::read_override_mold_references ()
     for (const auto& kv : override_reference_molds)
     {
         status = disir_mold_read (instance, "test", kv.first.c_str(), &mold);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         auto override_apply_func = kv.second;
 
         status = override_apply_func (&mold);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         m_override_reference_molds.insert (std::make_pair (kv.first, mold));
     }
@@ -188,7 +191,7 @@ JsonDioTestWrapper::emplace_mold (const char *namespace_entry, const char *name)
     namespace_dir << m_mold_base_dir << namespace_entry << "/";
 
     status = fslib_mkdir_p (instance, namespace_dir.str().c_str());
-    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     std::stringstream mold_override_filepath (namespace_dir.str());
     mold_override_filepath << namespace_dir.str() << name << ".json";
@@ -216,7 +219,7 @@ JsonDioTestWrapper::emplace_mold_from_string (const char *namespace_entry, const
     namespace_dir << m_mold_base_dir << namespace_entry << "/";
 
     status = fslib_mkdir_p (instance, namespace_dir.str().c_str());
-    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     std::stringstream mold_override_filepath (namespace_dir.str());
     mold_override_filepath << namespace_dir.str() << name << ".json";

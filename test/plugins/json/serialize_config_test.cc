@@ -11,7 +11,7 @@ class MarshallConfigTest : public testing::JsonDioTestWrapper
         ASSERT_TRUE (mold != NULL);
 
         status = dc_config_begin (mold, &context_config);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         writer = new dio::ConfigWriter (instance);
 

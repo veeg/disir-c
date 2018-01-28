@@ -87,6 +87,10 @@ testing::DisirTestTestPlugin::SetUpTestCase ()
     s = dc_config_set_keyval_string (context_section, "test", "config_base_id");
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
+    s = dc_config_set_keyval_string (context_section, "test", "mold_base_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
+
 
     // Finalize plugin section
     s = dc_finalize (&context_section);

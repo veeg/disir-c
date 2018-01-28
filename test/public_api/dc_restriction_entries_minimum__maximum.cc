@@ -100,7 +100,7 @@ TEST_F (DcRestrictionEntriesMinimumMaximum, minimum_no_restriction_set)
 
     status = dc_restriction_entries_minimum (context_query, &output);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-    ASSERT_EQ (0, output);
+    ASSERT_EQ (1, output);
 }
 
 TEST_F (DcRestrictionEntriesMinimumMaximum, maximum_no_restriction_set)

@@ -400,6 +400,14 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
             EXPECT_STATUS (DISIR_STATUS_RESTRICTION_VIOLATED, status);
         }
 
+        // Add key child
+        status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context_keyval);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+        status = dc_set_name (context_keyval, "key_string", strlen ("key_string"));
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+        status = dc_finalize (&context_keyval);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+
         status = dc_finalize (&context_section);
         if (i != 5)
         {
@@ -439,6 +447,15 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
         EXPECT_STATUS (DISIR_STATUS_OK, status);
         status = dc_set_name (context_section, "section", strlen ("section"));
         EXPECT_STATUS (DISIR_STATUS_OK, status);
+
+        // Add key child
+        status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context_keyval);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+        status = dc_set_name (context_keyval, "key_string", strlen ("key_string"));
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+        status = dc_finalize (&context_keyval);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
+
         status = dc_finalize (&context_section);
         EXPECT_STATUS (DISIR_STATUS_OK, status)
     }
@@ -449,12 +466,27 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
     EXPECT_STATUS (DISIR_STATUS_OK, status);
     status = dc_set_name (context_section, "section", strlen ("section"));
     EXPECT_STATUS (DISIR_STATUS_OK, status);
+    // Add key child
+    status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "key_string", strlen ("key_string"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
 
     // Begin fifth - finalize - this is fine.
     status = dc_begin (context_config, DISIR_CONTEXT_SECTION, &context_section2);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
     status = dc_set_name (context_section2, "section", strlen ("section"));
     EXPECT_STATUS (DISIR_STATUS_OK, status);
+    // Add key child
+    status = dc_begin (context_section2, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "key_string", strlen ("key_string"));
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_finalize (&context_keyval);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_finalize (&context_section2);
     EXPECT_STATUS (DISIR_STATUS_OK, status)
 
@@ -484,41 +516,32 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
     ASSERT_STATUS (DISIR_STATUS_OK, status);
     status = dc_set_name (context_section, "section", strlen ("section"));
     ASSERT_STATUS (DISIR_STATUS_OK, status);
-    status = dc_finalize (&context_section);
-    ASSERT_STATUS (DISIR_STATUS_OK, status);
-
-    status = dc_find_element (context_config, "section", 0, &context_section);
-    ASSERT_STATUS (DISIR_STATUS_OK, status);
 
     // version 1.0.0 has max 2 entries
-    for (int i = 1; i <= 3; i++)
+    for (int i = 0; i < 2; i++)
     {
         status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context_keyval);
         EXPECT_STATUS (DISIR_STATUS_OK, status);
 
         status = dc_set_name (context_keyval, "keyval", strlen ("keyval"));
-        if (i != 3)
-        {
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
-        }
-        else
-        {
-            EXPECT_STATUS (DISIR_STATUS_RESTRICTION_VIOLATED, status);
-        }
+        EXPECT_STATUS (DISIR_STATUS_OK, status);
 
         status = dc_finalize (&context_keyval);
-        if (i != 3)
-        {
-            EXPECT_STATUS (DISIR_STATUS_OK, status);
-            EXPECT_EQ (NULL, context_keyval);
-        }
-        else
-        {
-            // no name
-            EXPECT_STATUS (DISIR_STATUS_CONTEXT_IN_WRONG_STATE, status);
-            dc_putcontext (&context_keyval);
-        }
+        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        EXPECT_EQ (NULL, context_keyval);
     }
+
+    status = dc_finalize_keep_reference (context_section);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+
+
+    // Adding another keyval to this section will now result in an error
+    status = dc_begin (context_section, DISIR_CONTEXT_KEYVAL, &context_keyval);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    status = dc_set_name (context_keyval, "keyval", strlen ("keyval"));
+    EXPECT_STATUS (DISIR_STATUS_RESTRICTION_VIOLATED, status);
+    status = dc_finalize (&context_keyval);
+    EXPECT_STATUS (DISIR_STATUS_CONTEXT_IN_WRONG_STATE, status);
 
     dc_putcontext (&context_section);
     dc_putcontext (&context_config);

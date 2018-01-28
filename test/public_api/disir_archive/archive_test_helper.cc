@@ -147,6 +147,10 @@ testing::DisirTestArchive::SetUpTestCase ()
     s = dc_config_set_keyval_string (context_section, config_path, "config_base_id");
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
+    s = dc_config_set_keyval_string (context_section, "test", "mold_base_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
+
     // Finalize plugin section
     s = dc_finalize (&context_section);
     ASSERT_STATUS (DISIR_STATUS_OK, s);
@@ -304,6 +308,9 @@ testing::DisirTestArchive::SetUpTestCase ()
     s = dc_config_set_keyval_string (context_section, config_path, "config_base_id");
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
+    s = dc_config_set_keyval_string (context_section, "test", "mold_base_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
     // Finalize plugin section
     s = dc_finalize (&context_section);
     ASSERT_STATUS (DISIR_STATUS_OK, s);
@@ -329,6 +336,9 @@ testing::DisirTestArchive::SetUpTestCase ()
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
     s = dc_config_set_keyval_string (context_section, config_path, "config_base_id");
+    ASSERT_STATUS (DISIR_STATUS_OK, s);
+
+    s = dc_config_set_keyval_string (context_section, "test", "mold_base_id");
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
     // Finalize plugin section
@@ -392,12 +402,12 @@ testing::DisirTestArchive::GenerateConfigOverrides ()
     for (const auto& kv : override_reference_configs)
     {
         status = disir_mold_read (instance_import, "test", std::get<0>(kv.second).c_str(), &mold);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         auto override_apply_func = std::get<1>(kv.second);
 
         status = override_apply_func (mold, &config);
-        EXPECT_STATUS (DISIR_STATUS_OK, status);
+        ASSERT_STATUS (DISIR_STATUS_OK, status);
 
         m_nondefault_configs.insert (std::make_pair (kv.first, config));
 
