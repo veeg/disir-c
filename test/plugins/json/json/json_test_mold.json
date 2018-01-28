@@ -172,6 +172,28 @@
                }
             }
          }
+      },
+      "empty_section" : {
+         "introduced" : "1.0",
+         "elements" : {
+            "optional" : {
+               "type" : "STRING",
+               "documentation" : "d",
+               "restrictions" : [
+                  {
+                     "introduced" : "1.0",
+                     "type" : "MINIMUM_ENTRIES",
+                     "value" : 0
+                  }
+               ],
+               "defaults" : [
+                  {
+                     "introduced" : "1.0",
+                     "value" : "v"
+                  }
+               ]
+            }
+         }
       }
    }
 }

@@ -8,6 +8,8 @@
             "bool" : true,
             "float" : 123.123,
             "integer" : 123
+        },
+        "section_empty" : {
         }
     }
 }

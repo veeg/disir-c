@@ -137,3 +137,12 @@ TEST_F (UnserializeConfigTest, float_as_int_shall_succeed)
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 }
 
+TEST_F (UnserializeConfigTest, empty_section)
+{
+    ASSERT_NO_THROW (
+        root["config"]["empty_section"] = Json::objectValue;
+    );
+
+    status = unserialize_config();
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
+}

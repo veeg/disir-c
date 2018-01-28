@@ -131,6 +131,28 @@ json_test_mold (struct disir_mold **mold)
     if (status != DISIR_STATUS_OK)
         goto error;
 
+    // Add empty_section with one key who is optional
+    status = dc_begin (context_mold, DISIR_CONTEXT_SECTION, &context_section);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+    status = dc_set_name (context_section, "empty_section", strlen ("empty_section"));
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+    status = dc_add_keyval_string (context_section, "optional", "v", "d",
+                                   NULL, &context_keyval);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+    status = dc_add_restriction_entries_min (context_keyval, 0, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+    dc_putcontext (&context_keyval);
+
+    status = dc_finalize (&context_section);
+    if (status != DISIR_STATUS_OK)
+        goto error;
+
+
     status = dc_mold_finalize (&context_mold, mold);
     if (status != DISIR_STATUS_OK)
         goto error;
