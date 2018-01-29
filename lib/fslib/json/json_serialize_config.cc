@@ -320,6 +320,10 @@ ConfigWriter::_serialize_context (struct disir_context *parent_context, Json::Va
         {
             case DISIR_CONTEXT_SECTION:
 
+                // Initialize child to an empty object, that way we indicate
+                // in the serialized configuration that this section exists,
+                // it just didnt have any children
+                child = Json::objectValue;
                 status = _serialize_context (child_context, child);
                 if (status != DISIR_STATUS_OK)
                 {
