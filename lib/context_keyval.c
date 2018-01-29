@@ -256,7 +256,7 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         goto error;
     }
 
-    return DISIR_STATUS_OK;
+    return status;
 error:
     if (keyval)
     {
