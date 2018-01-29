@@ -756,7 +756,9 @@ dx_validate_context (struct disir_context *context)
             dx_crash_and_burn ("VALIDITY CHECK PROGRAMMER ERROR: RETURNED INVALID_CONTEXT");
         }
 
-        // Do nothing - we are returning status as-is.
+        // we are returning status as-is.
+        // but we are invalid, so mark us as invalid
+        context->CONTEXT_STATE_INVALID = 1;
     }
     // We are invalid - mark us as such.
     // ELEMENTS_INVALID does NOT put the calling context into invalid state.
