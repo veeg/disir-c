@@ -138,6 +138,9 @@ json_test_mold (struct disir_mold **mold)
     status = dc_set_name (context_section, "empty_section", strlen ("empty_section"));
     if (status != DISIR_STATUS_OK)
         goto error;
+    status = dc_add_restriction_entries_max (context_section, 0, NULL);
+    if (status != DISIR_STATUS_OK)
+        goto error;
 
     status = dc_add_keyval_string (context_section, "optional", "v", "d",
                                    NULL, &context_keyval);

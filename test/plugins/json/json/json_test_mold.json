@@ -175,6 +175,13 @@
       },
       "empty_section" : {
          "introduced" : "1.0",
+         "restrictions" : [
+            {
+               "introduced" : "1.0",
+               "type" : "MAXIMUM_ENTRIES",
+               "value" : 0
+            }
+         ],
          "elements" : {
             "optional" : {
                "type" : "STRING",
