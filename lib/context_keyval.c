@@ -255,6 +255,11 @@ add_keyval_generic (struct disir_context *parent, const char *name, const char *
         }
         goto error;
     }
+    if (keyval)
+    {
+        // We were invalid, and we got another reference
+        dc_putcontext (&keyval);
+    }
 
     return status;
 error:

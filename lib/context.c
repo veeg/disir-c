@@ -163,6 +163,7 @@ context_remove_from_parent (struct disir_context **context)
     // Remove from parent storage, if available
     if (storage && name)
     {
+        log_debug(8, "Removing '%s' from parent storage", name);
         dx_element_storage_remove (storage, name, *context);
     }
 }

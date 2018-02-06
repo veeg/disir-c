@@ -102,6 +102,8 @@ dx_element_storage_destroy (struct disir_element_storage **storage)
     list_iterator_t *iter;
     struct disir_context *context;
 
+    TRACE_ENTER ("stroage: %p", storage);
+
     if (storage == NULL || *storage == NULL)
     {
         log_debug (0, "invoked with storage NULL pointer.");
@@ -118,10 +120,19 @@ dx_element_storage_destroy (struct disir_element_storage **storage)
     // Destroy each context stored in the element storage (through the list)
     while ((context = list_iterator_next (iter)))
     {
+        log_debug(9, "destroying context %p in list belonging to storage", context);
         // Ignore return code - we just want to destroy and get out of town.
         // Destroying the context will decref our reference on it.
         if (context)
         {
+            // We are destroying a child of us - this dc_destroy call will
+            // remove our reference which we keep in the element storage.
+            // However, the dc_destroy call will reach back into this storage,
+            // removing its reference with a decref. This is to support
+            // removing children from a parent without destroying the parent.
+            // So, we actually have to incref here so that we add one references,
+            // and remove two.
+            dx_context_incref (context);
             dc_destroy (&context);
         }
     }
@@ -134,6 +145,8 @@ dx_element_storage_destroy (struct disir_element_storage **storage)
 
     free (*storage);
     *storage = NULL;
+
+    TRACE_EXIT ("");
     return DISIR_STATUS_OK;;
 }
 
@@ -229,8 +242,9 @@ dx_element_storage_remove (struct disir_element_storage *storage,
                            struct disir_context *context)
 {
     multimap_remove_value (storage->es_map, name, free, context);
-    if (list_remove (storage->es_list, context))
+    if (!list_remove (storage->es_list, context))
     {
+        log_debug(8, "removing context %p from storage", context);
         dx_context_decref (&context);
     }
 

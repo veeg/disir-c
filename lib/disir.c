@@ -345,6 +345,8 @@ disir_instance_destroy (struct disir_instance **instance)
             free (plugin->pi_plugin.dp_config_entry_type);
         if (plugin->pi_plugin.dp_config_base_id)
             free (plugin->pi_plugin.dp_config_base_id);
+        if (plugin->pi_plugin.dp_mold_base_id)
+            free (plugin->pi_plugin.dp_mold_base_id);
         if (plugin->pi_plugin.dp_mold_entry_type)
             free (plugin->pi_plugin.dp_mold_entry_type);
         if (plugin->pi_plugin.dp_description)
