@@ -198,6 +198,15 @@ set_value_input_check (struct disir_context *context, enum disir_value_type type
             (*storage)->dv_type = type;
             status = DISIR_STATUS_INVALID_CONTEXT;
         }
+        else if (context->CONTEXT_STATE_FINALIZED)
+        {
+            // Type check that we do not attempt to set incorrect type
+            if (dc_value_type (context) != type)
+            {
+                status = DISIR_STATUS_WRONG_VALUE_TYPE;
+                dx_context_error_set (context, "expected type %s", dc_value_type_string(context));
+            }
+        }
     }
 
     return status;
