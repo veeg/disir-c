@@ -35,7 +35,8 @@ set_value_generic (struct disir_context *context, enum disir_value_type type,
     switch (type)
     {
     case DISIR_VALUE_TYPE_ENUM:
-        // FALL-THROUGH
+        status = dc_set_value_enum (context, value_string, strlen (value_string));
+        break;
     case DISIR_VALUE_TYPE_STRING:
         status = dc_set_value_string (context, value_string, strlen (value_string));
         break;
@@ -66,7 +67,8 @@ get_value_generic (struct disir_context *context, enum disir_value_type type,
     switch (type)
     {
     case DISIR_VALUE_TYPE_ENUM:
-        // FALL-THROUGH
+        status = dc_get_value_enum (context, value_string, NULL);
+        break;
     case DISIR_VALUE_TYPE_STRING:
         status = dc_get_value_string (context, value_string, NULL);
         break;
@@ -139,7 +141,7 @@ config_get_keyval_generic (struct disir_context *parent, enum disir_value_type t
     status = dc_query_resolve_context_va (parent, query, &context, args);
     if (status == DISIR_STATUS_OK)
     {
-        status = get_value_generic (context, DISIR_VALUE_TYPE_STRING, value_string,
+        status = get_value_generic (context, type, value_string,
                                     value_boolean, value_integer, value_float);
         dc_putcontext (&context);
     }
@@ -159,10 +161,16 @@ config_set_keyval_generic (struct disir_context *parent, enum disir_value_type t
     struct disir_context *section;
     char keyval_name[2048];
 
-    if (parent == NULL || value_string == NULL || query == NULL)
+    if (parent == NULL || query == NULL)
     {
-        log_debug (0, "invoked with NULL pointer(s) (parent (%p), value_string (%p), query (%p)",
+        log_debug (0, "invoked with NULL pointer(s) (parent (%p), query (%p)",
                       parent, value_string, query);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+    if (value_string == NULL &&
+         (type == DISIR_VALUE_TYPE_STRING || type == DISIR_VALUE_TYPE_ENUM))
+    {
+        log_debug (0, "value_string invoked with NULL pointer");
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
@@ -174,7 +182,6 @@ config_set_keyval_generic (struct disir_context *parent, enum disir_value_type t
     {
         status = set_value_generic (context, type, value_string, value_boolean,
                                     value_integer, value_float);
-        dc_putcontext (&context);
     }
     else if (status == DISIR_STATUS_NOT_EXIST)
     {
@@ -207,7 +214,7 @@ config_set_keyval_generic (struct disir_context *parent, enum disir_value_type t
         // Check that the keyval type is actually string
         if (dc_value_type (context) != type)
         {
-            // TODO: Set error
+            dx_context_error_set (context, "expected type %s", dc_value_type_string(context));
             status = DISIR_STATUS_WRONG_VALUE_TYPE;
             goto error;
         }
@@ -224,68 +231,232 @@ config_set_keyval_generic (struct disir_context *parent, enum disir_value_type t
         if (status != DISIR_STATUS_OK)
         {
             // Abort the creation
-            dc_destroy (&context);
             goto error;
         }
     }
 
-    status = DISIR_STATUS_OK;;
     // FALL-THROUGH
 error:
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_context_transfer_logwarn (parent, context);
+    }
+    else
+    {
+        // We do not DESTROY the keyval if it went OK, only put it away
+        dc_putcontext (&context);
+    }
     if (section)
     {
         dc_putcontext (&section);
     }
     if (context)
     {
+        // Since the context was not put away, we are in an error condition and want to destroy it
         dc_destroy (&context);
     }
 
     return status;
 }
 
-/*
+//! PUBLIC API: high-level
+enum disir_status
+disir_config_get_keyval_boolean (struct disir_config *config, uint8_t *value,
+                                 const char *query, ...)
+{
+    enum disir_status status;
+    struct disir_context *context;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    if (config == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    context = dc_config_getcontext (config);
+    if (context != NULL)
+    {
+        va_start (args, query);
+        status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_BOOLEAN, query, args,
+                                            NULL, value, NULL, NULL);
+        va_end (args);
+        dc_putcontext (&context);
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API: high-level
+enum disir_status
+disir_config_set_keyval_boolean (struct disir_config *config, uint8_t value,
+                                 const char *query, ...)
+{
+    enum disir_status status;
+    struct disir_context *context;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    if (config == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    context = dc_config_getcontext (config);
+    if (context != NULL)
+    {
+        va_start (args, query);
+        status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_BOOLEAN, query, args,
+                                            NULL, value, 0, 0);
+        va_end (args);
+        dc_putcontext (&context);
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API: high-level
 enum disir_status
 disir_config_get_keyval_integer (struct disir_config *config, int64_t *value,
-                                 const char *name, ...)
+                                 const char *query, ...)
 {
-    (void) &config;
-    (void) &value;
-    (void) &name;
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    struct disir_context *context;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    if (config == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    context = dc_config_getcontext (config);
+    if (context != NULL)
+    {
+        va_start (args, query);
+        status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_INTEGER, query, args,
+                                            NULL, NULL, value, NULL);
+        va_end (args);
+        dc_putcontext (&context);
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
 }
 
+//! PUBLIC API: high-level
 enum disir_status
 disir_config_set_keyval_integer (struct disir_config *config, int64_t value,
-                                 const char *name, ...)
+                                 const char *query, ...)
 {
-    (void) &config;
-    (void) &value;
-    (void) &name;
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    struct disir_context *context;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    if (config == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    context = dc_config_getcontext (config);
+    if (context != NULL)
+    {
+        va_start (args, query);
+        status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_INTEGER, query, args,
+                                            NULL, 0, value, 0);
+        va_end (args);
+        dc_putcontext (&context);
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
 }
 
+//! PUBLIC API: high-level
 enum disir_status
-disir_config_get_keyval_float (struct disir_config *config, double value,
-                               const char *name, ...)
+disir_config_get_keyval_float (struct disir_config *config, double *value,
+                               const char *query, ...)
 {
-    (void) &config;
-    (void) &value;
-    (void) &name;
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    struct disir_context *context;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    if (config == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    context = dc_config_getcontext (config);
+    if (context != NULL)
+    {
+        va_start (args, query);
+        status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_FLOAT, query, args,
+                                            NULL, NULL, NULL, value);
+        va_end (args);
+        dc_putcontext (&context);
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
 }
 
 
+//! PUBLIC API: high-level
 enum disir_status
 disir_config_set_keyval_float (struct disir_config *config, double value,
-                               const char *name, ...)
+                               const char *query, ...)
 {
-    (void) &config;
-    (void) &value;
-    (void) &name;
-    return DISIR_STATUS_INTERNAL_ERROR;
+    enum disir_status status;
+    struct disir_context *context;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    if (config == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    context = dc_config_getcontext (config);
+    if (context != NULL)
+    {
+        va_start (args, query);
+        status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_FLOAT, query, args,
+                                            NULL, 0, 0, value);
+        va_end (args);
+        dc_putcontext (&context);
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
 }
-*/
 
 //! PUBLIC API: high-level
 enum disir_status
@@ -353,6 +524,72 @@ error:
     return status;
 }
 
+//! PUBLIC API: high-level
+enum disir_status
+disir_config_get_keyval_enum (struct disir_config *config, const char **value,
+                              const char *query, ...)
+{
+    enum disir_status status;
+    struct disir_context *context;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    if (config == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    context = dc_config_getcontext (config);
+    if (context != NULL)
+    {
+        va_start (args, query);
+        status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_ENUM, query, args,
+                                            value, NULL, NULL, NULL);
+        va_end (args);
+        dc_putcontext (&context);
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API: high-level
+enum disir_status
+disir_config_set_keyval_enum (struct disir_config *config, const char *value,
+                              const char *query, ...)
+{
+    enum disir_status status;
+    struct disir_context *context;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    if (config == NULL)
+    {
+        status = DISIR_STATUS_INVALID_ARGUMENT;
+        goto error;
+    }
+
+    context = dc_config_getcontext (config);
+    if (context != NULL)
+    {
+        va_start (args, query);
+        status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_ENUM, query, args,
+                                            value, 0, 0, 0);
+        va_end (args);
+        dc_putcontext (&context);
+    }
+
+    // FALL-THROUGH
+error:
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
 //! PUBLIC API: low-level
 enum disir_status
 dc_config_get_keyval_string (struct disir_context *parent, const char **value,
@@ -390,4 +627,3 @@ dc_config_set_keyval_string (struct disir_context *parent, const char *value,
     TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
-

@@ -165,6 +165,7 @@ disir_config_finished (struct disir_config **config);
 //! \param[in] query The varadic template and arguments to construct the query. See XXX_QUERY_XXX.
 //!
 //! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type string.
 //!
 enum disir_status
 disir_config_get_keyval_string (struct disir_config *config, const char **value,
@@ -180,10 +181,135 @@ disir_config_get_keyval_string (struct disir_config *config, const char **value,
 //! \param[in] ... Varadic argument list to populate query with, when applicable.
 //!
 //! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type string.
 //!
 enum disir_status
 disir_config_set_keyval_string (struct disir_config *config, const char *value,
                                 const char *query, ...);
+
+//! \brief Query the config for an enum valued keyval.
+//!
+//! For an exhaustive explaination of the query syntax, see XXX_QUERY_XXX
+//!
+//! \param[in] config The config object to query from.
+//! \param[out] value The pointer to populate a reference to the enum value to retrieve.
+//! \param[in] query The varadic template and arguments to construct the query. See XXX_QUERY_XXX.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type enum.
+//!
+enum disir_status
+disir_config_get_keyval_enum (struct disir_config *config, const char **value,
+                              const char *query, ...);
+
+//! \brief Set a enum keyval in config.
+//!
+//! \see Detailed Disir query resolution semantic for setters.
+//!
+//! \param[in] config The config to query from.
+//! \param[in] value The value to set the queried enum keyval to.
+//! \param[in] query A string suitable for query name resolution. See relevant documentation.
+//! \param[in] ... Varadic argument list to populate query with, when applicable.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type enum.
+//!
+enum disir_status
+disir_config_set_keyval_enum (struct disir_config *config, const char *value,
+                              const char *query, ...);
+
+//! \brief Query the config for a boolean valued keyval.
+//!
+//! For an exhaustive explaination of the query syntax, see XXX_QUERY_XXX
+//!
+//! \param[in] config The config object to query from.
+//! \param[out] value The pointer to populate a reference to the boolean value to retrieve.
+//! \param[in] query The varadic template and arguments to construct the query. See XXX_QUERY_XXX.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type boolean.
+//!
+enum disir_status
+disir_config_get_keyval_boolean (struct disir_config *config, uint8_t *value,
+                                 const char *query, ...);
+
+//! \brief Set a boolean keyval in config.
+//!
+//! \see Detailed Disir query resolution semantic for setters.
+//!
+//! \param[in] config The config to query from.
+//! \param[in] value The value to set the queried boolean keyval to.
+//! \param[in] query A string suitable for query name resolution. See relevant documentation.
+//! \param[in] ... Varadic argument list to populate query with, when applicable.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type boolean.
+//!
+enum disir_status
+disir_config_set_keyval_boolean (struct disir_config *config, uint8_t value,
+                                 const char *query, ...);
+
+//! \brief Query the config for a float valued keyval.
+//!
+//! For an exhaustive explaination of the query syntax, see XXX_QUERY_XXX
+//!
+//! \param[in] config The config object to query from.
+//! \param[out] value The pointer to populate a reference to the float value to retrieve.
+//! \param[in] query The varadic template and arguments to construct the query. See XXX_QUERY_XXX.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type float.
+//!
+enum disir_status
+disir_config_get_keyval_float (struct disir_config *config, double *value,
+                               const char *query, ...);
+
+//! \brief Set a float keyval in config.
+//!
+//! \see Detailed Disir query resolution semantic for setters.
+//!
+//! \param[in] config The config to query from.
+//! \param[in] value The value to set the queried float keyval to.
+//! \param[in] query A string suitable for query name resolution. See relevant documentation.
+//! \param[in] ... Varadic argument list to populate query with, when applicable.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type float.
+//!
+enum disir_status
+disir_config_set_keyval_float (struct disir_config *config, double value,
+                                 const char *query, ...);
+
+//! \brief Query the config for a integer valued keyval.
+//!
+//! For an exhaustive explaination of the query syntax, see XXX_QUERY_XXX
+//!
+//! \param[in] config The config object to query from.
+//! \param[out] value The pointer to populate a reference to the integer value to retrieve.
+//! \param[in] query The varadic template and arguments to construct the query. See XXX_QUERY_XXX.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type integer.
+//!
+enum disir_status
+disir_config_get_keyval_integer (struct disir_config *config, int64_t *value,
+                                 const char *query, ...);
+
+//! \brief Set a integer keyval in config.
+//!
+//! \see Detailed Disir query resolution semantic for setters.
+//!
+//! \param[in] config The config to query from.
+//! \param[in] value The value to set the queried integer keyval to.
+//! \param[in] query A string suitable for query name resolution. See relevant documentation.
+//! \param[in] ... Varadic argument list to populate query with, when applicable.
+//!
+//! \return DISIR_STATUS_OK on success.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type integer.
+//!
+enum disir_status
+disir_config_set_keyval_integer (struct disir_config *config, int64_t value,
+                                 const char *query, ...);
 
 
 #ifdef __cplusplus
