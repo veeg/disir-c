@@ -23,6 +23,15 @@ class EntryFinished : public testing::DisirTestTestPlugin
     void TearDown()
     {
         DisirLogTestBodyExit ();
+
+        struct disir_entry *entry = queue;
+        struct disir_entry *current = queue;
+        while (entry)
+        {
+            current = entry;
+            entry = entry->next;
+            disir_entry_finished (&current);
+        }
         DisirTestTestPlugin::TearDown ();
     }
 
@@ -107,6 +116,7 @@ TEST_F (EntryFinished, remove_all_elements)
             break;
         next = current->next;
     }
+    queue = NULL;
 }
 
 TEST_F (EntryFinished, query_single_finish_single)

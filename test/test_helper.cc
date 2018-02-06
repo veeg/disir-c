@@ -100,6 +100,7 @@ testing::DisirTestTestPlugin::SetUpTestCase ()
     ASSERT_STATUS (DISIR_STATUS_OK, s);
 
 
+
     s = disir_instance_create (NULL, libdisir_config, &instance);
     ASSERT_STATUS (DISIR_STATUS_OK, s);
     ASSERT_TRUE (instance != NULL);
@@ -120,6 +121,10 @@ testing::DisirTestTestPlugin::TearDownTestCase ()
     {
         enum disir_status s = disir_instance_destroy (&instance);
         EXPECT_STATUS (DISIR_STATUS_OK, s);
+    }
+    if (libdisir_mold)
+    {
+        disir_mold_finished (&libdisir_mold);
     }
 }
 

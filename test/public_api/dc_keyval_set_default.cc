@@ -28,17 +28,25 @@ class DcKeyvalSetDefault : public testing::DisirTestTestPlugin
     {
         DisirLogTestBodyExit ();
 
-        if (config)
+        if (context_keyval)
         {
-            disir_config_finished (&config);
+            dc_putcontext (&context_keyval);
         }
         if (context_config)
         {
             dc_putcontext (&context_config);
         }
-        if (context_keyval)
+        if (context_mold)
         {
-            dc_putcontext (&context_keyval);
+            dc_putcontext (&context_mold);
+        }
+        if (config)
+        {
+            disir_config_finished (&config);
+        }
+        if (mold)
+        {
+            disir_mold_finished (&mold);
         }
 
         DisirTestTestPlugin::TearDown ();

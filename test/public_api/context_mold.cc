@@ -32,7 +32,7 @@ class ContextMoldTest : public testing::DisirTestWrapper
 
         if (context_keyval)
         {
-            status = dc_destroy (&context_keyval);
+            status = dc_putcontext (&context_keyval);
             ASSERT_STATUS (DISIR_STATUS_OK, status);
         }
         if (mold)
@@ -185,7 +185,6 @@ TEST_F (ContextMoldTest, add_keyval_with_name_type_default_shall_succeed)
     status = dc_add_default_string (context_keyval, "TNT", strlen ("TNT"), NULL);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
-    // Missing default
     status = dc_finalize (&context_keyval);
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 }

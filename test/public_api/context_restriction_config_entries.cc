@@ -416,9 +416,9 @@ TEST_F (ContextRestrictionConfigFinalizedEntriesTestPluginTest,
         }
         else
         {
-            // no name
             EXPECT_STATUS (DISIR_STATUS_CONTEXT_IN_WRONG_STATE, status);
-            dc_putcontext (&context_section);
+            // We have to destroy, otherwise it would be dangling
+            dc_destroy (&context_section);
         }
     }
 

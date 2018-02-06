@@ -109,6 +109,7 @@ TEST_F (DisirMoldTest, valid_nested_invalid_context)
 
     // cleanup
     dc_collection_finished (&collection);
+    dc_putcontext (&context_section);
     disir_mold_finished (&mold);
 }
 
