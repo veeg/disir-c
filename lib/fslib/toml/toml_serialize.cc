@@ -107,7 +107,7 @@ toml_serialize_keyval (struct disir_context *context, toml::Value* current, cons
 }
 
 static enum disir_status
-toml_serialize_inner (struct disir_context *parent, struct disir_context *context,
+toml_serialize_inner (struct disir_context *parent,
                       toml::Value* current, const char *name)
 {
     enum disir_status status;
@@ -146,11 +146,11 @@ toml_serialize_inner (struct disir_context *parent, struct disir_context *contex
             break;
         }
 
-        switch (dc_context_type (context))
+        switch (dc_context_type (key_element))
         {
         case DISIR_CONTEXT_KEYVAL:
         {
-            status = toml_serialize_keyval (context, current, name);
+            status = toml_serialize_keyval (key_element, current, name);
             break;
         }
         case DISIR_CONTEXT_SECTION:
@@ -164,12 +164,12 @@ toml_serialize_inner (struct disir_context *parent, struct disir_context *contex
                 table = current->setChild (name, (toml::Table()));
             }
 
-            status = toml_serialize_elements (context, table);
+            status = toml_serialize_elements (key_element, table);
             break;
         }
         default:
         {
-            disir_log_user (NULL, "Unhandled child of elements: %s", dc_context_type_string (context));
+            disir_log_user (NULL, "Unhandled child of elements: %s", dc_context_type_string (key_element));
             status = DISIR_STATUS_INTERNAL_ERROR;
             goto out;
         }
@@ -240,7 +240,7 @@ toml_serialize_elements (struct disir_context *context, toml::Value* current)
         if (current->has (name))
             continue;
 
-        status = toml_serialize_inner (context, element, current, name);
+        status = toml_serialize_inner (context, current, name);
         if (status != DISIR_STATUS_OK)
             goto out;
 
