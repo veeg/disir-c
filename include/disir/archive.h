@@ -118,7 +118,8 @@ disir_archive_append_entry (struct disir_instance *instance, struct disir_archiv
 //!
 //! \param[in] instance The disir instance.
 //! \param[in] archive_path The path where the finished archive is written. Null to discard
-//      the archive entirely.
+//      the archive entirely. This path will be modified to include a trailing '.disir'
+//      if it is not part of the input archive_path.
 //! \param[in] archive The disir archive to be finalized.
 //!
 //! \return DISIR_STATUS_OK on success.

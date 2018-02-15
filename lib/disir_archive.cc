@@ -320,7 +320,6 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
                         struct disir_archive **archive)
 {
     enum disir_status status;
-    enum disir_status archive_status;
     struct disir_archive *ar;
     int ret;
     struct stat st;
@@ -334,6 +333,14 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
 
     status = DISIR_STATUS_OK;
     ar = *archive;
+
+    if (ar == NULL)
+    {
+        log_debug (0, "invoked with archive double NULL pointer (%p)", archive);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    log_info("Finalizing archive to archive_path (%s)", archive_path);
 
     // Make sure archive path is not a directory
     if (archive_path && archive_path[strlen (archive_path)-1] == '/')
@@ -360,28 +367,30 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
         }
     }
 
-    // Check for empty archive
-    if (ar && archive_path && ar->da_entries->empty())
+    // Check for empty archive - we cannot finalize empty archive
+    if (archive_path && ar->da_entries && ar->da_entries->empty())
     {
         disir_error_set (instance, "cannot finalize empty archive");
         status = DISIR_STATUS_NO_CAN_DO;
+        goto out;
     }
 
-    if (ar && archive_path && ar->da_entries && !ar->da_entries->empty())
+    // Write metadata for archive
+    if (archive_path && ar->da_entries && !ar->da_entries->empty())
     {
         status = dx_archive_metadata_write (ar);
         if (status != DISIR_STATUS_OK)
             goto out;
     }
 
-    if (ar && ar->da_archive)
+    // Close up the the archive
+    if (ar->da_archive)
     {
         if (archive_write_close (ar->da_archive) != ARCHIVE_OK)
         {
             log_error ("unable to close archive in finalize: %s",
                         archive_error_string (ar->da_archive));
             status = DISIR_STATUS_FS_ERROR;
-            goto out;
         }
 
         if (archive_write_free (ar->da_archive) != ARCHIVE_OK)
@@ -389,11 +398,15 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
             log_error ("unable to free archive in finalize: %s",
                         archive_error_string (ar->da_archive));
             status = DISIR_STATUS_FS_ERROR;
+        }
+
+        if (status != DISIR_STATUS_OK)
+        {
             goto out;
         }
     }
 
-    if (ar && archive_path && status == DISIR_STATUS_OK)
+    if (archive_path)
     {
         status = dx_archive_disk_append (archive_path, ar->da_existing_path,
                                          ar->da_temp_archive_path);
@@ -404,11 +417,9 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
     }
     // FALL-THROUGH
 out:
-    archive_status = status;
-    status = DISIR_STATUS_OK;
 
     // Remove temp archive.
-    if (ar && ar->da_temp_archive_path &&
+    if (ar->da_temp_archive_path &&
         fslib_stat_filepath (instance, ar->da_temp_archive_path, &st) == DISIR_STATUS_OK)
     {
         ret = remove (ar->da_temp_archive_path);
@@ -416,16 +427,12 @@ out:
         {
             log_error ("failed to remove temp archive '%s': %s", ar->da_temp_archive_path,
                        strerror (errno));
-            status = DISIR_STATUS_FS_ERROR;
         }
-    }
-    else
-    {
-        disir_error_clear (instance);
     }
 
     dx_archive_destroy (ar);
     *archive = NULL;
 
-    return (archive_status != DISIR_STATUS_OK) ? archive_status : status;
+    log_info("Finalized archive with status: %s", disir_status_string(status));
+    return status;
 }

@@ -62,66 +62,79 @@ TEST_F (ArchiveAppendNewTest, invalid_arguments)
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_group (instance_export, NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_group (instance_export, disir_archive, NULL);
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_group (instance_export, NULL, "JSON");
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_group (NULL, disir_archive, NULL);
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_group (NULL, disir_archive, "JSON");
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_group (NULL, NULL, "JSON");
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_entry (NULL, NULL, NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_entry (instance_export, NULL, NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_entry (instance_export, disir_archive, NULL, NULL);
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_entry (instance_export, disir_archive, "JSON", NULL);
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_entry (NULL, disir_archive, "JSON", "basic_keyval");
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_entry (instance_export, NULL, "JSON", "basic_keyval");
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
     ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    status = disir_archive_export_begin (instance_export, NULL, &disir_archive);
     status = disir_archive_append_entry (instance_export, disir_archive, NULL, "basic_keyval");
     ASSERT_STATUS (DISIR_STATUS_INVALID_ARGUMENT, status);
     status = disir_archive_finalize (instance_export, NULL, &disir_archive);
