@@ -93,7 +93,7 @@ fslib_plugin_mold_read (struct disir_instance *instance,
     namespace_entry = 0;
 
     status = fslib_mold_resolve_entry_id (instance, plugin, entry_id,
-                                          filepath, &statbuf, &namespace_entry);
+                                          filepath, NULL, &statbuf, &namespace_entry);
     if (status != DISIR_STATUS_OK)
     {
         return status;

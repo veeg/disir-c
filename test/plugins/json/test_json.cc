@@ -191,7 +191,7 @@ JsonDioTestWrapper::emplace_mold (const char *namespace_entry, const char *name)
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     std::stringstream mold_override_filepath (namespace_dir.str());
-    mold_override_filepath << namespace_dir.str() << name << ".json";
+    mold_override_filepath << namespace_dir.str() << name << ".o.json";
 
     ofs.open (mold_override_filepath.str().c_str(), std::ofstream::out);
     ASSERT_TRUE (ofs.is_open());
@@ -219,7 +219,7 @@ JsonDioTestWrapper::emplace_mold_from_string (const char *namespace_entry, const
     EXPECT_STATUS (DISIR_STATUS_OK, status);
 
     std::stringstream mold_override_filepath (namespace_dir.str());
-    mold_override_filepath << namespace_dir.str() << name << ".json";
+    mold_override_filepath << namespace_dir.str() << name << ".o.json";
 
     ofs.open (mold_override_filepath.str().c_str(), std::ofstream::out);
     ASSERT_TRUE (ofs.is_open());

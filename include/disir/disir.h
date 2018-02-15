@@ -159,6 +159,10 @@ struct disir_entry
                          DE_WRITABLE                    : 1,
                          //! Entry is valid for all subentries of this namespace.
                          DE_NAMESPACE_ENTRY             : 1,
+                         //! Entry is an override entry
+                         DE_OVERRIDE                    : 1,
+                         //! Entry
+                         DE_SINGLE                      : 1,
                                                         : 0;
         } flag;
     };

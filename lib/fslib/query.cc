@@ -375,6 +375,7 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_
 {
     enum disir_status status;
     char filepath[PATH_MAX];
+    char oe_filepath[PATH_MAX];
     struct disir_entry *query_entry;
     int namespace_entry;
     struct stat statbuf;
@@ -382,7 +383,7 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_
     namespace_entry = 0;
 
     status = fslib_mold_resolve_entry_id (instance, plugin, entry_id,
-                                          filepath, &statbuf, &namespace_entry);
+                                          filepath, oe_filepath, &statbuf, &namespace_entry);
     if (status != DISIR_STATUS_OK)
     {
         return status;
@@ -395,6 +396,17 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_
         // TODO: Get readable and writable from statbuf
         query_entry->flag.DE_READABLE = 1;
         query_entry->flag.DE_WRITABLE = 1;
+
+        if (filepath[0] == '\0' && namespace_entry != 1)
+        {
+            query_entry->flag.DE_SINGLE = 1;
+        }
+
+        if (oe_filepath[0] != '\0')
+        {
+            query_entry->flag.DE_OVERRIDE = 1;
+        }
+
         query_entry->flag.DE_NAMESPACE_ENTRY = namespace_entry;
 
         *entry = query_entry;
@@ -403,50 +415,152 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_
     return DISIR_STATUS_EXISTS;
 }
 
+//! FSLIB_API
+enum disir_status
+fslib_mold_resolve_entry_filepath (struct disir_instance *instance, const char *entry_path,
+                                   char *filepath, char *oe_filepath, struct stat *statbuf,
+                                   int *namespace_entry)
+{
+    enum disir_status status;
+    enum disir_status oe_status;
+    char *sep = NULL;
+    char suffix[128];
+
+    strncpy (oe_filepath, entry_path, PATH_MAX);
+
+    sep = strrchr (oe_filepath, '.');
+    if (sep == NULL)
+        return DISIR_STATUS_FS_ERROR;
+
+    strncpy (suffix, sep, 128);
+
+    // first check if the requested entry is an override entry
+    if (strncmp (sep - strlen (".o"), ".o", strlen (".o")) == 0)
+    {
+        strncpy (filepath, entry_path, PATH_MAX);
+
+        sep = strrchr (filepath, '.');
+        if (sep == NULL)
+            return DISIR_STATUS_FS_ERROR;
+
+        sep -= strlen(".o");
+        *sep = '\0';
+
+        strcat (filepath, suffix);
+
+        oe_status = fslib_stat_filepath (instance, oe_filepath, statbuf);
+    }
+    else
+    {
+        *oe_filepath = '\0';
+        strncpy (filepath, entry_path, PATH_MAX);
+    }
+
+    status = fslib_stat_filepath (instance, filepath, statbuf);
+    if (status == DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    sep = strrchr (filepath, '/');
+    if (sep == NULL)
+    {
+        return DISIR_STATUS_FS_ERROR;
+    }
+
+    strcat (filepath, "/__namespace.");
+    strcat (filepath, suffix);
+
+    status = fslib_stat_filepath (instance, filepath, statbuf);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+
+    // Only set namspace entry flag if it's the only one we found
+    if (oe_status != DISIR_STATUS_OK && status == DISIR_STATUS_OK
+        && namespace_entry != NULL)
+    {
+        *namespace_entry = 1;
+    }
+
+    return (oe_status == DISIR_STATUS_OK
+            && status != DISIR_STATUS_OK
+            ? DISIR_STATUS_NOT_EXIST : DISIR_STATUS_OK);
+}
+
 //! FSLIB API
 enum disir_status
 fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_register_plugin *plugin,
-                             const char *entry_id, char *filepath,
+                             const char *entry_id, char *filepath, char *oe_filepath,
                              struct stat *statbuf, int *namespace_entry)
 {
     enum disir_status status;
+    enum disir_status oe_status;
     char *sep = NULL;
 
-    // Query if this mold exists
+    oe_status = DISIR_STATUS_OK;
+    if (oe_filepath != NULL)
+    {
+        std::stringstream ss;
+        ss << entry_id << ".o";
+
+        std::string oe = ss.str();
+
+        status = fslib_mold_resolve_filepath (instance, plugin, oe.c_str(), oe_filepath);
+        if (status != DISIR_STATUS_OK)
+        {
+            return status;
+        }
+
+        // Check whether override entry exists, and hold onto the status
+        oe_status = fslib_stat_filepath (instance, oe_filepath, statbuf);
+        if (oe_status != DISIR_STATUS_OK)
+        {
+            // Null-terminate first character to indicate a non-existent override entry
+            *oe_filepath = '\0';
+        }
+    }
+
     status = fslib_mold_resolve_filepath (instance, plugin, entry_id, filepath);
     if (status != DISIR_STATUS_OK)
     {
-        // Already logged
         return status;
     }
 
     status = fslib_stat_filepath (instance, filepath, statbuf);
-    // TODO: We need to check if we have an override entry
+    if (status == DISIR_STATUS_OK)
+    {
+        return status;
+    }
 
-    // Fall back to checking if we have a namespace for this entry
-    // if so, we validate this entry id, but with the filepath to the namespace
+    sep = strrchr (filepath, '/');
+    if (sep == NULL)
+    {
+        return DISIR_STATUS_FS_ERROR;
+    }
+
+    *sep = '\0';
+
+    strcat (filepath, "/__namespace.");
+    strcat (filepath, plugin->dp_mold_entry_type);
+
+    // Attempt to find the namespace entry file.
+    status = fslib_stat_filepath (instance, filepath, statbuf);
     if (status != DISIR_STATUS_OK)
     {
-        // Find the directory of the file we attempted to find
-        sep = strrchr (filepath, '/');
-        if (sep == NULL)
-            return status;
+        *filepath = '\0';
+    }
 
-        disir_error_clear (instance);
-
-        // Create the namespace entry filepath
-        *sep = '\0';
-        strcat (filepath, "/__namespace.");
-        strcat (filepath, plugin->dp_mold_entry_type);
-
-        // Attempt to find the namespace entry file.
-        status = fslib_stat_filepath (instance, filepath, statbuf);
-        if (status != DISIR_STATUS_OK)
-            return status;
-
-        // This is a namespace entry
+    // Only set namspace entry flag if it's the only one we found
+    if (oe_status != DISIR_STATUS_OK && status == DISIR_STATUS_OK
+        && namespace_entry != NULL)
+    {
         *namespace_entry = 1;
     }
 
-    return DISIR_STATUS_OK;
+    return (oe_status == DISIR_STATUS_OK
+            && status != DISIR_STATUS_OK
+            ? DISIR_STATUS_NOT_EXIST : DISIR_STATUS_OK);
 }
+

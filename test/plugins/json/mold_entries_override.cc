@@ -91,9 +91,8 @@ class MoldOverrideParameterized :
             else
             {
                 char error[4096];
-                ASSERT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
-                snprintf (error, 4096, "requested mold '%s' is a mold namespace override entry"
-                                       ", yet no mold namespace entry exists",
+                ASSERT_STATUS (DISIR_STATUS_NOT_EXIST, status);
+                snprintf (error, 4096, "No plugin in group 'json_test' contains mold entry '%s'",
                                        entry_mold_override_id.c_str());
                 ASSERT_STREQ (error, disir_error (instance));
             }
