@@ -103,7 +103,7 @@ MoldReader::construct_mold (struct disir_mold **mold)
 
     if (m_moldRoot[ATTRIBUTE_KEY_MOLD].isNull ())
     {
-        dc_fatal_error (context_mold, "No Mold present");
+        dc_fatal_error (context_mold, "missing top-level object 'mold'");
         goto finalize;
     }
 
