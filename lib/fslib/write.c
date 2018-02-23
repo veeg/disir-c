@@ -38,6 +38,9 @@ fslib_plugin_config_write (struct disir_instance *instance, struct disir_registe
     status = fslib_stat_filepath (instance, filepath, &statbuf);
     if (status == DISIR_STATUS_NOT_EXIST)
     {
+        // Clear the disir_error set by stat
+        disir_error_clear (instance);
+
         // Create the directory strcutreu
         char dirpath[PATH_MAX];
         char *separator = NULL;
