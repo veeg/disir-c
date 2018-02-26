@@ -11,6 +11,25 @@
 
 #include <iostream>
 
+//! STATIC API
+bool
+validate_entry_id_characters(std::string& entry_id)
+{
+    // Apply name filter - we do not allow any entry not using only lowercase
+    // letters a-z
+    // UNICODE: Not really considered...
+    auto illegal = std::find_if(entry_id.begin(), entry_id.end(),
+        [](const char c)
+    {
+        if (c >= 'a' && c <= 'z') return false;
+        if (c >= '0' && c <= '9') return false;
+        if (c == '_' || c == '/') return false;
+        return true;
+    });
+
+    return (illegal == entry_id.end());
+}
+
 //! FSLIB API
 enum disir_status
 fslib_config_query_entries (struct disir_instance *instance, struct disir_register_plugin *plugin,
@@ -259,17 +278,7 @@ fslib_mold_query_entries (struct disir_instance *instance, struct disir_register
                     // Simply let it pass through
                 }
 
-                // Apply name filter - we do not allow any entry not using only lowercase
-                // letters a-z
-                // UNICODE: Not really considered...
-                auto illegal = std::find_if(entry_name.begin(), entry_name.end(),
-                    [](const char c)
-                {
-                    if (c >= 'a' && c <= 'z') return false;
-                    if (c == '_' || c == '/') return false;
-                    return true;
-                });
-                if (illegal != entry_name.end())
+                if (!validate_entry_id_characters(entry_name))
                 {
                     continue;
                 }
@@ -375,6 +384,12 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_
     if (status != DISIR_STATUS_OK)
     {
         return status;
+    }
+
+    std::string eid(entry_id);
+    if (!validate_entry_id_characters(eid))
+    {
+        return DISIR_STATUS_NOT_EXIST;
     }
 
     if (entry != NULL)
@@ -544,7 +559,7 @@ fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_regis
     if (status != DISIR_STATUS_OK)
     {
         *filepath = '\0';
-        // Neither nominla nor namespace entry exists
+        // Neither nominal nor namespace entry exists
         // Set an appropriate error
         disir_error_set(instance,
                 "entry_id '%s' is not covered by a normal nor namespace mold", entry_id);
@@ -557,7 +572,8 @@ fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_regis
         *namespace_entry = 1;
     }
 
-    return (override_status == DISIR_STATUS_OK
-            && status != DISIR_STATUS_OK
-            ? DISIR_STATUS_NOT_EXIST : DISIR_STATUS_OK);
+    // Regardless of what override status is, we will just care about
+    // whether or not the nominal mold exists
+    // The output of override is messured in output argument, not status
+    return status;
 }

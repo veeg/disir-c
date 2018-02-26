@@ -85,4 +85,3 @@ fslib_stat_filepath (struct disir_instance *instance,
 
     return DISIR_STATUS_OK;
 }
-

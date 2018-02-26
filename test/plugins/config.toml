@@ -1,7 +1,7 @@
 [[plugin]]
-  config_base_id = "/home/veeg/workspace/disir/disir-c/build/test/plugins/json/config"
-  mold_base_id = "/home/veeg/workspace/disir/disir-c/test/plugins/json/tree/"
+  config_base_id = "/home/vegardsa/workspace/disir/disir-c/build/test/plugins/json/config"
+  mold_base_id = "/home/vegardsa/workspace/disir/disir-c/test/plugins/json/tree/"
   group_id = "json"
   io_id = "xxx"
-  plugin_filepath = "/home/veeg/workspace/disir/disir-c/build/plugins/dplugin_json.so"
+  plugin_filepath = "/home/vegardsa/workspace/disir/disir-c/build/plugins/dplugin_json.so"
 
