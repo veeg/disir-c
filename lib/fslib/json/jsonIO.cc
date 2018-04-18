@@ -161,7 +161,7 @@ attribute_key_to_disir_value (const char *type)
     {
         return attribute_disir_value_keys.at (type);
     }
-    catch (std::out_of_range e)
+    catch (std::out_of_range& e)
     {
         return DISIR_VALUE_TYPE_UNKNOWN;
     }
@@ -174,7 +174,7 @@ attribute_key_to_disir_restriction (const char *type)
     {
         return attribute_disir_restriction_keys.at (type);
     }
-    catch (std::out_of_range e)
+    catch (std::out_of_range& e)
     {
         return DISIR_RESTRICTION_UNKNOWN;
     }
@@ -187,7 +187,7 @@ json_valuetype_stringify (Json::ValueType type)
     {
         return json_type_stringified.at (type);
     }
-    catch (std::out_of_range e)
+    catch (std::out_of_range& e)
     {
         return "unknown";
     }
