@@ -235,7 +235,7 @@ dx_archive_open_write (struct disir_archive *archive)
 {
     enum disir_status status;
     char temp_archive_path[PATH_MAX];
-    char random_suffix[PATH_MAX];
+    char random_suffix[20];
     struct archive *ar;
     struct stat st;
     int ret;
@@ -752,11 +752,12 @@ dx_archive_disk_append (const char *new_archive_path, const char *existing_archi
 {
     enum disir_status status;
     int ret;
-    char backup_path[4096];
+    char backup_path[PATH_MAX];
     char archive_path_with_extension[4096];
     const char *ext = NULL;
 
     strcpy (archive_path_with_extension, new_archive_path);
+    backup_path[0] = '\0';
 
     // Append extension if it doesn't already exists
     ext = strrchr (new_archive_path, '.');
@@ -802,9 +803,8 @@ dx_archive_disk_append (const char *new_archive_path, const char *existing_archi
         (strcmp (existing_archive_path, archive_path_with_extension) == 0))
     {
         // Rename existing archive with backup extension.
-        *backup_path = '\0';
-        strncat (backup_path, existing_archive_path, 4096);
-        strncat (backup_path, ".backup", 4096);
+        strncat (backup_path, existing_archive_path, PATH_MAX-1);
+        strncat (backup_path, ".backup", PATH_MAX-1);
         ret = rename (existing_archive_path, backup_path);
         if (ret != 0)
         {
