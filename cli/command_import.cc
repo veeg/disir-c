@@ -71,18 +71,18 @@ CommandImport::handle_command (std::vector<std::string> &args)
     {
         parser.ParseArgs (args);
     }
-    catch (args::Help)
+    catch (args::Help&)
     {
         std::cout << parser;
         return (0);
     }
-    catch (args::ParseError e)
+    catch (args::ParseError& e)
     {
         std::cerr << "ParseError: " << e.what() << std::endl;
         std::cerr << "See '" << parser.Prog() << " --help'" << std::endl;
         return (1);
     }
-    catch (args::ValidationError e)
+    catch (args::ValidationError& e)
     {
         std::cerr << "ValidationError: " << e.what() << std::endl;
         std::cerr << "See '" << parser.Prog() << " --help'" << std::endl;

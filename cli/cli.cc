@@ -111,7 +111,7 @@ Cli::parse_command_line_args (std::vector<std::string> &args)
     {
         parser.ParseArgs (args);
     }
-    catch (args::Help)
+    catch (args::Help&)
     {
         if (!command)
         {
@@ -119,7 +119,7 @@ Cli::parse_command_line_args (std::vector<std::string> &args)
             return (0);
         }
     }
-    catch (args::ParseError e)
+    catch (args::ParseError& e)
     {
         if (!command)
         {
@@ -128,7 +128,7 @@ Cli::parse_command_line_args (std::vector<std::string> &args)
             return (1);
         }
     }
-    catch (args::ValidationError e)
+    catch (args::ValidationError& e)
     {
         if (!command)
         {
