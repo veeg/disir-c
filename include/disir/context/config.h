@@ -14,6 +14,8 @@ extern "C"{
 //! \brief Retrieve the context associated with an already constructed disir_config.
 //!
 //! This context may be used to manipulate or query the config object.
+//! The caller is responsible for invoking dc_putcontext()
+//! after all operations are finished.
 //!
 //! \return NULL if config is NULL.
 //! \return context of type DISIR_CONTEXT_CONFIG.
