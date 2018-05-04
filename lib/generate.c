@@ -180,7 +180,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct disir_version *
         return status;
     }
 
-    generate_config_from_mold_recursive_step (mold->mo_context, config_context, &version, 1);
+    generate_config_from_mold_recursive_step (mold->mo_context, config_context, &version, 0);
 
     status = dc_config_finalize (&config_context, config);
     if (status != DISIR_STATUS_OK)
