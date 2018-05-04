@@ -271,7 +271,8 @@ MoldReader::_unserialize_mold (struct disir_context *parent_context, Json::Value
         else
         {
             dc_fatal_error (parent_context,
-                            "Could not resolve whether object is of type keyval or section");
+                            "Could not resolve whether child object '%s'"
+                            "is of type keyval or section", iter.name().c_str());
             return DISIR_STATUS_INVALID_CONTEXT;
         }
     }
