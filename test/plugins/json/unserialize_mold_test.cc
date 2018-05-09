@@ -237,7 +237,8 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_keyval_nor_section)
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 1);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD",
-                                        "Could not resolve whether object is of type keyval or section");
+                                        "Could not resolve whether child object 'section_name'"\
+                                        " is of type keyval or section");
 }
 
 TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_restriction_object)
@@ -405,7 +406,8 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_unresolvable_top_level_type)
 
     ASSERT_INVALID_CONTEXT_COUNT (mold, 1);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD",
-                                        "Could not resolve whether object is of type keyval or section");
+                                        "Could not resolve whether child object 'section_name'"\
+                                        " is of type keyval or section");
 }
 
 TEST_F (UnMarshallMoldTest, invalid_context_on_section_elements_wrong_type)
