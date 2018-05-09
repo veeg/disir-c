@@ -37,7 +37,7 @@ dx_documentation_add (struct disir_context *parent, struct disir_documentation *
     if (parent == NULL || doc == NULL)
         return DISIR_STATUS_INVALID_ARGUMENT;
 
-    log_info_context (parent, "Adding documentation entry to context,");
+    log_debug_context (4, parent, "Adding documentation entry to context,");
 
     switch(dc_context_type (parent))
     {
