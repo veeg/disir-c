@@ -51,6 +51,13 @@ dx_query_resolve_name (struct disir_context *parent, char *name, char *resolved,
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
+    // If we're not the first invocation to process, we need to add
+    // the key separator between invocations to resolved buffer.
+    if (resolved[0] != '\0')
+    {
+        strcat (resolved, ".");
+    }
+
     // We know that if there is any match, it will match within this key entry, and not the next,
     // since we replaced the key seperator with a NULL.
     index_indicator = strchr (name_above, '@');
