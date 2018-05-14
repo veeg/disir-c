@@ -152,6 +152,22 @@ void dx_context_destroy (struct disir_context **context);
 enum disir_status dx_set_mold_equiv (struct disir_context *context,
                                      const char *value, int32_t value_size);
 
+//! \brief Retrieve the mold equivalent context for the input context
+//!
+//! The input context must have root CONFIG context, where valid contexts are:
+//!     * DISIR_CONTEXT_CONFIG
+//!     * DISIR_CONTEXT_SECTION
+//!     * DISIR_CONTEXT_KEYVAL
+//!
+//! This does not increase the refcount on the returned equiv context.
+//!
+//! \return DISIR_STATUS_WRONG_CONTEXT if root context is not CONFIG.
+//! \return DISIR_STATUS_WRONG_CONTEXT context is not one of supported contexts.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dx_get_mold_equiv (struct disir_context *context, struct disir_context **equiv);
+
 //! \brief Identify context type of a child context matching name
 //!
 //! The input context must have root CONFIG context, where valid contexts are:

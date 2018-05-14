@@ -789,6 +789,37 @@ out:
 
 //! INTERNAL API
 enum disir_status
+dx_get_mold_equiv (struct disir_context *context, struct disir_context **equiv)
+{
+    if (context == NULL || equiv == NULL)
+    {
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    if (dc_context_type (context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    {
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+
+    switch (dc_context_type (context))
+    {
+    case DISIR_CONTEXT_CONFIG:
+        *equiv = context->cx_config->cf_mold->mo_context;
+        break;
+    case DISIR_CONTEXT_SECTION:
+        *equiv = context->cx_section->se_mold_equiv;
+        break;
+    case DISIR_CONTEXT_KEYVAL:
+        *equiv = context->cx_keyval->kv_mold_equiv;
+        break;
+    default:
+        return DISIR_STATUS_WRONG_CONTEXT;
+    }
+    return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
 dx_get_mold_equiv_type (struct disir_context *parent,
                         const char *name, enum disir_context_type *type)
 {
