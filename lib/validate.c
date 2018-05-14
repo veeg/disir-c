@@ -791,7 +791,7 @@ dx_validate_context (struct disir_context *context)
                            " Since we are constructing, returning INVALID_CONTEXT either way.");
         status = DISIR_STATUS_INVALID_CONTEXT;
     }
-    else
+    else if (status != DISIR_STATUS_OK)
     {
         log_debug (4, "validate context returned non-trivial error: %s",
                    disir_status_string (status));
