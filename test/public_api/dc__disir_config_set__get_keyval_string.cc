@@ -36,13 +36,13 @@ class DisirConfigSetGetKeyvalString : public testing::DisirTestTestPlugin
     {
         DisirLogTestBodyExit ();
 
-        if (config)
-        {
-            disir_config_finished (&config);
-        }
         if (context_config)
         {
             dc_putcontext (&context_config);
+        }
+        if (config)
+        {
+            disir_config_finished (&config);
         }
 
         DisirTestTestPlugin::TearDown ();
@@ -122,20 +122,62 @@ TEST_F (DisirConfigSetGetKeyvalString, dc_set_nonexisting_key_in_subsection_with
     ASSERT_STREQ ("bloody", string_value);
 }
 
-TEST_F (DisirConfigSetGetKeyvalString, dc_set_nonexisting_key_in_subsection_outside_range)
+TEST_F (DisirConfigSetGetKeyvalString, dc_set_nonexisting_key_in_existing_subsection_outside_range)
 {
     ASSERT_NO_SETUP_FAILURE();
 
     status = dc_config_set_keyval_string (context_config, "bloody", "first@1.key_string@2");
-    ASSERT_STATUS (DISIR_STATUS_NOT_EXIST, status);
+    ASSERT_STATUS (DISIR_STATUS_CONFLICT, status);
 }
 
-TEST_F (DisirConfigSetGetKeyvalString, dc_set_invalid_key_in_subsection)
+TEST_F (DisirConfigSetGetKeyvalString,
+        dc_set_nonexisting_key_in_nonexisting_subsection_outside_range)
+{
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = dc_config_set_keyval_string (context_config, "bloody", "first@2.key_string@2");
+    EXPECT_STATUS (DISIR_STATUS_CONFLICT, status);
+    EXPECT_STREQ ("accessing non-existent index key_string@2, expected index 1",
+                  dc_context_error (context_config));
+}
+
+TEST_F (DisirConfigSetGetKeyvalString,
+        dc_set_nonexisting_key_in_nonexisting_subsection_exceeds_maximum)
+{
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = dc_config_set_keyval_string (context_config, "bloody", "first@2.key_string@6");
+    EXPECT_STATUS (DISIR_STATUS_RESTRICTION_VIOLATED, status);
+    EXPECT_STREQ ("accessing index key_string@6 exceeds maximum allowed instances of 3",
+                  dc_context_error (context_config));
+}
+
+TEST_F (DisirConfigSetGetKeyvalString, dc_set_invalid_key_in_existing_subsection)
 {
     ASSERT_NO_SETUP_FAILURE();
 
     status = dc_config_set_keyval_string (context_config, "bloody", "first@1.bloody_key");
-    ASSERT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
+    EXPECT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
+    EXPECT_STREQ ("keyval bloody_key does not exist", dc_context_error (context_config));
+}
+
+TEST_F (DisirConfigSetGetKeyvalString, dc_set_invalid_key_in_nonexisting_subsection)
+{
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = dc_config_set_keyval_string (context_config, "bloody", "first@2.bloody_key");
+    EXPECT_STATUS (DISIR_STATUS_MOLD_MISSING, status);
+    EXPECT_STREQ ("keyval bloody_key does not exist", dc_context_error (context_config));
+}
+
+TEST_F (DisirConfigSetGetKeyvalString,
+        dc_set_existing_key_in_nonexisting_subsection_that_is_creatable)
+{
+    ASSERT_NO_SETUP_FAILURE();
+
+    status = dc_config_set_keyval_string (context_config, "bloody", "first@2.key_string");
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    EXPECT_STREQ (NULL, dc_context_error (context_config));
 }
 
 TEST_F (DisirConfigSetGetKeyvalString, disir_get_valid_key)

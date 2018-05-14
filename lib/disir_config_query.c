@@ -11,6 +11,7 @@
 #include "query_private.h"
 #include "log.h"
 #include "value.h"
+#include "restriction.h"
 
 //! Nested naming scheme
 //! e.g. "section@2.keyval@3, which accesses the section element 'section', whose element
@@ -149,6 +150,126 @@ config_get_keyval_generic (struct disir_context *parent, enum disir_value_type t
     return status;
 }
 
+static enum disir_status
+config_ensure_keyval_leaf (struct disir_context *immediate_parent, const char *keyval_name,
+                           int keyval_index, enum disir_value_type value_type,
+                           const char *value_string, uint8_t value_boolean, int64_t value_integer,
+                           double value_float)
+{
+    enum disir_status status;
+    struct disir_context *parent_mold_equiv = NULL;
+    struct disir_context *element_mold_equiv = NULL;
+
+    // Get the mold equivalen of our keyval, to check if it exists and that we can create it.
+    dx_get_mold_equiv (immediate_parent, &parent_mold_equiv);
+    status = dc_find_element (parent_mold_equiv, keyval_name, 0, &element_mold_equiv);
+    // NOTE: parent_mold_equiv is not incref'ed
+    if (status != DISIR_STATUS_OK)
+    {
+        // FIXME: We should have the path to the immediate_parent here as well.
+        dx_context_error_set (immediate_parent, "keyval %s does not exist", keyval_name);
+        log_debug (2, "unable to find keyval mold: %s", disir_status_string (status));
+        return DISIR_STATUS_MOLD_MISSING;
+    }
+
+    int max_elements = 0;
+    enum disir_context_type element_type = dc_context_type (element_mold_equiv);
+
+    // Check if our keyval_index is out of bounds of the maximum number of instances.
+    status = dx_restriction_entries_value (element_mold_equiv,
+                                           DISIR_RESTRICTION_INC_ENTRY_MAX,
+                                           NULL, &max_elements);
+    dc_putcontext (&element_mold_equiv);
+    if (status != DISIR_STATUS_OK)
+    {
+        log_warn ("TODO: HANDLE ERROR MESSAGE: restriction_entries_value");
+        return status;
+    }
+
+    log_debug (2, "ensuring leaf keyval %s, max: %d, index: %d",
+               keyval_name, max_elements, keyval_index);
+    // Ensure that the index we are creating is within bounds
+    // 1: index does not exceed max
+    if (max_elements != 0 && max_elements <= keyval_index)
+    {
+        dx_context_error_set (immediate_parent,
+                              "accessing index %s@%d exceeds maximum allowed instances of %d",
+                              keyval_name, keyval_index, max_elements);
+        log_debug (2, "%s", dc_context_error (immediate_parent));
+        return DISIR_STATUS_RESTRICTION_VIOLATED;
+    }
+
+    int num_elements = 0;
+    struct disir_collection *collection;
+    status = dc_find_elements (immediate_parent, keyval_name, &collection);
+    if (status == DISIR_STATUS_OK)
+    {
+        num_elements = dc_collection_size (collection);
+        dc_collection_finished (&collection);
+    }
+    if (keyval_index != num_elements)
+    {
+        dx_context_error_set (immediate_parent,
+                              "accessing non-existent index %s@%d, expected index %d",
+                              keyval_name, keyval_index, num_elements);
+        log_debug (2, "%s", dc_context_error (immediate_parent));
+        return DISIR_STATUS_CONFLICT;
+    }
+
+    // Check that the element type is a section
+    if (element_type != DISIR_CONTEXT_KEYVAL)
+    {
+        dx_context_error_set (immediate_parent,
+                              "expected %s to be a keyval, is section", keyval_name);
+        return DISIR_STATUS_CONFLICT;
+    }
+
+    // Hurray, we can create this leaf keyval.
+    struct disir_context *context = NULL;
+
+    status = dc_begin (immediate_parent, DISIR_CONTEXT_KEYVAL, &context);
+    if (status != DISIR_STATUS_OK)
+    {
+        return status;
+    }
+    status = dc_set_name (context, keyval_name, strlen (keyval_name));
+    if (status != DISIR_STATUS_OK)
+    {
+        log_warn ("set_name failed, even though it shouldnt have: %s",
+                  disir_status_string (status));
+        return status;
+    }
+
+    // Check that the keyval type is what we expect
+    if (dc_value_type (context) != value_type)
+    {
+        dx_context_error_set (immediate_parent, "expected type %s, found %s",
+                              dx_value_type_string (value_type),
+                              dc_value_type_string (context));
+        dc_destroy (&context);
+        return DISIR_STATUS_WRONG_VALUE_TYPE;
+    }
+
+    status = set_value_generic (context, value_type, value_string, value_boolean,
+                                value_integer, value_float);
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_context_transfer_logwarn (immediate_parent, context);
+        dc_destroy (&context);
+        return status;
+    }
+
+    status = dc_finalize (&context);
+    if (status != DISIR_STATUS_OK)
+    {
+        dx_context_transfer_logwarn (immediate_parent, context);
+        dc_destroy (&context);
+        return status;
+    }
+
+    return DISIR_STATUS_OK;
+}
+
 //! STATIC API
 static enum disir_status
 config_set_keyval_generic (struct disir_context *parent, enum disir_value_type type,
@@ -157,9 +278,12 @@ config_set_keyval_generic (struct disir_context *parent, enum disir_value_type t
                            double value_float)
 {
     enum disir_status status;
-    struct disir_context *context;
-    struct disir_context *section;
+    struct disir_context *context = NULL;
     char keyval_name[2048];
+    int keyval_index = 0;
+    va_list args_copy;
+
+    keyval_name[0] = '\0';
 
     if (parent == NULL || query == NULL)
     {
@@ -174,87 +298,91 @@ config_set_keyval_generic (struct disir_context *parent, enum disir_value_type t
         return DISIR_STATUS_INVALID_ARGUMENT;
     }
 
-    context = NULL;
-    section = NULL;
+    // We need to copy the args before we use them
+    va_copy (args_copy, args);
 
     status = dc_query_resolve_context_va (parent, query, &context, args);
     if (status == DISIR_STATUS_OK)
     {
+        log_debug (2, "set_keyval query resolved to existing keyval");
         status = set_value_generic (context, type, value_string, value_boolean,
                                     value_integer, value_float);
+        if (status != DISIR_STATUS_OK)
+        {
+            dx_context_transfer_logwarn (parent, context);
+        }
+
+        dc_putcontext (&context);
     }
     else if (status == DISIR_STATUS_NOT_EXIST)
     {
-        // Lets find the context of the section that should contain the leaf keyval
-        status = dx_query_resolve_parent_context (parent, &section, keyval_name,
-                                                  query, args);
+        struct disir_context *ancestor = NULL;
+        struct disir_context *immediate_parent = NULL;
+
+        log_debug (2, "set_keyval_query didn't resolve - ensuring ancestors exist.");
+        status = dx_query_ensure_ancestors (parent, query, args_copy, &ancestor, &immediate_parent,
+                                            keyval_name, &keyval_index);
         if (status != DISIR_STATUS_OK)
         {
-            // The section containing the leaf keyval does not exist. Bail
-            return status;
+            // Status already set
+            goto out;
         }
 
-        // Create the leaf keyval
-        status = dc_begin (section, DISIR_CONTEXT_KEYVAL, &context);
-        if (status != DISIR_STATUS_OK)
+        // Check if we've been able to create it during ensure_ancestors
+        status = dc_find_element(immediate_parent, keyval_name, keyval_index, &context);
+        if (status == DISIR_STATUS_OK)
         {
-            goto error;
-        }
-        status = dc_set_name (context, keyval_name, strlen (keyval_name));
-        if (status != DISIR_STATUS_OK)
-        {
-            // Signal to the caller that the requested key was infact, invalid.
-            if (status == DISIR_STATUS_NOT_EXIST)
+            log_debug (2, "Our keyval was created during ensure_ancestors");
+            // Lucily, we've can just set the value!
+            // If this fails, we will destroy the ancestor
+            status = set_value_generic (context, type, value_string, value_boolean,
+                                        value_integer, value_float);
+            // If this fails, transfer the
+            if (status != DISIR_STATUS_OK)
             {
-                status = DISIR_STATUS_MOLD_MISSING;
+                dx_context_transfer_logwarn (parent, context);
             }
-            goto error;
+            dc_putcontext (&context);
         }
-
-        // Check that the keyval type is actually string
-        if (dc_value_type (context) != type)
+        else
         {
-            dx_context_error_set (context, "expected type %s", dc_value_type_string(context));
-            status = DISIR_STATUS_WRONG_VALUE_TYPE;
-            goto error;
+            log_debug (2, "Our keyval doesnt exist (%s)- validate query and create it",
+                          disir_status_string (status));
+            // We need to find the mold equivalent of our immediate_parent,
+            // and ensure that the keyval_name@keyval_index is the only one we can create
+            status = config_ensure_keyval_leaf (immediate_parent, keyval_name,
+                                                keyval_index, type,
+                                                value_string, value_boolean,
+                                                value_integer, value_float);
+
+            if (status != DISIR_STATUS_OK)
+            {
+                dx_context_transfer_logwarn (parent, immediate_parent);
+            }
         }
 
-        status = set_value_generic (context, type, value_string, value_boolean,
-                                    value_integer, value_float);
-        if (status != DISIR_STATUS_OK)
+        dc_putcontext (&immediate_parent);
+
+        // If we've created an ancestor, we need to finalize/destroy it
+        if (ancestor && status == DISIR_STATUS_OK)
         {
-            // TODO: Set error?
-            goto error;
+            status = dc_finalize (&ancestor);
+            if (status != DISIR_STATUS_OK)
+            {
+                dx_context_transfer_logwarn (parent, ancestor);
+                dc_destroy (&ancestor);
+            }
         }
-
-        status = dc_finalize (&context);
-        if (status != DISIR_STATUS_OK)
+        else if (ancestor)
         {
-            // Abort the creation
-            goto error;
+            // We've failed!
+            dc_destroy (&ancestor);
         }
     }
 
-    // FALL-THROUGH
-error:
-    if (status != DISIR_STATUS_OK)
-    {
-        dx_context_transfer_logwarn (parent, context);
-    }
-    else
-    {
-        // We do not DESTROY the keyval if it went OK, only put it away
-        dc_putcontext (&context);
-    }
-    if (section)
-    {
-        dc_putcontext (&section);
-    }
-    if (context)
-    {
-        // Since the context was not put away, we are in an error condition and want to destroy it
-        dc_destroy (&context);
-    }
+out:
+    // Must ensure that va_copy is matched with a va_end
+    va_end (args_copy);
 
     return status;
 }
