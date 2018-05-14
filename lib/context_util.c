@@ -251,6 +251,10 @@ dx_context_transfer_logwarn (struct disir_context *destination, struct disir_con
     if (source->cx_error_message_size <= 0)
         return;
 
+    // Dont do jack shit if both source and dest is the same
+    if (source == destination)
+        return;
+
     // Remove existing error message at destination
     if (destination->cx_error_message)
     {
