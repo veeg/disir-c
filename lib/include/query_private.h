@@ -49,6 +49,45 @@ enum disir_status
 dx_query_resolve_parent_context (struct disir_context *parent, struct disir_context **out,
                                  char *keyval_name, const char *query, va_list args);
 
+//! \brief Ensure that all sections exist in query.
+//!
+//! If any of the sections in the query does not exist,
+//! it will attempt to create one in its place if its eligdable.
+//! It will not allow to create a section whose index exceed
+//! that of which already exists.
+//! Example:
+//!     "section@0" exists.
+//!     "section@1" does not exist.
+//!     "section@1.keyval" will succeed, with section index 1 created.
+//!     query "section@2.keyval" will fail, since index 1 does not exist.
+//!
+//! If the ancestor parameter is supplied, the section that must be created,
+//! closest to the root of the query, will NOT be finalized and returned to
+//! the caller. The parent will always be a reference to the section occurring
+//! directly before the keyval specification.
+//! Example:
+//!     "section@0" exists.
+//!     "section@0.nested@1" exists.
+//!     "section@0.nested@2" does not exist.
+//!     query: "section@0.nested@2.super@1.keyval"
+//!      - ancestor will be "section@0.nested@2"
+//!      - parent will be "section@0.nested@.super@1"
+//!
+//! \return DISIR_STATUS_NO_CAN_DO if we're attempting to access a non-existent
+//!     index to an element we cannot create an instance of. We can only create instances
+//!     of the index that is one greater than the number current instances.
+//! \return DISIR_STATUS_MOL_MISSING if any name referenced in query does not exist.
+//! \return DISIR_STATUS_CONFLICT if name in query resolved as a keyval, when section was expected.
+//! \return DISIR_STATUS_RESTRICTION_VIOLATED if we exceed maximum allowed instances.
+//! \return DISIR_STATUS_OK on success.
+//!
+enum disir_status
+dx_query_ensure_ancestors (struct disir_context *config,
+                           const char *query, va_list args,
+                           struct disir_context **ancestor,
+                           struct disir_context **parent,
+                           char *element_child_name, int *element_child_index);
+
 
 #endif // _LIBDISIR_PRIVATE_QUERY_H
 

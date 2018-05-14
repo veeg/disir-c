@@ -7,6 +7,7 @@
 
 #include "context_private.h"
 #include "query_private.h"
+#include "restriction.h"
 #include "log.h"
 
 
@@ -112,6 +113,255 @@ dx_query_resolve_name (struct disir_context *parent, char *name, char *resolved,
     *next = name_below;
 
     return DISIR_STATUS_OK;
+}
+
+//! INTERNAL API
+enum disir_status
+dx_query_ensure_ancestors (struct disir_context *config,
+                           const char *query, va_list args,
+                           struct disir_context **ancestor,
+                           struct disir_context **parent,
+                           char *element_child_name, int *element_child_index)
+{
+    enum disir_status status;
+    va_list args_copy;
+    char buffer[2048];
+    char resolved[2048];
+    char *current_element = NULL;
+    char *next_element = NULL;
+    char *last_element = NULL;
+    int current_index = 0;
+    int last_index = 0;
+
+    struct disir_context *current_context = NULL;
+    struct disir_context *parent_context = NULL;
+    struct disir_context *ancestor_context = NULL;
+
+    TRACE_ENTER ("parent (%p)", config);
+
+    // Populate a buffer with our query that we can process
+    va_copy (args_copy, args);
+    vsnprintf (buffer, 2048, query, args_copy);
+    va_end (args_copy);
+
+    resolved[0] = '\0';
+    current_element = buffer;
+    last_element = buffer;
+    parent_context = config;
+    do
+    {
+        status = dx_query_resolve_name (config, current_element, resolved,
+                                        &next_element, &current_index);
+        if (status != DISIR_STATUS_OK)
+        {
+            // config is populated with the appropriate error message
+            break;
+        }
+
+        // current_element now represent the last_element
+        if (!next_element)
+        {
+            // parent_context has been located!
+            last_element = current_element;
+            last_index = current_index;
+            break;
+        }
+
+        // Check if current_element@current_index exist in parent_context
+        // If not, create the section and mark it as the ancestor if not already sat.
+        status = dc_find_element (parent_context, current_element, current_index, &current_context);
+        if (status == DISIR_STATUS_NOT_EXIST)
+        {
+            int num_elements = 0;
+            // Can we create this element?
+            // find out how many elements there are, to ensure that we are
+            // referecing the index that should be created.
+            struct disir_collection *collection;
+            status = dc_find_elements (parent_context, current_element, &collection);
+            if (status == DISIR_STATUS_OK)
+            {
+                num_elements = dc_collection_size (collection);
+                dc_collection_finished (&collection);
+            }
+            else if (status != DISIR_STATUS_NOT_EXIST)
+            {
+                // internal error
+                log_warn ("unknown error: %s", disir_status_string (status));
+                status = DISIR_STATUS_INTERNAL_ERROR;
+                break;
+            }
+
+            // index must equal collection size
+            // The existing element is (collection size - 1), so
+            // when they are equal, we are able to create it.
+            if (current_index != num_elements)
+            {
+                status = DISIR_STATUS_NO_CAN_DO;
+                dx_context_error_set (config, "accessing index %s is out of range of existing" \
+                                               " number of elements %d, can only access index" \
+                                               " that is one greater",
+                                               resolved, num_elements);
+                break;
+            }
+
+            // Get mold equvalent to parent_context.
+            // This allows us to find the correct element to query
+            // the max number of elements allowed.
+            struct disir_context *parent_mold_equiv = NULL;
+            struct disir_context *element_mold_equiv = NULL;
+            dx_get_mold_equiv (parent_context, &parent_mold_equiv);
+            status = dc_find_element (parent_mold_equiv, current_element, 0, &element_mold_equiv);
+            // NOTE: parent_mold_equiv is not incref'ed
+            if (status != DISIR_STATUS_OK)
+            {
+                status = DISIR_STATUS_MOLD_MISSING;
+                dx_context_error_set (config, "section %s does not exist", resolved);
+                break;
+            }
+
+            int max_elements = 0;
+            status = dx_restriction_entries_value (element_mold_equiv,
+                                                   DISIR_RESTRICTION_INC_ENTRY_MAX,
+                                                   NULL, &max_elements);
+            if (status != DISIR_STATUS_OK)
+            {
+                dc_putcontext (&element_mold_equiv);
+                log_warn ("TODO: HANDLE ERROR MESSAGE: restriction_entries_value");
+                break;
+            }
+
+            // Check that the element type is a section
+            if (dc_context_type (element_mold_equiv) != DISIR_CONTEXT_SECTION)
+            {
+                dx_context_error_set (config, "expected %s to be a section, is keyval", resolved);
+                dc_putcontext (&element_mold_equiv);
+                status = DISIR_STATUS_CONFLICT;
+                break;
+            }
+
+            // Mark ourselves finished with this element
+            dc_putcontext (&element_mold_equiv);
+
+            // Check that the maximum restrictions for this context
+            // is greater than index
+            if (max_elements != 0 && max_elements <= current_index)
+            {
+                status = DISIR_STATUS_RESTRICTION_VIOLATED;
+                dx_context_error_set (config, "accessing index %s exceeds maximum elements %d",
+                                      resolved, max_elements);
+                break;
+            }
+
+            // We can successfully create the section
+            status = dc_begin (parent_context, DISIR_CONTEXT_SECTION, &current_context);
+            if (status != DISIR_STATUS_OK)
+            {
+                status = DISIR_STATUS_INTERNAL_ERROR;
+                log_warn ("TODO: HANDLE ERROR MESSAGE: dc_begin");
+                break;
+            }
+
+            // Set the context we've created highest up in the tree.
+            if (!ancestor_context)
+            {
+                ancestor_context = current_context;
+            }
+
+            status = dc_set_name (current_context, current_element, strlen(current_element));
+            if (status != DISIR_STATUS_OK)
+            {
+                log_warn ("TODO: HANDLE ERROR MESSAGE: set_name");
+                // TODO: Verify / sanify error message
+                // This should only happend if the variable referenced is a KEYVAL, not a section.
+                dx_context_transfer_logwarn (config, current_context);
+                dc_destroy (&current_context);
+                break;
+            }
+
+            status = dc_generate_from_config_root (current_context);
+            if (status != DISIR_STATUS_OK)
+            {
+                // This should NOT happend.
+                log_warn ("TODO: HANDLE ERROR MESSAGE: generate_from_config_root");
+                dc_destroy (&current_context);
+                break;
+            }
+
+            // We do not finalize the section if its our first ancestor
+            if (ancestor_context != current_context)
+            {
+                status = dc_finalize_keep_reference (current_context);
+                if (status != DISIR_STATUS_OK)
+                {
+                    // Ouch - what is wrong here?
+                    // TODO: error message
+                    log_warn ("TODO: HANDLE ERROR MESSAGE: dc_finalize_keep_reference");
+                    status = DISIR_STATUS_INTERNAL_ERROR;
+                    dc_destroy (&current_context);
+                    break;
+                }
+            }
+        }
+        else
+        {
+            // Check that our current_context is a section
+            if (dc_context_type (current_context) != DISIR_CONTEXT_SECTION)
+            {
+                dx_context_error_set (config, "expected %s to be a section, is keyval", resolved);
+                status = DISIR_STATUS_CONFLICT;
+                dx_context_decref (&current_context);
+                break;
+            }
+        }
+        // QUESTION: Handle any other situation?
+
+        // Update the parent for the next iteration in the loop
+        parent_context = current_context;
+        current_element = next_element;
+
+        // Do not decref our context if its our ancestor
+        if (current_context != ancestor_context)
+        {
+            dx_context_decref (&current_context);
+        }
+
+    } while (1);
+
+    // If we encounter an error condition, and we have created an ancestor,
+    // we need to destroy it.
+    if (status != DISIR_STATUS_OK && ancestor_context)
+    {
+        // We should only destroy the ancestor if we havent already destroyed
+        // it in our loop above
+        if (ancestor_context != current_context)
+        {
+            dc_destroy (&ancestor_context);
+        }
+    }
+
+    // Populate the output parameters
+    if (status == DISIR_STATUS_OK)
+    {
+        strcat (element_child_name, last_element);
+        *element_child_index = last_index;
+        if (parent)
+        {
+            *parent = parent_context;
+            dx_context_incref (*parent);
+        }
+        if (ancestor_context)
+        {
+            // We do NOT incref the ancestor, since it is not finalized
+            *ancestor = ancestor_context;
+        }
+        else
+        {
+            // TODO: finalize the ancestor
+        }
+    }
+
+    TRACE_EXIT ("status: %s", disir_status_string (status));
+    return status;
 }
 
 //! STATIC API
