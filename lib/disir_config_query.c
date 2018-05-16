@@ -755,3 +755,157 @@ dc_config_set_keyval_string (struct disir_context *parent, const char *value,
     TRACE_EXIT ("%s", disir_status_string (status));
     return status;
 }
+
+//! PUBLIC API: low-level
+enum disir_status
+dc_config_get_keyval_enum (struct disir_context *context, const char **value,
+                           const char *query, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    va_start (args, query);
+    status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_ENUM, query, args,
+                                        value, NULL, NULL, NULL);
+    va_end (args);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API: low-level
+enum disir_status
+dc_config_set_keyval_enum (struct disir_context *context, const char *value,
+                           const char *query, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    va_start (args, query);
+    status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_ENUM, query, args,
+                                        value, 0, 0, 0);
+    va_end (args);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API: low-level
+enum disir_status
+dc_config_get_keyval_float (struct disir_context *context, double *value,
+                            const char *query, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    va_start (args, query);
+    status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_FLOAT, query, args,
+                                        NULL, NULL, NULL, value);
+    va_end (args);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+
+//! PUBLIC API: low-level
+enum disir_status
+dc_config_set_keyval_float (struct disir_context *context, double value,
+                            const char *query, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    va_start (args, query);
+    status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_FLOAT, query, args,
+                                        NULL, 0, 0, value);
+    va_end (args);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+
+//! PUBLIC API: low-level
+enum disir_status
+dc_config_get_keyval_boolean (struct disir_context *context, uint8_t *value,
+                              const char *query, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    va_start (args, query);
+    status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_BOOLEAN, query, args,
+                                        NULL, value, NULL, NULL);
+    va_end (args);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API: low-level
+enum disir_status
+dc_config_set_keyval_boolean (struct disir_context *context, uint8_t value,
+                              const char *query, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    va_start (args, query);
+    status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_BOOLEAN, query, args,
+                                        NULL, value, 0, 0);
+    va_end (args);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API: low-level
+enum disir_status
+dc_config_get_keyval_integer (struct disir_context *context, int64_t *value,
+                              const char *query, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    va_start (args, query);
+    status = config_get_keyval_generic (context, DISIR_VALUE_TYPE_INTEGER, query, args,
+                                        NULL, NULL, value, NULL);
+    va_end (args);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
+
+//! PUBLIC API: low-level
+enum disir_status
+dc_config_set_keyval_integer (struct disir_context *context, int64_t value,
+                              const char *query, ...)
+{
+    enum disir_status status;
+    va_list args;
+
+    TRACE_ENTER ("");
+
+    va_start (args, query);
+    status = config_set_keyval_generic (context, DISIR_VALUE_TYPE_INTEGER, query, args,
+                                        NULL, 0, value, 0);
+    va_end (args);
+
+    TRACE_EXIT ("%s", disir_status_string (status));
+    return status;
+}
