@@ -560,9 +560,11 @@ disir_import_finalize (struct disir_instance *instance, enum disir_import_option
 
         for (i = 0; i < (*import)->di_num_entries; i++)
         {
-           buf[0] = '\n';
-           current = (*import)->di_entries[i];
-           if (current == NULL)
+            // Reset the status for each entry, since the logic relies on it.
+            status = DISIR_STATUS_OK;
+            buf[0] = '\n';
+            current = (*import)->di_entries[i];
+            if (current == NULL)
                continue;
 
            // Only import configs that have been resolved
