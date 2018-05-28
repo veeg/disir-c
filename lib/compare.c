@@ -537,7 +537,6 @@ compare_all_elements (struct disir_context *lhs, struct disir_context *rhs,
         // Entry already handled. Skip it.
         if (multimap_contains_key (map, name))
         {
-            dc_putcontext (&element);
             continue;
         }
 
@@ -593,7 +592,6 @@ compare_all_elements (struct disir_context *lhs, struct disir_context *rhs,
         // Entry exists in lhs - skip it
         if (multimap_contains_key (map, name))
         {
-            dc_putcontext (&element);
             continue;
         }
 
@@ -688,6 +686,8 @@ diff_compare_contexts_with_report (struct disir_context *lhs, struct disir_conte
             int32_t size;
             char lhsbuf[100];
             char rhsbuf[100];
+            lhsbuf[0] = '\0';
+            rhsbuf[0] = '\0';
             dx_value_stringify (&lhs->cx_keyval->kv_value, 100, lhsbuf, &size);
             dx_value_stringify (&rhs->cx_keyval->kv_value, 100, rhsbuf, &size);
             // QUESTION: Remove hardcoded size and allow dynamic range?
