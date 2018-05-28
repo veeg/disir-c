@@ -96,7 +96,7 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
         }
         else
         {
-            log_debug (3, "Failed to reallocate memory for diff report entry.");
+            log_error ("Failed to reallocate memory for diff report entry.");
             return;
         }
     }
@@ -105,7 +105,7 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
     report->dr_diff_string[i] = malloc (n);
     if (report->dr_diff_string[i] == NULL)
     {
-        log_debug (3, "Failed to allocate memory for diff entry string.");
+        log_error ("Failed to allocate memory for diff entry string.");
         return;
     }
 
@@ -116,7 +116,7 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
         if (ret < 0)
         {
             // Encoding error.
-            log_debug (0, "vsnprintf encoding error. Failed to write diff report string.");
+            log_error ("vsnprintf encoding error. Failed to write diff report string.");
             break;
         }
         else if (ret >= n)
@@ -130,7 +130,7 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
             }
             else
             {
-                log_debug (3, "Failed to realloc memory for diff report string.");
+                log_error ("Failed to realloc memory for diff report string.");
                 break;
             }
         }
@@ -361,7 +361,7 @@ compare_all_in_name (struct disir_context *lhs, struct disir_context *rhs, const
     struct disir_context *lhs_entry = NULL;
     struct disir_context *rhs_entry = NULL;
 
-    log_error ("Comparing %s (%p vs %p", name, lhs, rhs);
+    log_debug (1, "Comparing %s (%p vs %p)", name, lhs, rhs);
 
     status = dc_find_elements (lhs, name, &lhs_collection);
     if (status != DISIR_STATUS_OK)

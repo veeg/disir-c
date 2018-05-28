@@ -39,7 +39,7 @@ disir_error_set (struct disir_instance *instance, const char *message, ...)
         return;
 
     va_start (args, message);
-    dx_log_disir (DISIR_LOG_LEVEL_ERROR, 0, NULL, instance, 0, NULL, NULL, 0, NULL, message, args);
+    dx_log_disir (DISIR_LOG_LEVEL_DEBUG, 0, NULL, instance, 0, __FILE__, __func__, __LINE__, NULL, message, args);
     va_end (args);
 }
 
