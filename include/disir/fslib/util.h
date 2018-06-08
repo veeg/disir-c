@@ -41,6 +41,7 @@ typedef enum disir_status (*dio_unserialize_mold) (struct disir_instance *,
 //! \return DISIR_STATUS_FS_ERROR on any other error condition
 //! \return DISIR_STATUS_OK on success (entire path may already exist as directories)
 //!
+DISIR_EXPORT
 enum disir_status
 fslib_mkdir_p (struct disir_instance *instance, const char *path);
 
@@ -49,6 +50,7 @@ fslib_mkdir_p (struct disir_instance *instance, const char *path);
 //!
 //! return empty string if no such namespace entry can be created
 //!
+DISIR_EXPORT
 const char *
 fslib_namespace_entry (const char *name, char *namespace_entry);
 
@@ -60,8 +62,10 @@ fslib_namespace_entry (const char *name, char *namespace_entry);
 //! \return DISIR_STATUS_INSUFFICIENT_RESOURCES if the resolved path is too large.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
-fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_register_plugin *plugin,
+fslib_config_resolve_filepath (struct disir_instance *instance,
+                               struct disir_register_plugin *plugin,
                                const char *entry_id, char *filepath);
 
 //! \brief Resolve entry_id to plugin filepath for mold.
@@ -72,6 +76,7 @@ fslib_config_resolve_filepath (struct disir_instance *instance, struct disir_reg
 //! \return DISIR_STATUS_INSUFFICIENT_RESOURCES if the resolved path is too large.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_register_plugin *plugin,
                              const char *entry_id, char *filepath);
@@ -86,6 +91,7 @@ fslib_mold_resolve_filepath (struct disir_instance *instance, struct disir_regis
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_register_plugin *plugin,
                              const char *entry_id, char *filepath,
@@ -93,6 +99,7 @@ fslib_mold_resolve_entry_id (struct disir_instance *instance, struct disir_regis
                              int *namespace_entry);
 
 //! \brief Resolve mold entry from filepath
+DISIR_EXPORT
 enum disir_status
 fslib_mold_resolve_entry_filepath (struct disir_instance *instance, const char *entry_path,
                              char *filepath, char *override_filepath, struct stat *statbuf,
@@ -105,6 +112,7 @@ fslib_mold_resolve_entry_filepath (struct disir_instance *instance, const char *
 //! \return DISIR_STATUS_NOT_EXIST if filepath does not exist.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 fslib_stat_filepath (struct disir_instance *instance,
                      const char *filepath, struct stat *statbuf);
@@ -113,16 +121,19 @@ fslib_stat_filepath (struct disir_instance *instance,
 //!
 //! \return DISIR_STATUS_OK regardless of query operation
 //!
+DISIR_EXPORT
 enum disir_status
 fslib_config_query_entries (struct disir_instance *instance, struct disir_register_plugin *plugin,
                             const char *basedir, struct disir_entry **entries);
 
 //! \brief Generic recursive query implementation of mold_entries
+DISIR_EXPORT
 enum disir_status
 fslib_mold_query_entries (struct disir_instance *instance, struct disir_register_plugin *plugin,
                           const char *basedir, struct disir_entry **entries);
 
 //! \brief Generic filesystem based implementation of config_read
+DISIR_EXPORT
 enum disir_status
 fslib_plugin_config_read (struct disir_instance *instance,
                           struct disir_register_plugin *plugin, const char *entry_id,
@@ -130,6 +141,7 @@ fslib_plugin_config_read (struct disir_instance *instance,
                           dio_unserialize_config func_unserialize);
 
 //! \brief Generic filesystem based implementation of mold_read
+DISIR_EXPORT
 enum disir_status
 fslib_plugin_mold_read (struct disir_instance *instance,
                         struct disir_register_plugin *plugin, const char *entry_id,
@@ -137,28 +149,33 @@ fslib_plugin_mold_read (struct disir_instance *instance,
                         dio_unserialize_mold func_unserialize);
 
 //! \brief Generic filesystem based implementation of config_write
+DISIR_EXPORT
 enum disir_status
 fslib_plugin_config_write (struct disir_instance *instance, struct disir_register_plugin *plugin,
                            const char *entry_id, struct disir_config *config,
                            dio_serialize_config func_serialize);
 
 //! \brief Generic filesystem based implementation of mold_write
+DISIR_EXPORT
 enum disir_status
 fslib_plugin_mold_write (struct disir_instance *instance, struct disir_register_plugin *plugin,
                          const char *entry_id, struct disir_mold *mold,
                          dio_serialize_mold func_serialize);
 
 //! \brief Generic filesystem based implementation of config_remove
+DISIR_EXPORT
 enum disir_status
 fslib_plugin_config_remove (struct disir_instance *instance, struct disir_register_plugin *plugin,
                             const char *entry_id);
 
 //! \brief Generic filesystem based implementation of config_query
+DISIR_EXPORT
 enum disir_status
 fslib_plugin_config_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                            const char *entry_id, struct disir_entry **entry);
 
 //! \brief Generic filesystem based implementation of mold_query
+DISIR_EXPORT
 enum disir_status
 fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_plugin *plugin,
                          const char *entry_id, struct disir_entry **entry);

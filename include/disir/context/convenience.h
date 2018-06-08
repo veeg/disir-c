@@ -5,6 +5,7 @@
 extern "C"{
 #endif // __cplusplus
 
+#include <disir/disir.h>
 
 //!
 //! This file contains the high level context convenience functions.
@@ -32,6 +33,7 @@ extern "C"{
 //! \return DISIR_STATUS_EXISTS  if a documentation entry already exists.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_documentation (struct disir_context *context, const char *doc, int32_t doc_size);
 
@@ -59,6 +61,7 @@ dc_add_documentation (struct disir_context *context, const char *doc, int32_t do
 //! \return DISIR_STATUS_WRONG_CONTEXT if context is not of supported type.
 //! \return DISIR_STATUS_OK if doc is popualted with documentation string of context.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_documentation (struct disir_context *context, struct disir_version *version,
                       const char **doc, int32_t *doc_size);
@@ -79,6 +82,7 @@ dc_get_documentation (struct disir_context *context, struct disir_version *versi
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_keyval_string (struct disir_context *parent,
                       const char *name, const char *def,
@@ -106,6 +110,7 @@ dc_add_keyval_string (struct disir_context *parent,
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_keyval_enum (struct disir_context *parent,
                     const char *name, const char *def,
@@ -128,6 +133,7 @@ dc_add_keyval_enum (struct disir_context *parent,
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_keyval_integer (struct disir_context *parent,
                        const char *name, int64_t def,
@@ -150,6 +156,7 @@ dc_add_keyval_integer (struct disir_context *parent,
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_keyval_float (struct disir_context *parent,
                      const char *name, double def,
@@ -172,6 +179,7 @@ dc_add_keyval_float (struct disir_context *parent,
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either 'name', 'def' or 'doc' are NULL.
 //! \return DISIR_STATUS_WRONG_CONTEXT if input 'parent' is of wrong context type.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_keyval_boolean (struct disir_context *parent,
                        const char *name, uint8_t def,
@@ -195,6 +203,7 @@ dc_add_keyval_boolean (struct disir_context *parent,
 //!
 //! \return DISIR_STATUS_OK if a new default object was associated with the parent context
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_default (struct disir_context *context, const char *value,
                 int32_t value_size, struct disir_version *version);
@@ -214,6 +223,7 @@ dc_add_default (struct disir_context *context, const char *value,
 //!     to the parent context.
 //! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'version'.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_default_string (struct disir_context *parent, const char *value,
                        int32_t value_size, struct disir_version *version);
@@ -232,6 +242,7 @@ dc_add_default_string (struct disir_context *parent, const char *value,
 //!     to the parent context.
 //! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'version'.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_default_integer (struct disir_context *parent, int64_t value,
                         struct disir_version *version);
@@ -249,6 +260,7 @@ dc_add_default_integer (struct disir_context *parent, int64_t value,
 //!     to the parent context.
 //! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'version'.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_default_float (struct disir_context *parent, double value,
                       struct disir_version *version);
@@ -267,6 +279,7 @@ dc_add_default_float (struct disir_context *parent, double value,
 //!     to the parent context.
 //! \return DISIR_STATUS_CONFLICTING_SEMVER if there exists a default entry with equal 'version'.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
                         struct disir_version *version);
@@ -284,6 +297,7 @@ dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
 //! \return DISIR_CONTEXT_WRONG_CONTEXT if the context is of incorrect type or root.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_generate_from_config_root (struct disir_context *context);
 
@@ -304,6 +318,7 @@ dc_generate_from_config_root (struct disir_context *context);
 //! \return DISIR_STATUS_MOLD_MISSING if no mold is associated with this CONFIG KEYVAL.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_keyval_set_default (struct disir_context *keyval, struct disir_version *version);
 

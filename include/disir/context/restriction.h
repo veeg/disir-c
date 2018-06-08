@@ -5,6 +5,7 @@
 extern "C"{
 #endif // __cplusplus
 
+#include <disir/disir.h>
 
 //! \brief Retrieve a collection of all DISIR_CONTEXT_RESTRICTION available on the context.
 //!
@@ -23,6 +24,7 @@ extern "C"{
 //! \return DISIR_STATUS_NOT_EXIST if there where no restrictions to retrieve
 //! \return DISIR_STATUS_OK on success. The collection is allocated and populated.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_collection (struct disir_context *context, struct disir_collection **collection);
 
@@ -38,6 +40,7 @@ dc_restriction_collection (struct disir_context *context, struct disir_collectio
 //! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context is provided.
 //! \return DISR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_entries_minimum (struct disir_context *context, int *output);
 
@@ -53,6 +56,7 @@ dc_restriction_entries_minimum (struct disir_context *context, int *output);
 //! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context is provided.
 //! \return DISR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_entries_maximum (struct disir_context *context, int *output);
 
@@ -60,6 +64,7 @@ dc_restriction_entries_maximum (struct disir_context *context, int *output);
 //!
 //! \return Stringified restriction type.
 //!
+DISIR_EXPORT
 const char *
 dc_restriction_enum_string (enum disir_restriction_type restriction);
 
@@ -68,6 +73,7 @@ dc_restriction_enum_string (enum disir_restriction_type restriction);
 //! \return DISIR_RESTRICTION_UNKNOWN if string does not match a known type.
 //! \return matched restriction enum on success.
 //!
+DISIR_EXPORT
 enum disir_restriction_type
 dc_restriction_string_to_enum (const char *string);
 
@@ -75,6 +81,7 @@ dc_restriction_string_to_enum (const char *string);
 //!
 //! \return Stringified group type of restriction.
 //!
+DISIR_EXPORT
 const char *
 dc_restriction_group_type (enum disir_restriction_type restriction);
 
@@ -83,6 +90,7 @@ dc_restriction_group_type (enum disir_restriction_type restriction);
 //! \return 'INVALID' if context is NULL or not of type DISIR_CONTEXT_RESTRICTION
 //! \return Stringified restriction type.
 //!
+DISIR_EXPORT
 const char *
 dc_restriction_context_string (struct disir_context *context);
 
@@ -98,6 +106,7 @@ dc_restriction_context_string (struct disir_context *context);
 //! \return DISIR_STATUS_WRONG_CONTEXT if `context` is not of correct type.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_restriction_type (struct disir_context *context, enum disir_restriction_type *type);
 
@@ -138,6 +147,7 @@ dc_get_restriction_type (struct disir_context *context, enum disir_restriction_t
 //! return DISIR_STATUS_WRONG_VALUE_TYPE if the restriction type is not applicable to
 //!         the value type of the input parent context.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_restriction_type (struct disir_context *context, enum disir_restriction_type type);
 
@@ -149,6 +159,7 @@ dc_set_restriction_type (struct disir_context *context, enum disir_restriction_t
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_get_string (struct disir_context *context, const char **value);
 
@@ -160,6 +171,7 @@ dc_restriction_get_string (struct disir_context *context, const char **value);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_set_string (struct disir_context *context, const char *value);
 
@@ -171,6 +183,7 @@ dc_restriction_set_string (struct disir_context *context, const char *value);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_get_range (struct disir_context *context, double *min, double *max);
 
@@ -182,6 +195,7 @@ dc_restriction_get_range (struct disir_context *context, double *min, double *ma
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_set_range (struct disir_context *context, double min, double max);
 
@@ -193,6 +207,7 @@ dc_restriction_set_range (struct disir_context *context, double min, double max)
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_get_numeric (struct disir_context *context, double *value);
 
@@ -207,6 +222,7 @@ dc_restriction_get_numeric (struct disir_context *context, double *value);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_restriction_set_numeric (struct disir_context *context, double value);
 
@@ -225,6 +241,7 @@ dc_restriction_set_numeric (struct disir_context *context, double value);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_restriction_value_numeric (struct disir_context *parent, double value, const char *doc,
                                   struct disir_version *version,
@@ -245,6 +262,7 @@ dc_add_restriction_value_numeric (struct disir_context *parent, double value, co
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_restriction_value_range (struct disir_context *parent, double min, double max,
                                 const char * doc, struct disir_version *version,
@@ -265,6 +283,7 @@ dc_add_restriction_value_range (struct disir_context *parent, double min, double
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_restriction_value_enum (struct disir_context *parent, const char *value, const char *doc,
                                struct disir_version *version,
@@ -278,6 +297,7 @@ dc_add_restriction_value_enum (struct disir_context *parent, const char *value, 
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_restriction_entries_min (struct disir_context *parent, int64_t min,
                                 struct disir_version *version);
@@ -290,6 +310,7 @@ dc_add_restriction_entries_min (struct disir_context *parent, int64_t min,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_restriction_entries_max (struct disir_context *parent, int64_t max,
                                 struct disir_version *version);

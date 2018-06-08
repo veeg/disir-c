@@ -19,6 +19,7 @@ extern "C"{
 
 //! \brief TOML implementation of config_read
 //!
+DISIR_EXPORT
 enum disir_status
 dio_toml_config_read (struct disir_instance *instance,
                       struct disir_register_plugin *plugin, const char *entry_id,
@@ -26,6 +27,7 @@ dio_toml_config_read (struct disir_instance *instance,
 
 //! \brief TOML implementation of config_write
 //!
+DISIR_EXPORT
 enum disir_status
 dio_toml_config_write (struct disir_instance *instance,
                        struct disir_register_plugin *plugin, const char *entry_id,
@@ -33,6 +35,7 @@ dio_toml_config_write (struct disir_instance *instance,
 
 //! \brief TOML imlementation of config_entries
 //!
+DISIR_EXPORT
 enum disir_status
 dio_toml_config_entries (struct disir_instance *instance,
                          struct disir_register_plugin *plugin,
@@ -40,6 +43,7 @@ dio_toml_config_entries (struct disir_instance *instance,
 
 //! \brief TOML imlementation of config_query
 //!
+DISIR_EXPORT
 enum disir_status
 dio_toml_config_query (struct disir_instance *instance,
                        struct disir_register_plugin *plugin,
@@ -47,11 +51,13 @@ dio_toml_config_query (struct disir_instance *instance,
                        struct disir_entry **entry);
 
 //! TODO: docs
+DISIR_EXPORT
 enum disir_status
 dio_toml_serialize_config (struct disir_instance *instance,
                            struct disir_config *config, FILE *output);
 
 //! TODO: docs
+DISIR_EXPORT
 enum disir_status
 dio_toml_unserialize_config (struct disir_instance *instance, FILE *input,
                              struct disir_mold *mold, struct disir_config **config);

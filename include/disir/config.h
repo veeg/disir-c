@@ -38,6 +38,7 @@ extern "C"{
 //!     contexts and test state retrieve the erroneous state.
 //! \return status of the plugin config_read operation.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_read (struct disir_instance *instance, const char *group_id, const char *entry_id,
                    struct disir_mold *mold, struct disir_config **config);
@@ -57,6 +58,7 @@ disir_config_read (struct disir_instance *instance, const char *group_id, const 
 //!     is not registered with `disir`.
 //! \return status of the plugin config_write operation.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_write (struct disir_instance *instance, const char *group_id,
                     const char *entry_id, struct disir_config *config);
@@ -74,6 +76,7 @@ disir_config_write (struct disir_instance *instance, const char *group_id,
 //!     is not registered with `instance`.
 //! \return status of the plugin config_remove operation.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_remove (struct disir_instance *instance, const char *group_id,
                      const char *entry_id);
@@ -97,6 +100,7 @@ disir_config_remove (struct disir_instance *instance, const char *group_id,
 //! \return DISRI_STATUS_NO_MEMORY if internal memory allocations fail.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_entries (struct disir_instance *instance,
                       const char *group_id, struct disir_entry **entries);
@@ -111,6 +115,7 @@ disir_config_entries (struct disir_instance *instance,
 //! \return DISIR_STATUS_NOT_EXIST if the entry does not exist.
 //! \return DISIR_STATUS_EXISTS if the entry exists.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_query (struct disir_instance *instance, const char *group_id,
                     const char *entry_id, struct disir_entry **entry);
@@ -125,6 +130,7 @@ disir_config_query (struct disir_instance *instance, const char *group_id,
 //! \return DISIR_STATUS_INVALID_ARGUMENT if mold argument is NULL.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_generate_config_from_mold (struct disir_mold *mold, struct disir_version *version,
                                  struct disir_config **config);
@@ -140,6 +146,7 @@ disir_generate_config_from_mold (struct disir_mold *mold, struct disir_version *
 //!     Collection is (optionally) populated.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_valid (struct disir_config *config, struct disir_collection **collection);
 
@@ -153,6 +160,7 @@ disir_config_valid (struct disir_config *config, struct disir_collection **colle
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_finished (struct disir_config **config);
 
@@ -167,6 +175,7 @@ disir_config_finished (struct disir_config **config);
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type string.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_get_keyval_string (struct disir_config *config, const char **value,
                                 const char *query, ...);
@@ -183,6 +192,7 @@ disir_config_get_keyval_string (struct disir_config *config, const char **value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type string.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_set_keyval_string (struct disir_config *config, const char *value,
                                 const char *query, ...);
@@ -198,6 +208,7 @@ disir_config_set_keyval_string (struct disir_config *config, const char *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type enum.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_get_keyval_enum (struct disir_config *config, const char **value,
                               const char *query, ...);
@@ -214,6 +225,7 @@ disir_config_get_keyval_enum (struct disir_config *config, const char **value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type enum.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_set_keyval_enum (struct disir_config *config, const char *value,
                               const char *query, ...);
@@ -229,6 +241,7 @@ disir_config_set_keyval_enum (struct disir_config *config, const char *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type boolean.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_get_keyval_boolean (struct disir_config *config, uint8_t *value,
                                  const char *query, ...);
@@ -245,6 +258,7 @@ disir_config_get_keyval_boolean (struct disir_config *config, uint8_t *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type boolean.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_set_keyval_boolean (struct disir_config *config, uint8_t value,
                                  const char *query, ...);
@@ -260,6 +274,7 @@ disir_config_set_keyval_boolean (struct disir_config *config, uint8_t value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type float.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_get_keyval_float (struct disir_config *config, double *value,
                                const char *query, ...);
@@ -276,6 +291,7 @@ disir_config_get_keyval_float (struct disir_config *config, double *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type float.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_set_keyval_float (struct disir_config *config, double value,
                                  const char *query, ...);
@@ -291,6 +307,7 @@ disir_config_set_keyval_float (struct disir_config *config, double value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type integer.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_get_keyval_integer (struct disir_config *config, int64_t *value,
                                  const char *query, ...);
@@ -307,6 +324,7 @@ disir_config_get_keyval_integer (struct disir_config *config, int64_t *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type integer.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_config_set_keyval_integer (struct disir_config *config, int64_t value,
                                  const char *query, ...);

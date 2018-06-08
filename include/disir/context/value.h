@@ -18,6 +18,7 @@ extern "C"{
 //! \return disir_value_type represented by context if context is valid and contains
 //!     a valid disir_value_type
 //!
+DISIR_EXPORT
 enum disir_value_type
 dc_value_type (struct disir_context *context);
 
@@ -31,6 +32,7 @@ dc_value_type (struct disir_context *context);
 //!
 //! \return string representation of the disir_value_type held in context
 //!
+DISIR_EXPORT
 const char *
 dc_value_type_string (struct disir_context *context);
 
@@ -48,6 +50,7 @@ dc_value_type_string (struct disir_context *context);
 //! \return DISIR_STATUS_WRONG_CONTEXT if `context`'s toplevel context is CONFIG.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_value_type (struct disir_context *context, enum disir_value_type type);
 
@@ -63,6 +66,7 @@ dc_set_value_type (struct disir_context *context, enum disir_value_type type);
 //! \return DISIR_STATUS_WRONG_CONTEXT if it does not contain a value type.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_value_type (struct disir_context *context, enum disir_value_type *type);
 
@@ -81,6 +85,7 @@ dc_get_value_type (struct disir_context *context, enum disir_value_type *type);
 //! \return DISIR_STATUS_WRONG_CONTEXT if context is of unsupported type.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_value (struct disir_context *context, const char *value, int32_t value_size);
 
@@ -97,6 +102,7 @@ dc_set_value (struct disir_context *context, const char *value, int32_t value_si
 //! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a mold equivalent.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_value_string (struct disir_context *context, const char *value, int32_t value_size);
 
@@ -113,6 +119,7 @@ dc_set_value_string (struct disir_context *context, const char *value, int32_t v
 //! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a mold equivalent.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_value_enum (struct disir_context *context, const char *value, int32_t value_size);
 
@@ -128,6 +135,7 @@ dc_set_value_enum (struct disir_context *context, const char *value, int32_t val
 //!     caused it to enter an invalid state.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_value_integer (struct disir_context *context, int64_t value);
 
@@ -141,6 +149,7 @@ dc_set_value_integer (struct disir_context *context, int64_t value);
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_value_float (struct disir_context *context, double value);
 
@@ -154,6 +163,7 @@ dc_set_value_float (struct disir_context *context, double value);
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_value_boolean (struct disir_context *context, uint8_t value);
 
@@ -181,6 +191,7 @@ dc_set_value_boolean (struct disir_context *context, uint8_t value);
 //! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs context is not CONFIG.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_value (struct disir_context *context, int32_t output_buffer_size,
               char *output, int32_t *output_size);
@@ -201,6 +212,7 @@ dc_get_value (struct disir_context *context, int32_t output_buffer_size,
 //! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs root context is not CONFIG.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_value_string (struct disir_context *context, const char **output, int32_t *size);
 
@@ -220,6 +232,7 @@ dc_get_value_string (struct disir_context *context, const char **output, int32_t
 //! \return DISIR_STATUS_WRONG_CONTEXT if KEYVALs root context is not CONFIG.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_value_enum (struct disir_context *context, const char **output, int32_t *size);
 
@@ -237,6 +250,7 @@ dc_get_value_enum (struct disir_context *context, const char **output, int32_t *
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not DISIR_VALUE_TYPE_INTEGER.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_value_integer (struct disir_context *context, int64_t *value);
 
@@ -254,6 +268,7 @@ dc_get_value_integer (struct disir_context *context, int64_t *value);
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not DISIR_VALUE_TYPE_FLOAT.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_value_float (struct disir_context *context, double *value);
 
@@ -271,6 +286,7 @@ dc_get_value_float (struct disir_context *context, double *value);
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not DISIR_VALUE_TYPE_BOOLEAN.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_value_boolean (struct disir_context *context, uint8_t *value);
 

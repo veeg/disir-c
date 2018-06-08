@@ -5,6 +5,7 @@
 extern "C"{
 #endif // __cplusplus
 
+#include <disir/disir.h>
 
 //! \brief Create a mold for the libdisir configuration entry.
 //!
@@ -16,6 +17,7 @@ extern "C"{
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_libdisir_mold (struct disir_mold **mold);
 
@@ -27,6 +29,7 @@ disir_libdisir_mold (struct disir_mold **mold);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_libdisir_config_to_disk (struct disir_instance *instance,
                                struct disir_config *config,
@@ -42,6 +45,7 @@ disir_libdisir_config_to_disk (struct disir_instance *instance,
 //! \return DISIR_STATUS_INVALID_ARGUMENT if config_filepath cannot be opened.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_libdisir_config_from_disk (struct disir_instance *instance,
                                  const char *filepath,

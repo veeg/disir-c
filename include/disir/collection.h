@@ -23,6 +23,7 @@ extern "C"{
 //! \return NULL on allocation failure.
 //! \return Pointer to alloated disir_collection memory.
 //!
+DISIR_EXPORT
 struct disir_collection *
 dc_collection_create (void);
 
@@ -37,6 +38,7 @@ dc_collection_create (void);
 //! \return DISIR_STATUS_NO_MEMORY on memory re-allocation error.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_collection_push_context (struct disir_collection *collection, struct disir_context *context);
 
@@ -57,6 +59,7 @@ dc_collection_push_context (struct disir_collection *collection, struct disir_co
 //! \return DISIR_STATUS_EXHAUSTED when the collection iterator is empty.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_collection_next (struct disir_collection *collection, struct disir_context **context);
 
@@ -67,6 +70,7 @@ dc_collection_next (struct disir_collection *collection, struct disir_context **
 //! \return DISIR_STATUS_INVALID_ARGUMENT if collection is NULL.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_collection_reset (struct disir_collection *collection);
 
@@ -79,6 +83,7 @@ dc_collection_reset (struct disir_collection *collection);
 //! \return 0 if collection is NULL.
 //! \return >= 0
 //!
+DISIR_EXPORT
 int32_t
 dc_collection_size (struct disir_collection *collection);
 
@@ -95,6 +100,7 @@ dc_collection_size (struct disir_collection *collection);
 //! \return DISIR_STATUS_INVALID_ARGUMENT if collection or *collection is NULL.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_collection_finished (struct disir_collection **collection);
 

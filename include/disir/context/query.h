@@ -5,6 +5,7 @@
 extern "C"{
 #endif // __cplusplus
 
+#include <disir/disir.h>
 
 //! \brief Return the default value as a string representation from context.
 //!
@@ -29,6 +30,7 @@ extern "C"{
 //!     DISIR_CONTEXT_KEYVAL
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_default (struct disir_context *context, struct disir_version *version,
                 int32_t output_buffer_size,
@@ -47,6 +49,7 @@ dc_get_default (struct disir_context *context, struct disir_version *version,
 //! \return DISIR_STATUS_NO_MEMORY if collection allocation failed.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_default_contexts (struct disir_context *context, struct disir_collection **collection);
 
@@ -64,6 +67,7 @@ dc_get_default_contexts (struct disir_context *context, struct disir_collection 
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input parameters are NULL
 //! \return DISRI_STATUS_WRONG_CONTEXT if the input context is not of correct type.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_elements (struct disir_context *context, struct disir_collection **collection);
 
@@ -83,6 +87,7 @@ dc_get_elements (struct disir_context *context, struct disir_collection **collec
 //! \return DISIR_STATUS_WRONG_CONTEXT if the input context is not of correct type.
 //! \return DISIR_STATUS_OK if the output context is populated with the requested entry.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_find_element (struct disir_context *parent, const char *name, unsigned int index,
                  struct disir_context **output);
@@ -101,6 +106,7 @@ dc_find_element (struct disir_context *parent, const char *name, unsigned int in
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input parameters are NULL
 //! \return DISIR_STATUS_WRONG_CONTEXT if the input context is not of correct type.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_find_elements (struct disir_context *context, const char *name,
                   struct disir_collection **collection);
@@ -114,6 +120,7 @@ dc_find_elements (struct disir_context *context, const char *name,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_query_resolve_context (struct disir_context *parent, const char *name,
                           struct disir_context **out, ...);
@@ -121,6 +128,8 @@ dc_query_resolve_context (struct disir_context *parent, const char *name,
 //! \see dc_query_resolve_context
 //!
 //! Varatic argument version of dc_query_resolve_context.
+//!
+DISIR_EXPORT
 enum disir_status
 dc_query_resolve_context_va (struct disir_context *parent, const char *name,
                              struct disir_context **out, va_list args);

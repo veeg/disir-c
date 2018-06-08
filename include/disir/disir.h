@@ -8,6 +8,7 @@ extern "C"{
 
 #include <stdint.h>
 
+#define DISIR_EXPORT __attribute__((visibility("default")))
 
 //! \brief Status return codes returned by most libdisir API functions.
 enum disir_status
@@ -176,6 +177,7 @@ struct disir_entry
 //!
 //! \return DISIR_STATUS_OK.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_entry_finished (struct disir_entry **entry);
 
@@ -185,6 +187,7 @@ disir_entry_finished (struct disir_entry **entry);
 //!
 //! \return stringified version of the input status.
 //!
+DISIR_EXPORT
 const char *
 disir_status_string (enum disir_status status);
 
@@ -213,6 +216,7 @@ disir_status_string (enum disir_status status);
 //! \return DISIR_STATUS_NO_MEMORY if memory allocation failed.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_instance_create (const char *config_filepath, struct disir_config *config,
                        struct disir_instance **disir);
@@ -226,11 +230,14 @@ disir_instance_create (const char *config_filepath, struct disir_config *config,
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input paramter address and its pointed to value
 //!     are NULL:
 //! \return DISIR_STATUS_OK on success.
+//!
+DISIR_EXPORT
 enum disir_status
 disir_instance_destroy (struct disir_instance **instance);
 
 //! \brief Log a USER level log entry to the disir log.
 //!
+DISIR_EXPORT
 void
 disir_log_user (struct disir_instance *instance, const char *message, ...);
 
@@ -238,10 +245,12 @@ disir_log_user (struct disir_instance *instance, const char *message, ...);
 //!
 //! This will also issue a ERROR level log event to the log stream.
 //!
+DISIR_EXPORT
 void
 disir_error_set (struct disir_instance *instance, const char *message, ...);
 
 //! \brief Clear any error message previously sat on the disir instance.
+DISIR_EXPORT
 void
 disir_error_clear (struct disir_instance *instance);
 
@@ -264,6 +273,7 @@ disir_error_clear (struct disir_instance *instance);
 //! \return DISIR_STATUS_INSSUFICIENT_RESOURCES if `buffer` is of an insufficient size.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_error_copy (struct disir_instance *instance,
                   char *buffer, int32_t buffer_size, int32_t *bytes_written);
@@ -272,6 +282,7 @@ disir_error_copy (struct disir_instance *instance,
 //!
 //!If no error message exists, NULL is returned.
 //!
+DISIR_EXPORT
 const char *
 disir_error (struct disir_instance *instance);
 
@@ -299,6 +310,7 @@ disir_error (struct disir_instance *instance);
 //!     manual resolution through disir_update_resolve.
 //! \return DISIR_STATUS_OK if the update operation went through without any conflicts
 //!
+DISIR_EXPORT
 enum disir_status
 disir_update_config (struct disir_config *config,
                      struct disir_version *target, struct disir_update **update);
@@ -307,6 +319,7 @@ disir_update_config (struct disir_config *config,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_update_conflict (struct disir_update *update, const char **name,
                        const char **keyval, const char **mold);
@@ -314,7 +327,8 @@ disir_update_conflict (struct disir_update *update, const char **name,
 //! \brief Resolve a conflict in an update with the new value
 //!
 //! \return DISIR_STATUS_OK on success.
-//1
+//!
+DISIR_EXPORT
 enum disir_status
 disir_update_resolve (struct disir_update *update, const char *resolve);
 
@@ -323,6 +337,7 @@ disir_update_resolve (struct disir_update *update, const char *resolve);
 //! \return DISIR_STATUS_OK on success. The config object is now up-to-date with its target
 //!     version. Use disir_update_finished() on the update object to dispose of it.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_update_continue (struct disir_update *update);
 
@@ -330,6 +345,7 @@ disir_update_continue (struct disir_update *update);
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_update_finished (struct disir_update **update, struct disir_config **config);
 

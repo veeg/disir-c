@@ -19,6 +19,7 @@ extern "C"{
 
 //! \brief JSON implementation of config_read
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_config_read (struct disir_instance *instance,
                       struct disir_register_plugin *plugin, const char *entry_id,
@@ -26,6 +27,7 @@ dio_json_config_read (struct disir_instance *instance,
 
 //! \brief JSON implementation of config_write
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_config_write (struct disir_instance *instance,
                        struct disir_register_plugin *plugin, const char *entry_id,
@@ -33,24 +35,28 @@ dio_json_config_write (struct disir_instance *instance,
 
 //! \brief JSON implementation of config_remove
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_config_remove (struct disir_instance *instance,
                         struct disir_register_plugin *plugin, const char *entry_id);
 
 //! \brief JSON implementation of config_write to filedescriptor
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_config_fd_write (struct disir_instance *instance,
                           struct disir_config *config, FILE *out);
 
 //! \brief JSON implementation of config_read to filedescriptor
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_config_fd_read (struct disir_instance *instance, FILE *in,
                          struct disir_mold *mold, struct disir_config **config);
 
 //! \brief JSON imlementation of config_entries
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_config_entries (struct disir_instance *instance,
                          struct disir_register_plugin *plugin,
@@ -58,6 +64,7 @@ dio_json_config_entries (struct disir_instance *instance,
 
 //! \brief JSON imlementation of config_query
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_config_query (struct disir_instance *instance,
                        struct disir_register_plugin *plugin,
@@ -67,6 +74,7 @@ dio_json_config_query (struct disir_instance *instance,
 
 //! \brief JSON implementation of mold_read
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_mold_read (struct disir_instance *instance,
                     struct disir_register_plugin *plugin, const char *entry_id,
@@ -74,6 +82,7 @@ dio_json_mold_read (struct disir_instance *instance,
 
 //! \brief JSON implementation of mold_write
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_mold_write (struct disir_instance *instance,
                      struct disir_register_plugin *plugin, const char *entry_id,
@@ -81,6 +90,7 @@ dio_json_mold_write (struct disir_instance *instance,
 
 //! \brief JSON imlementation of mold_entries
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_mold_entries (struct disir_instance *instance,
                        struct disir_register_plugin *plugin,
@@ -88,6 +98,7 @@ dio_json_mold_entries (struct disir_instance *instance,
 
 //! \brief JSON imlementation of mold_query
 //!
+DISIR_EXPORT
 enum disir_status
 dio_json_mold_query (struct disir_instance *instance,
                      struct disir_register_plugin *plugin,
@@ -95,25 +106,31 @@ dio_json_mold_query (struct disir_instance *instance,
                      struct disir_entry **entry);
 
 //! TODO: docs
+DISIR_EXPORT
 enum disir_status
 dio_json_serialize_config (struct disir_instance *instance,
                            struct disir_config *config, FILE *output);
 
 //! TODO: docs
+DISIR_EXPORT
 enum disir_status
 dio_json_unserialize_config (struct disir_instance *instance, FILE *input,
                              struct disir_mold *mold, struct disir_config **config);
 
 //! TODO: docs
+DISIR_EXPORT
 enum disir_status
 dio_json_serialize_mold (struct disir_instance *instance,
                          struct disir_mold *mold, FILE *output);
 
 //! TODO: docs
+DISIR_EXPORT
 enum disir_status
 dio_json_unserialize_mold (struct disir_instance *instance,
                            FILE *input, struct disir_mold **mold);
 
+//! TODO: docs
+DISIR_EXPORT
 enum disir_status
 dio_json_unserialize_mold_filepath (struct disir_instance *instance,
                                     const char *filepath, const char *override_filepath,

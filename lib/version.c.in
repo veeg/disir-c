@@ -1,12 +1,13 @@
 
+#include <disir/disir.h>
 
-const unsigned int libdisir_version_major = @PROJECT_VERSION_MAJOR@;
-const unsigned int libdisir_version_minor = @PROJECT_VERSION_MINOR@;
-const unsigned int libdisir_version_patch = @PROJECT_VERSION_PATCH@;
+DISIR_EXPORT const unsigned int libdisir_version_major = @PROJECT_VERSION_MAJOR@;
+DISIR_EXPORT const unsigned int libdisir_version_minor = @PROJECT_VERSION_MINOR@;
+DISIR_EXPORT const unsigned int libdisir_version_patch = @PROJECT_VERSION_PATCH@;
 
-const char *libdisir_version_string = "@PROJECT_VERSION_MAJOR@." \
+DISIR_EXPORT const char *libdisir_version_string = "@PROJECT_VERSION_MAJOR@." \
                                         "@PROJECT_VERSION_MINOR@." \
                                         "@PROJECT_VERSION_PATCH@";
 
-const char *libdisir_build_string = "@build@";
+DISIR_EXPORT const char *libdisir_build_string = "@build@";
 

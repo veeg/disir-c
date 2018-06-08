@@ -5,6 +5,7 @@
 extern "C"{
 #endif // _cplusplus
 
+#include <disir/disir.h>
 
 //! The namespace employed for all low-level context operations
 //! is dc_*
@@ -51,17 +52,25 @@ enum disir_context_type
 // Utility context API
 //
 
-//! Return the disir_context_type associated with the passed
-//! DISIR_CONTEXT.
-enum disir_context_type dc_context_type (struct disir_context *context);
+//! \brief Retrieve the disir_context_type of the passed context.
+//!
+//! \param context The context to query.
+//!
+//! \return DISIR_CONTEXT_UNKNOWN if the input context is NULL.
+//! \return correct disir_context_type of context.
+//!
+DISIR_EXPORT
+enum disir_context_type
+dc_context_type (struct disir_context *context);
 
-//! Return a string representation of the passed context.
-//! type_string_size is populated with the size in octets for
-//! the returned string. If this pointer is NULL, this output
-//! parameter is ignored.
-//! If context is NULL, the returned string is equal to
-//! that if the input context were unknown.
-const char * dc_context_type_string (struct disir_context *context);
+//! \brief Return a string representation of the passed context.
+//!
+//! \return NULL if context is NULL.
+//! \return const string matching context type.
+//!
+DISIR_EXPORT
+const char *
+dc_context_type_string (struct disir_context *context);
 
 
 //! \brief Return the error message on input context.
@@ -69,7 +78,9 @@ const char * dc_context_type_string (struct disir_context *context);
 //! \return NULL if no error message is associated with input context
 //! \return const char pointer to error message.
 //!
-const char *dc_context_error (struct disir_context *context);
+DISIR_EXPORT
+const char *
+dc_context_error (struct disir_context *context);
 
 //
 // Base context API
@@ -87,8 +98,10 @@ const char *dc_context_error (struct disir_context *context);
 //! \return DISIR_STATUS_WRONG_CONTEXT if an unsupported context type is submitted.
 //! \return DISIR_STATUS_OK when everything is OK!
 //!
-enum disir_status dc_begin (struct disir_context *parent, enum disir_context_type context_type,
-                            struct disir_context **child);
+DISIR_EXPORT
+enum disir_status
+dc_begin (struct disir_context *parent, enum disir_context_type context_type,
+          struct disir_context **child);
 
 //! \brief Destroy the object pointed to by this context.
 //!
@@ -107,7 +120,9 @@ enum disir_status dc_begin (struct disir_context *parent, enum disir_context_typ
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_destroy (struct disir_context **context);
+DISIR_EXPORT
+enum disir_status
+dc_destroy (struct disir_context **context);
 
 //! \brief Submit the context to the parent.
 //!
@@ -124,13 +139,17 @@ enum disir_status dc_destroy (struct disir_context **context);
 //!
 //! \return DISIR_STATUS_OK on success, context pointer is invalidated and set to NULL.
 //!
-enum disir_status dc_finalize (struct disir_context **context);
+DISIR_EXPORT
+enum disir_status
+dc_finalize (struct disir_context **context);
 
 //! \brief Submit the context to the parent, while keeping the reference on success.
 //!
 //! \see dc_finalize()
 //!
-enum disir_status dc_finalize_keep_reference (struct disir_context *context);
+DISIR_EXPORT
+enum disir_status
+dc_finalize_keep_reference (struct disir_context *context);
 
 //! \brief Put away a context obtained while querying a parent context.
 //!
@@ -142,7 +161,9 @@ enum disir_status dc_finalize_keep_reference (struct disir_context *context);
 //! \return DISIR_STATUS_CONTEXT_IN_WRONG_STATE if context is not in constructing mode
 //! \return DISIR_STATUS_OK when successful. Passed context pointer is set tp NULL.
 //!
-enum disir_status dc_putcontext (struct disir_context **context);
+DISIR_EXPORT
+enum disir_status
+dc_putcontext (struct disir_context **context);
 
 //! \brief Query the context whether or not it is valid
 //!
@@ -150,7 +171,9 @@ enum disir_status dc_putcontext (struct disir_context **context);
 //! \return DISIR_STATUS_INVALID_CONTEXT if invalid
 //! \return DISIR_STATUS_INVALID_ARGUMENT if input is NULL
 //!
-enum disir_status dc_context_valid (struct disir_context *context);
+DISIR_EXPORT
+enum disir_status
+dc_context_valid (struct disir_context *context);
 
 //! \brief Add a name to a context entry.
 //!
@@ -175,7 +198,9 @@ enum disir_status dc_context_valid (struct disir_context *context);
 //!     the same context type as the input context.
 //! \return DISIR_STATUS_OK on successful insertion of name to context.
 //!
-enum disir_status dc_set_name (struct disir_context *context, const char *name, int32_t name_size);
+DISIR_EXPORT
+enum disir_status
+dc_set_name (struct disir_context *context, const char *name, int32_t name_size);
 
 //! \brief Get a name attribute associated with the context entry
 //!
@@ -191,8 +216,10 @@ enum disir_status dc_set_name (struct disir_context *context, const char *name, 
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not of the supported types.
 //! \return DISIR_STATUS_OK if name is successfully populated with the name attribute of context.
 //!
-enum disir_status dc_get_name (struct disir_context *context,
-                               const char **name, int32_t *name_size);
+DISIR_EXPORT
+enum disir_status
+dc_get_name (struct disir_context *context,
+             const char **name, int32_t *name_size);
 
 //! \brief Rescursively resolve the name from the context to the root.
 //!
@@ -204,6 +231,7 @@ enum disir_status dc_get_name (struct disir_context *context,
 //! \return DISIR_STATUS_NO_MEMORY on allocation failure.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_resolve_root_name (struct disir_context *context, char **output);
 
@@ -229,6 +257,7 @@ struct disir_diff_report
 //! \return DISIR_STATUS_NO_MEMORY on memory allocation failure.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_compare (struct disir_context *lhs, struct disir_context *rhs,
             struct disir_diff_report **report);
@@ -247,12 +276,14 @@ dc_compare (struct disir_context *lhs, struct disir_context *rhs,
 //! \return DISIR_STATUS_CONTEXT_IN_WRONG_STATE if context is finalized.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_fatal_error (struct disir_context *context, const char *msg, ...);
 
 //! \see dc_fatal_error
 //! Varadic argument list version of dc_fatal_error()
 //!
+DISIR_EXPORT
 enum disir_status
 dc_fatal_error_va (struct disir_context *context, const char *msg, va_list args);
 

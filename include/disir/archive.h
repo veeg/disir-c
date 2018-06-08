@@ -5,6 +5,7 @@
 extern "C"{
 #endif // _cplusplus
 
+#include <disir/disir.h>
 
 // Forward decleration
 struct disir_archive;
@@ -60,6 +61,7 @@ enum disir_import_option
 //!     invalid options.
 //! \return DISIR_STATUS_NO_MEMORY if unable to allocate enough memory for disir archive structure.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_archive_export_begin (struct disir_instance *instance,
                             const char *archive_path, struct disir_archive **archive);
@@ -82,6 +84,7 @@ disir_archive_export_begin (struct disir_instance *instance,
 //! \return DISIR_STATUS_FS_ERROR if unable to write to disk or clean up temporary files.
 //! \return DISIR_STATUS_NO_CAN_DO if plugin does not support serializing configuration entries.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_archive_append_group (struct disir_instance *instance, struct disir_archive *archive,
                             const char *group_id);
@@ -104,6 +107,7 @@ disir_archive_append_group (struct disir_instance *instance, struct disir_archiv
 //! \return DISIR_STATUS_FS_ERROR if unable to write to disk or clean up temporary files.
 //! \return DISIR_STATUS_NO_CAN_DO if plugin does not support serializing configuartion entries.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_archive_append_entry (struct disir_instance *instance, struct disir_archive *archive,
                             const char *group_id, const char *entry_id);
@@ -133,6 +137,7 @@ disir_archive_append_entry (struct disir_instance *instance, struct disir_archiv
 //!     destroyed and caller must re-call finalize with a new (valid) path or discard it with
 //!     archive_path = NULL.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_archive_finalize (struct disir_instance *instance, const char *archive_path,
                         struct disir_archive **archive);
@@ -152,6 +157,7 @@ disir_archive_finalize (struct disir_instance *instance, const char *archive_pat
 //! \return DISIR_STATUS_FS_ERROR if archive is invalid.
 //! \return DISIR_STATUS_NOT_EXIST if no archive on archive_path exist.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_archive_import (struct disir_instance *instance, const char *archive_path,
                       struct disir_import **import, int *entries);
@@ -179,6 +185,7 @@ disir_archive_import (struct disir_instance *instance, const char *archive_path,
 //! \return DISIR_STATUS_ARGUMENT_INVALID if one or several input parameters are NULL, or
 //!          index *entry* is out of range.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_import_entry_status (struct disir_import *import, int entry,
                            const char **entry_id, const char **group_id,
@@ -198,6 +205,7 @@ disir_import_entry_status (struct disir_import *import, int entry,
 //!          a keyval set on a newer config version violates a restriction
 //!          introduced on a higher version than the imported config.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_import_resolve_entry (struct disir_import *import,
                             int entry, enum disir_import_option opt);
@@ -217,11 +225,13 @@ disir_import_resolve_entry (struct disir_import *import,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either of the inputs are NULL or invalid options.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_import_finalize (struct disir_instance *instance, enum disir_import_option opt,
                        struct disir_import **import, struct import_report **report);
 
 //! \brief Destroy import summary structure.
+DISIR_EXPORT
 enum disir_status
 disir_import_report_destroy (struct import_report **report);
 

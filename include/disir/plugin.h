@@ -246,6 +246,7 @@ struct disir_plugin
 //! \return DISIR_STATUS_NO_MEMORY if memory allocation failed.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_plugin_register (struct disir_instance *instance, struct disir_register_plugin *plugin,
                        const char *io_id, const char *group_id);
@@ -264,6 +265,7 @@ disir_plugin_register (struct disir_instance *instance, struct disir_register_pl
 //! \return DISIR_STATUS_INVALID ARGUMENT if wither of the input arguments are NULL.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_plugin_registered (struct disir_instance *instance, struct disir_plugin **plugins);
 
@@ -274,6 +276,7 @@ disir_plugin_registered (struct disir_instance *instance, struct disir_plugin **
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_plugin_finished (struct disir_plugin **plugin);
 

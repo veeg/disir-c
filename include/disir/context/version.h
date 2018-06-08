@@ -5,12 +5,14 @@
 extern "C"{
 #endif // __cplusplus
 
+#include <disir/disir.h>
 
 //! \brief Add an introduced semantic version number to a context.
 //!
 //! \return DISIR_STATUS_EXISTS is returned if an introduced entry already exists.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_introduced (struct disir_context *context, struct disir_version *version);
 
@@ -27,6 +29,7 @@ dc_add_introduced (struct disir_context *context, struct disir_version *version)
 //! \return DISIR_STATUS_WRONG_CONTEXT if top-level is not MOLD.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_add_deprecated (struct disir_context *context, struct disir_version *version);
 
@@ -47,6 +50,7 @@ dc_add_deprecated (struct disir_context *context, struct disir_version *version)
 //! \return DISIR_STATUS_WRONG_CONTEXT if `context` whose top-level is not MOLD.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_introduced (struct disir_context *context, struct disir_version *version);
 
@@ -65,6 +69,7 @@ dc_get_introduced (struct disir_context *context, struct disir_version *version)
 //! \return DISIR_STATUS_WRONG_CONTEXT if `context` whose top-level is not MOLD.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_deprecated (struct disir_context *context, struct disir_version *version);
 
@@ -81,6 +86,7 @@ dc_get_deprecated (struct disir_context *context, struct disir_version *version)
 //! \return DISIR_STATUS_WRONG_CONTEXT if `context` is not of supported type.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_get_version (struct disir_context *context, struct disir_version *version);
 
@@ -99,6 +105,7 @@ dc_get_version (struct disir_context *context, struct disir_version *version);
 //!     applied to a DISIR_CONTEXT_CONFIG context.
 //! \return DISRI_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_set_version (struct disir_context *context, struct disir_version *version);
 

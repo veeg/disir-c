@@ -35,6 +35,7 @@ struct disir_version
 //! \return NULL if buffer is of insufficient size.
 //! \return buffer when the full string represention was populated into the buffer.
 //!
+DISIR_EXPORT
 char *
 dc_version_string (char *buffer, int32_t buffer_size,
                    struct disir_version *version);
@@ -51,6 +52,7 @@ dc_version_string (char *buffer, int32_t buffer_size,
 //!     with the values it has already detected and parsed.
 //! \return DISRI_STATUS_OK on success
 //!
+DISIR_EXPORT
 enum disir_status
 dc_version_convert (const char *input, struct disir_version *version);
 
@@ -58,6 +60,7 @@ dc_version_convert (const char *input, struct disir_version *version);
 //!
 //! No input validation is performed.
 //!
+DISIR_EXPORT
 void
 dc_version_set (struct disir_version *destination, struct disir_version *source);
 
@@ -67,6 +70,7 @@ dc_version_set (struct disir_version *destination, struct disir_version *source)
 //! \return 0 if s1 == s2
 //! \return > 0 if s2 is greater than s1.
 //!
+DISIR_EXPORT
 int
 dc_version_compare (struct disir_version *s1, struct disir_version *s2);
 

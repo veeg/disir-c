@@ -5,6 +5,7 @@
 extern "C"{
 #endif // __cplusplus
 
+#include <disir/disir.h>
 
 //!
 //! This file exposes the low level Disir Config Context API.
@@ -20,6 +21,7 @@ extern "C"{
 //! \return NULL if config is NULL.
 //! \return context of type DISIR_CONTEXT_CONFIG.
 //!
+DISIR_EXPORT
 struct disir_context *
 dc_config_getcontext (struct disir_config *config);
 
@@ -31,6 +33,7 @@ dc_config_getcontext (struct disir_config *config);
 //! \return DISIR_STATUS_INVALID_ARGUMENT if config or version are NULL
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_get_version (struct disir_config *config, struct disir_version *version);
 
@@ -41,7 +44,9 @@ dc_config_get_version (struct disir_config *config, struct disir_version *versio
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
-enum disir_status dc_config_begin (struct disir_mold *mold, struct disir_context **config);
+DISIR_EXPORT
+enum disir_status
+dc_config_begin (struct disir_mold *mold, struct disir_context **config);
 
 //! \brief Finalize the construction of a DISIR_CONTEXT_CONFIG
 //!
@@ -52,8 +57,9 @@ enum disir_status dc_config_begin (struct disir_mold *mold, struct disir_context
 //! \return DISIR_STATUS_INVALID_CONTEXT if any part of the context is not valid.
 //! \return DISIR_STATUS_OK on success
 //!
-enum disir_status dc_config_finalize (struct disir_context **context,
-                                      struct disir_config **config);
+DISIR_EXPORT
+enum disir_status
+dc_config_finalize (struct disir_context **context, struct disir_config **config);
 
 //! \brief Query the context for a heirarchical string keyval child.
 //!
@@ -64,6 +70,7 @@ enum disir_status dc_config_finalize (struct disir_context **context,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_get_keyval_string (struct disir_context *context, const char **value,
                              const char *query, ...);
@@ -79,6 +86,7 @@ dc_config_get_keyval_string (struct disir_context *context, const char **value,
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_set_keyval_string (struct disir_context *parent, const char *value,
                              const char *name, ...);
@@ -94,6 +102,7 @@ dc_config_set_keyval_string (struct disir_context *parent, const char *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type enum.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_get_keyval_enum (struct disir_context *context, const char **value,
                            const char *query, ...);
@@ -110,6 +119,7 @@ dc_config_get_keyval_enum (struct disir_context *context, const char **value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type enum.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_set_keyval_enum (struct disir_context *context, const char *value,
                            const char *query, ...);
@@ -125,6 +135,7 @@ dc_config_set_keyval_enum (struct disir_context *context, const char *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type boolean.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_get_keyval_boolean (struct disir_context *context, uint8_t *value,
                               const char *query, ...);
@@ -141,6 +152,7 @@ dc_config_get_keyval_boolean (struct disir_context *context, uint8_t *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type boolean.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_set_keyval_boolean (struct disir_context *context, uint8_t value,
                               const char *query, ...);
@@ -156,6 +168,7 @@ dc_config_set_keyval_boolean (struct disir_context *context, uint8_t value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type float.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_get_keyval_float (struct disir_context *context, double *value,
                             const char *query, ...);
@@ -172,6 +185,7 @@ dc_config_get_keyval_float (struct disir_context *context, double *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type float.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_set_keyval_float (struct disir_context *context, double value,
                             const char *query, ...);
@@ -187,6 +201,7 @@ dc_config_set_keyval_float (struct disir_context *context, double value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type integer.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_get_keyval_integer (struct disir_context *context, int64_t *value,
                               const char *query, ...);
@@ -203,6 +218,7 @@ dc_config_get_keyval_integer (struct disir_context *context, int64_t *value,
 //! \return DISIR_STATUS_OK on success.
 //! \return DISIR_STATUS_WRONG_VALUE_TYPE if the resolved query is not of type integer.
 //!
+DISIR_EXPORT
 enum disir_status
 dc_config_set_keyval_integer (struct disir_context *context, int64_t value,
                               const char *query, ...);

@@ -29,6 +29,7 @@ extern "C"{
 //!     is not registered with `disir`.
 //! \return status of the plugin mold_read operation.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_mold_read (struct disir_instance *instance, const char *group_id,
                  const char *entry_id, struct disir_mold **mold);
@@ -48,6 +49,7 @@ disir_mold_read (struct disir_instance *instance, const char *group_id,
 //!     is not registered with `disir`.
 //! \return status of the plugin mold_write operation.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_mold_write (struct disir_instance *instance, const char *groupd_id,
                   const char *entry_id, struct disir_mold *mold);
@@ -71,6 +73,7 @@ disir_mold_write (struct disir_instance *instance, const char *groupd_id,
 //! \return DISRI_STATUS_NO_MEMORY if internal memory allocations fail.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_mold_entries (struct disir_instance *instance,
                     const char *group_id, struct disir_entry **entries);
@@ -84,6 +87,7 @@ disir_mold_entries (struct disir_instance *instance,
 //! \return DISIR_STATUS_NOT_EXIST if the entry does not exist.
 //! \return DISIR_STATUS_EXISTS if the entry exists.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_mold_query (struct disir_instance *instance, const char *group_id,
                   const char *entry_id, struct disir_entry **entry);
@@ -99,6 +103,7 @@ disir_mold_query (struct disir_instance *instance, const char *group_id,
 //!     Collection is (optionally) populated.
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_mold_valid (struct disir_mold *mold, struct disir_collection **collection);
 
@@ -109,6 +114,7 @@ disir_mold_valid (struct disir_mold *mold, struct disir_collection **collection)
 //!
 //! \return DISIR_STATUS_OK on success.
 //!
+DISIR_EXPORT
 enum disir_status
 disir_mold_finished (struct disir_mold **mold);
 
