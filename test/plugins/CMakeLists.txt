@@ -6,6 +6,7 @@ add_subdirectory (json)
 set (TESTS_PLUGIN_PLUGIN tests_plugin_plugin)
 file (GLOB TESTS_PLUGIN_PLUGIN_SOURCES *.cc)
 list (APPEND TESTS_PLUGIN_PLUGIN_SOURCES "../test_helper.cc" "../gtest.cc")
+list (APPEND TESTS_PLUGIN_PLUGIN_SOURCES ${CMAKE_SOURCE_DIR}/lib/log.c)
 
 add_executable (${TESTS_PLUGIN_PLUGIN} ${TESTS_PLUGIN_PLUGIN_SOURCES})
 

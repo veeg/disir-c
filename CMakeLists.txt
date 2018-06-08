@@ -11,9 +11,12 @@ find_package(PkgConfig REQUIRED)
 pkg_search_module(ARCHIVE REQUIRED libarchive)
 
 set (CMAKE_C_STANDARD 11)
-set (CMAKE_CXSTANDARD_REQUIRED ON)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Honor visibility properties for all target types.
+cmake_policy (SET CMP0063 NEW)
 
 # TODO: Require GCC >= 6
 

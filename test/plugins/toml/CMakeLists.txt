@@ -3,6 +3,7 @@ enable_testing()
 set (TESTS_PLUGIN_TOML tests_plugin_toml)
 file (GLOB TESTS_PLUGIN_TOML_SOURCES *.cc)
 list (APPEND TESTS_PLUGIN_TOML_SOURCES "../../test_helper.cc" "../../gtest.cc")
+list (APPEND TESTS_PLUGIN_TOML_SOURCES ${CMAKE_SOURCE_DIR}/lib/log.c)
 
 add_executable (${TESTS_PLUGIN_TOML} ${TESTS_PLUGIN_TOML_SOURCES})
 

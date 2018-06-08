@@ -6,8 +6,10 @@ include_directories (
 macro (add_dplugin folder)
   add_library (dplugin_${folder} SHARED ${folder}/main.cc)
   set_target_properties (dplugin_${folder} PROPERTIES PREFIX "")
+  set_target_properties(dplugin_${folder} PROPERTIES
+    LINK_FLAGS -Wl,-no-undefined)
 
-  link_libraries (${PROJECT_SO_LIBRARY})
+  target_link_libraries (dplugin_${folder} ${PROJECT_SO_LIBRARY})
   install (
     TARGETS dplugin_${folder}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/disir/

@@ -95,30 +95,45 @@ set (_LIBDISIR_SOURCES
     test/plugin.cc
 )
 
-set (PROJECT_SO_LIBRARY disir_c
-    CACHE INTERNAL "${PROJECT_NAME}: shared library" FORCE)
-# Define shared library
-add_library(${PROJECT_SO_LIBRARY} SHARED ${_LIBDISIR_SOURCES})
-add_dependencies (${PROJECT_SO_LIBRARY} configure_version)
+# Create an object library out of our sources
+set (PROJECT_OBJ_LIBRARY libdisir_objlib)
 
-target_include_directories (${PROJECT_SO_LIBRARY} PRIVATE
+add_library (libdisir_objlib OBJECT ${_LIBDISIR_SOURCES})
+add_dependencies (${PROJECT_OBJ_LIBRARY} configure_version)
+
+set_target_properties (${PROJECT_OBJ_LIBRARY} PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties (${PROJECT_OBJ_LIBRARY} PROPERTIES
+  C_VISIBILITY_PRESET hidden
+  CXX_VISIBILITY_PRESET hidden
+  VISIBILITY_INLINES_HIDDEN ON)
+
+# Include properties for this object library
+target_include_directories (${PROJECT_OBJ_LIBRARY} PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/include/
   ${_LIBDISIR_3PARTY_LIB_INCLUDEDIR}
 )
-
-target_include_directories (${PROJECT_SO_LIBRARY} PUBLIC
+target_include_directories (${PROJECT_OBJ_LIBRARY} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include/>
   $<INSTALL_INTERFACE:include/>
 )
 
-# TODO: Do we need the fpic option?
-set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES COMPILE_FLAGS "-fPIC")
+# Define the other libraries
+set (PROJECT_SO_LIBRARY disir_c
+    CACHE INTERNAL "${PROJECT_NAME}: shared library" FORCE)
+set (PROJECT_STATIC_LIBRARY disir_static
+    CACHE INTERNAL "${PROJECT_NAME}: static library" FORCE)
+
+# Define shared library
+add_library(${PROJECT_SO_LIBRARY} SHARED $<TARGET_OBJECTS:libdisir_objlib>)
+# Define static library - we do not want to export this, only for internal test usage.
+add_library(${PROJECT_STATIC_LIBRARY} STATIC $<TARGET_OBJECTS:libdisir_objlib>)
+
 set_target_properties (${PROJECT_SO_LIBRARY} PROPERTIES SOVERSION 0)
 
 # Only set the implict-fallthrough lint on GCC >= 7
 if (CMAKE_COMPILER_IS_GNUCC)
   if (NOT (CMAKE_C_COMPILER_VERSION LESS "7"))
-    set_target_properties (${PROJECT_SO_LIBRARY}
+    set_target_properties (${PROJECT_OBJ_LIBRARY}
       PROPERTIES COMPILE_FLAGS -Wimplicit-fallthrough=0)
   endif()
 endif()

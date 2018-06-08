@@ -3,6 +3,7 @@ enable_testing()
 set (TESTS_PUBLIC_API tests_public_api)
 file (GLOB TESTS_PUBLIC_API_SOURCES *.cc)
 list (APPEND TESTS_PUBLIC_API_SOURCES "../test_helper.cc" "../gtest.cc")
+list (APPEND TESTS_PUBLIC_API_SOURCES ${CMAKE_SOURCE_DIR}/lib/log.c)
 
 add_executable (${TESTS_PUBLIC_API} ${TESTS_PUBLIC_API_SOURCES})
 
