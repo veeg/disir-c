@@ -9,6 +9,7 @@ set (LIBDISIR_TEST_INCLUDE_DIRS
   ${GTEST_INCLUDE_DIRS}
   # Hack it. Should find a better way to specify libdisir private include dir
   ${CMAKE_SOURCE_DIR}/lib/include/
+  ${CMAKE_SOURCE_DIR}/include/
   ${VOID-MULTIMAP_PUBLIC_INCLUDE_DIR}
   ${VOID-LIST_PUBLIC_INCLUDE_DIR}
   CACHE INTERNAL "libdisir: test include directories" FORCE
