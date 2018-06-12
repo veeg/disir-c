@@ -377,6 +377,13 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_
     int namespace_entry;
     struct stat statbuf;
 
+    std::string eid(entry_id);
+    if (!validate_entry_id_characters(eid))
+    {
+        disir_error_set (instance, "entry_id is ill-formed");
+        return DISIR_STATUS_RESTRICTION_VIOLATED;
+    }
+
     namespace_entry = 0;
 
     status = fslib_mold_resolve_entry_id (instance, plugin, entry_id,
@@ -384,12 +391,6 @@ fslib_plugin_mold_query (struct disir_instance *instance, struct disir_register_
     if (status != DISIR_STATUS_OK)
     {
         return status;
-    }
-
-    std::string eid(entry_id);
-    if (!validate_entry_id_characters(eid))
-    {
-        return DISIR_STATUS_NOT_EXIST;
     }
 
     if (entry != NULL)

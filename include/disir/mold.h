@@ -84,6 +84,7 @@ disir_mold_entries (struct disir_instance *instance,
 //!     caller must free the entry struct with disir_entry_finished().
 //!
 //! \return DISIR_STATUS_INVALID_ARGUMENT if either `instance`, `group_id` or `entry_id` are NULL.
+//! \return DISIR_STATUS_RESTRICTION_VIOLATED if the entry_id is ill-formed.
 //! \return DISIR_STATUS_NOT_EXIST if the entry does not exist.
 //! \return DISIR_STATUS_EXISTS if the entry exists.
 //!
