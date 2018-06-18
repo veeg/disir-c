@@ -151,6 +151,20 @@ DISIR_EXPORT
 enum disir_status
 disir_config_valid (struct disir_config *config, struct disir_collection **collection);
 
+//! \brief Retrieve the mold associated with this config.
+//!
+//! \param[in] config Input config to retrieve mold from.
+//! \param[out] mold Output mold for config.
+//!     This reference has incremented the refcount.
+//!     You must call disir_mold_finished() to release your acquired reference.
+//!
+//! \return DISIR_STATUS_INVALID_ARGUMENT if config or mold is NULL.
+//! \return DISIR_STATUS_OK on success.
+//!
+DISIR_EXPORT
+enum disir_status
+disir_config_get_mold(struct disir_config *config, struct disir_mold **mold);
+
 //! \brief Mark yourself finished with the configuration object.
 //!
 //! NOTE: Destroys the config object outright - not usable anywhere after this operation

@@ -216,3 +216,21 @@ dc_config_get_version (struct disir_config *config, struct disir_version *versio
 
     return DISIR_STATUS_OK;
 }
+
+//! PUBLIC API
+enum disir_status
+disir_config_get_mold (struct disir_config *config, struct disir_mold **mold)
+{
+    // Check arguments
+    if (config == NULL || mold == NULL)
+    {
+        // LOGWARN
+        log_debug (0, "invoked with NULL pointers (config: %p, mold: %p)", config, mold);
+        return DISIR_STATUS_INVALID_ARGUMENT;
+    }
+
+    *mold = config->cf_mold;
+    (*mold)->mo_reference_count++;
+
+    return DISIR_STATUS_OK;
+}
