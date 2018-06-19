@@ -68,7 +68,7 @@ dc_version_set (struct disir_version *destination, struct disir_version *source)
 //!
 //! \return < 0 if s1 is lesser than s2,
 //! \return 0 if s1 == s2
-//! \return > 0 if s2 is greater than s1.
+//! \return > 0 if s1 is greater than s2.
 //!
 DISIR_EXPORT
 int
