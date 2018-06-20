@@ -711,7 +711,7 @@ MoldReader::unserialize_defaults (struct disir_context *context_keyval, Json::Va
         {
             disir_log_user (m_disir, "dc_begin resulted in error: %s",
                                      disir_status_string (status));
-            return status;
+            continue;
         }
 
         if (def[ATTRIBUTE_KEY_VALUE].isNull ())
@@ -732,7 +732,6 @@ MoldReader::unserialize_defaults (struct disir_context *context_keyval, Json::Va
             {
                 disir_log_user (m_disir, "Unable to set value on context: %s",
                                        disir_status_string (status));
-                return status;
             }
             else if (status == DISIR_STATUS_WRONG_VALUE_TYPE)
             {
@@ -742,16 +741,9 @@ MoldReader::unserialize_defaults (struct disir_context *context_keyval, Json::Va
                                 json_valuetype_stringify (def[ATTRIBUTE_KEY_VALUE].type()));
             }
 
-            status = unserialize_introduced (context_default, def);
-            if (status != DISIR_STATUS_OK)
+            if (status == DISIR_STATUS_OK)
             {
-                return status;
-            }
-
-            status = unserialize_deprecated (context_default, def);
-            if (status != DISIR_STATUS_OK)
-            {
-                return status;
+                status = unserialize_introduced (context_default, def);
             }
         }
 
@@ -759,9 +751,9 @@ MoldReader::unserialize_defaults (struct disir_context *context_keyval, Json::Va
         if (status != DISIR_STATUS_OK &&
             status != DISIR_STATUS_INVALID_CONTEXT)
         {
-             disir_error_set (m_disir, "could not finalize defaul: %s",
+             disir_error_set (m_disir, "could not finalize default: %s",
                                         disir_status_string (status));
-             goto error;
+             dc_destroy(&context_default);
         }
 
         if (status == DISIR_STATUS_INVALID_CONTEXT)
@@ -771,12 +763,6 @@ MoldReader::unserialize_defaults (struct disir_context *context_keyval, Json::Va
     }
 
     return DISIR_STATUS_OK;
-error:
-    if (context_default)
-    {
-        dc_destroy (&context_default);
-    }
-    return status;
 }
 
 enum disir_status
@@ -793,7 +779,7 @@ MoldReader::unserialize_introduced (struct disir_context *context, Json::Value& 
     status = assert_json_value_type (current[ATTRIBUTE_KEY_INTRODUCED], Json::stringValue);
     if (status != DISIR_STATUS_OK)
     {
-        dc_fatal_error (context, "Wrong type for introduced");
+        dc_fatal_error (context, "property 'introduced' expects JSON type string");
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
@@ -801,7 +787,7 @@ MoldReader::unserialize_introduced (struct disir_context *context, Json::Value& 
     if (status != DISIR_STATUS_OK)
     {
 
-        dc_fatal_error (context, "Semamtic version introduced is not formatted correctly");
+        dc_fatal_error (context, "property 'introduced' version incorrectly formated");
         return status;
     }
 
@@ -827,14 +813,14 @@ MoldReader::unserialize_deprecated (struct disir_context *context, Json::Value& 
 
     if (current[ATTRIBUTE_KEY_DEPRECATED].type () != Json::stringValue)
     {
-        dc_fatal_error (context, "Semantic version deprecated is not of type string");
+        dc_fatal_error (context, "property 'deprecated' expects JSON type string");
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = dc_version_convert (current[ATTRIBUTE_KEY_DEPRECATED].asCString (), &version);
     if (status != DISIR_STATUS_OK)
     {
-        dc_fatal_error (context, "Semantic version deprecated is not formated correctly");
+        dc_fatal_error (context, "property 'deprecated' version incorrectly formated");
         return DISIR_STATUS_INVALID_CONTEXT;
     }
 

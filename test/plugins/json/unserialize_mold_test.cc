@@ -178,7 +178,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_deprecated_type)
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
     ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
-                                        "Semantic version deprecated is not of type string");
+        "property 'deprecated' expects JSON type string");
 }
 
 TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_deprecated_format)
@@ -193,7 +193,7 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_deprecated_format)
     ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
     ASSERT_INVALID_CONTEXT_EXIST (mold, NULL, "MOLD", NULL);
     ASSERT_INVALID_CONTEXT_EXIST (mold, "test1", "KEYVAL",
-                                        "Semantic version deprecated is not formated correctly");
+        "property 'deprecated' version incorrectly formated");
 }
 
 TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_elements_type)
@@ -469,3 +469,32 @@ TEST_F (UnMarshallMoldTest, invalid_context_on_wrong_default_value_type)
                                         "value default should be FLOAT, got string");
 }
 
+TEST_F (UnMarshallMoldTest, default_introduced_wrong_json_type)
+{
+    ASSERT_NO_THROW (
+        Json::Value& defaults = json_mold["mold"]["float"]["defaults"];
+        defaults[0]["introduced"] = 1.10;
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
+                                        "property 'introduced' expects JSON type string");
+}
+
+TEST_F (UnMarshallMoldTest, default_introduced_incorrectly_formated)
+{
+    ASSERT_NO_THROW (
+        Json::Value& defaults = json_mold["mold"]["float"]["defaults"];
+        defaults[0]["introduced"] = "1.x";
+    );
+
+    status = reader->unserialize (json_writer.writeOrdered (json_mold), &mold);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    ASSERT_INVALID_CONTEXT_COUNT (mold, 2);
+    ASSERT_INVALID_CONTEXT_EXIST (mold, "float", "KEYVAL",
+                                        "property 'introduced' version incorrectly formated");
+}
