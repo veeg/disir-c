@@ -128,15 +128,21 @@ dc_destroy (struct disir_context **context);
 //!
 //! If any invalid state or missing elements that are required is not present
 //! in the context, an appropriate status code is returned.
-//! Upon success, the input context pointer is set to NULL.
 //!
-//! The return code depends on the state of the parent. If there is any problem with the input
-//! context, but enough state exists to submit an invalid context to parent, it will still
-//! be submitted to a parent who is still constructing (not finalized.)
-//! The return code will then be INVALID_CONTEXT.
-//! When the parent is finalized, such invalid context entries
-//! will be rejected and the appropriate status code is returned.
+//! This will bring a context in constructing state over to finalized state.
+//! When a context is finalized, operations that maniulate the object
+//! that will bring the context into invalid state will be rejected,
+//! instead of being accepted and error assigned to the context.
 //!
+//! The process of finalizing a context will insert it into its' parents scope.
+//!
+//! \return DISIR_STATUS_INVALID_CONTEXT if there is any inconsistent, incorrect or
+//!     fatal state associated with this finalized context.
+//!     Input context' refcount is incremented and output is not cleared.
+//!     Caller must invoke dc_putcontext() when finished dealing with the error scenario.
+//! \return DISIR_STATUS_ELEMENTS_INVALID if any child element(s) are invalid,
+//!     which in-turn implies that we cannot safely assume object state.
+//!     Context pointer is invalidated and set to NULL.
 //! \return DISIR_STATUS_OK on success, context pointer is invalidated and set to NULL.
 //!
 DISIR_EXPORT
