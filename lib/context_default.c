@@ -90,8 +90,6 @@ dx_default_finalize (struct disir_context *default_context)
     enum disir_status status;
     struct disir_default *def;
     struct disir_default **queue;
-    int exists;
-    char buffer[32];
 
     status = CONTEXT_NULL_INVALID_TYPE_CHECK (default_context);
     if (status != DISIR_STATUS_OK)
@@ -99,28 +97,19 @@ dx_default_finalize (struct disir_context *default_context)
         // Already logged
         return status;
     }
+
     def = default_context->cx_default;
     queue = &default_context->cx_parent_context->cx_keyval->kv_default_queue;
 
     // TODO: Verify that the default respect the restrictions on the parent keyval
 
-    exists = MQ_SIZE_COND (*queue,
-            (dc_version_compare (&entry->de_introduced, &def->de_introduced) == 0));
-    if (exists)
-    {
-        dx_log_context (default_context,
-                        "already contains a default entry with semantic version: %s",
-                        dc_version_string (buffer, 32, &def->de_introduced));
-        status = DISIR_STATUS_CONFLICTING_SEMVER;
-    }
-    else
-    {
-        MQ_ENQUEUE_CONDITIONAL (*queue, def,
-            (dc_version_compare (&entry->de_introduced, &def->de_introduced) > 0));
-        status = DISIR_STATUS_OK;
-    }
+    // We must always enqueue default context regardless of state and equal
+    // sibling default context
+    default_context->CONTEXT_STATE_IN_PARENT = 1;
+    MQ_ENQUEUE_CONDITIONAL (*queue, def,
+        (dc_version_compare (&entry->de_introduced, &def->de_introduced) > 0));
 
-    return status;
+    return dx_validate_context (default_context);
 }
 
 //! INTERNAL API
@@ -315,13 +304,17 @@ dc_add_default_string (struct disir_context *parent, const char *value,
     }
 
     status = dc_finalize (&def);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged to context
         goto error;
     }
+    if (status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+        dc_putcontext(&def);
+    }
 
-    return DISIR_STATUS_OK;
+    return status;
 error:
     if (def)
     {
@@ -366,13 +359,17 @@ dc_add_default_integer (struct disir_context *parent, int64_t value,
     }
 
     status = dc_finalize (&def);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged to context
         goto error;
     }
+    if (status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+        dc_putcontext(&def);
+    }
 
-    return DISIR_STATUS_OK;
+    return status;
 error:
     if (def)
     {
@@ -417,13 +414,17 @@ dc_add_default_float (struct disir_context *parent, double value, struct disir_v
     }
 
     status = dc_finalize (&def);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged to context
         goto error;
     }
+    if (status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+        dc_putcontext(&def);
+    }
 
-    return DISIR_STATUS_OK;
+    return status;
 error:
     if (def)
     {
@@ -473,13 +474,17 @@ dc_add_default_boolean (struct disir_context *parent, uint8_t boolean,
     }
 
     status = dc_finalize (&def);
-    if (status != DISIR_STATUS_OK)
+    if (status != DISIR_STATUS_OK && status != DISIR_STATUS_INVALID_CONTEXT)
     {
         // Already logged to context
         goto error;
     }
+    if (status == DISIR_STATUS_INVALID_CONTEXT)
+    {
+        dc_putcontext(&def);
+    }
 
-    return DISIR_STATUS_OK;
+    return status;
 error:
     if (def)
     {

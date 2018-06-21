@@ -693,7 +693,24 @@ validate_context_validity (struct disir_context *context)
     }
     case DISIR_CONTEXT_DEFAULT:
     {
-        // TODO: Add some validation to default context
+        int exists;
+        struct disir_default **queue;
+
+        // TODO: Validate that the default value does not validate
+        // value restrictions
+
+        // Check that we only have one introduced default for this version
+        queue = &context->cx_parent_context->cx_keyval->kv_default_queue;
+        exists = MQ_SIZE_COND (*queue,
+             (dc_version_compare (&entry->de_introduced, &context->cx_default->de_introduced) == 0));
+        if (exists != 1)
+        {
+            char buffer[32];
+            dx_log_context (context,
+                            "already contains a default entry with semantic version: %s",
+                            dc_version_string (buffer, 32, &context->cx_default->de_introduced));
+            invalid = DISIR_STATUS_CONFLICTING_SEMVER;
+        }
         break;
     }
     case DISIR_CONTEXT_RESTRICTION:

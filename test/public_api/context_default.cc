@@ -279,4 +279,24 @@ TEST_F (ContextDefaultTest, set_value_float_on_type_string_shall_fail)
     ASSERT_STATUS (DISIR_STATUS_WRONG_VALUE_TYPE, status);
 }
 
+TEST_F (ContextDefaultTest, second_default_with_conflicting_version_is_invalid)
+{
+    // setup
+    status = dc_set_value_type (context_keyval, DISIR_VALUE_TYPE_INTEGER);
+    ASSERT_STATUS (DISIR_STATUS_OK, status);
 
+    // Add first default. This is OK.
+    status = dc_add_default (context_keyval, "1234", 0, NULL);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    EXPECT_TRUE (dc_context_error (context_keyval) == NULL);
+
+    // Add second default. This is alos OK, but the context is invalid
+    status = dc_add_default (context_keyval, "2345", 0, NULL);
+    EXPECT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
+
+    struct disir_collection *defaults = NULL;
+    status = dc_get_default_contexts (context_keyval, &defaults);
+    EXPECT_STATUS (DISIR_STATUS_OK, status);
+    EXPECT_EQ (2, dc_collection_size(defaults));
+    dc_collection_finished (&defaults);
+}
