@@ -98,8 +98,12 @@ dc_set_value (struct disir_context *context, const char *value, int32_t value_si
 //! \return DISIR_STATUS_INVALID_ARGUMENT if context or value are NULL,
 //!     or if value_size is less or equal to zero.
 //! \return DISIR_STATUS_WRONG_CONTEXT if root context is not CONFIG.
-//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
-//! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a mold equivalent.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if context is finalized and
+//!     value type is not string.
+//! \return DISIR_STATUS_MOLD_MISSING if set_name has never been issued to this context.
+//! \return DISIR_STATUS_INVALID_CONTEXT if we are constructing and our value or type
+//!     does not adhere to our mold definition.
+//!     This is also issued when set_name has been attempted, but no mold equivalent exist.
 //! \return DISIR_STATUS_OK on success.
 //!
 DISIR_EXPORT
@@ -115,8 +119,12 @@ dc_set_value_string (struct disir_context *context, const char *value, int32_t v
 //! \return DISIR_STATUS_INVALID_ARGUMENT if context or value are NULL,
 //!     or if value_size is less or equal to zero.
 //! \return DISIR_STATUS_WRONG_CONTEXT if root context is not CONFIG.
-//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not enum.
-//! \return DISIR_STATUS_INVALID_CONTEXT if the entry does not have a mold equivalent.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if context is finalized and
+//!     value type is not enum.
+//! \return DISIR_STATUS_MOLD_MISSING if set_name has never been issued to this context.
+//! \return DISIR_STATUS_INVALID_CONTEXT if we are constructing and our value or type
+//!     does not adhere to our mold definition.
+//!     This is also issued when set_name has been attempted, but no mold equivalent exist.
 //! \return DISIR_STATUS_OK on success.
 //!
 DISIR_EXPORT
@@ -130,9 +138,12 @@ dc_set_value_enum (struct disir_context *context, const char *value, int32_t val
 //!   * DISIR_CONTEXT_DEFAULT
 //!
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
-//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
-//! \return DISIR_STATUS_INVALID_CONTEXT if context is under construction, and this operation
-//!     caused it to enter an invalid state.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if context is finalized and
+//!     value type is not integer.
+//! \return DISIR_STATUS_MOLD_MISSING if set_name has never been issued to this context.
+//! \return DISIR_STATUS_INVALID_CONTEXT if we are constructing and our value or type
+//!     does not adhere to our mold definition.
+//!     This is also issued when set_name has been attempted, but no mold equivalent exist.
 //! \return DISIR_STATUS_OK on success.
 //!
 DISIR_EXPORT
@@ -146,7 +157,12 @@ dc_set_value_integer (struct disir_context *context, int64_t value);
 //!   * DISIR_CONTEXT_DEFAULT
 //!
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
-//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if context is finalized and
+//!     value type is not float.
+//! \return DISIR_STATUS_MOLD_MISSING if set_name has never been issued to this context.
+//! \return DISIR_STATUS_INVALID_CONTEXT if we are constructing and our value or type
+//!     does not adhere to our mold definition.
+//!     This is also issued when set_name has been attempted, but no mold equivalent exist.
 //! \return DISIR_STATUS_OK on success.
 //!
 DISIR_EXPORT
@@ -160,7 +176,12 @@ dc_set_value_float (struct disir_context *context, double value);
 //!   * DISIR_CONTEXT_DEFAULT
 //!
 //! \return DISIR_STATUS_WRONG_CONTEXT if input context is not among the applicable contexts.
-//! \return DISIR_STATUS_WRONG_VALUE_TYPE if value type in context is not string.
+//! \return DISIR_STATUS_WRONG_VALUE_TYPE if context is finalized and
+//!     value type is not boolean.
+//! \return DISIR_STATUS_MOLD_MISSING if set_name has never been issued to this context.
+//! \return DISIR_STATUS_INVALID_CONTEXT if we are constructing and our type
+//!    is not boolean.
+//!     This is also issued when set_name has been attempted, but no mold equivalent exist.
 //! \return DISIR_STATUS_OK on success.
 //!
 DISIR_EXPORT

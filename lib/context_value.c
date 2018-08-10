@@ -174,7 +174,6 @@ set_value_input_check (struct disir_context *context, enum disir_value_type type
                 status = DISIR_STATUS_INVALID_CONTEXT;
                 // Set storage type to mirror input
                 (*storage)->dv_type = type;
-
             }
             // Use-case 3
             // set_name has been called and succeed, but wrong type assigned.
@@ -676,6 +675,7 @@ dc_set_value_float (struct disir_context *context, double value)
     if (invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
     {
         context->CONTEXT_STATE_INVALID = 1;
+        invalid = DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = dx_value_set_float (value_storage, value);
@@ -686,11 +686,8 @@ dc_set_value_float (struct disir_context *context, double value)
                               dx_value_type_string (DISIR_VALUE_TYPE_FLOAT),
                               dc_value_type_string (context));
     }
-    else
-    {
-        status = invalid;
-    }
 
+    status = (status == DISIR_STATUS_OK ? invalid : status);
     // FALL-THROUGH
 error:
     TRACE_EXIT ("%s", disir_status_string (status));
@@ -835,6 +832,7 @@ dc_set_value_enum (struct disir_context *context, const char *value, int32_t val
     if (invalid == DISIR_STATUS_RESTRICTION_VIOLATED)
     {
         context->CONTEXT_STATE_INVALID = 1;
+        invalid = DISIR_STATUS_INVALID_CONTEXT;
     }
 
     status = dx_value_set_string (value_storage, value, value_size);
@@ -845,11 +843,8 @@ dc_set_value_enum (struct disir_context *context, const char *value, int32_t val
                               dx_value_type_string (DISIR_VALUE_TYPE_ENUM),
                               dc_value_type_string (context));
     }
-    else
-    {
-        status = invalid;
-    }
 
+    status = (status == DISIR_STATUS_OK ? invalid : status);
 out:
     TRACE_EXIT ("%s", disir_status_string (status));
     return status;

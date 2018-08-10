@@ -182,7 +182,7 @@ TEST_F (ContextRestrictionConfigConstructingKeyvalPluginTest, float_restriction_
 
     // We are allowed to set the value, but it will become invalid
     status = dc_set_value_float (context_keyval, 45.87);
-    ASSERT_STATUS (DISIR_STATUS_RESTRICTION_VIOLATED, status);
+    ASSERT_STATUS (DISIR_STATUS_INVALID_CONTEXT, status);
 
     // Assert context is invalid
     status = dc_context_valid (context_keyval);
