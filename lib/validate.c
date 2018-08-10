@@ -127,7 +127,7 @@ validate_inclusive_restrictions (struct disir_context *context)
             context->CONTEXT_STATE_INVALID = 1;
             // TODO: Add complete resolved name
             dx_log_context (context,
-                           "%s did not fulfill minumum required entities (minimum: %d, actual: %d)",
+                           "%s did not fulfill minimum required entities (minimum: %d, actual: %d)",
                            name, min, size);
 
             log_debug (2, "violated minimum restriction (count %d vx min %d)", size, min);
@@ -299,6 +299,8 @@ validate_children (struct disir_context *context)
     element = NULL;
     collection = NULL;
 
+    log_debug_context(2, context, "validating children");
+
     // Invoke recursively on children
     status = dc_get_elements (context, &collection);
     if (status != DISIR_STATUS_OK)
@@ -377,6 +379,8 @@ validate_config_keyval (struct disir_context *keyval)
 
     mold_equiv = keyval->cx_keyval->kv_mold_equiv;
 
+    log_debug_context(2, keyval, "validating config keyval");
+
     // XXX: Should we check for empty name? This scenario is unlikely.
 
     // If no mold equivalent, this entry is invalid.
@@ -428,6 +432,8 @@ validate_config_section (struct disir_context *section)
     struct disir_context *mold_equiv;
 
     mold_equiv = section->cx_section->se_mold_equiv;
+
+    log_debug_context(2, section, "validating config section");
 
     // If no mold equivalent, this entry is invalid.
     if (mold_equiv == NULL)
@@ -530,6 +536,8 @@ validate_name (struct disir_context *context)
     const char *name;
     const char *c;
 
+    log_debug_context(2, context, "validating name");
+
     status = dc_get_name (context, &name, NULL);
     if (status != DISIR_STATUS_OK)
         return status;
@@ -589,6 +597,10 @@ validate_context_validity (struct disir_context *context)
     {
     case DISIR_CONTEXT_CONFIG:
     {
+        char buffer[30];
+        log_debug(2, "Validating CONFIG for version %s",
+                     dc_version_string(buffer, 50, &(context)->cx_config->cf_version));
+
         invalid = validate_inclusive_restrictions (context);
         if (invalid != DISIR_STATUS_OK && invalid != DISIR_STATUS_RESTRICTION_VIOLATED)
         {
@@ -598,6 +610,9 @@ validate_context_validity (struct disir_context *context)
     }
     case DISIR_CONTEXT_MOLD:
     {
+        char buffer[30];
+        log_debug(2, "Validating MOLD for version %s",
+                     dc_version_string(buffer, 50, &(context)->cx_mold->mo_version));
         // TODO: Clear error reports
         status = validate_children (context);
         // Update invalid with new state, if non were already present.
@@ -618,6 +633,7 @@ validate_context_validity (struct disir_context *context)
         }
         else
         {
+            log_debug_context(2, context, "validating restrictions");
             struct disir_restriction *current_restriction;
             current_restriction = context->cx_section->se_restrictions_queue;
             while (invalid == DISIR_STATUS_OK && current_restriction)
@@ -749,6 +765,7 @@ validate_context_validity (struct disir_context *context)
     }
 
     // status must be a fatal status, else return the invalid status
+    log_debug_context (1, context, "validated to: %s", disir_status_string (invalid));
     return (status != DISIR_STATUS_OK ? status : invalid);
 }
 

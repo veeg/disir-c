@@ -1132,7 +1132,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
 
             if (value >= entry->re_value_min && value <= entry->re_value_max)
             {
-                log_debug (8, "Exclusive restriction %s(%p) fufilled. (Value (%f) == [%f, %f])",
+                log_debug (8, "Exclusive restriction %s(%p) fulfilled. (Value (%f) == [%f, %f])",
                               dc_restriction_enum_string (entry->re_type), entry,
                               value, entry->re_value_min, entry->re_value_max);
                 exclusive_fulfilled = 1;
@@ -1189,7 +1189,7 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
             if (strcmp (string_value, entry->re_value_string) == 0)
             {
                 // QUESTION: Check length aswell ?
-                log_debug (6, "Exclusive_restriction fufilled (Value (%s) == %s)",
+                log_debug (6, "Exclusive_restriction fulfilled (Value (%s) == %s)",
                               string_value, entry->re_value_string);
                 exclusive_fulfilled = 1;
             }
