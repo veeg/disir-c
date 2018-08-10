@@ -37,6 +37,7 @@ validate_inclusive_restrictions (struct disir_context *context)
     struct disir_collection *config_elements;
     const char *name;
     struct disir_context *element;
+    struct disir_version *target_version = NULL;
     int max;
     int min;
     int size;
@@ -47,6 +48,14 @@ validate_inclusive_restrictions (struct disir_context *context)
     element = NULL;
     mold_collection = NULL;
     name = NULL;
+
+    if (dc_context_type(context->cx_root_context) != DISIR_CONTEXT_CONFIG)
+    {
+        log_error("validate inclusive restrictions called for toplevel MOLD");
+        return DISIR_STATUS_INTERNAL_ERROR;
+    }
+
+    log_debug_context(2, context, "validating inclusive restrictions");
 
     switch (dc_context_type (context))
     {
@@ -66,6 +75,9 @@ validate_inclusive_restrictions (struct disir_context *context)
         log_error ("cannot get mold equivalent entries for %s.", dc_context_type_string (context));
         return status;
     }
+
+    // We only validate inclusive restrictions for CONFIG toplevel contexts.
+    target_version = &context->cx_root_context->cx_config->cf_version;
 
     do
     {
@@ -104,9 +116,9 @@ validate_inclusive_restrictions (struct disir_context *context)
 
         // find maximum/minimum number required.
         dx_restriction_entries_value (element, DISIR_RESTRICTION_INC_ENTRY_MIN,
-                &(context)->cx_config->cf_version, &min);
+                target_version, &min);
         dx_restriction_entries_value (element, DISIR_RESTRICTION_INC_ENTRY_MAX,
-                &(context)->cx_config->cf_version, &max);
+                target_version, &max);
 
 
         // Minimum restriction not fufilled.
@@ -123,7 +135,17 @@ validate_inclusive_restrictions (struct disir_context *context)
         }
 
         // Maximum restriction not fufilled
-        if (size > max && max != 0)
+        if (max == -1 && size > 0)
+        {
+            context->CONTEXT_STATE_INVALID = 1;
+            char buffer[50];
+            dx_log_context (context,
+                            "%s is not a valid element for version %s",
+                            name, dc_version_string(buffer, 50,
+                                                    &(context)->cx_config->cf_version));
+            invalid = DISIR_STATUS_RESTRICTION_VIOLATED;
+        }
+        if (size > max && max > 0)
         {
             context->CONTEXT_STATE_INVALID = 1;
             // TODO: Add complete resolved name

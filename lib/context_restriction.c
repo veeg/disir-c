@@ -1091,8 +1091,15 @@ dx_restriction_exclusive_value_check (struct disir_context *context, int64_t int
             continue;
         }
 
-        // Restriction is atleast older or equal to config version
-        // TODO: Check deprecated.
+        // Has this restriction been deprecated?
+        if ((entry->re_deprecated.sv_major != 0 || entry->re_deprecated.sv_minor != 0)
+                && dc_version_compare (config_version, &entry->re_deprecated) >= 0)
+        {
+            log_debug(9, "queue entry deprecated. skipping");
+            restriction_entries_inactive += 1;
+            entry = entry->next;
+            continue;
+        }
 
         switch (entry->re_type)
         {
@@ -1260,6 +1267,8 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
     int min_closes_match = INT_MIN;
     int max_closes_match = INT_MIN;
     int diff;
+    struct disir_version *element_introduced = NULL;
+    struct disir_version *element_deprecated = NULL;
 
     status = CONTEXT_TYPE_CHECK (context, DISIR_CONTEXT_SECTION, DISIR_CONTEXT_KEYVAL);
     if (status != DISIR_STATUS_OK)
@@ -1276,23 +1285,51 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
             q = &context->cx_section->se_mold_equiv->cx_section->se_restrictions_queue;
+            element_introduced = &context->cx_section->se_mold_equiv->cx_section->se_introduced;
+            element_deprecated = &context->cx_section->se_mold_equiv->cx_section->se_deprecated;
         }
         else
         {
             q = &context->cx_section->se_restrictions_queue;
+            element_introduced = &context->cx_section->se_introduced;
+            element_deprecated = &context->cx_section->se_deprecated;
         }
         break;
     }
     case DISIR_CONTEXT_KEYVAL:
     {
+        struct disir_keyval *keyval_mold;
         if (dc_context_type (context->cx_root_context) == DISIR_CONTEXT_CONFIG)
         {
             q = &context->cx_keyval->kv_mold_equiv->cx_keyval->kv_restrictions_queue;
+            keyval_mold = context->cx_keyval->kv_mold_equiv->cx_keyval;
         }
         else
         {
             q = &context->cx_keyval->kv_restrictions_queue;
+            keyval_mold = context->cx_keyval;
         }
+        element_deprecated = &keyval_mold->kv_deprecated;
+
+        // Get _lowest_ introduced for keyval
+        struct disir_default **default_queue = &keyval_mold->kv_default_queue;
+        MQ_FOREACH (*default_queue,
+        {
+            if (element_introduced == NULL)
+            {
+                element_introduced = &entry->de_introduced;
+                entry = entry->next;
+                continue;
+            }
+            if (dc_version_compare(&entry->de_introduced, element_introduced) < 0)
+            {
+                element_introduced = &entry->de_introduced;
+            }
+
+            entry = entry->next;
+            continue;
+        });
+
         break;
     }
     default:
@@ -1362,13 +1399,31 @@ dx_restriction_entries_value (struct disir_context *context, enum disir_restrict
         min = 1;
     }
 
+    // If the current element we are comparing was introduced after our target version,
+    // we bail out
+    if (element_introduced && dc_version_compare (element_introduced, version) > 0)
+    {
+        min = 0;
+        max = -1;
+    }
+    // If it was deprecated on our version, or prior to our version, we bail out
+    if (element_deprecated &&
+        (element_deprecated->sv_major != 0 || element_deprecated->sv_minor != 0) &&
+        dc_version_compare (element_deprecated, version) <= 0)
+    {
+        min = 0;
+        max = -1;
+    }
+
     if (type == DISIR_RESTRICTION_INC_ENTRY_MAX)
     {
         *output = max;
+        log_debug(8, "maximum instances allowed: %d", max);
     }
     else if (type == DISIR_RESTRICTION_INC_ENTRY_MIN)
     {
         *output = min;
+        log_debug(8, "minimum instances allowed: %d", min);
     }
 
     return DISIR_STATUS_OK;
