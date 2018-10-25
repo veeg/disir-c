@@ -112,7 +112,10 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
     va_start (args, fmt);
     do
     {
-        ret = vsnprintf (report->dr_diff_string[i], n, fmt, args);
+        va_list args_copy;
+        va_copy (args_copy, args);
+        ret = vsnprintf (report->dr_diff_string[i], n, fmt, args_copy);
+        va_end (args_copy);
         if (ret < 0)
         {
             // Encoding error.
@@ -122,8 +125,8 @@ dx_diff_report_add (struct disir_diff_report *report, const char *fmt, ...)
         else if (ret >= n)
         {
             // Insufficient space.
-            n *= 2;
-            moved = realloc (report->dr_diff_string, n);
+            n = ret + sizeof ('\0');
+            moved = realloc (report->dr_diff_string[i], n);
             if (moved)
             {
                 report->dr_diff_string[i] = moved;
