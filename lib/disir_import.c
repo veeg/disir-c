@@ -235,7 +235,7 @@ dx_resolve_config_import_status (struct disir_instance *instance, const char *co
 {
     enum disir_status status;
     struct disir_mold *mold = NULL;
-    struct disir_config *config_imported;
+    struct disir_config *config_imported = NULL;
     char buf[500];
 
     status = verify_mold_support (instance, import, &mold);
