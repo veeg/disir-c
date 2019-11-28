@@ -55,6 +55,11 @@ ConfigWriter::serialize (struct disir_config *config, std::ostream& stream)
         goto end;
     }
 
+    if (m_configRoot[ATTRIBUTE_KEY_CONFIG].empty())
+    {
+        m_configRoot[ATTRIBUTE_KEY_CONFIG] = Json::objectValue;
+    }
+
     stream << writer.writeOrdered (m_configRoot);
 
 end:
@@ -87,6 +92,11 @@ ConfigWriter::serialize (struct disir_config *config, std::string& output)
     if (status != DISIR_STATUS_OK)
     {
         goto end;
+    }
+
+    if (m_configRoot[ATTRIBUTE_KEY_CONFIG].empty())
+    {
+	    m_configRoot[ATTRIBUTE_KEY_CONFIG] = Json::objectValue;
     }
 
     output = writer.writeOrdered (m_configRoot);
